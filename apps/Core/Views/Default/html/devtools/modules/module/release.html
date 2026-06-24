@@ -160,6 +160,28 @@
 {% endif %}
 <div class="row">
     <div class="col">
+        {{ adminltetags.useTag('buttons',
+            [
+                'componentId'           : componentId,
+                'sectionId'             : sectionId,
+                'buttonType'            : 'button',
+                'buttons'               :
+                    [
+                        'quick-minor' : [
+                            'label'                   : '',
+                            'title'                   : 'Quick Minor Release',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'position'                : 'left'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
         <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',

@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class StoragesLocal
 {
@@ -10,7 +11,7 @@ class StoragesLocal
     {
         return
             [
-               'columns' => [
+                'columns' => [
                     new Column(
                         'id',
                         [
@@ -31,7 +32,7 @@ class StoragesLocal
                         'uuid',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 1024,
+                            'size'    => 100,
                             'notNull' => true,
                         ]
                     ),
@@ -39,7 +40,7 @@ class StoragesLocal
                         'uuid_location',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 4096,
+                            'size'    => 1024,
                             'notNull' => true,
                         ]
                     ),
@@ -47,7 +48,7 @@ class StoragesLocal
                         'links',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 4096,
+                            'size'    => 1024,
                             'notNull' => false,
                         ]
                     ),
@@ -64,6 +65,20 @@ class StoragesLocal
                         [
                             'type'      => Column::TYPE_INTEGER,
                             'notNull'   => true
+                        ]
+                    ),
+                    new Column(
+                        'height',
+                        [
+                            'type'      => Column::TYPE_INTEGER,
+                            'notNull'   => false
+                        ]
+                    ),
+                    new Column(
+                        'width',
+                        [
+                            'type'      => Column::TYPE_INTEGER,
+                            'notNull'   => false
                         ]
                     ),
                     new Column(
@@ -117,8 +132,40 @@ class StoragesLocal
                             'notNull' => true,
                             'default' => 'CURRENT_TIMESTAMP',
                         ]
-                    )
+                    ),
+                    new Column(
+                        'package_class',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 200,
+                            'notNull' => true
+                        ]
+                    ),
+                    new Column(//Source Row Id
+                        'package_row_id',
+                        [
+                            'type'    => Column::TYPE_INTEGER,
+                            'notNull' => true
+                        ]
+                    ),
                 ]
             ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'uuid',
+                    'orphan',
+                    'package_class',
+                    'package_row_id'
+                ],
+                'INDEX'
+            )
+        ];
     }
 }

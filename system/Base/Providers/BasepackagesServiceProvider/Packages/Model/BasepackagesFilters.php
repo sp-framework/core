@@ -25,4 +25,6 @@ class BasepackagesFilters extends BaseModel
     public $account_id;
 
     public $shared_ids;
+
+    public $archived;
 }

@@ -31,12 +31,13 @@ class QueueComponent extends BaseComponent
 
                 $email = $this->formatStatus(0, $email);
                 $email = $this->formatPriority(0, $email);
-                $email = $this->formatSentOn(0, $email);
+                $email = $this->formatSentOn(0, $email, true);
                 $email = $this->formatToAddresses(0, $email);
                 $email = $this->formatConfidential(0, $email);
 
                 $this->view->email = $email;
             }
+
             return;
         }
 
@@ -69,9 +70,9 @@ class QueueComponent extends BaseComponent
             $this->emailqueue,
             'system/email/queue/view',
             $conditions,
-            ['status', 'priority', 'sent_on', 'to_addresses', 'subject'],
+            ['status', 'priority', 'confidential', 'from', 'to_addresses', 'subject', 'sent_on'],
             true,
-            ['status', 'priority', 'sent_on', 'to_addresses', 'subject'],
+            ['status', 'priority', 'confidential', 'from', 'to_addresses', 'subject', 'sent_on'],
             $controlActions,
             null,
             $replaceColumns,
@@ -86,6 +87,7 @@ class QueueComponent extends BaseComponent
         foreach ($dataArr as $dataKey => &$data) {
             $data = $this->formatStatus($dataKey, $data);
             $data = $this->formatPriority($dataKey, $data);
+            $data = $this->formatConfidential($dataKey, $data);
             $data = $this->formatSentOn($dataKey, $data);
             $data = $this->formatToAddresses($dataKey, $data);
             $data = $this->addRequeueButton($dataKey, $data);
@@ -120,14 +122,18 @@ class QueueComponent extends BaseComponent
         return $data;
     }
 
-    protected function formatSentOn($rowId, $data)
+    protected function formatSentOn($rowId, $data, $id = null)
     {
         if (!$data['sent_on']) {
-            $data['sent_on'] =
-                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-send-' . $rowId . '" href="' . $this->links->url('system/email/queue/processqueue') . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-info btn-xs rowSendNow text-uppercase">
-                    <i class="mr-1 fas fa-fw fa-xs fa-paper-plane"></i>
-                    <span class="text-xs"> Send Now</span>
-                </a>';
+            if ($id) {
+                $data['sent_on'] = '-';
+            } else {
+                $data['sent_on'] =
+                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-send-' . $rowId . '" href="' . $this->links->url('system/email/queue/processqueue') . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-info btn-xs rowSendNow text-uppercase">
+                        <i class="mr-1 fas fa-fw fa-xs fa-paper-plane"></i>
+                        <span class="text-xs"> Send Now</span>
+                    </a>';
+            }
         }
 
         return $data;
@@ -139,7 +145,16 @@ class QueueComponent extends BaseComponent
             $data['to_addresses'] = $this->helper->decode($data['to_addresses'], true);
         }
 
-        $data['to_addresses'] = implode(',', $data['to_addresses']);
+        $toAddresses = [];
+        foreach ($data['to_addresses'] as $toAddress) {
+            if (isset($toAddress['email']) && isset($toAddress['name'])) {
+                array_push($toAddresses, $toAddress['email'] . '|' . $toAddress['name']);
+            } else {
+                array_push($toAddresses, $toAddress);
+            }
+        }
+
+        $data['to_addresses'] = implode(',', $toAddresses);
 
         return $data;
     }
@@ -150,6 +165,8 @@ class QueueComponent extends BaseComponent
             $data['confidential'] = '<span class="badge badge-danger text-uppercase">Yes</span>';
             $data['body'] = "Confidential emails are encrypted on the server and cannot be viewed.";
         } else if ($data['confidential'] == '0') {
+            $data['confidential'] = '<span class="badge badge-secondary text-uppercase">No</span>';
+        } else {
             $data['confidential'] = '<span class="badge badge-secondary text-uppercase">No</span>';
         }
 
@@ -172,26 +189,11 @@ class QueueComponent extends BaseComponent
     /**
      * @acl(name="update")
      */
-    public function changePriorityAction()
+    public function updateAction()
     {
         $this->requestIsPost();
 
-        $this->emailqueue->changePriority($this->postData());
-
-        $this->addResponse(
-            $this->emailqueue->packagesData->responseMessage,
-            $this->emailqueue->packagesData->responseCode
-        );
-    }
-
-    /**
-     * @acl(name="remove")
-     */
-    public function removeAction()
-    {
-        $this->requestIsPost();
-
-        $this->emailqueue->removeEmailService($this->postData());
+        $this->emailqueue->updateQueue($this->postData());
 
         $this->addResponse(
             $this->emailqueue->packagesData->responseMessage,
@@ -227,7 +229,7 @@ class QueueComponent extends BaseComponent
         );
     }
 
-    public function requeueAction()
+    public function reQueueAction()
     {
         $this->requestIsPost();
 

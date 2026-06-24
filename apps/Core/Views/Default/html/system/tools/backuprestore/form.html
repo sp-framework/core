@@ -101,18 +101,7 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-keys'                                    : {
-            afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-keys').click(function() {
-                    if ($(this)[0].checked === true) {
-                        $('#{{componentId}}-{{sectionId}}-systems_dir').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-systems_dir')[0].checked = true;
-                    } else {
-                        $('#{{componentId}}-{{sectionId}}-systems_dir').attr('disabled', false);
-                    }
-                });
-            }
-        },
+        '{{componentId}}-{{sectionId}}-keys'                                    : { },
         '{{componentId}}-{{sectionId}}-password_protect'                        : { },
         '{{componentId}}-{{sectionId}}-notes'                                   : { },
         '{{componentId}}-{{sectionId}}-restore_root_username'                   : { },
@@ -129,7 +118,7 @@ dataCollectionSection =
                     dataCollectionSectionForm['funcs']['clearFields']('remove');
                 });
 
-                BazProgress.buildProgressBar($('#backup-progress'));
+                BazProgress.buildProgressBar($('#backup-progress'), false, false, true);
 
                 function generateBackup() {
                     $('#{{componentId}}-{{sectionId}}-backup').attr('disabled', true);
@@ -339,9 +328,8 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
             }
         }
 
+        postData['dbs'] = [];
         if ($('.db-restore') && $('.db-restore').children().length > 0) {
-            postData['dbs'] = [];
-
             var dbsCheckboxes = $('.db-restore').children().find('input');
             for (var j = 0; j < dbsCheckboxes.length; j++) {
                 if ($(dbsCheckboxes[j])[0].checked === true) {
@@ -425,6 +413,7 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
         }, 'json');
     }
 }
+
 $('#body').off('dropzoneInitDone');
 $('#body').on('dropzoneInitDone', function() {
     if (dataCollectionSection['core-backuprestore-main-backup_upload_restore']) {

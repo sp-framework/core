@@ -18,7 +18,11 @@ class Auth extends BaseMiddleware
             try {
                 $this->access->auth->setUserFromSession();
             } catch (\Exception $e) {
-                $this->access->auth->logout();
+                $this->access->auth->logout(true);
+
+                $this->session->set('redirectUrl', $this->request->getUri());
+
+                return $this->response->redirect($data['appRoute'] . '/auth');
             }
         }
 
@@ -27,7 +31,11 @@ class Auth extends BaseMiddleware
             try {
                 $this->access->auth->setUserFromRecaller();
             } catch (\Exception $e) {
-                $this->access->auth->logout();
+                $this->access->auth->logout(true);
+
+                $this->session->set('redirectUrl', $this->request->getUri());
+
+                return $this->response->redirect($data['appRoute'] . '/auth');
             }
         }
 

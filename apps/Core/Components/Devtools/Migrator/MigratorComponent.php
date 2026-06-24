@@ -13,7 +13,7 @@ class MigratorComponent extends BaseComponent
     {
         $this->migratorPackage = $this->usePackage(DevtoolsMigrator::class);
 
-        $this->setModuleSettings(true);
+        $this->setModuleSettings();
 
         $this->setModuleSettingsData([
                 'apis' => $this->migratorPackage->getAvailableApis(true, false),

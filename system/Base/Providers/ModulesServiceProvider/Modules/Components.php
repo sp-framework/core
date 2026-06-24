@@ -13,7 +13,17 @@ class Components extends BasePackage
 
 	public function init(bool $resetCache = false)
 	{
-		$this->getAll($resetCache);
+		if ($this->opCache) {
+			if (!$resetCache && $this->opCache->checkCache('components', 'core')) {
+				$this->components = $this->opCache->getCache('components', 'core');
+			} else {
+				$this->getAll($resetCache);
+
+				$this->opCache->setCache('components', $this->components, 'core');
+			}
+		} else {
+			$this->getAll($resetCache);
+		}
 
 		return $this;
 	}
@@ -355,17 +365,17 @@ class Components extends BasePackage
 		$components = $this->helper->decode($data['components'], true);
 		$needAuths = $this->helper->decode($data['need_auths'], true);
 
-		$homeNeedsAuth = false;
-		if (in_array(true, $needAuths)) {//If any of them is true, we have to make home true.
-			$homeNeedsAuth = true;
-		}
+		// $homeNeedsAuth = false;
+		// if (in_array(true, $needAuths)) {//If any of them is true, we have to make home true.
+		// 	$homeNeedsAuth = true;
+		// }
 
 		foreach ($components as $componentId => $status) {
 			$component = $this->getById($componentId);
 
-			if ($component['route'] === 'home' && $homeNeedsAuth) {
-				$needAuths[$componentId] = true;
-			}
+			// if ($component['route'] === 'home' && $homeNeedsAuth) {
+			// 	$needAuths[$componentId] = true;
+			// }
 
 			if (is_string($component['apps'])) {
 				$component['apps'] = $this->helper->decode($component['apps'], true);
@@ -375,7 +385,6 @@ class Components extends BasePackage
 				$component['settings'] = $this->helper->decode($component['settings'], true);
 			}
 
-			// if ($status === true) {
 			$component['apps'][$data['id']]['enabled'] = (bool) $status;
 
 			if (isset($needAuths[$componentId])) {
@@ -412,6 +421,39 @@ class Components extends BasePackage
 
 						$package['apps'] = $this->helper->encode($package['apps']);
 
+						//We install new databases for each package if it does not exist
+						//Removal is manual or we can add process to system/core for removal of db tables.
+						if ($package['app_type'] !== 'core' &&
+							isset($data['use_app_db']) && $data['use_app_db'] == '1'
+						) {
+							$classArr = explode('\\', $package['class']);
+							$classArr = array_slice($classArr, 0, -1);
+							$class = implode('\\', $classArr) . '\\Install\\Install';
+							$path = lcfirst(str_replace('\\', '/', $class) . '.php');
+
+							try {
+								if ($this->localContent->fileExists($path)) {
+									$packageInstall = (new $class())->init();
+									$reflection = new \ReflectionClass($packageInstall);
+									$databases = $reflection->getProperty('databases');
+									$databases->setAccessible(true);
+
+									$databases = $databases->getValue($packageInstall);
+
+									if ($databases && count($databases) > 0) {
+										foreach ($databases as $databaseName => &$database) {
+											$database['tableName'] = str_replace($data['app_type'], $data['route'], $database['model']->getSource());
+										}
+
+										$dbInstaller = new \System\Base\Providers\ModulesServiceProvider\DbInstaller;
+										$dbInstaller->installDb($databases);
+									}
+								}
+							} catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
+								$this->logger->log->debug('Error while installing package : ' . $package['name'] . ' for app database. ' . $e->getMessage());
+							}
+						}
+
 						$this->modules->packages->update($package);
 					}
 				}
@@ -441,10 +483,6 @@ class Components extends BasePackage
 
 			$component['dependencies'] = $this->helper->encode($component['dependencies'], JSON_UNESCAPED_SLASHES);
 
-			// } else if ($status === false) {
-			// 	$component['apps'][$data['id']]['enabled'] = false;
-			// }
-
 			$component['apps'] = $this->helper->encode($component['apps']);
 
 			$this->update($component);
@@ -462,13 +500,23 @@ class Components extends BasePackage
 		}
 
 		foreach ($this->apps->apps as $appId => $app) {
-			if (!isset($subscriptions[$appId]) ||
-				!isset($subscriptions[$appId]['components'])
-			) {
-				continue;
+			if ($app['app_type'] === 'core') {
+				if (!isset($subscriptions[$appId]) ||
+					!isset($subscriptions[$appId]['components'])
+				) {
+					continue;
+				}
+
+				$subscriptionsArr = $subscriptions[$appId]['components'];
+			} else {
+				if (!isset($subscriptions[$appId])) {
+					continue;
+				}
+
+				$subscriptionsArr = $subscriptions[$appId];
 			}
 
-			foreach ($subscriptions[$appId]['components'] as $componentId => $componentSubscriptions) {
+			foreach ($subscriptionsArr as $componentId => $componentSubscriptions) {
 				if (!isset($this->components[$componentId])) {
 					continue;
 				}
@@ -482,7 +530,7 @@ class Components extends BasePackage
 						foreach ($componentSubscriptions as $subscriptionKey => $subscriptionValue) {
 							if (isset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey])) {
 								if ($subscriptionValue == 1) {
-									if ($subscriptionKey == 'email') {
+									if ($subscriptionKey === 'email') {
 										if (!isset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']])) {
 											$this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']] = $account['email'];
 										}
@@ -492,7 +540,7 @@ class Components extends BasePackage
 										}
 									}
 								} else if ($subscriptionValue == 0) {
-									if ($subscriptionKey == 'email') {
+									if ($subscriptionKey === 'email') {
 										if (isset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']])) {
 											unset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']]);
 										}
@@ -526,7 +574,7 @@ class Components extends BasePackage
 
 									if (in_array($subscriptionKey, $notification_allowed_methods)) {
 										if ($subscriptionValue == 1) {
-											if ($subscriptionKey == 'email') {
+											if ($subscriptionKey === 'email') {
 												$this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']] = [$account['email']];
 											}
 										} else {
@@ -536,12 +584,18 @@ class Components extends BasePackage
 								}
 							}
 						}
+
+						if (!isset($componentSubscriptions['email'])) {
+							if (isset($this->components[$componentId]['notification_subscriptions'][$appId]['email'][$account['id']])) {
+								unset($this->components[$componentId]['notification_subscriptions'][$appId]['email'][$account['id']]);
+							}
+						}
 					} else {
 						$this->components[$componentId]['notification_subscriptions'][$appId] = [];
 
 						foreach ($componentSubscriptions as $notificationKey => $notification) {
 							if ($notification == 1) {
-								if ($notificationKey == 'email') {
+								if ($notificationKey === 'email') {
 									$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id'] => $account['email']];
 								} else {
 									$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id']];
@@ -556,7 +610,7 @@ class Components extends BasePackage
 
 					foreach ($componentSubscriptions as $notificationKey => $notification) {
 						if ($notification == 1) {
-							if ($notificationKey == 'email') {
+							if ($notificationKey === 'email') {
 								$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id'] => $account['email']];
 							} else {
 								$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id']];

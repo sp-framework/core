@@ -54,7 +54,14 @@ class Apps
 					]
 				),
 				new Column(
-					'default_component',
+					'default_component_guests',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
+						'notNull' => true,
+					]
+				),
+				new Column(
+					'default_component_users',
 					[
 						'type'    => Column::TYPE_TINYINTEGER,
 						'notNull' => true,
@@ -151,6 +158,13 @@ class Apps
 					'menu_structure',
 					[
 						'type'    => Column::TYPE_JSON,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'use_app_db',
+					[
+						'type'    => Column::TYPE_BOOLEAN,
 						'notNull' => false,
 					]
 				),

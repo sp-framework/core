@@ -32,7 +32,17 @@ class Apps extends BasePackage
 
 		$this->reservedRoutes = $this->getReservedRoutes();
 
-		$this->getAll($resetCache);
+		if ($this->opCache) {
+			if (!$resetCache && $this->opCache->checkCache('apps', 'core')) {
+				$this->apps = $this->opCache->getCache('apps', 'core');
+			} else {
+				$this->getAll($resetCache);
+
+				$this->opCache->setCache('apps', $this->apps, 'core');
+			}
+		} else {
+			$this->getAll($resetCache);
+		}
 
 		$this->app = $this->getAppInfo();
 
@@ -105,11 +115,35 @@ class Apps extends BasePackage
 
 			if ((isset($apiUri) && count($apiUri) === 1) ||
 				count($uri) === 1
-			) {//Check for Murl
+			) {
 				if (isset($apiUri)) {
-					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, trim($apiUri[0], '/'), $domain['id']);
+					$murlApiUri = trim($apiUri[0], '/');
+				}
+				$murlUri = trim($uri[0], '/');
+
+				//Check for Murl
+				//If we access component-ID directly
+				//Example: https://domain.com/jobs-3830, it should look for murl entry jobs-{id}
+				$uriId = 0;
+				if (str_contains(trim($uri[0], '/'), '-')) {
+					$uriArr = explode('-', trim($uri[0], '/'));
+
+					if (count($uriArr) > 1) {
+						$uriId = (int) $this->helper->last($uriArr);
+
+						if ($uriId > 0) {
+							if (isset($apiUri)) {
+								$murlApiUri = $this->helper->first($uriArr);
+							}
+							$murlUri = $this->helper->first($uriArr);
+						}
+					}
+				}
+
+				if (isset($apiUri)) {
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, $murlApiUri, $domain['id'], $uriId);
 				} else {
-					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, trim($uri[0], '/'), $domain['id']);
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, $murlUri, $domain['id'], $uriId);
 				}
 
 				if ($this->isMurl) {
@@ -179,6 +213,23 @@ class Apps extends BasePackage
 		return false;
 	}
 
+	public function getAppsByType($type)
+	{
+		if (!$type) {
+			return false;
+		}
+
+		$apps = [];
+
+		foreach($this->apps as $app) {
+			if (strtolower($app['app_type']) == strtolower($type)) {
+				$apps[$app['id']] = $app;
+			}
+		}
+
+		return $apps;
+	}
+
 	public function addApp(array $data)
 	{
 		if (!$this->checkType($data)) {
@@ -191,17 +242,14 @@ class Apps extends BasePackage
 			return false;
 		}
 
-		$data['default_component'] = 0;
+		$data['default_component_guests'] = 0;
+		$data['default_component_users'] = 0;
 		$data['errors_component'] = 0;
 		$data['incorrect_login_attempt_block_ip'] = 0;
 		$data['auto_unblock_ip_minutes'] = 0;
 		$data['ip_filter_default_action'] = 'allow';
 		$data['can_login_role_ids'] = $this->helper->encode(['1']);
 		$data['acceptable_usernames'] = $this->helper->encode(['email']);
-
-		if (isset($data['default_dashboard']) && $data['default_dashboard']) {
-			$data['settings']['defaultDashboard'] = $data['default_dashboard'];
-		}
 
 		if ($this->add($data)) {
 
@@ -252,8 +300,14 @@ class Apps extends BasePackage
 
 		$app = $this->getById($data['id']);
 
-		if (isset($data['default_dashboard']) && $data['default_dashboard']) {
+		if (isset($data['default_dashboard']) && $data['default_dashboard'] && $data['default_dashboard'] !== 'null') {
 			$data['settings']['defaultDashboard'] = $data['default_dashboard'];
+		}
+		if (isset($data['default_guest_page']) && $data['default_guest_page'] && $data['default_guest_page'] !== 'null') {
+			$data['settings']['defaultGuestPage'] = $data['default_guest_page'];
+		}
+		if (isset($data['default_user_page']) && $data['default_user_page'] && $data['default_user_page'] !== 'null') {
+			$data['settings']['defaultUserPage'] = $data['default_user_page'];
 		}
 
 		$app = array_merge($app, $data);

@@ -102,8 +102,12 @@ class Murls extends BasePackage
     {
         if ($this->remove($data['id'])) {
             $this->addResponse('Murl removed');
+
+            return true;
         } else {
             $this->addResponse('Error removing murl', 1);
+
+            return false;
         }
     }
 
@@ -189,28 +193,46 @@ class Murls extends BasePackage
         return true;
     }
 
-    public function getMurlByDomainId($apps, $murlUrl, $domainId)
+    public function getMurlByDomainId($apps, $murlUrl, $domainId, $uriId = 0)
     {
         if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'murl'          => $murlUrl,
+                    'domain_id'     => $domainId
+                ];
+
+            if ($uriId > 0) {
+                $conditions =
+                    [
+                        'murl'          => $murlUrl . '-{id}',
+                        'domain_id'     => $domainId
+                    ];
+            }
             $params =
                 [
                     'conditions'    => 'murl = :murl: AND domain_id = :domain_id:',
-                    'bind'          =>
-                        [
-                            'murl'          => $murlUrl,
-                            'domain_id'     => $domainId
-                        ]
+                    'bind'          => $conditions
                 ];
         } else {
-            $params = [
-                'conditions' => [
+            $conditions =
+                [
                     ['murl', '=', $murlUrl],
                     ['domain_id', '=', $domainId]
-                ]
-            ];
+                ];
+            if ($uriId > 0) {
+                $conditions =
+                    [
+                        ['murl', '=', $murlUrl . '-{id}'],
+                        ['domain_id', '=', $domainId]
+                    ];
+            }
+
+            $params = ['conditions' => $conditions];
         }
 
         $murl = $this->getByParams($params);
+
         if ($murl && count($murl) > 0) {
             $murl = $murl[0];
 
@@ -265,6 +287,34 @@ class Murls extends BasePackage
             $murl['murl'] = $murlUrl;
             $murl['vMurl'] = true;
 
+            return $murl;
+        }
+
+        return false;
+    }
+
+    public function getMurlByUrl($url)
+    {
+        if ($this->config->databasetype === 'db') {
+            $params =
+                [
+                    'conditions'    => 'url = :url:',
+                    'bind'          =>
+                        [
+                            'url'           => $url
+                        ]
+                ];
+        } else {
+            $params = [
+                'conditions' => [
+                    ['url', '=', $url]
+                ]
+            ];
+        }
+
+        $murl = $this->getByParams($params);
+
+        if ($murl && count($murl) > 0) {
             return $murl;
         }
 

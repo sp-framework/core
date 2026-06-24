@@ -24,6 +24,8 @@ class BasepackagesEmailServices extends BaseModel
 
     public $from_address;
 
+    public $from_name;
+
     public $encryption;
 
     public $allow_html_body;

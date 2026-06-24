@@ -94,6 +94,37 @@ class Card extends Adminltetags
         $cardTitle = strtoupper($this->params['cardTitle']) :
         $cardTitle = 'MISSING TITLE';
 
+        if (isset($this->params['mutexLock'])) {
+            if (isset($this->view->getParamsToView()['mutexLock']['parent_lock_by_id']) ||
+                (isset($this->view->getParamsToView()['mutexLock']['self']) &&
+                 $this->view->getParamsToView()['mutexLock']['self'] === false)
+            ) {
+                if (isset($this->view->getParamsToView()['mutexLock']['self']) &&
+                    $this->view->getParamsToView()['mutexLock']['self'] === false
+                ) {
+                    if (isset($this->params['mutexLock']['account_name'])) {
+                        $cardType = "bg-warning";
+                        $cardTitle = $cardTitle . ' (';
+                        $cardTitle = $cardTitle . 'LOCKED BY : ' . strtoupper($this->view->getParamsToView()['mutexLock']['account_name']);
+                        if (isset($this->view->getParamsToView()['mutexLock']['parent_lock_by_id'])) {
+                            $cardTitle = $cardTitle . ' VIA : ' . strtoupper($this->view->getParamsToView()['mutexLock']['parent_lock_by_package']);
+                        }
+                        $cardTitle = $cardTitle . ')';
+
+                        if (isset($this->view->getParamsToView()['mutexLock']['can_remove_lock']) &&
+                            $this->view->getParamsToView()['mutexLock']['can_remove_lock'] == 'true'
+                        ) {
+                            if (isset($this->params['cardShowTools']) && count($this->params['cardShowTools']) > 0) {
+                                array_push($this->params['cardShowTools'], 'unlock');
+                            } else {
+                                $this->params['cardShowTools'] = ['unlock'];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         isset($this->params['cardSpanType']) && isset($this->params['cardSpanText']) ?
         $cardSpan =
             '<span class="badge bg-' . $this->params['cardSpanType'] . '">' .
@@ -124,16 +155,21 @@ class Card extends Adminltetags
 
         $tools = '';
         if (isset($this->params['cardShowTools']) && count($this->params['cardShowTools']) > 0) {
+            $iconColors = '';
+
+            if ($cardType === 'bg-warning') {
+                $iconColors = 'text-primary';
+            }
             foreach ($this->params['cardShowTools'] as $key => $tool) {
                 if ($tool === "refresh") {
                     $tools .=
                         '<button type="button" class="btn btn-tool btn-tool-refresh" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Refresh" data-card-widget="refresh"' . $cardRefreshSource . ' ' . $cardRefreshParams . ' ' . $cardRefreshDataType . ' ' . $cardRefreshMethod . ' ' . $cardRefreshSourceSelector . '>
-                            <i class="fas fa-fw fa-sync-alt"></i>
+                            <i class="' . $iconColors . ' fas fa-fw fa-sync-alt"></i>
                         </button>';
                 } else if ($tool === "maximize") {
                     $tools .=
                         '<button type="button" class="btn btn-tool btn-tool-maximize" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Maximize" data-card-widget="maximize">
-                            <i class="fas fa-fw fa-expand"></i>
+                            <i class="' . $iconColors . ' fas fa-fw fa-expand"></i>
                         </button>';
                 } else if ($tool === "collapse") {
                     if (!isset($this->params['cardCollapsed']) ||
@@ -141,28 +177,33 @@ class Card extends Adminltetags
                     ) {
                         $tools .=
                             '<button type="button" class="btn btn-tool btn-tool-collapse" ' . $cardAnimationSpeed . ' data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Collapse" data-card-widget="collapse">
-                                <i class="fas fa-fw fa-minus"></i>
+                                <i class="' . $iconColors . ' fas fa-fw fa-minus"></i>
                             </button>';
                     }
                 } else if ($tool === "settings") {
                     $tools .=
                         '<button type="button" class="btn btn-tool btn-tool-settings" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Settings" data-card-widget="settings">
-                            <i class="fas fa-fw fa-gear"></i>
+                            <i class="' . $iconColors . ' fas fa-fw fa-gear"></i>
                         </button>';
                 } else if ($tool === "move") {
                     $tools .=
                         '<button type="button" class="btn btn-tool btn-tool-move" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Move" data-card-widget="move">
-                            <i class="fas fa-fw fa-up-down-left-right"></i>
+                            <i class="' . $iconColors . ' fas fa-fw fa-up-down-left-right"></i>
                         </button>';
                 } else if ($tool === "remove") {
                     $tools .=
                         '<button type="button" class="btn btn-tool btn-tool-remove" ' . $cardAnimationSpeed . ' data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Remove" data-card-widget="remove">
-                            <i class="fas fa-fw fa-times"></i>
+                            <i class="' . $iconColors . ' fas fa-fw fa-times"></i>
+                        </button>';
+                } else if ($tool === "unlock") {
+                    $tools .=
+                        '<button type="button" class="btn btn-tool btn-tool-unlock" ' . $cardAnimationSpeed . ' data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Force Unlock" data-card-widget="unlock">
+                            <i class="' . $iconColors . ' fas fa-fw fa-lock-open"></i>
                         </button>';
                 } else if ($tool === "widgetRemove") {
                     $tools .=
                         '<button type="button" class="btn btn-tool btn-tool-widgetRemove" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Remove" data-card-widget="widgetRemove">
-                            <i class="fas fa-fw fa-times"></i>
+                            <i class="' . $iconColors . ' fas fa-fw fa-times"></i>
                         </button>';
                 } else if ($tool === "packageSettings") {
                     if ($this->view->canMsv && $this->view->usedModules) {
@@ -193,14 +234,82 @@ class Card extends Adminltetags
                                 });
                             </script>
                             <button type="button" class="btn btn-tool btn-tool-package-settings" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Package Settings" data-card-widget="package-settings">
-                                <i class="fas fa-fw fa-gears"></i>
+                                <i class="' . $iconColors . ' fas fa-fw fa-gears"></i>
                             </button>';
                     }
                 } else if ($tool === "cacheReset") {
                     if ($this->config->cache->enabled) {
                         $tools .=
                             '<button type="button" class="btn btn-tool btn-tool-reset-cache" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Reset Cache">
-                                <i class="fas fa-fw fa-database"></i>
+                                <i class="' . $iconColors . ' fas fa-fw fa-database"></i>
+                            </button>';
+                    }
+                } else if ($tool === "form") {//For redirecting to form entry of the set dataId
+                    if (isset($this->view->getParamsToView()['dataId'])) {//Only show this when dataId is present
+                        $url = $this->links->url($this->params['component']['route'] . '/q/id/' . $this->view->getParamsToView()['dataId']);
+                        $tools .=
+                            '<a href="' . $url . '" class="btn btn-tool btn-tool-form-link disabled" role="button" hidden="">Form Link</a>' .
+                            '<script>
+                                $(document).ready(function() {
+                                    $(".btn-tool-form").click(function() {
+                                        BazContentLoader.loadAjax($(".btn-tool-form-link"), {
+                                            ajaxBefore                      : function () {
+                                                                                Pace.restart();
+                                                                                $("#baz-content").empty();
+                                                                                $("#loader").attr("hidden", false);
+                                                                            },
+                                            ajaxFinished                    : function () {
+                                                                                BazCore.updateBreadcrumb();
+                                                                                $("#loader").attr("hidden", true);
+                                                                                $(".tooltip").remove();
+                                                                            },
+                                            ajaxError                       : function () {
+                                                                                $("#loader").attr("hidden", true);
+                                                                                BazCore.updateBreadcrumb();
+                                                                            }
+                                        });
+                                        BazContentLoader.init();
+                                    });
+                                });
+                            </script>
+                            <button type="button" class="btn btn-tool btn-tool-form" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Form" data-card-widget="form">
+                                <i class="' . $iconColors . ' fas fa-fw fa-file-pen"></i>
+                            </button>';
+                    }
+                } else if ($tool === "activityLogs") {
+                    if (isset($this->view->getParamsToView()['dataId'])) {//Only show this when dataId is present
+                        $url = $this->links->url($this->params['component']['route'] . '/q/id/' . $this->view->getParamsToView()['dataId'] . '/activitylogs/true');
+                        $tools .=
+                            '<a href="' . $url . '" class="btn btn-tool btn-tool-activitylogs-link disabled" role="button" hidden="">Activity Logs Link</a>' .
+                            '<script>
+                                $(document).ready(function() {
+                                    $(".btn-tool-activitylogs").click(function() {
+                                        if (window.dataCollection.env.mutexLock) {
+                                            delete(window.dataCollection.env.mutexLock);
+                                        }
+
+                                        BazContentLoader.loadAjax($(".btn-tool-activitylogs-link"), {
+                                            ajaxBefore                      : function () {
+                                                                                Pace.restart();
+                                                                                $("#baz-content").empty();
+                                                                                $("#loader").attr("hidden", false);
+                                                                            },
+                                            ajaxFinished                    : function () {
+                                                                                BazCore.updateBreadcrumb();
+                                                                                $("#loader").attr("hidden", true);
+                                                                                $(".tooltip").remove();
+                                                                            },
+                                            ajaxError                       : function () {
+                                                                                $("#loader").attr("hidden", true);
+                                                                                BazCore.updateBreadcrumb();
+                                                                            }
+                                        });
+                                        BazContentLoader.init();
+                                    });
+                                });
+                            </script>
+                            <button type="button" class="btn btn-tool btn-tool-activitylogs" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Activity Logs" data-card-widget="activitylogs">
+                                <i class="' . $iconColors . ' fas fa-fw fa-list"></i>
                             </button>';
                     }
                 }
@@ -215,13 +324,10 @@ class Card extends Adminltetags
             '';
 
         if (isset($this->params['cardBodyContent'])) {
-
             $cardBody = $this->params['cardBodyContent'];
-
         } else if (isset($this->params['cardBodyInclude']) &&
                    isset($this->params['cardBodyIncludeParams'])
         ) {
-
             $cardBody =
                 $this->view->getPartial(
                     $this->params['cardBodyInclude'],
@@ -250,14 +356,12 @@ class Card extends Adminltetags
             } else if (isset($this->params['cardFooterInclude']) &&
                        isset($this->params['cardFooterIncludeParams'])
             ) {
-
                 $cardFooter =
                     $this->view->getPartial(
                         $this->params['cardFooterInclude'],
                         $this->params['cardFooterIncludeParams']
                     );
             } else if (isset($this->params['cardFooterInclude'])) {
-
                 $cardFooter =
                     $this->view->getPartial(
                         $this->params['cardFooterInclude'],

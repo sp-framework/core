@@ -35,6 +35,10 @@ class Local extends BasePackage
 
     protected $fileSize;
 
+    protected $fileHeight;
+
+    protected $fileWidth;
+
     protected $directory;
 
     protected $sizes;
@@ -50,6 +54,12 @@ class Local extends BasePackage
     protected $getData;
 
     protected $width;
+
+    protected $allowedImageSizes;
+
+    protected $maxImageSize;
+
+    protected $packageInfo;
 
     public function initLocal(array $storage)
     {
@@ -90,7 +100,7 @@ class Local extends BasePackage
         $this->imageMimeTypes = $this->storage['allowed_image_mime_types'];
 
         if (!isset($this->storage['allowed_image_sizes'])) {
-            $this->storage['allowed_image_sizes'] = [30, 80, 200, 800, 1200, 2000];
+            $this->storage['allowed_image_sizes'] = [];
         }
 
         $this->allowedImageSizes = $this->storage['allowed_image_sizes'];
@@ -98,6 +108,12 @@ class Local extends BasePackage
         if (!isset($this->storage['allowed_file_mime_types'])) {
             $this->storage['allowed_file_mime_types'] = [];
         }
+
+        if (!isset($this->storage['max_image_size'])) {
+            $this->storage['max_image_size'] = 2000;
+        }
+
+        $this->maxImageSize = $this->storage['max_image_size'];
 
         $this->fileMimeTypes = $this->storage['allowed_file_mime_types'];
 
@@ -116,8 +132,10 @@ class Local extends BasePackage
         return $this;
     }
 
-    public function store($directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false)
+    public function store($directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false, $packageInfo = [])
     {
+        $this->packageInfo = $packageInfo;
+
         if (!$file && $addToDbOnly) {
             $this->directory = $directory;
 
@@ -152,6 +170,11 @@ class Local extends BasePackage
             $this->directory = null;
         }
 
+        if (isset($this->request->getPost()['package_class']) && isset($this->request->getPost()['package_row_id'])) {
+            $this->packageInfo['package_class'] = $this->request->getPost()['package_class'];
+            $this->packageInfo['package_row_id'] = (int) $this->request->getPost()['package_row_id'];
+        }
+
         if ((isset($this->request->getPost()['isBackupFile']) && $this->request->getPost()['isBackupFile'] == 'true') ||
             (isset($this->request->getPost()['isPointer']) && $this->request->getPost()['isPointer'] == 'true')
         ) {
@@ -170,7 +193,7 @@ class Local extends BasePackage
             file_put_contents($tempFile, $file);
 
             $this->file = new UploadedFile(
-                $tempFile,
+                fopen($tempFile, "r"),
                 $size,
                 UPLOAD_ERR_OK,
                 $fileName
@@ -189,7 +212,6 @@ class Local extends BasePackage
             }
 
             $storageData = $this->packagesData->last;
-
         } else if ($this->request->getUploadedFiles()) {
             foreach ($this->request->getUploadedFiles() as $key => $file) {
                 $this->file = $file;
@@ -211,6 +233,10 @@ class Local extends BasePackage
 
                 $storageData = $this->packagesData->last;
             }
+        } else {
+            $this->addResponse('No File(s) to uploaded', 1, []);
+
+            return false;
         }
 
         if (isset($this->request->getPost()['setOrphan']) &&
@@ -278,6 +304,21 @@ class Local extends BasePackage
             }
 
             $this->moveImageToLocationAsUUID();
+        }
+
+        try {
+            $image = new Imagick($this->imagesPath . $this->uuidLocation);
+
+            $this->fileHeight = $image->getHeight();
+            $this->fileWidth = $image->getWidth();
+        } catch (\throwable $e) {
+            if ($this->config->logs->exceptions) {
+                $this->logger->logExceptions->critical(json_trace($e));
+            }
+
+            $this->response->setStatusCode(500, 'Error loading image! Check exception logs.');
+
+            return false;
         }
 
         $this->addFileInfoToDb();
@@ -350,11 +391,15 @@ class Local extends BasePackage
                 'uuid_location'         => $this->directory . '/',
                 'org_file_name'         => $this->fileName,
                 'size'                  => $this->fileSize,
+                'height'                => $this->fileHeight,
+                'width'                 => $this->fileWidth,
                 'type'                  => $this->mimeType,
                 'orphan'                => 1,
                 'is_pointer'            => $this->isPointer,
                 'created_by'            => $createdBy,
-                'updated_by'            => $updatedBy
+                'updated_by'            => $updatedBy,
+                'package_class'         => isset($this->packageInfo['package_class']) ? $this->packageInfo['package_class'] : 'unknown',
+                'package_row_id'        => isset($this->packageInfo['package_row_id']) ? (int) $this->packageInfo['package_row_id'] : 0
             ];
 
         $this->add($data);
@@ -370,20 +415,24 @@ class Local extends BasePackage
         }
 
         if (in_array($file[0]['type'], $this->imageMimeTypes)) {
-            if (isset($this->getData['w']) && in_array($this->getData['w'], $this->allowedImageSizes)) {
-                $sizedImage = $this->getSizedImage($file[0], $this->getData['w']);
+            if (isset($this->getData['w'])) {
+                if (count($this->allowedImageSizes) > 0 &&
+                    in_array($this->getData['w'], $this->allowedImageSizes)
+                ) {
+                    $sizedImage = $this->getSizedImage($file[0], $this->getData['w']);
+                } else if ((int) $this->getData['w'] <= $this->maxImageSize) {
+                    $sizedImage = $this->getSizedImage($file[0], $this->getData['w']);
+                }
 
                 if ($sizedImage) {
                     $this->response->setContentType($file[0]['type']);
 
                     $this->response->setContent($this->localContent->read($sizedImage));
+                } else {
+                    $this->response->setStatusCode(404, 'Not Found');
                 }
-
-                return $this->response->send();
             } else {
                 $this->response->setStatusCode(404, 'Not Found');
-
-                return $this->response->send();
             }
         } else if (in_array($file[0]['type'], $this->fileMimeTypes)) {
             if ($file[0]['is_pointer'] == 1) {
@@ -396,7 +445,7 @@ class Local extends BasePackage
             if ($this->storage['permission'] === 'public') {
                 $this->updateFileLink(
                     $file[0],
-                    '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'],
+                    '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'],
                     null
                 );
             }
@@ -409,19 +458,19 @@ class Local extends BasePackage
                 return $this->response->setFileToSend(base_path($dataFile));
             }
 
+            $response = $this->response->setFileToSend(base_path($dataFile));
+
             $this->response->setContentType($file[0]['type']);
 
-            $this->response
-                ->setHeader("Content-Length", filesize(base_path($dataFile)))
-                ->setHeader("Content-Disposition", "attachment; filename=" . $file[0]['org_file_name']);
+            $this->response->setHeader("Content-Disposition", "attachment; filename=" . $file[0]['org_file_name']);
+            $this->response->setContentLength(filesize(base_path($dataFile)));
 
-            return $this->response->setFileToSend(base_path($dataFile));
-
+            return $response;
         } else {
             $this->response->setStatusCode(404, 'Not Found');
-
-            return $this->response->send();
         }
+
+        return $this->response->send();
     }
 
     public function getFiles($params)
@@ -475,7 +524,17 @@ class Local extends BasePackage
             return false;
         }
 
-        $image = new Imagick(base_path($imageFile));
+        try {
+            $image = new Imagick(base_path($imageFile));
+        } catch (\throwable $e) {
+            if ($this->config->logs->exceptions) {
+                $this->logger->logExceptions->critical(json_trace($e));
+            }
+
+            $this->response->setStatusCode(500, 'Error loading image! Check exception logs.');
+
+            return false;
+        }
 
         // If max width of image is less than requested size, make width to image size.
         if ($image->getWidth() < $width) {
@@ -532,10 +591,12 @@ class Local extends BasePackage
             return '#';
         }
 
-        if (isset($file[0]['links']) &&
-            ($file[0]['links'] !== null && $file[0]['links'] !== '')
-        ) {
-            $file[0]['links'] = $file[0]['links'];
+        if (isset($file[0]['links'])) {
+            if (is_string($file[0]['links'])) {
+                $file[0]['links'] = $this->helper->decode($file[0]['links'], true);
+            }
+        } else {
+            $file[0]['links'] = [];
         }
 
         if ($width) {
@@ -547,26 +608,19 @@ class Local extends BasePackage
                 }
             }
 
-            if ($this->width) {
-                if (in_array($this->width, $this->allowedImageSizes)) {
-                    $this->getSizedImage($file[0], $this->width);
-                } else {
-                    $this->addResponse('Requested Width not registered with system.', 1);
-
-                    return false;
-                }
-            } else {
+            if (count($this->allowedImageSizes) > 0) {
                 if (in_array($width, $this->allowedImageSizes)) {
-                    $this->getSizedImage($file[0], $width);
+                    return $this->getSizedImage($file[0], $width);
                 } else {
                     $this->addResponse('Requested Width not registered with system.', 1);
-
-                    return false;
                 }
+            } else if ((int) $width <= $this->maxImageSize) {
+                return $this->getSizedImage($file[0], $width);
+            } else {
+                $this->addResponse('Requested Width not registered with system.', 1);
             }
 
-            return $this->getPublicLink($uuid, $this->width);
-
+            return false;
         } else {
             if (isset($file[0]['links']['data'])) {
                 return $file[0]['links']['data'];
@@ -594,7 +648,7 @@ class Local extends BasePackage
         $this->update($file);
     }
 
-    public function removeFile($uuid, $purge)
+    public function removeFile($uuid, $purge, $removeDb = null, $removeFile = null)
     {
         if (!$uuid) {
             $this->addResponse('Please provide UUID', 1);
@@ -603,13 +657,20 @@ class Local extends BasePackage
         }
 
         if ($purge) {
-            return $this->purgeFile($uuid);
+            if (!isset($removeDb)) {
+                $removeDb = true;
+            }
+            if (!isset($removeFile)) {
+                $removeFile = true;
+            }
+
+            return $this->purgeFile($uuid, $removeDb, $removeFile);
         } else {
             return $this->flipOrphanStatus($uuid, 1);
         }
     }
 
-    protected function purgeFile($uuid)
+    protected function purgeFile($uuid, $removeDb, $removeFile)
     {
         $file = $this->getFileInfo($uuid);
 
@@ -617,68 +678,72 @@ class Local extends BasePackage
             if ($file[0]['uuid_location'] && $file[0]['uuid_location'] !== '') {
                 $fileLocation = $file[0]['uuid_location'];
                 $fileLocation = trim($fileLocation, '/');
-                $fileLocation = '/' . $fileLocation . '/';
+                if ($file[0]['is_pointer']) {
+                    $fileLocation .= '/';
+                } else {
+                    $fileLocation = '/' . $fileLocation . '/';
+                }
             } else {
                 $fileLocation = '';
             }
 
-            if (in_array($file[0]['type'], $this->imageMimeTypes)) {
-                $fileRemovedFromDB = $this->removeFileFromDb($file[0]['id']);
-
-                $fileDeleted =
-                    $this->removeFileFromLocation(
-                        '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsImagesPath . $fileLocation . $file[0]['uuid']
-                    );
-
-                $fileCacheDeleted =
-                    $this->removeFileCache(
-                        '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . $fileLocation . $file[0]['uuid']
-                    );
-
-                if (!$fileRemovedFromDB) {
-                    $this->addResponse('Error deleting file from DB', 1);
-
-                    return false;
+            if ($file[0]['is_pointer']) {
+                if ($removeDb) {
+                    $fileRemovedFromDB = $this->removeFileFromDb($file[0]['id']);
                 }
 
-                if (!$fileDeleted) {
-                    $this->addResponse('Error deleting file from location', 1);
-
-                    return false;
+                if ($removeFile) {
+                    $fileDeleted = $this->removeFileFromLocation($fileLocation . $file[0]['uuid']);
+                }
+            } else if (in_array($file[0]['type'], $this->imageMimeTypes)) {
+                if ($removeDb) {
+                    $fileRemovedFromDB = $this->removeFileFromDb($file[0]['id']);
                 }
 
-                if (!$fileCacheDeleted) {
-                    $this->addResponse('Error deleting file from cache', 1);
+                if ($removeFile) {
+                    $fileDeleted =
+                        $this->removeFileFromLocation(
+                            '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsImagesPath . $fileLocation . $file[0]['uuid']
+                        );
 
-                    return false;
+                    $fileCacheDeleted =
+                        $this->removeFileCache(
+                            '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . $fileLocation . $file[0]['uuid']
+                        );
                 }
-
-                $this->addResponse('File purged from DB, Location and cache');
-
-                return true;
             } else if (in_array($file[0]['type'], $this->fileMimeTypes)) {
-                $fileRemovedFromDB = $this->removeFileFromDb($file[0]['id']);
-
-                $fileDeleted = $this->removeFileFromLocation(
-                    '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . $fileLocation . $file[0]['uuid']
-                );
-
-                if (!$fileRemovedFromDB) {
-                    $this->addResponse('Error deleting file from DB', 1);
-
-                    return false;
+                if ($removeDb) {
+                    $fileRemovedFromDB = $this->removeFileFromDb($file[0]['id']);
                 }
 
-                if (!$fileDeleted) {
-                    $this->addResponse('Error deleting file from location', 1);
-
-                    return false;
+                if ($removeFile) {
+                    $fileDeleted = $this->removeFileFromLocation(
+                        '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . $fileLocation . $file[0]['uuid']
+                    );
                 }
-
-                $this->addResponse('File removed from DB, Location and cache');
-
-                return true;
             }
+
+            if (isset($fileRemovedFromDB) && !$fileRemovedFromDB) {
+                $this->addResponse('Error deleting file from DB', 1);
+
+                return false;
+            }
+
+            if (isset($fileDeleted) && !$fileDeleted) {
+                $this->addResponse('Error deleting file from location', 1);
+
+                return false;
+            }
+
+            if (isset($fileCacheDeleted) && !$fileCacheDeleted) {
+                $this->addResponse('Error deleting file from cache', 1);
+
+                return false;
+            }
+
+            $this->addResponse('File removed from DB, Location and cache');
+
+            return true;
         }
 
         $this->addResponse('Incorrect UUID, Not in DB.', 1);
@@ -747,19 +812,23 @@ class Local extends BasePackage
 
         for ($checkPath = count($paths) - 1; $checkPath >= 3; $checkPath--) { //>=3 to ignore images/, cache/, data/, storageID directory
             if (count($this->localContent->listContents($paths[$checkPath], false)->toArray()) === 0) {
-                $this->localContent->deleteDir($paths[$checkPath]);
+                $this->localContent->deleteDirectory($paths[$checkPath]);
             }
         }
     }
 
-    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
+    public function changeOrphanStatus($newUUID = null, $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
     {
+        if ($oldUUID && $newUUID === $oldUUID) {
+            $oldUUID = null;
+        }
+
         if ($array) {
             if ($oldUUID) {
                 $olduuids = $oldUUID;
 
                 foreach ($olduuids as $olduuidKey => $olduuid) {
-                    if (!$status) {
+                    if (!$status || ($status && $status === 0)) {
                         $status = 1;
                     }
 
@@ -770,7 +839,7 @@ class Local extends BasePackage
             if ($newUUID) {
                 $uuids = $newUUID;
                 foreach ($uuids as $uuidKey => $newuuid) {
-                    if (!$status) {
+                    if (!$status || ($status && $status === 1)) {
                         $status = 0;
                     }
 
@@ -779,7 +848,7 @@ class Local extends BasePackage
             }
         } else {
             if ($oldUUID) {
-                if (!$status) {
+                if (!$status || ($status && $status === 0)) {
                     $status = 1;
                 }
 
@@ -787,7 +856,7 @@ class Local extends BasePackage
             }
 
             if ($newUUID || $orgFileName) {
-                if (!$status) {
+                if (!$status || ($status && $status === 1)) {
                     $status = 0;
                 }
 

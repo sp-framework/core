@@ -48,11 +48,26 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['vars'] = { };
-dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+$(document).ready(function() {
+    dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+});
+dataCollectionSectionForm['vars']['bulkActions'] = { };
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-include_core_modules'                : { },
+        '{{componentId}}-{{sectionId}}-app_type'                            : {
+            placeholder: 'SHOW MODULES FOR SELECTED APP TYPE',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function(e) {
+                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, true, false, false, false, false, false, false, e.params.data.id);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, false, e.params.data.id);
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-api_id'                              : {
             placeholder: "SELECT REPO",
             afterInit: function() {
@@ -70,7 +85,6 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-modules'                             : {
-            'placeholder'   : 'SELECT MODULE TO EDIT',
             'afterInit'     : function() {
                 if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-modules-table')) {
                     dataCollectionSectionForm['vars']['modulesTable'] = $('#{{componentId}}-{{sectionId}}-modules-table').DataTable({
@@ -88,102 +102,261 @@ dataCollectionSection =
                             [100, -1],
                             [100, 'All']
                         ],
+                        select: 'multiple',
+                        buttons : [
+                            {
+                                extend: 'selectAll',
+                                action: function(e) {
+                                    e.preventDefault();
+
+                                    dataCollectionSectionForm['vars']['modulesTable'].rows({ search: 'applied'}).select();
+                                    var selectedRows = dataCollectionSectionForm['vars']['modulesTable'].rows({ selected: true }).data().toArray();
+
+                                    if (selectedRows.length > 0) {
+                                        $(selectedRows).each(function(index, row) {
+                                            var moduleType = row[4];
+                                            if (moduleType === 'views (sub)') {
+                                                moduleType = 'views';
+                                            }
+                                            var id = row[0];
+
+                                            if (!dataCollectionSectionForm['vars']['bulkActions'][moduleType]) {
+                                                dataCollectionSectionForm['vars']['bulkActions'][moduleType] = [];
+                                            }
+
+                                            if (!dataCollectionSectionForm['vars']['bulkActions'][moduleType].includes(id)) {
+                                                dataCollectionSectionForm['vars']['bulkActions'][moduleType].push(id);
+                                            }
+                                        });
+                                    }
+
+                                    dataCollectionSectionForm['funcs']['editBulkButton']();
+                                }
+                            },
+                            {
+                                extend: 'selectNone',
+                                action: function(e) {
+                                    dataCollectionSectionForm['vars']['modulesTable'].rows().deselect();
+                                    dataCollectionSectionForm['vars']['bulkActions'] = { };
+                                    dataCollectionSectionForm['funcs']['editBulkButton']();
+                                }
+                            }
+                        ],
+                        dom : '<"row mb-1"<"col-md-3 col-xs-12"B><"col-md-3 col-xs-12"l><"col-md-3 col-xs-12"f><"col-md-3 col-xs-12"p>>' +
+                              '<"row mb-1"<"col"tr>>' +
+                              '<"row"<"col-md-6 col-xs-12"i><"col-md-6 col-xs-12"p>>',
+                        language : {
+                            buttons         : {
+                                selectAll   : '<i class="fas fa-fw fa-check-double"></i>',
+                                selectNone  : '<span class="fa-stack">' +
+                                              '<i class="fas fa-fw fa-check-double fa-stack-1x"></i>' +
+                                              '<i class="fas fa-fw fa-ban fa-stack-2x text-danger"></i>' +
+                                              '</span>'
+                            }
+                        }
+                    });
+
+                    dataCollectionSectionForm['vars']['modulesTable'].on('page', function() {
+                        resetButtons();
+                    });
+                    dataCollectionSectionForm['vars']['modulesTable'].on('search.dt', function() {
+                        resetButtons();
+                    });
+                    dataCollectionSectionForm['vars']['modulesTable'].on('select.dt', function(e, dt, type, indexes) {
+                        var moduleType = dataCollectionSectionForm['vars']['modulesTable'].rows(indexes).data()[0][4];
+                        if (moduleType === 'views (sub)') {
+                            moduleType = 'views';
+                        }
+                        var id = dataCollectionSectionForm['vars']['modulesTable'].rows(indexes).data()[0][0];
+
+                        if (!dataCollectionSectionForm['vars']['bulkActions'][moduleType]) {
+                            dataCollectionSectionForm['vars']['bulkActions'][moduleType] = [];
+                        }
+
+                        if (!dataCollectionSectionForm['vars']['bulkActions'][moduleType].includes(id)) {
+                            dataCollectionSectionForm['vars']['bulkActions'][moduleType].push(id);
+                        }
+                        dataCollectionSectionForm['funcs']['editBulkButton']();
+                    });
+                    dataCollectionSectionForm['vars']['modulesTable'].on('deselect.dt', function(e, dt, type, indexes) {
+                        var moduleType = dataCollectionSectionForm['vars']['modulesTable'].rows(indexes).data()[0][4];
+                        if (moduleType === 'views (sub)') {
+                            moduleType = 'views';
+                        }
+                        var id = dataCollectionSectionForm['vars']['modulesTable'].rows(indexes).data()[0][0];
+
+                        if (!dataCollectionSectionForm['vars']['bulkActions'][moduleType]) {
+                            return;
+                        }
+
+                        if (dataCollectionSectionForm['vars']['bulkActions'][moduleType].includes(id)) {
+                            var index = dataCollectionSectionForm['vars']['bulkActions'][moduleType].indexOf(id);
+
+                            dataCollectionSectionForm['vars']['bulkActions'][moduleType].splice(index, 1);
+                        }
+                        dataCollectionSectionForm['funcs']['editBulkButton']();
+                    });
+                    dataCollectionSectionForm['funcs']['enableBulkButtonsLinks']();
+                }
+
+                function resetButtons() {
+                    var isSubView = false;
+
+                    $('.editModule').off();
+                    $('.editModule').click(function(e) {
+                        e.preventDefault();
+
+                        var apptype = false;
+                        if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                            apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                        }
+
+                        if ($(this).data()['type'] === 'views' && $(this).data()['subview'] === true) {
+                            isSubView = true;
+                        }
+
+                        if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, false, false, isSubView, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, false, false, isSubView);
+                            }
+                        } else {
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, false, isSubView, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, false, isSubView);
+                            }
+                        }
+                    });
+
+                    $('.cloneModule').off();
+                    $('.cloneModule').click(function(e) {
+                        e.preventDefault();
+
+                        var apptype = false;
+                        if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                            apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                        }
+
+                        if ($(this).data()['type'] === 'views' && $(this).data()['subview'] === true) {
+                            isSubView = true;
+                        }
+
+                        if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, true, false, isSubView, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, true, false, isSubView);
+                            }
+                        } else {
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, true, false, isSubView, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, true, false, isSubView);
+                            }
+                        }
+                    });
+
+                    $('.removeModule').off();
+                    $('.removeModule').click(function(e) {
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['id'] = $(this).data()['id'];
+                        postData['module_type'] = $(this).data()['type'];
+                        postData['remove_files'] = false;
+
+                        Swal.fire({
+                            title                       : '<span class="text-danger"> Remove module files from the system as well?</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            cancelButtonText            : 'No',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                dataCollection.env.sounds.swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                postData['remove_files'] = true;
+
+                                remove(postData);
+                            } else {
+                                remove(postData);
+                            }
+                        });
+                    });
+
+                    $('.generateRelease').off();
+                    $('.generateRelease').click(function(e) {
+                        e.preventDefault();
+
+                        var apptype = false;
+                        if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                            apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                        }
+
+                        if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, true, false, false, false, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, true);
+                            }
+                        } else {
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, true, false, false, false, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, true);
+                            }
+                        }
+                    });
+
+                    $('.commitModuleJson').off();
+                    $('.commitModuleJson').click(function(e) {
+                        e.preventDefault();
+
+                        var apptype = false;
+                        if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                            apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                        }
+
+                        if (apptype) {
+                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, true, false, false, false, apptype);
+                        } else {
+                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, true);
+                        }
                     });
                 }
 
-                var isSubView = false;
-
-                $('.editModule').off();
-                $('.editModule').click(function(e) {
-                    e.preventDefault();
-
-                    if ($(this).data()['type'] === 'views' && $(this).data()['subview'] === true) {
-                        isSubView = true;
-                    }
-
-                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, false, false, isSubView);
-                    } else {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, false, isSubView);
-                    }
-                });
-
-                $('.cloneModule').off();
-                $('.cloneModule').click(function(e) {
-                    e.preventDefault();
-
-                    if ($(this).data()['type'] === 'views' && $(this).data()['subview'] === true) {
-                        isSubView = true;
-                    }
-
-                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, true, false, isSubView);
-                    } else {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, true, false, isSubView);
-                    }
-                });
-
-                $('.removeModule').off();
-                $('.removeModule').click(function(e) {
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['id'] = $(this).data()['id'];
-                    postData['module_type'] = $(this).data()['type'];
-                    postData['remove_files'] = false;
-
-                    Swal.fire({
-                        title                       : '<span class="text-danger"> Remove module files from the system as well?</span>',
-                        icon                        : 'question',
-                        background                  : 'rgba(0,0,0,.8)',
-                        backdrop                    : 'rgba(0,0,0,.6)',
-                        buttonsStyling              : false,
-                        confirmButtonText           : 'Yes',
-                        cancelButtonText            : 'No',
-                        customClass                 : {
-                            'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
-                            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-                        },
-                        showCancelButton            : true,
-                        keydownListenerCapture      : true,
-                        allowOutsideClick           : true,
-                        allowEscapeKey              : true,
-                        didOpen                     : function() {
-                            dataCollection.env.sounds.swalSound.play();
-                        }
-                    }).then((result) => {
-                        if (result.value) {
-                            postData['remove_files'] = true;
-
-                            remove(postData);
-                        } else {
-                            remove(postData);
-                        }
-                    });
-                });
-
-                $('.generateRelease').off();
-                $('.generateRelease').click(function(e) {
-                    e.preventDefault();
-
-                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, true);
-                    } else {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, true);
-                    }
-                });
-
-                $('.commitModuleJson').off();
-                $('.commitModuleJson').click(function(e) {
-                    e.preventDefault();
-
-                    dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, true);
-                });
+                resetButtons();
 
                 $('#{{componentId}}-{{sectionId}}-include_core_modules').click(function() {
+                    var apptype = false;
+                    if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                        apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    }
+
                     if ($(this)[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                        if (apptype) {
+                            dataCollectionSectionForm['funcs']['loadAjax'](null, null, true, false, false, false, false, false, false, apptype);
+                        } else {
+                            dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                        }
                     } else {
-                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                        if (apptype) {
+                            dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, false, apptype);
+                        } else {
+                            dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                        }
                     }
                 });
 
@@ -196,10 +369,23 @@ dataCollectionSection =
 
                         if (response.responseCode == 0) {
                             paginatedPNotify('success', {'text': response.responseMessage});
+                            var apptype = false;
+                            if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                                apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                            }
+
                             if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                                dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                                if (apptype) {
+                                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, true, false, false, false, false, false, false, apptype);
+                                } else {
+                                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                                }
                             } else {
-                                dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                                if (apptype) {
+                                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, false, apptype);
+                                } else {
+                                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                                }
                             }
                         } else {
                             paginatedPNotify('error', {'text': response.responseMessage});
@@ -209,7 +395,16 @@ dataCollectionSection =
 
                 $('#{{componentId}}-{{sectionId}}-check-for-changes').off();
                 $('#{{componentId}}-{{sectionId}}-check-for-changes').click(function() {
-                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, true);
+                    var apptype = false;
+                    if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                        apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    }
+
+                    if (apptype) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, true, apptype);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, true);
+                    }
                 });
             }
         },
@@ -222,7 +417,7 @@ dataCollectionSection =
     });
 
 dataCollectionSectionForm['funcs']['loadAjax'] =
-    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false, isSubView = false, isRemote = false, isChanges = false) {
+    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false, isSubView = false, isRemote = false, isChanges = false, isAppType = null) {
         if (id && label) {
             if (label === 'bundles' && !newrelease) {
                 dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/bundles/true/id/' + id + '")}}';
@@ -249,20 +444,35 @@ dataCollectionSectionForm['funcs']['loadAjax'] =
                 }
             }
         } else if (includecoremodules) {
+            if (isAppType) {
+                dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/q/apptype/' + isAppType;
+            }
+
             if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
-                dataCollectionSectionForm['vars']['url'] = '{{links.url("/includecoremodules/true")}}';
+                dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/includecoremodules/true';
             } else {
-                dataCollectionSectionForm['vars']['url'] = '{{links.url("/devtools/modules/q/includecoremodules/true")}}';
+                dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/q/includecoremodules/true';
             }
         } else {
-            dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+            if (isAppType) {
+                dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/apptype/' + isAppType + '")}}';
+            } else {
+                dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+            }
         }
 
         if (id && isRemote) {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/repo/true/id/' + id + '")}}';
         }
+        if (id && isAppType) {
+            dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/apptype/' + isAppType;
+        }
+
         if (isChanges) {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/changes/true")}}';
+            if (isAppType) {
+                dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/apptype/' + isAppType;
+            }
         }
 
         if (dataCollectionSectionForm['vars']['url'].charAt(0) !== 'h' &&
@@ -289,4 +499,106 @@ dataCollectionSectionForm['funcs']['loadAjax'] =
                                             }
         });
     }
+
+dataCollectionSectionForm['funcs']['editBulkButton'] = function() {
+    var total = 0;
+
+    if (Object.keys(dataCollectionSectionForm['vars']['bulkActions']).length > 0) {
+        for (var moduleType in dataCollectionSectionForm['vars']['bulkActions']) {
+            if (dataCollectionSectionForm['vars']['bulkActions'][moduleType].length > 0) {
+                total = total + dataCollectionSectionForm['vars']['bulkActions'][moduleType].length;
+            }
+        }
+    }
+
+    if (total > 0) {
+        $('#{{componentId}}-{{sectionId}}-bulk').html('<i class="fas fa-fw fa-wand-magic-sparkles"></i>  (' + total + ') BULK ACTIONS');
+        $('#{{componentId}}-{{sectionId}}-bulk').attr('disabled', false);
+    } else {
+        $('#{{componentId}}-{{sectionId}}-bulk').html('<i class="fas fa-fw fa-wand-magic-sparkles"></i>  (0) BULK ACTIONS');
+        $('#{{componentId}}-{{sectionId}}-bulk').attr('disabled', true);
+    }
+}
+
+dataCollectionSectionForm['funcs']['enableBulkButtonsLinks'] = function() {
+    $('#{{componentId}}-{{sectionId}}-install,#{{componentId}}-{{sectionId}}-uninstall,#{{componentId}}-{{sectionId}}-truncate,' +
+      '#{{componentId}}-{{sectionId}}-run_script,#{{componentId}}-{{sectionId}}-cancel').off();
+    $('#{{componentId}}-{{sectionId}}-install,#{{componentId}}-{{sectionId}}-uninstall,#{{componentId}}-{{sectionId}}-truncate,' +
+      '#{{componentId}}-{{sectionId}}-run_script,#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
+
+        e.preventDefault();
+
+        var buttonID = $(this)[0].id;
+
+        if (buttonID === '{{componentId}}-{{sectionId}}-cancel') {
+            dataCollectionSectionForm['vars']['modulesTable'].rows().deselect();
+            dataCollectionSectionForm['vars']['bulkActions'] = { };
+            dataCollectionSectionForm['funcs']['editBulkButton']();
+        } else {
+            Swal.fire({
+                title                       : '<span class="text-warning"> Perform Bulk Action against selected modules?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                cancelButtonText            : 'No',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-warning btn-sm text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    dataCollectionSectionForm['funcs']['performBulkAction'](buttonID);
+                }
+            });
+        }
+    });
+}
+
+dataCollectionSectionForm['funcs']['performBulkAction'] = function(buttonID) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['bulk_actions'] = dataCollectionSectionForm['vars']['bulkActions'];
+
+    var buttonIDArr = buttonID.split('-');
+    postData['task'] = buttonIDArr[buttonIDArr.length - 1];
+
+    $('#' + buttonID).parent().siblings().attr('disabled', true)
+    $('#' + buttonID).parent().siblings().children().removeClass('fa-wand-magic-sparkles').addClass('fa-cog fa-spin');
+
+    $.post('{{links.url("devtools/modules/bulk")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            paginatedPNotify('success', {'text': response.responseMessage});
+
+            var apptype = false;
+            if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+            }
+
+            if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                dataCollectionSectionForm['funcs']['loadAjax'](null, null, true, false, false, false, false, false, false, apptype);
+            } else {
+                dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, false, apptype);
+            }
+        } else {
+            paginatedPNotify('error', {'text': response.responseMessage});
+
+            $('#' + buttonID).parent().siblings().attr('disabled', false);
+            $('#' + buttonID).parent().siblings().children().removeClass('fa-cog fa-spin').addClass('fa-wand-magic-sparkles');
+        }
+    }, 'json');
+}
 </script>

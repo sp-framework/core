@@ -1,0 +1,19 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('addresses',
+            [
+                'component'                                   : component,
+                'componentName'                               : componentName,
+                'componentId'                                 : componentId,
+                'sectionId'                                   : sectionId,
+                'addressFieldType'                            : 'multiple',
+                'includeStreet'                               : true,
+                'searchType'                                  : 'city',
+                'addresses'                                   : profile['addresses'],
+                'addressPostLink'                             : links.url('system/users/profile/addresses'),
+                'addressPackageClass'                         : 'System_Base_Providers_BasepackagesServiceProvider_Packages_Users_Profiles',
+                'addressPackageRowId'                         : profile['id']
+            ]
+        )}}
+    </div>
+</div>

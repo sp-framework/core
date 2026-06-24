@@ -5,12 +5,16 @@ namespace System\Base\Providers\CoreServiceProvider\Install;
 use System\Base\BasePackage;
 use System\Base\Installer\Packages\Setup\Schema;
 use System\Base\Providers\ModulesServiceProvider\DbInstaller;
+use System\Base\Providers\ModulesServiceProvider\MenuInstaller;
+use System\Base\Providers\ModulesServiceProvider\TaskCallInstaller;
 
 class Install extends BasePackage
 {
     protected $databases;
 
     protected $dbInstaller;
+
+    protected $menuInstaller;
 
     public function init($schemaNames = [])
     {
@@ -30,7 +34,11 @@ class Install extends BasePackage
             $this->databases = $schemaNamesDatabase;
         }
 
+        $this->menuInstaller = new MenuInstaller;
+
         $this->dbInstaller = new DbInstaller;
+
+        $this->taskCallInstaller = new TaskCallInstaller;
 
         return $this;
     }
@@ -39,7 +47,11 @@ class Install extends BasePackage
     {
         $this->preInstall();
 
+        $this->installMenu();
+
         $this->installDb();
+
+        $this->installTaskCall();
 
         $this->postInstall();
 
@@ -63,6 +75,13 @@ class Install extends BasePackage
         return true;
     }
 
+    public function installTaskCall()
+    {
+        $this->taskCallInstaller->installTaskCall('basepackages');
+
+        return true;
+    }
+
     public function postInstall()
     {
         //Do anything after installation.
@@ -73,5 +92,21 @@ class Install extends BasePackage
     public function truncate()
     {
         $this->dbInstaller->truncate($this->databases);
+    }
+
+    protected function installMenu()
+    {
+        $this->menuInstaller->installMenu($this);
+
+        return true;
+    }
+
+    public function uninstall($remove = false)
+    {
+        if ($remove) {
+            $this->menuInstaller->uninstallMenu($this);
+        }
+
+        return true;
     }
 }

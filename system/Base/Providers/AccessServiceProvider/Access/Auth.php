@@ -34,15 +34,11 @@ class Auth extends BasePackage
 
     protected $otp;
 
-    protected $cookieTimeout = 0;
-
     public function init()
     {
         $this->app = $this->apps->getAppInfo();
 
         $this->cookieKey = 'remember_' . $this->getKey();
-
-        $this->cookieTimeout = time() + $this->config->timeout->cookies;
 
         $this->twoFa = new TwoFa();
 
@@ -51,7 +47,7 @@ class Auth extends BasePackage
         return $this;
     }
 
-    public function attempt($data)
+    public function login(array $data)
     {
         $validate = $this->validateData($data, 'auth');
 
@@ -69,7 +65,7 @@ class Auth extends BasePackage
             return true;
         }
 
-        if (!$this->checkAccount($data)) {
+        if (!$this->checkAccount($data)) {//Set $this->account here
             $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
 
             return false;
@@ -163,7 +159,11 @@ class Auth extends BasePackage
 
         $this->basepackages->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
 
+        $this->basepackages->accounts->checkEnv($this->account['id']);
+
         $this->setSessionAndRecaller($data);
+
+        $this->setUserIdCooikie();
 
         if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
             $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
@@ -171,12 +171,16 @@ class Auth extends BasePackage
             $this->packagesData->redirectUrl = $this->links->url('home');
         }
 
+        if ($this->opCache && $this->opCache->checkCache('account_' . $this->account['id'], 'core')) {
+            $this->opCache->removeCache('account_' . $this->account['id'], 'core');
+        }
+
         $this->logger->log->debug($this->account['email'] . ' authenticated successfully on app ' . $this->app['name']);
 
         return true;
     }
 
-    public function logout()
+    public function logout($forced = false)
     {
         if (!$this->account) {
             try {
@@ -192,8 +196,10 @@ class Auth extends BasePackage
 
         $this->clearAccountSessionId();
 
-        if ($this->cookies->has($this->cookieKey)) {
-            $this->cookies->delete($this->cookieKey);
+        $this->cookies->reset();
+
+        if ($this->opCache && $this->opCache->checkCache('account_' . $this->account['id'], 'core')) {
+            $this->opCache->removeCache('account_' . $this->account['id'], 'core');
         }
 
         if ($this->session->has('_PHCOOKIE_' . $this->cookieKey)) {
@@ -204,11 +210,13 @@ class Auth extends BasePackage
             $this->session->remove($this->key);
         }
 
-        $this->session->redirectUrl = '/';
+        if (!$forced) {
+            $this->session->redirectUrl = '/';
 
-        $this->packagesData->redirectUrl = $this->links->url('/');
+            $this->packagesData->redirectUrl = $this->links->url('/');
 
-        $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->apps->getAppInfo()['name']);
+            $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->apps->getAppInfo()['name']);
+        }
 
         return true;
     }
@@ -240,6 +248,294 @@ class Auth extends BasePackage
             }
         }
 
+        $this->clearRecallerCookies();
+    }
+
+    protected function clearAccountSessionId()
+    {
+        $sessionModel = new BasepackagesUsersAccountsSessions;
+        $sessionStore = $this->ff->store($sessionModel->getSource());
+
+        if ($this->config->databasetype === 'db') {
+            $session = $sessionModel::find(
+                [
+                'account_id = :accountId: AND app = :app:',
+                'bind'      =>
+                    [
+                        'accountId'     => $this->account['id'],
+                        'app'           => $this->getKey()
+                    ]
+                ]
+            );
+
+            if ($session) {
+                if (!$session->delete()) {
+                    $this->logger->log->debug($session->getMessages());
+                }
+            }
+        } else {
+            $sessions = $sessionStore->findBy([['account_id', '=', $this->account['id']], ['app', '=', $this->getKey()]]);
+
+            if ($sessions && count($sessions) > 0) {
+                foreach ($sessions as $session) {
+                    $sessionStore->deleteById($session['id'], true, false, ['agents']);
+                }
+            }
+        }
+
+        $this->sessionTools->removeSessionKey($this->getKey());
+    }
+
+    public function checkAccount(array $data, $viaProfile = null)
+    {
+        $account = $this->basepackages->accounts->checkAccount($data['user'], true);
+
+        if ($account) {
+            if ($account['status'] != '1') {
+                $this->addResponse('Error: Username/Password incorrect!', 1);
+
+                $this->logger->log->debug($data['user'] . ' is disabled!');
+
+                return false;
+            }
+
+            //New App OR New account via rego
+            $canLogin = $this->basepackages->accounts->canLogin($account['id'], $this->app['id']);
+
+            if ($canLogin === false ||
+                ($canLogin && is_array($canLogin) && $canLogin['allowed'] == '2')
+            ) {
+                if ($this->app['can_login_role_ids']) {
+                    if (is_string($this->app['can_login_role_ids'])) {
+                        $this->app['can_login_role_ids'] = $this->helper->decode($this->app['can_login_role_ids'], true);
+                    }
+
+                    if (in_array($account['security']['role_id'], $this->app['can_login_role_ids'])) {
+                        if ($canLogin === false) {
+                            if ($this->config->databasetype === 'db') {
+                                $canloginModel = new BasepackagesUsersAccountsCanlogin;
+
+                                $newLogin['account_id'] = $account['id'];
+                                $newLogin['app_id'] = $this->app['id'];
+                                $newLogin['allowed'] = '2';
+
+                                $canloginModel->assign($newLogin);
+
+                                $canloginModel->create();
+                            } else {
+                                $canloginStore = $this->ff->store('basepackages_users_accounts_canlogin');
+
+                                $canloginStore->insert(
+                                    [
+                                        'account_id'    => $account['id'],
+                                        'app_id'        => $this->app['id'],
+                                        'allowed'       => 2
+                                    ]
+                                );
+                            }
+                        }
+                    } else {
+                        $this->addResponse('Error: Contact System Administrator', 1);
+
+                        $this->logger->log->debug($account['email'] . ' and their role is not allowed to login to app ' . $this->app['name']);
+
+                        return false;
+                    }
+                } else {
+                    $this->addResponse('Error: Contact System Administrator', 1);
+
+                    $this->logger->log->debug('App\'s can_login_role_ids not set for app ' . $this->app['name']);
+
+                    return false;
+                }
+            } else if ($canLogin && is_array($canLogin) && $canLogin['allowed'] == '0') {
+                $this->addResponse('Error: Contact System Administrator', 1);
+
+                $this->logger->log->debug($account['email'] . ' and their role is not allowed to login to app ' . $this->app['name']);
+
+                return false;
+            }
+
+            if (!$this->secTools->checkPassword($data['pass'], $account['security']['password'])) {//Password Fail
+                if ($account['security']['forgotten_request'] == true) {
+                    if (time() > $account['security']['forgotten_request_sent_on'] + ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForgottenPasswordTimeout'] ?? 60)
+                    ) {
+                        $account['security']['forgotten_request'] = null;
+                        $account['security']['forgotten_request_session_id'] = null;
+                        $account['security']['forgotten_request_ip'] = null;
+                        $account['security']['forgotten_request_agent'] = null;
+                        $account['security']['forgotten_request_code'] = null;
+                        $account['security']['forgotten_request_sent_on'] = null;
+                        $this->basepackages->accounts->addUpdateSecurity($account['id'], $account['security']);
+                        $this->addResponse('Code Expired! Request new code...', 1);
+
+                        return false;
+                    }
+
+                    if ($account['security']['forgotten_request_session_id'] !== $this->session->getId() ||
+                        $account['security']['forgotten_request_ip'] !== $this->request->getClientAddress() ||
+                        $account['security']['forgotten_request_agent'] !== $this->request->getUserAgent()
+                    ) {
+                        $this->addResponse('Error: OTP entered on a different browser than requested!', 1);
+
+                        return false;
+                    }
+
+                    if ($this->secTools->checkPassword($data['pass'], $account['security']['forgotten_request_code'])) {//forgotten success and we remove forgotten fields
+                        $account['security']['forgotten_request'] = null;
+                        $account['security']['forgotten_request_session_id'] = null;
+                        $account['security']['forgotten_request_ip'] = null;
+                        $account['security']['forgotten_request_agent'] = null;
+                        $account['security']['forgotten_request_code'] = null;
+                        $account['security']['forgotten_request_sent_on'] = null;
+                        $this->basepackages->accounts->addUpdateSecurity($account['id'], $account['security']);
+
+                        return true;
+                    }
+                }
+
+                if ($viaProfile) {
+                    $this->addResponse('Error: Current Password incorrect!', 1);
+                } else {
+                    $this->addResponse('Error: Username/Password incorrect!', 1);
+                }
+
+                $this->logger->log->debug('Incorrect username/password entered by account ' . $account['email'] . ' on app ' . $this->app['name']);
+
+                return false;
+            }
+
+            if ($account['security']['forgotten_request'] == true) {//We remove this as the user now remembers their password and logs in with it.
+                $account['security']['forgotten_request'] = null;
+                $account['security']['forgotten_request_session_id'] = null;
+                $account['security']['forgotten_request_ip'] = null;
+                $account['security']['forgotten_request_agent'] = null;
+                $account['security']['forgotten_request_code'] = null;
+                $this->basepackages->accounts->addUpdateSecurity($account['id'], $account['security']);
+            }
+
+            date_default_timezone_set($account['profile']['locale_timezone']);
+
+            $this->account = $account;
+        } else {
+            $this->secTools->hashPassword(rand());//Randomize so we take same time to respond as if the account exists.
+
+            $this->addResponse('Error: Username/Password incorrect!', 1);
+
+            $this->logger->log->debug($data['user'] . ' is not in DB. App: ' . $this->app['name']);
+
+            //This is where we do something with too many login attempts, we can move it to iptables and block the IP or put them in a honeypot.
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function setSessionAndRecaller(array $data)
+    {
+        if ($this->setUserSession($this->account)) {
+            $newSession['account_id'] = $this->account['id'];
+            $newSession['app'] = $this->getKey();
+            $newSession['session_id'] = $this->session->getId();
+            //Set Session Timeouts
+            $newSession['session_idle_timeout'] = time() + (int) $this->config->timeout->session_idle;
+            $newSession['session_absolute_timeout'] = time() + (int) $this->config->timeout->session_absolute;
+
+            if ($this->config->databasetype === 'db') {
+                $sessionModel = new BasepackagesUsersAccountsSessions;
+
+                $sessionModel->assign($newSession);
+
+                try {
+                    $sessionModel->create();
+                } catch (\Exception $e) {
+                    $this->logger->log->debug('Duplicate session Id Found. This happens when session was deleted from server and browser used an old session ID.');
+
+                    $this->logout(true);
+
+                    throw $e;
+                }
+            } else {
+                $sessionStore = $this->ff->store('basepackages_users_accounts_sessions');
+
+                try {
+                    $sessionStore->insert($newSession);
+                } catch (\Exception $e) {
+                    $this->logger->log->debug('Duplicate session Id Found. This happens when session was deleted from server and browser used an old session ID.');
+
+                    //Delete the duplicate entry and try again.
+                    try {
+                        //
+                    } catch (\Exception $e) {
+                        $this->logout(true);
+
+                        throw $e;
+                    }
+                }
+            }
+        }
+
+        if (isset($data['remember']) && $data['remember'] == 'true') {
+            $this->setRecaller();
+        }
+    }
+
+    protected function updateSessionIdleTimer(array $session)
+    {
+        $session['session_idle_timeout'] = time() + (int) $this->config->timeout->session_idle;
+
+        if ($this->config->databasetype === 'db') {
+            $sessionModel = new BasepackagesUsersAccountsSessions;
+
+            $sessionModel->assign($session);
+
+            try {
+                $sessionModel->update();
+            } catch (\Exception $e) {
+                $this->logger->log->debug('Not able to update session idle timeout for session id: ' . $session['session_id']);
+
+                $this->logout(true);
+
+                return false;
+            }
+        } else {
+            $sessionStore = $this->ff->store('basepackages_users_accounts_sessions');
+
+            try {
+                $sessionStore->update($session);
+            } catch (\Exception $e) {
+                $this->logger->log->debug('Not able to update session idle timeout for session id: ' . $session['session_id']);
+
+                $this->logout(true);
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function setUserIdCooikie()
+    {
+        $this->cookies->useEncryption(false);
+
+        $this->cookies->set(
+            'id',
+            $this->account['id'],
+            time() + $this->config->timeout->cookies,
+            '/',
+            $this->config->dev === true ? false : true,
+            $this->domains->getDomain()['name'],
+            true
+        );
+
+        $this->cookies->send();
+
+        $this->cookies->useEncryption(true);
+    }
+
+    protected function clearRecallerCookies()
+    {
         //Set cookies to 1 second so browser removes them.
         $this->cookies->set(
             $this->cookieKey,
@@ -270,239 +566,19 @@ class Auth extends BasePackage
         }
     }
 
-    protected function clearAccountSessionId()
+    protected function setRecallerCooikie($identifier, $token)
     {
-        $sessionModel = new BasepackagesUsersAccountsSessions;
-        $sessionStore = $this->ff->store($sessionModel->getSource());
-
-        if ($this->config->databasetype === 'db') {
-            $session = $sessionModel::findFirst(
-                [
-                'session_id = :sessionId: AND app = :app:',
-                'bind'      =>
-                    [
-                        'sessionId' => $this->session->getId(),
-                        'app'       => $this->getKey()
-                    ]
-                ]
-            );
-
-            if ($session) {
-                if (!$session->delete()) {
-                    $this->logger->log->debug($session->getMessages());
-                }
-            }
-        } else {
-            $sessionStore->findOneBy([['session_id', '=', $this->session->getId()], "AND", ['app', '=', $this->getKey()]]);
-
-            if ($sessionStore->toArray()) {
-                $sessionStore->deleteById($sessionStore->toArray()['id'], true, false, ['agents']);
-            }
-        }
-
-        $this->sessionTools->removeSessionKey($this->getKey());
-    }
-
-    public function checkAccount(array $data, $viaProfile = null)
-    {
-        $this->account = $this->basepackages->accounts->checkAccount($data['user'], true);
-
-        if ($this->account) {
-            if ($this->account['status'] != '1') {
-                $this->addResponse('Error: Username/Password incorrect!', 1);
-
-                $this->logger->log->debug($data['user'] . ' is disabled!');
-
-                return false;
-            }
-
-            //New App OR New account via rego
-            $canLogin = $this->basepackages->accounts->canLogin($this->account['id'], $this->app['id']);
-
-            if ($canLogin === false ||
-                ($canLogin && is_array($canLogin) && $canLogin['allowed'] == '2')
-            ) {
-                if ($this->app['can_login_role_ids']) {
-                    if (is_string($this->app['can_login_role_ids'])) {
-                        $this->app['can_login_role_ids'] = $this->helper->decode($this->app['can_login_role_ids'], true);
-                    }
-
-                    if (in_array($this->account['security']['role_id'], $this->app['can_login_role_ids'])) {
-                        if ($canLogin === false) {
-                            if ($this->config->databasetype === 'db') {
-                                $canloginModel = new BasepackagesUsersAccountsCanlogin;
-
-                                $newLogin['account_id'] = $this->account['id'];
-                                $newLogin['app_id'] = $this->app['id'];
-                                $newLogin['allowed'] = '2';
-
-                                $canloginModel->assign($newLogin);
-
-                                $canloginModel->create();
-                            } else {
-                                $canloginStore = $this->ff->store('basepackages_users_accounts_canlogin');
-
-                                $canloginStore->insert(
-                                    [
-                                        'account_id'    => $this->account['id'],
-                                        'app_id'        => $this->app['id'],
-                                        'allowed'       => 2
-                                    ]
-                                );
-                            }
-                        }
-                    } else {
-                        $this->addResponse('Error: Contact System Administrator', 1);
-
-                        $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to app ' . $this->app['name']);
-
-                        return false;
-                    }
-                } else {
-                    $this->addResponse('Error: Contact System Administrator', 1);
-
-                    $this->logger->log->debug('App\'s can_login_role_ids not set for app ' . $this->app['name']);
-
-                    return false;
-                }
-            } else if ($canLogin && is_array($canLogin) && $canLogin['allowed'] == '0') {
-                $this->addResponse('Error: Contact System Administrator', 1);
-
-                $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to app ' . $this->app['name']);
-
-                return false;
-            }
-
-            if (!$this->secTools->checkPassword($data['pass'], $this->account['security']['password'])) {//Password Fail
-                if ($this->account['security']['forgotten_request'] == true) {
-                    if (time() > $this->account['security']['forgotten_request_sent_on'] + ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForgottenPasswordTimeout'] ?? 60)
-                    ) {
-                        $this->account['security']['forgotten_request'] = null;
-                        $this->account['security']['forgotten_request_session_id'] = null;
-                        $this->account['security']['forgotten_request_ip'] = null;
-                        $this->account['security']['forgotten_request_agent'] = null;
-                        $this->account['security']['forgotten_request_code'] = null;
-                        $this->account['security']['forgotten_request_sent_on'] = null;
-                        $this->basepackages->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
-                        $this->addResponse('Code Expired! Request new code...', 1);
-
-                        return false;
-                    }
-
-                    if ($this->account['security']['forgotten_request_session_id'] !== $this->session->getId() ||
-                        $this->account['security']['forgotten_request_ip'] !== $this->request->getClientAddress() ||
-                        $this->account['security']['forgotten_request_agent'] !== $this->request->getUserAgent()
-                    ) {
-                        $this->addResponse('Error: OTP entered on a different browser than requested!', 1);
-
-                        return false;
-                    }
-
-                    if ($this->secTools->checkPassword($data['pass'], $this->account['security']['forgotten_request_code'])) {//forgotten success and we remove forgotten fields
-                        $this->account['security']['forgotten_request'] = null;
-                        $this->account['security']['forgotten_request_session_id'] = null;
-                        $this->account['security']['forgotten_request_ip'] = null;
-                        $this->account['security']['forgotten_request_agent'] = null;
-                        $this->account['security']['forgotten_request_code'] = null;
-                        $this->account['security']['forgotten_request_sent_on'] = null;
-                        $this->basepackages->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
-
-                        return true;
-                    }
-                }
-
-                if ($viaProfile) {
-                    $this->addResponse('Error: Current Password incorrect!', 1);
-                } else {
-                    $this->addResponse('Error: Username/Password incorrect!', 1);
-                }
-
-                $this->logger->log->debug('Incorrect username/password entered by account ' . $this->account['email'] . ' on app ' . $this->app['name']);
-
-                return false;
-            }
-
-            if ($this->account['security']['forgotten_request'] == true) {//We remove this as the user now remembers their password and logs in with it.
-                $this->account['security']['forgotten_request'] = null;
-                $this->account['security']['forgotten_request_session_id'] = null;
-                $this->account['security']['forgotten_request_ip'] = null;
-                $this->account['security']['forgotten_request_agent'] = null;
-                $this->account['security']['forgotten_request_code'] = null;
-                $this->basepackages->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
-            }
-        } else {
-            $this->secTools->hashPassword(rand());//Randomize so we take same time to respond as if the account exists.
-
-            $this->addResponse('Error: Username/Password incorrect!', 1);
-
-            $this->logger->log->debug($data['user'] . ' is not in DB. App: ' . $this->app['name']);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    protected function setSessionAndRecaller(array $data)
-    {
-        if ($this->setUserSession()) {
-            $newSession['account_id'] = $this->account['id'];
-            $newSession['app'] = $this->getKey();
-            $newSession['session_id'] = $this->session->getId();
-
-            if ($this->config->databasetype === 'db') {
-                $sessionModel = new BasepackagesUsersAccountsSessions;
-
-                $sessionModel->assign($newSession);
-
-                try {
-                    $sessionModel->create();
-                } catch (\Exception $e) {
-                    $this->logger->log->debug('Duplicate session Id Found. This happens when session was deleted from server and browser used an old session ID.');
-
-                    $this->logout();
-
-                    throw $e;
-                }
-            } else {
-                $sessionStore = $this->ff->store('basepackages_users_accounts_sessions');
-
-                try {
-                    $sessionStore->insert($newSession);
-                } catch (\Exception $e) {
-                    $this->logger->log->debug('Duplicate session Id Found. This happens when session was deleted from server and browser used an old session ID.');
-
-                    $this->logout();
-
-                    throw $e;
-                }
-            }
-        }
-
-        $this->setUserIdCooikie();
-
-        if (isset($data['remember']) && $data['remember'] === 'true') {
-            $this->setRecaller();
-        }
-    }
-
-    protected function setUserIdCooikie()
-    {
-        $this->cookies->useEncryption(false);
-
         $this->cookies->set(
-            'id',
-            $this->account['id'],
-            $this->cookieTimeout,
+            $this->cookieKey,
+            $identifier . $this->separator . $token,
+            time() + $this->config->timeout->cookies,
             '/',
             $this->config->dev === true ? false : true,
             $this->domains->getDomain()['name'],
             true
         );
 
-        $this->cookies->send();
-
-        $this->cookies->useEncryption(true);
+        $this->cookies->get($this->cookieKey)->setOptions(['samesite'=>'strict']);
     }
 
     public function setUserFromRecaller()
@@ -523,10 +599,14 @@ class Auth extends BasePackage
             throw new \Exception('Cannot set account from cookie');
         }
 
-        $this->account = $this->basepackages->accounts->getAccountById($hasIdentifier['account_id']);
+        $account = $this->basepackages->accounts->getAccountById($hasIdentifier['account_id']);
 
-        if ($this->account) {
+        if ($account) {
             $this->updateSessionIdForSessionAndIdentifier($hasIdentifier);
+
+            $this->setUserSession($account);
+
+            $this->account = $account;
 
             return true;
         }
@@ -577,26 +657,22 @@ class Auth extends BasePackage
             if ($session) {
                 $session['session_id'] = $this->session->getId();
 
-                if ($this->config->databasetype === 'db') {
-                    $sessionModel->assign($session);
+                $this->updateSessionIdleTimer($session);
+            } else {
+                $this->logger->log->debug('Old session ID for the identifier does not match the new session ID, forcing logout');
 
-                    $sessionModel->update();
-                } else {
-                    $sessionStore->update($session);
-                }
+                throw new \Exception('Error: Contact System Administrator');
             }
         }
-
-        $this->setUserSession();
     }
 
     public function hasRecaller()
     {
-        if (!$this->cookies->has($this->cookieKey) && $this->hasUserInSession()) {
-            if (!$this->cookies->has('id')) {
-                $this->setUserIdCooikie();
-            }
+        if (!$this->cookies->has('id') && $this->hasUserInSession()) {
+            $this->setUserIdCooikie();
+        }
 
+        if (!$this->cookies->has($this->cookieKey) && $this->hasUserInSession()) {
             if ($this->config->databasetype === 'db') {
                 $identifierModel = new BasepackagesUsersAccountsIdentifiers;
 
@@ -642,20 +718,6 @@ class Auth extends BasePackage
     {
         list($identifier, $token) = $this->generateRecaller();
 
-        $this->cookies->set(
-            $this->cookieKey,
-            $identifier . $this->separator . $token,
-            $this->cookieTimeout,
-            '/',
-            $this->config->dev === true ? false : true,
-            $this->domains->getDomain()['name'],
-            true
-        );
-
-        $this->cookies->get($this->cookieKey)->setOptions(['samesite'=>'strict']);
-
-        $this->cookies->send();
-
         $newIdentifier['account_id'] = $this->account['id'];
         $newIdentifier['app'] = $this->getKey();
         $newIdentifier['session_id'] = $this->session->getId();
@@ -673,6 +735,8 @@ class Auth extends BasePackage
 
             $identifierStore->insert($newIdentifier);
         }
+
+        $this->setRecallerCooikie($identifier, $token);
     }
 
     protected function generateRecaller()
@@ -685,13 +749,21 @@ class Auth extends BasePackage
         return $this->account;
     }
 
-    public function check()
+    public function check($resetCache = false)
     {
-        if ($this->account) {
+        if (!$resetCache && $this->account) {
             return true;
         }
 
-        if ($this->hasUserInSession() || $this->hasRecaller()) {
+        if ($this->hasUserInSession()) {
+            $this->access->auth->setUserFromSession();
+
+            return true;
+        }
+
+        if ($this->hasRecaller()) {
+            $this->access->auth->setUserFromRecaller();
+
             return true;
         }
 
@@ -720,38 +792,69 @@ class Auth extends BasePackage
     public function setUserFromSession()
     {
         if ($this->session->get($this->getKey())) {
-            $this->account = $this->basepackages->accounts->getAccountById($this->session->get($this->getKey()));
+            $account = $this->basepackages->accounts->getAccountById($this->session->get($this->getKey()));
 
-            if (!$this->account) {
-                $this->logger->log->debug($this->account['email'] . ' not found in session for app: ' . $this->app['name']);
+            if (!$account) {
+                $this->logger->log->debug('User not found for app: ' . $this->app['name']);
 
-                throw new \Exception('User not found in session');
+                throw new \Exception('Error: Contact System Administrator');
             }
 
-            if ($this->account['sessions'] && is_array($this->account['sessions']) && count($this->account['sessions']) > 0) {
-                foreach ($this->account['sessions'] as $session) {
-                    if (isset($session['session_id']) &&
-                        $session['session_id'] === $this->session->getId() &&
+            if ($account['sessions'] && is_array($account['sessions']) && count($account['sessions']) > 0) {
+                foreach ($account['sessions'] as $session) {
+                    if ($session['session_id'] === $this->session->getId() &&
                         $session['app'] === $this->getKey()
                     ) {
+                        //Check Timeout
+                        if (isset($session['session_absolute_timeout']) && $session['session_absolute_timeout'] > 0) {
+                            if (time() > $session['session_absolute_timeout']) {
+                                $this->account = $account;
+
+                                $this->logger->log->debug($account['email'] . ' absolute session timeout reached, forcing logout');
+
+                                throw new \Exception('Error: Absolute session timeout!');
+                            }
+                        }
+
+                        if (isset($session['session_idle_timeout']) && $session['session_idle_timeout'] > 0) {
+                            if (time() > $session['session_idle_timeout']) {
+                                $this->account = $account;
+
+                                $this->logger->log->debug($account['email'] . ' idle session timeout reached, forcing logout');
+
+                                throw new \Exception('Error: Idle session timeout!');
+                            } else {
+                                if (!$this->updateSessionIdleTimer($session)) {
+                                    throw new \Exception('Error: Contact System Administrator');
+                                }
+                            }
+                        }
+
+                        $this->account = $account;
+
                         return true;
                     }
                 }
             }
 
-            $this->logger->log->debug($this->account['email'] . ' session id ' . $this->session->getId() . ' not present in DB.');
+            if ($this->cookies->has($this->cookieKey)) {
+                return false;
+            }
 
-            $this->sessionTools->clearSession($this->session->getId());
+            $this->logger->log->debug(
+                $account['email'] . ' session id ' . $this->session->getId() .
+                ' not present in DB. Possibly session deleted by administrator via force logout'
+            );
 
-            throw new \Exception('User session deleted in DB by administrator via force logout.');
+            throw new \Exception('Error: Contact System Administrator');
         } else {
             return false;
         }
     }
 
-    protected function setUserSession()
+    protected function setUserSession($account)
     {
-        $this->session->set($this->getKey(), $this->account['id']);
+        $this->session->set($this->getKey(), $account['id']);
 
         return true;
     }
@@ -864,14 +967,14 @@ class Auth extends BasePackage
 
     public function getAccountSecurityObject()
     {
-        $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
-
         if ($this->config->databasetype === 'db') {
+            $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
+
             return $accountsObj->getSecurity();
         } else {
-            $account = $accountsObj->toArray();
-
-            if ($account) {
+            if (isset($this->account()['security'])) {
+                return (object) $this->account()['security'];
+            } else {
                 $securityStore = $accountsObj->changeStore('basepackages_users_accounts_security');
 
                 $securityStore->findOneBy(['account_id', '=', $this->account()['id']]);

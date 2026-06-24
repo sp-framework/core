@@ -2,6 +2,8 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\User;
 
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
+
 class Account
 {
     public function register($db, $ff, $email, $password, $helper)
@@ -12,7 +14,7 @@ class Account
                 'email'                     => $email,
                 'username'                  => explode('@', $email)[0],
                 'domain'                    => explode('@', $email)[1],
-                'profile_package_name'      => 'UsersProfiles',
+                'profile_package_class'     => str_replace('\\', '_', Profiles::class),
                 'profile_package_row_id'    => 1
             ];
 
@@ -27,6 +29,8 @@ class Account
         }
 
         $this->registerAccountSecurity($db, $ff, $password, $helper);
+
+        $this->registerAccountEnv($db, $ff, $helper);
     }
 
     protected function registerAccountSecurity($db, $ff, $password, $helper)
@@ -49,6 +53,25 @@ class Account
             $securityStore = $ff->store('basepackages_users_accounts_security');
 
             $securityStore->updateOrInsert($security);
+        }
+    }
+
+    protected function registerAccountEnv($db, $ff, $helper)
+    {
+        $env =
+            [
+                'account_id'            => 1,
+                'params'                => $helper->encode(['1' => []])
+            ];
+
+        if ($db) {
+            $db->insertAsDict('basepackages_users_accounts_env', $env);
+        }
+
+        if ($ff) {
+            $envStore = $ff->store('basepackages_users_accounts_env');
+
+            $envStore->updateOrInsert($env);
         }
     }
 }

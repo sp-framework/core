@@ -20,6 +20,8 @@ class ViewssettingsComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
+            $this->useStorage('public');
+
             if ($this->getData()['id'] != 0) {
                 $viewssettings = $this->modules->viewsSettings->getViewsSettingsById($this->getData()['id']);
 
@@ -41,9 +43,14 @@ class ViewssettingsComponent extends BaseComponent
 
                 if ($views) {
                     foreach ($views as $viewKey => $view) {
+                        if ($view['is_subview']) {
+                            continue;
+                        }
+
                         $apps[$value['id']]['views'][$view['id']]['id'] = $view['id'];
                         $apps[$value['id']]['views'][$view['id']]['name'] = $view['name'];
                         $apps[$value['id']]['views'][$view['id']]['display_name'] = $view['display_name'];
+
                         if (is_string($view['settings'])) {
                             $view['settings'] = $this->helper->decode($view['settings'], true);
                         }
@@ -52,7 +59,6 @@ class ViewssettingsComponent extends BaseComponent
                             is_array($view['settings']['branding'])
                         ) {
                             foreach ($view['settings']['branding'] as $brandKey => $brand) {
-
                                 if (is_array($brand) && !isset($brand['brand'])) {
                                     // we unset it as branding is not correct.
                                     unset($view['settings']['branding'][$brandKey]);
@@ -68,6 +74,7 @@ class ViewssettingsComponent extends BaseComponent
                                 }
                             }
                         }
+
                         $apps[$value['id']]['views'][$view['id']]['settings'] = $view['settings'];
                     }
                 }
@@ -112,8 +119,25 @@ class ViewssettingsComponent extends BaseComponent
                     $views = [$apps[$viewssettings['app_id']]['views'][$viewssettings['view_id']]];
                 }
 
+                $activeViewLayout = 'default';
+
+                if (isset($viewssettings['settings']['layouts']) &&
+                    is_array($viewssettings['settings']['layouts'])
+                ) {
+                    foreach ($viewssettings['settings']['layouts'] as $layout) {
+                        if (isset($layout['active']) && $layout['active'] == 'true') {
+                            $activeViewLayout = $layout['view'];
+
+                            break;
+                        }
+                    }
+                } else {
+                    $viewssettings['settings']['layouts'] = [];
+                }
+
                 $this->view->views = $views;
                 $this->view->viewssettings = $viewssettings;
+                $this->view->activeViewLayout = $activeViewLayout;
             } else {
                 $this->view->viewssettings = [];
             }

@@ -38,6 +38,314 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
+dataCollectionSectionForm['funcs'] = { };
+
+dataCollectionSectionForm['funcs']['syncBranches'] = function(quick = false) {
+    $('#{{componentId}}-{{sectionId}}-sync-branches').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-sync-branches').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+
+    $.post('{{links.url("devtools/modules/syncBranches")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            if (response.responseData && response.responseData.branches) {
+                $('#{{componentId}}-{{sectionId}}-branch').empty().trigger('change');
+                for (var branch in response.responseData.branches) {
+                    var newOption
+                        = new Option(
+                            response.responseData.branches[branch]['name'],
+                            response.responseData.branches[branch]['name'], false, false
+                        );
+
+                    $('#{{componentId}}-{{sectionId}}-branch').append(newOption).trigger('change');
+                }
+                if (quick) {
+                    $('#{{componentId}}-{{sectionId}}-branch').val('main').trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-branch').valid();
+                    $('#{{componentId}}-{{sectionId}}-release-type').valid();
+                }
+            }
+            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.branches.length + ' branches.'});
+        } else {
+            paginatedPNotify('error', {'text': response.responseMessage});
+        }
+
+        $('#{{componentId}}-{{sectionId}}-sync-branches').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-sync-branches').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+    }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['syncMilestones'] = function() {
+    $('#{{componentId}}-{{sectionId}}-sync-milestones').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-sync-milestones').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+
+    $.post('{{links.url("devtools/modules/syncMilestones")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            if (response.responseData && response.responseData.milestones) {
+                $('#{{componentId}}-{{sectionId}}-milestone').empty().trigger('change');
+                for (var milestone in response.responseData.milestones) {
+                    var milestoneNumber = 1;
+
+                    if (response.responseData.milestones[milestone]['number']) {
+                        milestoneNumber = response.responseData.milestones[milestone]['number'];
+                    } else if (response.responseData.milestones[milestone]['id']) {
+                        milestoneNumber = response.responseData.milestones[milestone]['id'];
+                    }
+                    var newOption
+                        = new Option(
+                            response.responseData.milestones[milestone]['title'],
+                            milestoneNumber, false, false
+                        );
+
+                    $('#{{componentId}}-{{sectionId}}-milestone').append(newOption).trigger('change');
+
+                    milestoneNumber++;
+                }
+            }
+            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.milestones.length + ' milestones.'});
+        } else {
+            paginatedPNotify('error', {'text': response.responseMessage});
+        }
+
+        $('#{{componentId}}-{{sectionId}}-sync-milestones').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-sync-milestones').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+    }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['syncLabels'] = function() {
+    $('#{{componentId}}-{{sectionId}}-sync-label').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-sync-label').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+    $('#{{componentId}}-{{sectionId}}-label').empty().trigger('change');
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+
+    $.post('{{links.url("devtools/modules/syncLabels")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            if (response.responseData && response.responseData.labels) {
+                for (var label in response.responseData.labels) {
+                    var newOption
+                        = new Option(
+                            response.responseData.labels[label]['name'],
+                            response.responseData.labels[label]['id'], false, false
+                        );
+
+                    $('#{{componentId}}-{{sectionId}}-label').append(newOption).trigger('change');
+                }
+            }
+            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.labels.length + ' label.'});
+        } else {
+            paginatedPNotify('error', {'text': response.responseMessage});
+        }
+        $('#{{componentId}}-{{sectionId}}-sync-label').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-sync-label').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+    }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['bump'] = function(bump) {
+    if (bump === 'custom') {
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-custom-version').attr('disabled', false);
+            $('#semver').attr('hidden', true);
+            $('#custom').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-get-next-release').attr('disabled', true);
+    } else {
+        $('#semver').attr('hidden', false);
+        $('#custom').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-custom-version').val('');
+
+        if (bump === 'preRelease' ||
+            bump === 'major_preRelease' ||
+            bump === 'minor_preRelease' ||
+            bump === 'patch_preRelease'
+        ) {
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
+        } else if (bump === 'buildMeta' ||
+                   bump === 'major_buildMeta' ||
+                   bump === 'minor_buildMeta' ||
+                   bump === 'patch_buildMeta'
+        ) {
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
+        } else if (bump === 'preReleaseBuildMeta' ||
+                   bump === 'major_preReleaseBuildMeta' ||
+                   bump === 'minor_preReleaseBuildMeta' ||
+                   bump === 'patch_preReleaseBuildMeta'
+        ) {
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
+        } else {
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+        }
+
+        $('#{{componentId}}-{{sectionId}}-get-next-release').attr('disabled', false);
+    }
+    $('#release-version-text').html('');
+}
+
+dataCollectionSectionForm['funcs']['getNextRelease'] = function(bump) {
+    if (bump === 'custom') {
+        return;
+    }
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+    postData['force-mark-prerelease'] = $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked;
+    postData['bump'] = bump;
+
+    if (bump === 'preRelease' ||
+        bump === 'major_preRelease' ||
+        bump === 'minor_preRelease' ||
+        bump === 'patch_preRelease'
+    ) {
+        postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
+        if (postData['preReleasePrefix'] === '') {
+            paginatedPNotify('error', {'text': 'Provide pre-release prefix.'});
+            return;
+        }
+    } else if (bump === 'buildMeta' ||
+               bump === 'major_buildMeta' ||
+               bump === 'minor_buildMeta' ||
+               bump === 'patch_buildMeta'
+    ) {
+        postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
+        if (postData['buildMetaPrefix'] === '') {
+            paginatedPNotify('error', {'text': 'Provide build meta prefix.'});
+            return;
+        }
+    } else if (bump === 'preReleaseBuildMeta' ||
+               bump === 'major_preReleaseBuildMeta' ||
+               bump === 'minor_preReleaseBuildMeta' ||
+               bump === 'patch_preReleaseBuildMeta'
+    ) {
+        postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
+        postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
+        if (postData['preReleasePrefix'] === '') {
+            paginatedPNotify('error', {'text': 'Provide pre-release prefix.'});
+            return;
+        }
+        if (postData['buildMetaPrefix'] === '') {
+            paginatedPNotify('error', {'text': 'Provide build meta prefix.'});
+            return;
+        }
+    }
+    $('#release-version-text').html(
+        '<div class="row">' +
+        '    <div class="col text-lg">' +
+        '        <i class="fa fa-cog fa-spin"></i> Loading...' +
+        '    </div>' +
+        '</div>'
+    );
+
+    $.post('{{links.url("devtools/modules/bumpVersion")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        var color = 'primary';
+        var newVersionColor = 'primary';
+
+        if (response.responseCode == 0 ||
+            response.responseCode == -1 ||
+            response.responseCode == 2 ||
+            response.responseCode == 3
+        ) {
+            if (response.responseCode == -1) {
+                paginatedPNotify('notice', {'text': 'Local version is lower than remote version!'});
+                color = 'warning';
+            } else if (response.responseCode == 2) {
+                paginatedPNotify('error', {'text': 'Local Version is greater than remote version!'});
+                color = 'danger';
+            } else if (response.responseCode == 3) {
+                paginatedPNotify('info', {'text': 'Remote release is set as draft!'});
+                color = 'info';
+                $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked = true;
+                $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-success').addClass('bg-info');
+            }
+
+            if (color === 'info' || $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
+                newVersionColor = 'info';
+            }
+
+            if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
+                $('#release-version-text').html(
+                    '<span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
+                    '<i class="text-success fa-solid fa-arrow-right"></i> ' +
+                    '<span class="text-' + newVersionColor + '" id="next-release-text">' + response.responseData.newVersion + '</span>'
+                );
+            }
+        } else {
+            if (color === 'info' || $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
+                newVersionColor = 'info';
+            }
+            if (response.responseData && response.responseData.release) {
+                $('#release-version-text').html(
+                    '<span class="text-' + newVersionColor + '">' + response.responseData.release + '</span>'
+                );
+            } else {
+                $('#release-version-text').html(
+                    '<span class="text-danger">ERROR LOADING RELEASE INFORMATION!</span>'
+                );
+            }
+
+            paginatedPNotify('error', {'text': response.responseMessage});
+        }
+
+        if (response.responseData && response.responseData.versionIsDraft && response.responseData.versionIsDraft == true) {
+            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-release-type').attr('disabled', true);
+        }
+    }, 'json');
+}
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -106,191 +414,25 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-release-type'                            : {
             placeholder: 'SELECT NEW RELEASE TYPE',
             afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-quick-minor').off();
+                $('#{{componentId}}-{{sectionId}}-quick-minor').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}-release-type').val('minor').trigger('change');
+                    dataCollectionSectionForm['funcs']['bump']('minor');
+                    dataCollectionSectionForm['funcs']['getNextRelease']('minor');
+                    dataCollectionSectionForm['funcs']['syncBranches'](true);
+                });
+
                 $('#{{componentId}}-{{sectionId}}-release-type').on('select2:select', function(e) {
-                    var bump = e.params.data.id;
-
-                    if (bump === 'custom') {
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-custom-version').attr('disabled', false);
-                            $('#semver').attr('hidden', true);
-                            $('#custom').attr('hidden', false);
-                            $('#{{componentId}}-{{sectionId}}-get-next-release').attr('disabled', true);
-                    } else {
-                        $('#semver').attr('hidden', false);
-                        $('#custom').attr('hidden', true);
-                        $('#{{componentId}}-{{sectionId}}-custom-version').val('');
-
-                        if (bump === 'preRelease' ||
-                            bump === 'major_preRelease' ||
-                            bump === 'minor_preRelease' ||
-                            bump === 'patch_preRelease'
-                        ) {
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
-                        } else if (bump === 'buildMeta' ||
-                                   bump === 'major_buildMeta' ||
-                                   bump === 'minor_buildMeta' ||
-                                   bump === 'patch_buildMeta'
-                        ) {
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
-                        } else if (bump === 'preReleaseBuildMeta' ||
-                                   bump === 'major_preReleaseBuildMeta' ||
-                                   bump === 'minor_preReleaseBuildMeta' ||
-                                   bump === 'patch_preReleaseBuildMeta'
-                        ) {
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
-                        } else {
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
-                        }
-
-                        $('#{{componentId}}-{{sectionId}}-get-next-release').attr('disabled', false);
-                    }
-                    $('#release-version-text').html('');
+                    dataCollectionSectionForm['funcs']['bump'](e.params.data.id);
                 });
 
                 $('#{{componentId}}-{{sectionId}}-get-next-release').off();
                 $('#{{componentId}}-{{sectionId}}-get-next-release').click(function(e) {
                     e.preventDefault();
-                    var bump = $('#{{componentId}}-{{sectionId}}-release-type').val();
 
-                    if (bump === 'custom') {
-                        return;
-                    }
-
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
-                    postData['force-mark-prerelease'] = $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked;
-                    postData['bump'] = bump;
-
-                    if (bump === 'preRelease' ||
-                        bump === 'major_preRelease' ||
-                        bump === 'minor_preRelease' ||
-                        bump === 'patch_preRelease'
-                    ) {
-                        postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
-                        if (postData['preReleasePrefix'] === '') {
-                            paginatedPNotify('error', {'text': 'Provide pre-release prefix.'});
-                            return;
-                        }
-                    } else if (bump === 'buildMeta' ||
-                               bump === 'major_buildMeta' ||
-                               bump === 'minor_buildMeta' ||
-                               bump === 'patch_buildMeta'
-                    ) {
-                        postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
-                        if (postData['buildMetaPrefix'] === '') {
-                            paginatedPNotify('error', {'text': 'Provide build meta prefix.'});
-                            return;
-                        }
-                    } else if (bump === 'preReleaseBuildMeta' ||
-                               bump === 'major_preReleaseBuildMeta' ||
-                               bump === 'minor_preReleaseBuildMeta' ||
-                               bump === 'patch_preReleaseBuildMeta'
-                    ) {
-                        postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
-                        postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
-                        if (postData['preReleasePrefix'] === '') {
-                            paginatedPNotify('error', {'text': 'Provide pre-release prefix.'});
-                            return;
-                        }
-                        if (postData['buildMetaPrefix'] === '') {
-                            paginatedPNotify('error', {'text': 'Provide build meta prefix.'});
-                            return;
-                        }
-                    }
-                    $('#release-version-text').html(
-                        '<div class="row">' +
-                        '    <div class="col text-lg">' +
-                        '        <i class="fa fa-cog fa-spin"></i> Loading...' +
-                        '    </div>' +
-                        '</div>'
-                    );
-
-
-                    $.post('{{links.url("devtools/modules/bumpVersion")}}', postData, function(response) {
-                        if (response.tokenKey && response.token) {
-                            $('#security-token').attr('name', response.tokenKey);
-                            $('#security-token').val(response.token);
-                        }
-
-                        var color = 'primary';
-                        var newVersionColor = 'primary';
-
-                        if (response.responseCode == 0 ||
-                            response.responseCode == -1 ||
-                            response.responseCode == 2 ||
-                            response.responseCode == 3
-                        ) {
-                            if (response.responseCode == -1) {
-                                paginatedPNotify('notice', {'text': 'Local version is lower than remote version!'});
-                                color = 'warning';
-                            } else if (response.responseCode == 2) {
-                                paginatedPNotify('error', {'text': 'Local Version is greater than remote version!'});
-                                color = 'danger';
-                            } else if (response.responseCode == 3) {
-                                paginatedPNotify('info', {'text': 'Remote release is set as draft!'});
-                                color = 'info';
-                                $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked = true;
-                                $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-success').addClass('bg-info');
-                            }
-
-                            if (color === 'info' || $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
-                                newVersionColor = 'info';
-                            }
-
-                            if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
-                                $('#release-version-text').html(
-                                    '<span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
-                                    '<i class="text-success fa-solid fa-arrow-right"></i> ' +
-                                    '<span class="text-' + newVersionColor + '" id="next-release-text">' + response.responseData.newVersion + '</span>'
-                                );
-                            }
-                        } else {
-                            if (color === 'info' || $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
-                                newVersionColor = 'info';
-                            }
-                            if (response.responseData && response.responseData.release) {
-                                $('#release-version-text').html(
-                                    '<span class="text-' + newVersionColor + '">' + response.responseData.release + '</span>'
-                                );
-                            } else {
-                                $('#release-version-text').html(
-                                    '<span class="text-danger">ERROR LOADING RELEASE INFORMATION!</span>'
-                                );
-                            }
-
-                            paginatedPNotify('error', {'text': response.responseMessage});
-                        }
-
-                        if (response.responseData && response.responseData.versionIsDraft && response.responseData.versionIsDraft == true) {
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-release-type').attr('disabled', true);
-                        }
-                    }, 'json');
+                    dataCollectionSectionForm['funcs']['getNextRelease']($('#{{componentId}}-{{sectionId}}-release-type').val());
                 });
 
                 $('#{{componentId}}-{{sectionId}}-mark-as-draft').change(function() {
@@ -455,41 +597,7 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-sync-branches').click(function(e) {
                     e.preventDefault();
 
-                    $('#{{componentId}}-{{sectionId}}-sync-branches').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-sync-branches').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
-
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
-
-                    $.post('{{links.url("devtools/modules/syncBranches")}}', postData, function(response) {
-                        if (response.tokenKey && response.token) {
-                            $('#security-token').attr('name', response.tokenKey);
-                            $('#security-token').val(response.token);
-                        }
-
-                        if (response.responseCode == 0) {
-                            if (response.responseData && response.responseData.branches) {
-                                $('#{{componentId}}-{{sectionId}}-branch').empty().trigger('change');
-                                for (var branch in response.responseData.branches) {
-                                    var newOption
-                                        = new Option(
-                                            response.responseData.branches[branch]['name'],
-                                            response.responseData.branches[branch]['name'], false, false
-                                        );
-
-                                    $('#{{componentId}}-{{sectionId}}-branch').append(newOption).trigger('change');
-                                }
-                            }
-                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.branches.length + ' branches.'});
-                        } else {
-                            paginatedPNotify('error', {'text': response.responseMessage});
-                        }
-
-                        $('#{{componentId}}-{{sectionId}}-sync-branches').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-sync-branches').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
-                    }, 'json');
+                    dataCollectionSectionForm['funcs']['syncBranches']();
                 });
             }
         },
@@ -500,50 +608,7 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-sync-milestones').click(function(e) {
                     e.preventDefault();
 
-                    $('#{{componentId}}-{{sectionId}}-sync-milestones').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-sync-milestones').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
-
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
-
-                    $.post('{{links.url("devtools/modules/syncMilestones")}}', postData, function(response) {
-                        if (response.tokenKey && response.token) {
-                            $('#security-token').attr('name', response.tokenKey);
-                            $('#security-token').val(response.token);
-                        }
-
-                        if (response.responseCode == 0) {
-                            if (response.responseData && response.responseData.milestones) {
-                                $('#{{componentId}}-{{sectionId}}-milestone').empty().trigger('change');
-                                for (var milestone in response.responseData.milestones) {
-                                    var milestoneNumber = 1;
-
-                                    if (response.responseData.milestones[milestone]['number']) {
-                                        milestoneNumber = response.responseData.milestones[milestone]['number'];
-                                    } else if (response.responseData.milestones[milestone]['id']) {
-                                        milestoneNumber = response.responseData.milestones[milestone]['id'];
-                                    }
-                                    var newOption
-                                        = new Option(
-                                            response.responseData.milestones[milestone]['title'],
-                                            milestoneNumber, false, false
-                                        );
-
-                                    $('#{{componentId}}-{{sectionId}}-milestone').append(newOption).trigger('change');
-
-                                    milestoneNumber++;
-                                }
-                            }
-                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.milestones.length + ' milestones.'});
-                        } else {
-                            paginatedPNotify('error', {'text': response.responseMessage});
-                        }
-
-                        $('#{{componentId}}-{{sectionId}}-sync-milestones').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-sync-milestones').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
-                    }, 'json');
+                    dataCollectionSectionForm['funcs']['syncMilestones']();
                 });
             }
         },
@@ -556,40 +621,8 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-sync-label').off();
                 $('#{{componentId}}-{{sectionId}}-sync-label').click(function(e) {
                     e.preventDefault();
-                    $('#{{componentId}}-{{sectionId}}-sync-label').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-sync-label').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
-                    $('#{{componentId}}-{{sectionId}}-label').empty().trigger('change');
 
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
-
-                    $.post('{{links.url("devtools/modules/syncLabels")}}', postData, function(response) {
-                        if (response.tokenKey && response.token) {
-                            $('#security-token').attr('name', response.tokenKey);
-                            $('#security-token').val(response.token);
-                        }
-
-                        if (response.responseCode == 0) {
-                            if (response.responseData && response.responseData.labels) {
-                                for (var label in response.responseData.labels) {
-                                    var newOption
-                                        = new Option(
-                                            response.responseData.labels[label]['name'],
-                                            response.responseData.labels[label]['id'], false, false
-                                        );
-
-                                    $('#{{componentId}}-{{sectionId}}-label').append(newOption).trigger('change');
-                                }
-                            }
-                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.labels.length + ' label.'});
-                        } else {
-                            paginatedPNotify('error', {'text': response.responseMessage});
-                        }
-                        $('#{{componentId}}-{{sectionId}}-sync-label').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-sync-label').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
-                    }, 'json');
+                    dataCollectionSectionForm['funcs']['syncLabels']();
                 });
             }
         },
@@ -1240,7 +1273,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                                      : { },
         '{{componentId}}-{{sectionId}}-app_type'                                : { },
         '{{componentId}}-{{sectionId}}-name'                                    : { },
-        '{{componentId}}-{{sectionId}}-dashboards'                              : { },
         '{{componentId}}-{{sectionId}}-description'                             : { },
         '{{componentId}}-{{sectionId}}-api_id'                                  : {
             'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
@@ -1388,7 +1420,7 @@ dataCollectionSection =
                     ]
                 ]
             %}
-            {% if module is defined and module['module_type'] === 'components' or type === 'components' %}
+            {% if module is defined and module['module_type'] == 'components' or type == 'components' %}
                 {% set tabsData = array_merge(tabsData,
                     [
                         'menu'   :
@@ -1402,6 +1434,13 @@ dataCollectionSection =
                         [
                             'tabTitle'          : 'Widgets',
                             'tabInclude'        : 'modules/module/widgets'
+                        ]
+                    ],
+                    [
+                        'filters'   :
+                        [
+                            'tabTitle'          : 'Filters',
+                            'tabInclude'        : 'modules/module/filters'
                         ]
                     ])
                 %}
@@ -1439,8 +1478,15 @@ dataCollectionSection =
             </form>
             {% if module['id'] is defined %}
                 {% set moduleId = module['id'] %}
+                {% set moduleAppType = module['app_type'] %}
+                {% set moduleDevSettings = '{}' %}
+                {% if module['module_details']['settings'] is defined %}
+                    {% set moduleDevSettings = json_encode(module['module_details']['settings'], 16) %}
+                {% endif %}
             {% else %}
                 {% set moduleId = '0' %}
+                {% set moduleAppType = '' %}
+                {% set moduleDevSettings = '{}' %}
             {% endif %}
             {% set subView = false %}
             {% if subview is defined and subview === true %}
@@ -1473,14 +1519,18 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 
 dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['func'] = { };
 dataCollectionSectionForm['vars']['module_type'] = '{{type}}';
+dataCollectionSectionForm['vars']['module_app_type'] = '{{moduleAppType}}';
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
 dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
 dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
 dataCollectionSectionForm['vars']['moduleWidgets'] = JSON.parse('{{moduleWidgets}}');
+dataCollectionSectionForm['vars']['moduleFilters'] = JSON.parse('{{moduleFilters}}');
 
 if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     dataCollectionSectionForm['vars']['moduleSettings'] = { };
+    dataCollectionSectionForm['vars']['moduleDevSettings'] = { };
     if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
         dataCollectionSectionForm['vars']['subview'] = '{{subView}}';
 
@@ -1492,8 +1542,6 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
             dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
             dataCollectionSectionForm['vars']['moduleSettings']['tags'] = '';
             dataCollectionSectionForm['vars']['moduleSettings']['branding'] = { };
-            dataCollectionSectionForm['vars']['moduleSettings']['branding']['small'] = '';
-            dataCollectionSectionForm['vars']['moduleSettings']['branding']['large'] = '';
             dataCollectionSectionForm['vars']['moduleSettings']['head']['title'] = '';
             dataCollectionSectionForm['vars']['moduleSettings']['head']['meta'] = { };
             dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'] = '';
@@ -1512,6 +1560,7 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['favicons'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets'] = { };
@@ -1525,6 +1574,7 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     }
 } else {
     dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
+    dataCollectionSectionForm['vars']['moduleDevSettings'] = JSON.parse('{{moduleDevSettings}}');
     if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
         dataCollectionSectionForm['vars']['subview'] = '{{subView}}';
     }
@@ -1534,6 +1584,22 @@ if (dataCollectionSectionForm['vars']['module_type'] !== 'views' &&
     !dataCollectionSectionForm['vars']['moduleDependencies']['externals']
 ) {
     dataCollectionSectionForm['vars']['moduleDependencies']['externals'] = { };
+}
+
+dataCollectionSectionForm['func']['toggleDependenciesModules'] = function() {
+    if (dataCollectionSectionForm['vars']['moduleId'] != '0' &&
+        dataCollectionSectionForm['vars']['module_app_type'] !== ''
+    ) {
+        $('#{{componentId}}-{{sectionId}}-dependencies-modules option').each(function(index, option) {
+            if ($(option).data('app_type') &&
+                $(option).data('app_type') !== dataCollectionSectionForm['vars']['module_app_type']
+            ) {
+                $(option).attr('disabled', true);
+            } else {
+                $(option).attr('disabled', false);
+            }
+        });
+    }
 }
 
 dataCollectionSection =
@@ -1953,6 +2019,96 @@ dataCollectionSection =
                 prettyfyJson();
             }
         },
+        '{{componentId}}-{{sectionId}}-settings_dev'                            : {
+            'afterInit'     : function() {
+                if (dataCollectionSectionForm['vars']['moduleDevSettings'].length === 0) {
+                    dataCollectionSectionForm['vars']['moduleDevSettings'] = { };
+                }
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-settings_dev')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleDevSettings'], null, 4));
+                }
+
+                prettyfyJson();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-filter_name'                             : { },
+        '{{componentId}}-{{sectionId}}-filter_default'                          : { },
+        '{{componentId}}-{{sectionId}}-filter_conditions'                       : { },
+        '{{componentId}}-{{sectionId}}-filters'                                 : {
+            'afterInit'     : function() {
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-filters')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleFilters'], null, 4));
+                }
+                prettyfyJson();
+
+                function reset() {
+                    $('#{{componentId}}-{{sectionId}}-filter_name').val('');
+                    $('#{{componentId}}-{{sectionId}}-filter_conditions').val('');
+                    $("#filter-no").prop('checked', true);
+                    $('#{{componentId}}-{{sectionId}}-filters').val('');
+                }
+
+                $('#{{componentId}}-{{sectionId}}-filter-add, ' +
+                  '#{{componentId}}-{{sectionId}}-filter-remove').click(function(e) {
+                    e.preventDefault();
+
+                    if ($('#{{componentId}}-{{sectionId}}-filter_name').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-filter_name').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-filter_name').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-filter_conditions').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-filter_conditions').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-filter_conditions').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else {
+                        if (dataCollectionSectionForm['vars']['moduleFilters'].length > 0) {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-filter-remove') {
+                                $(dataCollectionSectionForm['vars']['moduleFilters']).each(function(index, filter) {
+                                    if (filter['name'] === $('#{{componentId}}-{{sectionId}}-filter_name').val() &&
+                                        filter['conditions'] === $('#{{componentId}}-{{sectionId}}-filter_conditions').val()
+                                    ) {
+                                        dataCollectionSectionForm['vars']['moduleFilters'].splice(index, 1);
+
+                                        return;
+                                    }
+                                });
+                            } else {
+                                addFilter();
+                            }
+                        } else {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-filter-remove') {
+                                return false;
+                            } else {
+                                addFilter();
+                            }
+                        }
+                    }
+
+                    reset();
+                    prettyfyJson();
+                });
+
+                function addFilter() {
+                    var filterDefault = false;
+
+                    if ($('#{{componentId}}-{{sectionId}}-filter_default').find('input[type=radio]:checked').data('value') == 'filter-yes') {
+                        filterDefault = true;
+                    }
+
+                    dataCollectionSectionForm['vars']['moduleFilters'].push(
+                        {
+                            'name'          : $('#{{componentId}}-{{sectionId}}-filter_name').val(),
+                            'conditions'    : $('#{{componentId}}-{{sectionId}}-filter_conditions').val(),
+                            'is_default'    : filterDefault
+                        }
+                    );
+                }
+            }
+        },
         '{{componentId}}-{{sectionId}}-menu'                                    : { },
         '{{componentId}}-{{sectionId}}-menu_id'                                 : { },
         '{{componentId}}-{{sectionId}}-apps'                                    : { },
@@ -2022,20 +2178,22 @@ dataCollectionSection =
                         });
                     } else {
                         if (dataCollectionSectionForm['vars']['moduleWidgets'].length > 0) {
-                            $(dataCollectionSectionForm['vars']['moduleWidgets']).each(function(index, widget) {
-                                if (widget['method'] === $('#{{componentId}}-{{sectionId}}-widget-method').val()) {
-                                    dataCollectionSectionForm['vars']['moduleWidgets'].splice(index, 1);
-                                }
-                            });
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-widget-remove') {
+                                $(dataCollectionSectionForm['vars']['moduleWidgets']).each(function(index, widget) {
+                                    if (widget['method'] === $('#{{componentId}}-{{sectionId}}-widget-method').val()) {
+                                        dataCollectionSectionForm['vars']['moduleWidgets'].splice(index, 1);
 
-                            if ($(this)[0].id !== '{{componentId}}-{{sectionId}}-widget-remove') {
+                                        return;
+                                    }
+                                });
+                            } else {
                                 addWidget();
                             }
                         } else {
-                            if ($(this)[0].id !== '{{componentId}}-{{sectionId}}-widget-remove') {
-                                addWidget();
-                            } else {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-widget-remove') {
                                 return false;
+                            } else {
+                                addWidget();
                             }
                         }
                     }
@@ -2086,6 +2244,12 @@ dataCollectionSection =
                             'head-link-href-assets-prod' : {
                                 'id'    : 'head-link-href-assets-prod',
                                 'text'  : 'Head CSS Links (Production)'
+                            }
+                        },
+                        {
+                            'head-link-href-favicons' : {
+                                'id'    : 'head-link-href-favicons',
+                                'text'  : 'Head Favicons'
                             }
                         },
                         {
@@ -2515,6 +2679,22 @@ dataCollectionSection =
                                 }
 
                                 break;
+                            case 'head-link-href-favicons' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['favicons']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['favicons'];
+                                }
+
+                                break;
                             case 'head-script-src-assets-dev' :
                                 type = 'array';
                                 settings = '';
@@ -2871,6 +3051,11 @@ dataCollectionSection =
                                      = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;
+                            case 'head-link-href-favicons' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['favicons']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
                             case 'head-script-src-assets-dev' :
                                 dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev']
                                      = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
@@ -3026,7 +3211,10 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-export'                                  : { },
         '{{componentId}}-{{sectionId}}-dependencies-modules'                    : {
             'placeholder'   : 'SELECT MODULE',
-            'allowClear'    : true
+            'allowClear'    : true,
+            afterInit       : function() {
+                dataCollectionSectionForm['func']['toggleDependenciesModules']();
+            }
         },
         '{{componentId}}-{{sectionId}}-dependencies-modulename'                 : { },
         '{{componentId}}-{{sectionId}}-dependencies-moduleversion'              : { },
@@ -3490,6 +3678,10 @@ dataCollectionSection =
             },
             onSubmitResponse: function(response) {
                 if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {
+                    if (response.responseMessage) {
+                        paginatedPNotify('info', {'text': response.responseMessage});
+                    }
+
                     if (response.responseData.newRepo == false) {
                         return true;
                     }

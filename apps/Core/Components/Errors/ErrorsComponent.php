@@ -22,14 +22,28 @@ class ErrorsComponent extends BaseComponent
 
     public function controllerPackageDependencyErrorAction()
     {
-        $this->view->pick('errors/controllerdependencyerror');
+        $this->view->pick('common/errors/controllerdependencyerror');
 
         $this->addResponse('Component Dependency Error', 1);
     }
 
     public function controllerViewDependencyErrorAction()
     {
-        $this->view->pick('errors/controllerdependencyerror');
+        $this->view->pick('common/errors/controllerdependencyerror');
+
+        $this->addResponse('Component Dependency Error', 1);
+    }
+
+    public function appPackagePermissionDeniedAction()
+    {
+        $this->view->pick('common/errors/controllerdependencyerror');
+
+        $this->addResponse('Component Dependency Error', 1);
+    }
+
+    public function appComponentPermissionDeniedAction()
+    {
+        $this->view->pick('common/errors/controllerdependencyerror');
 
         $this->addResponse('Component Dependency Error', 1);
     }

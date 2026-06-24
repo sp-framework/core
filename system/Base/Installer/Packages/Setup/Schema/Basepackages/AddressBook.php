@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class AddressBook
 {
@@ -21,10 +22,10 @@ class AddressBook
                     ]
                 ),
                 new Column(
-                    'package_name',
+                    'package_class',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
+                        'size'    => 200,
                         'notNull' => true
                     ]
                 ),
@@ -35,17 +36,19 @@ class AddressBook
                         'notNull' => true
                     ]
                 ),
-                new Column(
-                    'address_type',
+                new Column(//sequence
+                    'seq',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => true
+                        'notNull' => true,
+                        'default' => 0
                     ]
                 ),
                 new Column(
-                    'is_primary',
+                    'address_reference',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
                         'notNull' => true
                     ]
                 ),
@@ -74,6 +77,22 @@ class AddressBook
                     ]
                 ),
                 new Column(
+                    'street_address_3',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'street_address_4',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'city_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
@@ -89,10 +108,17 @@ class AddressBook
                     ]
                 ),
                 new Column(
-                    'post_code',
+                    'post_code_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
-                        'size'    => 20,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'post_code',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
                         'notNull' => false,
                     ]
                 ),
@@ -126,7 +152,34 @@ class AddressBook
                         'notNull' => false,
                     ]
                 ),
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'package_row_id',
+                        'package_class',
+                        'address_reference'
+                    ],
+                    'UNIQUE'
+                )
             ]
+        ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'package_row_id',
+                    'package_class',
+                    'address_reference'
+                ],
+                'INDEX'
+            )
         ];
     }
 }

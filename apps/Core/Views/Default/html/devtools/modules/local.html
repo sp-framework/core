@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set apptypesURL = links.url('devtools/modules/q/module/true/type/apptypes/id/0') %}
 {% set componentsURL = links.url('devtools/modules/q/module/true/type/components/id/0') %}
 {% set packagesURL = links.url('devtools/modules/q/module/true/type/packages/id/0') %}
@@ -11,6 +11,14 @@
     {% set packagesURL = packagesURL ~ '/includecoremodules/true' %}
     {% set middlewaresURL = middlewaresURL ~ '/includecoremodules/true' %}
     {% set viewsURL = viewsURL ~ '/includecoremodules/true' %}
+{% endif %}
+{% if selectedAppType is defined and selectedAppType != 0 %}
+    {% set componentsURL = componentsURL ~ '/apptype/' ~ selectedAppType %}
+    {% set packagesURL = packagesURL ~ '/apptype/' ~ selectedAppType %}
+    {% set middlewaresURL = middlewaresURL ~ '/apptype/' ~ selectedAppType %}
+    {% set viewsURL = viewsURL ~ '/apptype/' ~ selectedAppType %}
+    {% set subViewsURL = subViewsURL ~ '/apptype/' ~ selectedAppType %}
+    {% set bundlesURL = bundlesURL ~ '/apptype/' ~ selectedAppType %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -139,6 +147,69 @@
     </div>
 </div>
 <hr>
+<div class="row mb-1">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'app_type',
+                'fieldLabel'                           : false,
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select app type to see only that app type modules.',
+                'fieldRequired'                        : false,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : false,
+                'fieldBazPostOnUpdate'                 : false,
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2Options'              : appTypes,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : selectedAppType
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'                       : componentId,
+                'sectionId'                         : sectionId,
+                'buttonType'                        : 'DropdownSplitButtons',
+                'buttonLabel'                       : false,
+                'dropdownButtonId'                  : 'bulk',
+                'dropdownButtonTitle'               : '(0) Bulk Actions',
+                'dropdownButtonIcon'                : 'wand-magic-sparkles',
+                'dropdownButtonDisabled'            : true,
+                'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                'dropdownAlign'                     : 'right',
+                'buttonPosition'                    : 'right',
+                'dropdowns'                         :
+                    {
+                        'install' : {
+                            'title'                   : 'Install'
+                        },
+                        'uninstall' : {
+                            'title'                   : 'Uninstall'
+                        },
+                        'divider1' : 'divider',
+                        'truncate' : {
+                            'title'                   : 'Truncate DB'
+                        },
+                        'run_script' : {
+                            'title'                   : 'Run Install/Uninstall Script'
+                        },
+                        'divider2' : 'divider',
+                        'cancel' : {
+                            'title'                   : 'Cancel'
+                        }
+                    }
+            ]
+        )}}
+    </div>
+</div>
 <div class="row">
     <div class="col">
         {% set modulesTable = '' %}
@@ -218,7 +289,6 @@
                             '<td>' ~ actionButtons ~ '</td>' ~
                         '</tr>'
                     %}
-                    {# {{ trace([module]) }} #}
                 {% endfor %}
             {% endif %}
         {% endfor %}
@@ -263,3 +333,4 @@
         )}}
     </div>
 </div>
+<!-- htmlmin:ignore -->

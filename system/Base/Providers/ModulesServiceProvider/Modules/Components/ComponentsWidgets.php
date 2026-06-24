@@ -24,7 +24,11 @@ class ComponentsWidgets
 
         $this->view->component = $component;
 
-        $this->view->componentName = 'dashboards';
+        if ($component['route'] !== 'pages') {
+            $this->view->componentName = 'dashboards';
+        } else {
+            $this->view->componentName = 'widgets';
+        }
 
         $this->view->appRoute = $this->componentObj->apps->getAppInfo()['route'];
 
@@ -51,7 +55,11 @@ class ComponentsWidgets
 
         $this->views = $this->componentObj->modules->views;
 
-        $this->views->setPhalconViewPath();
+        $viewsPath = base_path('apps/' .
+                              ucfirst($this->component['app_type']) .
+                              '/Views/' . $this->views->getViewInfo()['name'] .
+                              '/html/');
+        $this->views->setPhalconViewPath($viewsPath);
 
         $this->view->setViewsDir($this->views->getPhalconViewPath() . $this->component['route']);
 
@@ -60,13 +68,22 @@ class ComponentsWidgets
 
     public function info($widget)
     {
-        return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/info');
+        return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/info', ['widget' => $widget]);
+    }
+
+    public function settings($widget, $pagewidget = null)
+    {
+        return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/settings', ['widget' => $widget, 'pagewidget' => $pagewidget]);
     }
 
     public function getWidgetContent($widget, $data = [])
     {
         if (count($data) > 0) {
-            $widget['data'] = $data;
+            if (isset($widget['data'])) {
+                $widget['data'] = array_merge_recursive($widget['data'], $data);
+            } else {
+                $widget['data'] = $data;
+            }
         }
 
         try {

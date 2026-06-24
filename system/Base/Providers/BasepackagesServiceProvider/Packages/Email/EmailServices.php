@@ -18,13 +18,27 @@ class EmailServices extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('emailServices', 'core')) {
+                $this->emailServices = $this->opCache->getCache('emailServices', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('emailServices', $this->emailServices, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         parent::init();
 
         return $this;
     }
 
+    /**
+     * @notification(name=add)
+     * @notification_allowed_methods(email)
+     */
     public function addEmailService(array $data)
     {
         $data = $this->encryptPass($data);
@@ -38,6 +52,8 @@ class EmailServices extends BasePackage
         }
 
         if ($this->add($data)){
+            unset($data['password']);
+
             $this->addActivityLog($data);
 
             $this->addResponse('Added new email service ' . $data['name'], 0, null, true);
@@ -46,8 +62,19 @@ class EmailServices extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=update)
+     * @notification_allowed_methods(email)
+     */
     public function updateEmailService(array $data)
     {
+        $emailService = $this->getById($data['id']);
+
+        $passChange = false;
+        if ($emailService['password'] !== $data['password']) {
+            $passChange = true;
+        }
+
         $data = $this->encryptPass($data);
 
         $validate = $this->validateServiceData($data);
@@ -58,12 +85,23 @@ class EmailServices extends BasePackage
             return false;
         }
 
-        $emailService = $this->getById($data['id']);
+        if (!$emailService) {
+            $this->addResponse('Email Service with ID not found', 1);
 
-        $emailService = array_merge($emailService, $data);
+            return false;
+        }
 
-        if ($this->update($emailService)) {
+        if ($this->update(array_merge($emailService, $data))) {
+            if ($passChange) {
+                $data['password'] = 'Changed';
+            } else {
+                unset($data['password']);
+                unset($emailService['password']);
+            }
+
             $this->addActivityLog($data, $emailService);
+
+            $this->addToNotification('update', 'Updated: Email Service.', null, null, $emailService['id']);
 
             $this->addResponse('Updated email service ' . $data['name']);
         } else {
@@ -71,12 +109,18 @@ class EmailServices extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=remove)
+     * @notification_allowed_methods(email)
+     */
     public function removeEmailService(array $data)
     {
         $emailService = $this->getById($data['id']);
 
         //Check relations before removing.
         if ($this->remove($emailService['id'])) {
+            $this->addToNotification('remove', 'Removed: Email Service - ' . $emailService['name'], null, null);
+
             $this->addResponse('Removed email service ' . $emailService['name']);
         } else {
             $this->addResponse('Error removing email service.', 1);

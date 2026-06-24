@@ -205,11 +205,18 @@ var BazNotifications = function() {
     }
 
     function onMessage(type, response) {
+        if (response.responseData.for_user) {
+            if (response.responseData.for_user !== window.dataCollection.env.profile.email) {
+                return;
+            }
+        }
         //eslint-disable-next-line
         console.log(type, response);
         if (response.responseCode == 0) {
             if (response.responseData && response.responseData.count && response.responseData.mute !== 'undefined') {
-                getNotificationsCount(response.responseData);
+                if (response.responseData.app && response.responseData.app === window.dataCollection.env.appRoute) {
+                    getNotificationsCount(response.responseData);
+                }
             } else {
                 getNotificationsCount();
             }

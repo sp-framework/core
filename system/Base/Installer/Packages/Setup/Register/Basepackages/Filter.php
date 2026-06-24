@@ -27,7 +27,8 @@ class Filter
                     'filter_type'       => 0,
                     'auto_generated'    => 0,
                     'is_default'        => 1,
-                    'account_id'        => 0
+                    'account_id'        => 0,
+                    'archived'          => 0
                 ];
 
             $db->insertAsDict('basepackages_filters', $filter);
@@ -48,7 +49,8 @@ class Filter
                     'filter_type'       => 0,
                     'auto_generated'    => 0,
                     'is_default'        => 1,
-                    'account_id'        => 0
+                    'account_id'        => 0,
+                    'archived'          => 0
                 ];
 
             $filterStore->updateOrInsert($filter);

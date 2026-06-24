@@ -53,14 +53,14 @@ class Tasks
                     new Column(
                         'is_on_demand',
                         [
-                            'type'          => Column::TYPE_TINYINTEGER,
+                            'type'          => Column::TYPE_BOOLEAN,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
                         'enabled',
                         [
-                            'type'          => Column::TYPE_TINYINTEGER,
+                            'type'          => Column::TYPE_BOOLEAN,
                             'notNull'       => true,
                         ]
                     ),
@@ -100,13 +100,6 @@ class Tasks
                             'notNull'       => false,
                         ]
                     ),
-                    new Column(//Raw Process Id
-                        'pid',
-                        [
-                            'type'          => Column::TYPE_INTEGER,
-                            'notNull'       => false,
-                        ]
-                    ),
                     new Column(
                         'previous_run',
                         [
@@ -127,6 +120,21 @@ class Tasks
                         'force_next_run',
                         [
                             'type'          => Column::TYPE_TINYINTEGER,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(//1 - per job run, 2 per hour, 3 per day
+                        'job_log_mode',
+                        [
+                            'type'          => Column::TYPE_TINYINTEGER,
+                            'notNull'       => true,
+                            'default'       => 1
+                        ]
+                    ),
+                    new Column(
+                        'email_service_id',
+                        [
+                            'type'          => Column::TYPE_SMALLINTEGER,
                             'notNull'       => false,
                         ]
                     ),

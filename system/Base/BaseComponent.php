@@ -40,6 +40,12 @@ abstract class BaseComponent extends Controller
 
 	protected $usedModules = [];
 
+	protected $alPackage;
+
+	protected $notifyPackage;
+
+	protected $notifyNameField;
+
 	public $widgets;
 
 	protected function onConstruct()
@@ -157,7 +163,7 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	public function checkComponentWidgets()
+	public function checkComponentWidgets($appType = null)
 	{
 		$namespace = $this->reflection->getNamespaceName();
 
@@ -165,11 +171,17 @@ abstract class BaseComponent extends Controller
 
 		try {
 			if (class_exists($widgetsClass)) {
-				$route = str_replace('apps/' . $this->app['app_type'] . '/components/', '', strtolower(str_replace('\\', '/', $namespace)));
+				if (!$appType) {
+					$appType = $this->apps->getAppInfo()['app_type'];
+				}
 
-				$component = $this->modules->components->getComponentByRouteForAppId($route, $this->app['id']);
+				$route = str_replace('apps/' . $appType . '/components/', '', strtolower(str_replace('\\', '/', $namespace)));
 
-				$this->widgets = (new $widgetsClass())->init($this, $component);
+				$component = $this->modules->components->getComponentByAppTypeAndRoute($appType, $route);
+
+				if ($component) {
+					$this->widgets = (new $widgetsClass())->init($this, $component);
+				}
 			}
 		} catch (\Exception $e) {
 			throw $e;
@@ -189,7 +201,7 @@ abstract class BaseComponent extends Controller
 
 	public function beforeExecuteRoute()
 	{
-		$this->checkSettingsRoute();
+		$this->checkForwarders();
 
 		if ($this->app) {
 			$appType = $this->apps->types->getAppTypeByType($this->app['app_type']);
@@ -354,7 +366,7 @@ abstract class BaseComponent extends Controller
 		$this->view->canMsu = $canMsu;
 	}
 
-	protected function checkSettingsRoute()
+	protected function checkForwarders()
 	{
 		if ($this->dispatcher->wasForwarded()) {
 			return;
@@ -365,23 +377,50 @@ abstract class BaseComponent extends Controller
 		) {
 			$this->dispatcher->forward(['action' => 'msview']);
 		}
+
+		if (isset($this->getData()['activitylogs']) &&
+			$this->getData()['activitylogs'] == 'true'
+		) {
+			//public function initialize($onlyActivityLogs = false)
+			//set $onlyActivityLogs to true so you can control when initialize can return
+			//Example: If you have 10 packages to initialize, Only instantiate package that is needed by the activitylogs and then return.
+			//See Email/ServicesComponent.
+			//Setting setActivityLogsPackage is needed at the initialize level as we need to set replaceKeys, replaceValues, disableKeys for POST as well
+			$this->initialize(true);
+
+			$this->dispatcher->forward(['action' => 'activitylogs']);
+		}
 	}
 
 	/**
+	 * Module Settings
 	 * @acl(name=msview)
 	 */
 	public function msviewAction()
 	{
+		if (!$this->showModuleSettings) {
+			$this->setErrorDispatcher('routeNotFound', ['error' => true]);
+
+			return;
+		}
+
 		if (isset($this->getData()['settings']) && $this->getData()['settings'] == 'true') {
 			$this->view->pick($this->helper->last(explode('/', $this->component['route'])) . '/msview');
 		}
 	}
 
 	/**
+	 * Module Settings
 	 * @acl(name=msupdate)
 	 */
 	public function msupdateAction()
 	{
+		if (!$this->showModuleSettings) {
+			$this->setErrorDispatcher('routeNotFound', ['error' => true]);
+
+			return;
+		}
+
 		$this->requestIsPost();
 
 		if (isset($this->postData()['id']) &&
@@ -402,6 +441,289 @@ abstract class BaseComponent extends Controller
 				$this->modules->packages->packagesData->responseMessage,
 				$this->modules->packages->packagesData->responseCode
 			);
+		}
+	}
+
+	//Modify Basepackages Addresses from any component
+	public function addressesAction()
+	{
+		if (!isset($this->postData()['package_class']) && !isset($this->postData()['package_row_id'])) {
+			$this->addResponse('Address package information missing', 1);
+
+			return;
+		}
+
+		if (isset($this->postData()['package_class']) && $this->postData()['package_class'] === '') {
+			$this->addResponse('Address package information missing', 1);
+
+			return;
+		}
+		if (isset($this->postData()['package_row_id']) && (int) $this->postData()['package_row_id'] == '0') {
+			$this->addResponse('Address package information missing', 1);
+
+			return;
+		}
+
+		if (isset($this->postData()['delete_address_ids'])) {
+			if (is_string($this->postData()['delete_address_ids'])) {
+				$this->postData()['delete_address_ids'] = $this->helper->decode($this->postData()['delete_address_ids'], true);
+			}
+
+			if (count($this->postData()['delete_address_ids']) > 0) {
+				foreach ($this->postData()['delete_address_ids'] as $addressId) {
+					$dbAddress = $this->basepackages->addressbook->getById($addressId);
+
+					if ($dbAddress) {
+						$this->basepackages->addressbook->removeAddress($dbAddress);
+					}
+				}
+			}
+		}
+
+		if (isset($this->postData()['address_ids'])) {
+			if (is_string($this->postData()['address_ids'])) {
+				$this->postData()['address_ids'] = $this->helper->decode($this->postData()['address_ids'], true);
+			}
+
+			if (count($this->postData()['address_ids']) > 0) {
+				foreach ($this->postData()['address_ids'] as $addressId => $address) {
+					if (isset($address['new']) && $address['new'] == 1) {
+						$address['package_class'] = $this->postData()['package_class'];
+						$address['package_row_id'] = (int) $this->postData()['package_row_id'];
+
+						$this->basepackages->addressbook->addAddress($address);
+					} else {
+						$dbAddress = $this->basepackages->addressbook->getById($addressId);
+
+						if ($dbAddress) {
+							$dbAddress = array_merge($dbAddress, $this->postData()['address_ids'][$addressId]);
+
+							$this->basepackages->addressbook->updateAddress($dbAddress);
+						}
+					}
+				}
+			}
+		}
+
+		$addresses = [];
+
+		$addressesArr =
+			$this->basepackages->addressbook->getAddressesByPackageClassAndPackageRowId(
+				$this->postData()['package_class'], $this->postData()['package_row_id']
+			);
+
+		if ($addressesArr && count($addressesArr) > 0) {
+			foreach ($addressesArr as $address) {
+				$addresses[$address['id']] = $address;
+			}
+
+			$this->addResponse('Updated addresses', 0, ['addresses' => $addresses]);
+		}
+	}
+
+	//Modify Basepackages Contacts from any component
+	public function contactsAction()
+	{
+		if (!isset($this->postData()['package_class']) && !isset($this->postData()['package_row_id'])) {
+			$this->addResponse('Contact package information missing', 1);
+
+			return;
+		}
+
+		if (isset($this->postData()['package_class']) && $this->postData()['package_class'] === '') {
+			$this->addResponse('Contact package information missing', 1);
+
+			return;
+		}
+		if (isset($this->postData()['package_row_id']) && (int) $this->postData()['package_row_id'] == '0') {
+			$this->addResponse('Contact package information missing', 1);
+
+			return;
+		}
+
+		if (isset($this->postData()['contact_ids'])) {
+			if (is_string($this->postData()['contact_ids'])) {
+				$this->postData()['contact_ids'] = $this->helper->decode($this->postData()['contact_ids'], true);
+			}
+
+			if (count($this->postData()['contact_ids']) > 0) {
+				foreach ($this->postData()['contact_ids'] as $contactId => $contact) {
+					if (isset($contact['new']) && $contact['new'] == 1) {
+						$contact['package_class'] = $this->postData()['package_class'];
+						$contact['package_row_id'] = (int) $this->postData()['package_row_id'];
+
+						if (isset($contact['first_name']) && isset($contact['last_name'])) {
+							$contact['full_name'] = $contact['first_name'] . ' ' . $contact['last_name'];
+						} else {
+							$contact['full_name'] = $contact['first_name'];
+						}
+
+						$this->basepackages->contactbook->addContact($contact);
+
+						if ($contact['portrait'] !== '') {
+							$this->basepackages->storages->changeOrphanStatus(newUUID : $contact['portrait'], status: 0);
+						}
+					} else {
+						$dbContact = $this->basepackages->contactbook->getById($contactId);
+
+						if ($dbContact) {
+							$oldPortrait = null;
+							$newPortrait = null;
+							if ($dbContact['portrait'] !== '') {
+								$oldPortrait = $dbContact['portrait'];
+							}
+							if ($this->postData()['contact_ids'][$contactId]['portrait'] !== '') {
+								$newPortrait = $this->postData()['contact_ids'][$contactId]['portrait'];
+							}
+
+							$dbContact = array_merge($dbContact, $this->postData()['contact_ids'][$contactId]);
+
+							if (isset($dbContact['first_name']) && isset($dbContact['last_name'])) {
+								$dbContact['full_name'] = $dbContact['first_name'] . ' ' . $dbContact['last_name'];
+							} else {
+								$dbContact['full_name'] = $dbContact['first_name'];
+							}
+
+							$this->basepackages->contactbook->updateContact($dbContact);
+
+							if ($this->postData()['contact_ids'][$contactId]['portrait'] !== '') {
+								$this->basepackages->storages->changeOrphanStatus(newUUID : $newPortrait, oldUUID: $oldPortrait, status: 0);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (isset($this->postData()['delete_contact_ids'])) {
+			if (is_string($this->postData()['delete_contact_ids'])) {
+				$this->postData()['delete_contact_ids'] = $this->helper->decode($this->postData()['delete_contact_ids'], true);
+			}
+
+			if (count($this->postData()['delete_contact_ids']) > 0) {
+				foreach ($this->postData()['delete_contact_ids'] as $contactId) {
+					$dbContact = $this->basepackages->contactbook->getById($contactId);
+
+					if ($dbContact) {
+						$this->basepackages->contactbook->removeContact($dbContact);
+
+						if ($dbContact['portrait'] !== '') {
+							$this->basepackages->storages->changeOrphanStatus(oldUUID : $dbContact['portrait'], status: 1);
+						}
+					}
+				}
+			}
+		}
+
+		$contacts = [];
+
+		$contactsArr =
+			$this->basepackages->contactbook->getContactsByPackageClassAndPackageRowId(
+				$this->postData()['package_class'], $this->postData()['package_row_id']
+			);
+
+		if ($contactsArr && count($contactsArr) > 0) {
+			foreach ($contactsArr as $contact) {
+				$contacts[$contact['id']] = $contact;
+			}
+		}
+
+		$this->addResponse('Updated contacts', 0, ['contacts' => $contacts]);
+	}
+
+	public function releaseMutexAction()
+	{
+		if (isset($this->postData()['mutexLock']) && isset($this->postData()['mutexLock']['id'])) {
+			$this->basepackages->mutex->releaseMutex($this->postData());
+		}
+	}
+
+	public function setModuleSettings(bool $showModuleSettings = true)
+	{
+		$this->showModuleSettings = $showModuleSettings;
+	}
+
+	public function setModuleSettingsData(array $data = [])
+	{
+		if (isset($this->getData()['settings']) &&
+			$this->getData()['settings'] == 'true'
+		) {
+			$this->showModuleSettingsData = array_merge($this->showModuleSettingsData, $data);
+		}
+	}
+
+	protected function setActivityLogsPackage(&$alPackage, $postLink, $replaceKeys = [], $replaceValues = [], $disableKeys = [])
+	{
+		if ((isset($this->getData()['id']) && $this->getData()['id'] != 0) ||
+			($this->request->isPost() && (isset($this->postData()['id']) && $this->postData()['id'] != 0))
+		) {
+			$this->alPackage = [];
+
+			$this->alPackage['package'] = $alPackage;
+			$this->alPackage['postLink'] = $postLink;
+			$this->alPackage['replaceKeys'] = $replaceKeys;
+			$this->alPackage['replaceValues'] = $replaceValues;
+			$this->alPackage['disableKeys'] = $disableKeys;
+		}
+	}
+
+	/**
+	 * Activity Logs
+	 * @acl(name=activitylogs)
+	 */
+	public function activitylogsAction()
+	{
+		if (isset($this->getData()['activitylogs']) && $this->getData()['activitylogs'] == 'true') {
+			if (isset($this->getData()['id']) && $this->getData()['id'] != 0 && isset($this->alPackage['package'])) {
+				$this->view->activityLogs = $this->alPackage['package']->getActivityLogs((int) $this->getData()['id'], $this->alPackage['postLink']);
+			}
+
+			$this->view->replaceKeys = $this->alPackage['replaceKeys'];
+			$this->view->replaceValues = $this->alPackage['replaceValues'];
+			$this->view->disableKeys = $this->alPackage['disableKeys'];
+
+			$this->view->pick($this->helper->last(explode('/', $this->component['route'])) . '/activitylogs');
+
+			return;
+		} else if ($this->request->isPost()) {
+			if (!isset($this->postData()['id']) ||
+				(isset($this->postData()['id']) && $this->postData()['id'] == 0)
+			) {
+				$this->addResponse('Id not set!', 1);
+
+				return false;
+			}
+
+			$package = $this->modules->packages->getPackageByClass(str_replace('_', '\\', $this->postData()['packageClass']));
+
+			if ($package) {
+				$this->alPackage['package'] = $this->usePackage($package['class']);
+				$this->alPackage['id'] = $this->postData()['id'];
+				$this->alPackage['postLink'] = $this->postData()['postLink'];
+				$this->alPackage['page'] = (int) $this->postData()['page'];
+
+				$this->view->activityLogs =
+					$this->alPackage['package']->getActivityLogs(
+						$this->alPackage['id'],
+						$this->alPackage['postLink'],
+						true,
+						(int) $this->alPackage['page']
+					);
+
+				$viewDirArr = explode('/', trim($this->view->getViewsDir(), '/'));
+				$componentRoute = array_pop($viewDirArr);
+				$this->view->setViewsDir('/' . implode('/', $viewDirArr) . '/');
+
+				$this->setDefaultViewData();
+
+				$this->view->replaceKeys = $this->alPackage['replaceKeys'];
+				$this->view->replaceValues = $this->alPackage['replaceValues'];
+				$this->view->disableKeys = $this->alPackage['disableKeys'];
+
+				$this->view->logs = $this->view->partial($componentRoute . '/activitylogs');
+
+				return false;
+			}
 		}
 	}
 
@@ -562,6 +884,12 @@ abstract class BaseComponent extends Controller
 		}
 
 		$this->view->version = $this->core->getVersion();
+
+		if (isset($this->getData()['id'])) {//Set data Id to view, can be used for anything like activity logs.
+			$this->view->dataId = (int) $this->getData()['id'];
+		} else if (isset($this->postData()['id'])) {
+			$this->view->dataId = (int) $this->postData()['id'];
+		}
 	}
 
 	protected function sendJson()
@@ -598,22 +926,76 @@ abstract class BaseComponent extends Controller
 			$this->response->setHeader('token', $this->token);
 		}
 
-		if ($this->request->isPost() && $this->isJson()) {
-			return $this->sendJson();
-		}
-
 		if ($this->app && $this->view->componentName !== 'auth') {
 			if (!$this->app['menu_structure']) {
-				$this->view->menus =
-					$this->basepackages->menus->buildMenusForApp($this->app['id']);
+				$menus =
+					$this->basepackages->menus->buildMenusForApp($this->app);
 			} else {
 				if (is_string($this->app['menu_structure'])) {
-					$this->view->menus =
+					$menus =
 						$this->helper->decode($this->app['menu_structure'], true);
 				} else {
-					$this->view->menus = $this->app['menu_structure'];
+					$menus = $this->app['menu_structure'];
 				}
 			}
+
+			//Check Permission for the user
+			if ($this->access->auth->check()) {
+				//Overridden permissions first
+				if (isset($this->access->auth->account()['security']['permissions']) &&
+					count($this->access->auth->account()['security']['permissions']) > 0
+				) {
+					$menus =
+						$this->basepackages->menus->buildMenusForAppWithPermissions(
+							$this->app,
+							$this->access->auth->account()['security']['permissions'][$this->app['id']]
+						);
+				}
+
+				//Role Permissions
+				if (isset($this->access->auth->account()['role']['permissions']) &&
+					count($this->access->auth->account()['role']['permissions']) > 0
+				) {
+					$menus =
+						$this->basepackages->menus->buildMenusForAppWithPermissions(
+							$this->app,
+							$this->access->auth->account()['role']['permissions'][$this->app['id']]
+						);
+				}
+			}
+
+			$this->view->menus = $menus;
+		}
+
+		if ($this->request->isPost() && $this->isJson()) {
+			if ($this->access->auth->check(true)) {
+				if (!isset($this->access->auth->account()['env'])) {
+					$routeEnv = $this->basepackages->accounts->updateEnv($this->access->auth->account()['id']);
+				} else {
+					$routeArr = explode('/q/', $this->request->getURI());
+					if ($this->domains->domain['exclusive_to_default_app']) {
+						$route = str_replace('/' . $this->apps->getAppInfo()['route'], '', $routeArr[0]);
+					} else {
+						$route = $routeArr[0];
+					}
+
+					if (isset($this->access->auth->account()['env']['params'][$this->apps->getAppInfo()['id']][$route])) {
+						$routeEnv = $this->access->auth->account()['env']['params'][$this->apps->getAppInfo()['id']][$route];
+					} else {
+						$routeEnv = $this->basepackages->accounts->updateEnv($this->access->auth->account()['id']);
+					}
+				}
+
+				if ($routeEnv) {
+					$this->view->routeEnv = $routeEnv;
+				}
+
+				if (isset($this->notifyPackage)) {
+					$this->addToNotification(null, null);
+				}
+			}
+
+			return $this->sendJson();
 		}
 
 		//Murl - update Hits
@@ -730,12 +1112,18 @@ abstract class BaseComponent extends Controller
 
 		if ($this->app && isset($this->componentRoute)) {
 			if ($this->componentRoute === '') {
-				$this->componentRoute = 'home';
+				$this->view->breadcrumb = 'home';
+			} else {
+				$this->view->breadcrumb = $this->componentRoute;
+			}
+
+			if (isset($this->view->getParamsToView()['breadcrumbName'])) {
+				$this->view->breadcrumb = $this->view->breadcrumb . '/' . $this->view->getParamsToView()['breadcrumbName'];
 			}
 
 			$this->response->setHeader(
 				'breadcrumb',
-				$this->componentRoute
+				$this->view->breadcrumb
 			);
 
 			if (isset($this->getData()['id'])) {
@@ -894,10 +1282,29 @@ abstract class BaseComponent extends Controller
 			}
 
 			foreach ($arr as $value) {
-				if (isset($value[1])) {
-					$this->getQueryArr[$value[0]] = $value[1];
-				} else {
-					$this->getQueryArr[$value[0]] = 0; //Value not set, so default to 0
+				if (isset($value[0]) && isset($value[1])) {
+					if (is_string($value[0]) && is_string($value[1])) {
+						if ($value[1] === '{id}') {
+							$uriId = 0;
+							if (str_contains(trim($this->request->getURI(), '/'), '-')) {
+								$uriArr = explode('-', trim($this->request->getURI(), '/'));
+
+								if (count($uriArr) > 1) {
+									if (isset($apiUri)) {
+										$murlApiUri = $this->helper->first($uriArr);
+									}
+									$murlUri = $this->helper->first($uriArr);
+									$uriId = (int) $this->helper->last($uriArr);
+								}
+							}
+
+							if ($uriId > 0) {
+								$this->getQueryArr[$value[0]] = $uriId;
+							}
+						} else {
+							$this->getQueryArr[$value[0]] = $value[1];
+						}
+					}
 				}
 			}
 
@@ -962,6 +1369,7 @@ abstract class BaseComponent extends Controller
 			}
 		} else {
 			$package = (new $packageClass())->init();
+
 			$packageName = $this->helper->last(explode('\\', $packageClass));
 
 			if (!$this->checkPackage($packageClass)) {
@@ -1169,22 +1577,30 @@ abstract class BaseComponent extends Controller
 		return preg_replace('/[^0-9]/', '', $string);
 	}
 
-	public function setModuleSettings(bool $setting)
+	protected function setNotificationPackage(&$notifyPackage = null, $notifyNameField = null)
 	{
-		$this->showModuleSettings = $setting;
-	}
-
-	public function setModuleSettingsData(array $data = [])
-	{
-		if (isset($this->getData()['settings']) &&
-			$this->getData()['settings'] == 'true'
-		) {
-			$this->showModuleSettingsData = $data;
+		if ($this->request->isPost() && (isset($this->postData()['id']) && $this->postData()['id'] != 0)) {
+			$this->notifyPackage = $notifyPackage;
+			$this->notifyNameField = $notifyNameField;
 		}
 	}
 
 	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $last = null)
 	{
+		if (isset($this->view->responseCode) && $this->view->responseCode !== 0) {
+			return;
+		}
+
+		if ($this->notifyPackage) {
+			$this->notifyPackage->addToNotification($this->dispatcher->getActionName(), null, null, null, null, $this->component, $this->notifyNameField);
+
+			return;
+		}
+
+		if (is_null($subscriptionType)) {
+			throw new \Exceptions('Notification subscription not set');
+		}
+
 		if ($this->component['notification_subscriptions']) {
 			if (!is_array($this->component['notification_subscriptions'])) {
 				$this->component['notification_subscriptions'] = $this->helper->decode($this->component['notification_subscriptions'], true);
@@ -1208,6 +1624,12 @@ abstract class BaseComponent extends Controller
 					count($subscriptions[$subscriptionType]) > 0
 				) {
 					foreach ($subscriptions[$subscriptionType] as $key => $aId) {
+						if ($this->access->auth->check() &&
+							$this->access->auth->account()['id'] === $aId
+						) {
+							continue;
+						}
+
 						$this->basepackages->notifications->addNotification(
 							$messageTitle,
 							$messageDetails,

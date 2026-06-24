@@ -3,7 +3,6 @@
 namespace Apps\Core\Packages\Adminltetags\Tags\Content\Listing;
 
 use Apps\Core\Packages\Adminltetags\Adminltetags;
-use Phalcon\Helper\Arr;
 
 class Filters extends Adminltetags
 {
@@ -40,12 +39,6 @@ class Filters extends Adminltetags
             $sharedHidden = false;
         }
 
-        // $employeesPackage = $this->init()->checkPackage('Apps\Core\Packages\Hrms\Employees\Employees');
-
-        // if ($employeesPackage) {
-        //     $employeesPackage = new \Apps\Core\Packages\Hrms\Employees\Employees;
-        // }
-
         foreach ($this->params['dtFilters'] as $filterKey => $filter) {
             $filters[$filterKey] = $filter;
 
@@ -69,17 +62,9 @@ class Filters extends Adminltetags
 
             if ($filter['filter_type'] === '0') {
                 $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (System)';
-            // } else if ($filter['filter_type'] === '1') {
-            //     $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared)';
             } else if ($filter['shared'] == '1' && $filter['shared_ids']) {
                 if ($this->access->auth->account()['id'] != $filter['account_id']) {
-                    // if ($employeesPackage) {
-                    //     $employee = $employeesPackage->searchByAccountId($filter['account_id']);
-
-                    //     $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared by ' . $employee['full_name'] . ')';
-                    // } else {
-                        $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared by ' . $filter['account_email'] . ')';
-                    // }
+                    $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared by ' . $filter['account_email'] . ')';
                 }
             }
         }
@@ -206,6 +191,12 @@ class Filters extends Adminltetags
             $fieldGroupPreAddonDropdownButtonListTitle = [];
 
             foreach ($this->params['dtFilterColumns'] as $columnKey => $column) {
+                if (isset($this->params['dtQuickFilterColumns']) && count($this->params['dtQuickFilterColumns']) > 0) {
+                    if (!in_array($columnKey, $this->params['dtQuickFilterColumns'])) {
+                        continue;
+                    }
+                }
+
                 if (isset($this->params['dtTable']['columns'][$column['id']]) &&
                     $this->params['dtTable']['columns'][$column['id']]['name'] !== $column['name']
                 ) {
@@ -241,6 +232,15 @@ class Filters extends Adminltetags
                                             'title'                   => false,
                                             'type'                    => 'primary',
                                             'icon'                    => 'search',
+                                            'noMargin'                => true,
+                                            'disabled'                => true,
+                                            'buttonAdditionalClass'   => 'rounded-0 text-white',
+                                            'position'                => 'right'
+                                        ],
+                                        'clear'        => [
+                                            'title'                   => false,
+                                            'type'                    => 'secondary',
+                                            'icon'                    => 'times',
                                             'noMargin'                => true,
                                             'disabled'                => true,
                                             'buttonAdditionalClass'   => 'rounded-0 text-white',
@@ -607,56 +607,29 @@ class Filters extends Adminltetags
                                 ) .
                             '</div>
                         </div>';
-                        //Check if employees package exists we show employees. We can extract the Account Ids from them.
-                        // $employeesPackage = $this->init()->checkPackage('Apps\Core\Packages\Hrms\Employees\Employees');
 
-                        // if ($employeesPackage) {
-                        //     $modalContent .= '<div class="row">
-                        //         <div class="col">' .
-                        //             $this->useTag('fields',
-                        //                 [
-                        //                     'componentId'                         => $this->params['componentId'],
-                        //                     'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
-                        //                     'fieldId'                             => 'eids',
-                        //                     'fieldLabel'                          => 'Employee(s)',
-                        //                     'fieldType'                           => 'select2',
-                        //                     'fieldHelp'                           => true,
-                        //                     'fieldHelpTooltipContent'             => 'Select Employees to share filter with',
-                        //                     'fieldBazScan'                        => true,
-                        //                     'fieldRequired'                       => false,
-                        //                     'fieldDataSelect2Options'             => [],
-                        //                     'fieldDataSelect2Multiple'            => true,
-                        //                     'fieldDataSelect2OptionsKey'          => 'id',
-                        //                     'fieldDataSelect2OptionsValue'        => 'name',
-                        //                     'fieldDataSelect2OptionsArray'        => true
-                        //                 ]
-                        //             ) .
-                        //         '</div>
-                        //     </div>';
-                        // } else {
-                            $modalContent .= '<div class="row">
-                                <div class="col">' .
-                                    $this->useTag('fields',
-                                        [
-                                            'componentId'                         => $this->params['componentId'],
-                                            'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
-                                            'fieldId'                             => 'aids',
-                                            'fieldLabel'                          => 'Account(s)',
-                                            'fieldType'                           => 'select2',
-                                            'fieldHelp'                           => true,
-                                            'fieldHelpTooltipContent'             => 'Select Accounts to share filter with',
-                                            'fieldBazScan'                        => true,
-                                            'fieldRequired'                       => false,
-                                            'fieldDataSelect2Options'             => [],
-                                            'fieldDataSelect2Multiple'            => true,
-                                            'fieldDataSelect2OptionsKey'          => 'id',
-                                            'fieldDataSelect2OptionsValue'        => 'name',
-                                            'fieldDataSelect2OptionsArray'        => true
-                                        ]
-                                    ) .
-                                '</div>
-                            </div>';
-                        // }
+                        $modalContent .= '<div class="row">
+                            <div class="col">' .
+                                $this->useTag('fields',
+                                    [
+                                        'componentId'                         => $this->params['componentId'],
+                                        'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
+                                        'fieldId'                             => 'aids',
+                                        'fieldLabel'                          => 'Account(s)',
+                                        'fieldType'                           => 'select2',
+                                        'fieldHelp'                           => true,
+                                        'fieldHelpTooltipContent'             => 'Select Accounts to share filter with',
+                                        'fieldBazScan'                        => true,
+                                        'fieldRequired'                       => false,
+                                        'fieldDataSelect2Options'             => [],
+                                        'fieldDataSelect2Multiple'            => true,
+                                        'fieldDataSelect2OptionsKey'          => 'id',
+                                        'fieldDataSelect2OptionsValue'        => 'name',
+                                        'fieldDataSelect2OptionsArray'        => true
+                                    ]
+                                ) .
+                            '</div>
+                        </div>';
 
                     $modalContent .=
                     '</fieldset>
@@ -772,23 +745,6 @@ class Filters extends Adminltetags
                                             $("#security-token").attr("name", response.tokenKey);
                                             $("#security-token").val(response.token);
                                         }
-                                        // if (response.employees) {
-                                        //     var employeesData = [];
-                                        //     for (var item of response.employees) {
-                                        //         employeesData.push({
-                                        //             "id"    : item["id"],
-                                        //             "text"  : item["full_name"]
-                                        //         });
-                                        //     }
-
-                                        //     return {
-                                        //         results: employeesData
-                                        //     }
-                                        // } else {
-                                            return {
-                                                results : []
-                                            }
-                                        // }
                                     },
                                     cache: true
                                 },
@@ -900,32 +856,3 @@ class Filters extends Adminltetags
             </script>';
     }
 }
-                    //DropdownSplitButtons - Dropdown
-                    // [
-                    //     'componentId'                       => $this->params['componentId'],
-                    //     'sectionId'                         => $this->params['sectionId'],
-                    //     'buttonType'                        => 'dropdownSplitButtons',
-                    //     'buttonSize'                        => 'sm',
-                    //     'dropdownButtonTitle'               => 'Actions',
-                    //     'dropdownSplitButtonsSplit'         => true,
-                    //     'dropdownButtonId'                  => 'modal-actions',
-                    //     'dropdownDirection'                 => 'up',
-                    //     'dropdownAlign'                     => 'right',
-                    //     'buttons'                           =>
-                    //         [
-                    //             'save' => [
-                    //                 'title'                   => 'Save',
-                    //                 'disabled'                => true,
-                    //                 'icon'                    => 'save'
-                    //             ],
-                    //             'apply-new' => [
-                    //                 'title'                   => 'Apply',
-                    //                 'disabled'                => true,
-                    //                 'icon'                    => 'filter',
-                    //             ],
-                    //             'saveapply'   => [
-                    //                 'title'                   => 'Save & Apply',
-                    //                 'disabled'                => true,
-                    //             ]
-                    //         ]
-                    // ]

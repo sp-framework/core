@@ -29,6 +29,8 @@ class TasksComponent extends BaseComponent
     {
         $this->schedules = $this->basepackages->workers->schedules->schedules;
 
+        $this->view->jobLogsModes = $this->tasks->getJobLogsModes();
+
         if (isset($this->getData()['id'])) {
             $calls = [];
 
@@ -52,14 +54,14 @@ class TasksComponent extends BaseComponent
 
             $this->tasks->setFFRelations(true);
 
-            // $calls = $this->tasks->getAllCalls();
-
             $this->view->calls = $calls;
 
             $this->view->schedules = $this->schedules;
 
+            $this->view->emailservices = $this->basepackages->emailservices->getAll()->emailServices;
+
             if ($this->getData()['id'] != 0) {
-                $task = $this->tasks->getById($this->getData()['id']);
+                $task = $this->tasks->getById((int) $this->getData()['id']);
 
                 if (!$task) {
                     return $this->throwIdNotFound();
@@ -176,7 +178,7 @@ class TasksComponent extends BaseComponent
 
     protected function formatStatus($rowId, $data)
     {
-        if ($data['enabled'] == '0' && $data['status'] != '2') {
+        if ($data['enabled'] == '0' && $data['is_on_demand'] == '0') {
             $data['status'] = '-';
 
             return $data;
@@ -189,11 +191,11 @@ class TasksComponent extends BaseComponent
         } else if ($data['status'] == '2') {
             $data['status'] = '<span class="badge badge-info text-uppercase">Running...</span>';
         } else if ($data['status'] == '3') {
+            $data['status'] = '<span class="badge badge-success text-uppercase">Success!</span>';
+        } else if ($data['status'] == '4') {
             $data['status'] = '<span class="badge badge-danger text-uppercase">Error!</span>';
-        }
-
-        if ($data['force_next_run'] == '1') {
-            return $data;
+        } else if ($data['status'] == '5') {
+            $data['status'] = '<span class="badge badge-warning text-uppercase">Rescheduled (no workers)</span>';
         }
 
         return $data;

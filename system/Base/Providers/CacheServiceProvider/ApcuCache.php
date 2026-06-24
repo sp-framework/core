@@ -31,8 +31,6 @@ class ApcuCache
 
             $cacheFactory = new CacheFactory($adapterFactory);
 
-            $adapter = $adapterFactory->newInstance('apcu', $options);
-
             $cacheOptions = [
                 'adapter' => 'apcu',
                 'options' => [

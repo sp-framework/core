@@ -20,9 +20,7 @@ class AddressBook extends BasePackage
         if ($address) {
             unset($address['id']);
             unset($address['name']);
-            unset($address['address_type']);
-            unset($address['is_primary']);
-            unset($address['package_name']);
+            unset($address['package_class']);
 
             return $address;
         }
@@ -32,12 +30,8 @@ class AddressBook extends BasePackage
 
     public function addAddress(array $data)
     {
-        if (!isset($data['address_type'])) {//Default is shipping address
-            $data['address_type'] = 1;
-        }
-
-        if (!isset($data['is_primary'])) {//Default is primary address
-            $data['is_primary'] = 1;
+        if (!isset($data['address_reference'])) {
+            $data['address_reference'] = 'Main';
         }
 
         if ($this->add($data)) {
@@ -67,37 +61,28 @@ class AddressBook extends BasePackage
         }
     }
 
-    public function mergeAndUpdate(array $data)
+    public function getAddressesByPackageClassAndPackageRowId($packageClass, $packageRowId)
     {
-        $address = $this->getById($data['contact_address_id']);
-
-        unset($data['id']);
-
-        $address = array_merge($address, $data);
-
-        $this->updateAddress($address);
-
-        return true;
-    }
-
-    public function getAddressesTypes()
-    {
-        return
-            [
+        if ($this->config->databasetype === 'db') {
+            $conditions =
                 [
-                    'id'              => '1',
-                    'name'            => 'Shipping Address',
-                    'status'          => '1',
-                    'address_type'    => '1',
-                    'description'     => 'Used for shipping packages.'
-                ],
+                    'conditions'    => 'package_class = :packageClass: AND package_row_id = :packageRowId:',
+                    'bind'          =>
+                        [
+                            'packageClass'      => $packageClass,
+                            'packageRowId'      => $packageRowId
+                        ]
+                ];
+        } else {
+            $conditions =
                 [
-                    'id'              => '2',
-                    'name'            => 'Mailing Address',
-                    'status'          => '1',
-                    'address_type'    => '1',
-                    'description'     => 'Used for mailing letters, invoices and bills, can be PO box.'
-                ]
-            ];
+                    'conditions'    => [
+                        ['package_class', '=', $packageClass],
+                        ['package_row_id', '=', (int) $packageRowId]
+                    ]
+                ];
+        }
+
+        return $this->getByParams($conditions);
     }
 }

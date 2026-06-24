@@ -61,12 +61,13 @@ class Email extends BasePackage
     {
         $emailservices = new EmailServices;
 
-        if ($appId === null) {
-            $appId = $this->app['id'];
-        }
         if ($emailSettings) {
             $this->emailSettings = $emailSettings;
         } else {
+            if ($appId === null) {
+                $appId = $this->apps->getAppInfo()['id'];
+            }
+
             if (!$this->domain && $domainId) {
                 $this->domain = $this->domains->getById($domainId);
 

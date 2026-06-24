@@ -25,11 +25,13 @@ class Tags extends BasePackage
             $data['swatch'] = strtoupper(\Colors\RandomColor::one(['luminosity' => 'light']));
         }
 
-        if (!$this->modules->packages->getPackageByName($data['package_name'])) {
+        if (!$package = $this->modules->packages->getPackageByClass(str_replace('_', '\\', $data['package_class']))) {
             $this->addResponse('Package name provided is incorrect.', 1);
 
             return false;
         }
+
+        $data['package_class'] = str_replace('\\', '_', $package['class']);
 
         $data['package_row_ids'] = [];
         if (isset($data['package_row_id'])) {
@@ -67,11 +69,13 @@ class Tags extends BasePackage
             unset($data['swatch']);
         }
 
-        if (!$this->modules->packages->getPackageByName($data['package_name'])) {
+        if (!$package = $this->modules->packages->getPackageByClass(str_replace('_', '\\', $data['package_class']))) {
             $this->addResponse('Package name provided is incorrect.', 1);
 
             return false;
         }
+
+        $data['package_class'] = str_replace('\\', '_', $package['class']);
 
         $data = array_replace($tag, $data);
 
@@ -136,19 +140,19 @@ class Tags extends BasePackage
         return true;
     }
 
-    public function getTagsByPackageName($packageName)
+    public function getTagsByPackageClass($packageClass)
     {
         if ($this->config->databasetype === 'db') {
             $params =
                 [
-                    'conditions'    => 'package_name = :package_name:',
+                    'conditions'    => 'package_class = :package_class:',
                     'bind'          =>
                         [
-                            'package_name'          => $packageName,
+                            'package_class'          => $packageClass,
                         ]
                 ];
         } else {
-            $params = ['conditions' => [['package_name', '=', $packageName]]];
+            $params = ['conditions' => [['package_class', '=', $packageClass]]];
         }
 
         $tagsArr = $this->getByParams($params);
@@ -166,9 +170,9 @@ class Tags extends BasePackage
         return [];
     }
 
-    public function getTagsByPackageNameAndPackageRowId($packageName, $packageRowId)
+    public function getTagsByPackageClassAndPackageRowId($packageClass, $packageRowId)
     {
-        $tagsArr = $this->getTagsByPackageName($packageName);
+        $tagsArr = $this->getTagsByPackageClass($packageClass);
 
         $tags = [];
 

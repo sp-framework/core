@@ -13,7 +13,17 @@ class ViewsSettings extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('viewssettings', 'core')) {
+                $this->viewssettings = $this->opCache->getCache('viewssettings', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('viewssettings', $this->viewssettings, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }
@@ -71,6 +81,12 @@ class ViewsSettings extends BasePackage
             return false;
         }
 
+        if (!isset($data['domain_id'])) {
+            $this->addResponse('Please provide domain id', 1);
+
+            return false;
+        }
+
         $view = $this->modules->views->getById($data['view_id']);
 
         if (!$view) {
@@ -79,15 +95,15 @@ class ViewsSettings extends BasePackage
             return false;
         }
 
-        $data['settings'] = $this->mergeViewsSettings($data, $view);
+        $settings = $this->getById($data['id']);
+
+        $data['settings'] = $this->mergeViewsSettings($data, $view, $settings);
 
         if (!$this->basepackages->utils->validateJson(['json' => $data['settings']])) {
             $this->addResponse($this->basepackages->utils->packagesData->responseMessage, 1);
 
             return false;
         }
-
-        $settings = $this->getById($data['id']);
 
         if ($settings) {
             $settings['settings'] = $data['settings'];
@@ -97,12 +113,12 @@ class ViewsSettings extends BasePackage
 
                 return;
             }
-
-            $this->addResponse('Error updating settings', 1);
         }
+
+        $this->addResponse('Error updating settings', 1);
     }
 
-    protected function mergeViewsSettings($data, $view)
+    protected function mergeViewsSettings($data, $view, $currentSettings = null)
     {
         if (is_string($view['settings'])) {
             $view['settings'] = $this->helper->decode($view['settings'], true);
@@ -118,14 +134,63 @@ class ViewsSettings extends BasePackage
             return $data['settings'];
         }
 
-        foreach ($view['settings']['branding'] as $brandingKey => $branding) {
-            if (isset($data[$brandingKey])) {
-                if ($data[$brandingKey] !== $view['settings']['branding'][$brandingKey]['brand']) {
-                    $data[$brandingKey] = str_replace('public/' . $this->apps->getAppInfo()['app_type'] . '/' . strtolower($this->modules->views->getViewInfo()['name']) . '/images/', '', $data[$brandingKey]);
+        if (isset($data['view_layout'])) {
+            if (isset($view['settings']['layouts']) &&
+                is_array($view['settings']['layouts'])
+            ) {
+                foreach ($view['settings']['layouts'] as &$layout) {
+                    if (isset($layout['active']) && $layout['active'] == 'true') {
+                        unset($layout['active']);
+                    }
 
-                    $view['settings']['branding'][$brandingKey]['brand'] = $data[$brandingKey];
+                    if (strtolower($data['view_layout']) === $layout['view']) {
+                        $layout['active'] = true;
+                    }
                 }
-                unset($data[$brandingKey]);
+            }
+
+            unset($data['view_layout']);
+        }
+
+        if (isset($data['branding'])) {
+            if (is_string($data['branding'])) {
+                $data['branding'] = $this->helper->decode($data['branding'], true);
+            }
+        } else if (isset($data['settings']['branding'])) {//Coming from Devtools or if no branding is set.
+            if ($currentSettings) {
+                $data['branding'] = $currentSettings['settings']['branding'];
+            } else {
+                $data['branding'] = $data['settings']['branding'];
+            }
+        }
+
+        if (isset($data['branding']) && count($data['branding']) > 0) {
+            $domain = $this->domains->getDomainById($data['domain_id']);
+
+            if ($domain && isset($domain['apps'][$data['app_id']]['publicStorage'])) {
+                $view['settings']['branding'] = [];
+
+                foreach ($data['branding'] as $brandingKey => $brandingUUID) {
+                    if (is_string($brandingUUID)) {
+                        $branding = $this->basepackages->storages->getFileInfo($brandingUUID);
+
+                        if ($branding) {
+                            $view['settings']['branding'][$brandingKey]['type'] = $branding['type'];
+                            $view['settings']['branding'][$brandingKey]['uuid'] = $branding['uuid'];
+                            $view['settings']['branding'][$brandingKey]['org_file_name'] = $branding['org_file_name'];
+                            $view['settings']['branding'][$brandingKey]['brand'] =
+                                'public/' . $domain['apps'][$data['app_id']]['publicStorage'] . '/images/assets/' . $data['id'] . '/' . $brandingUUID;
+
+                            $view['settings']['branding'][$brandingKey]['maxWidth'] = $branding['width'];
+                            $view['settings']['branding'][$brandingKey]['maxHeight'] = $branding['height'];
+                            $view['settings']['branding'][$brandingKey]['links'] = $branding['links'];
+                        }
+                    }
+                }
+            }
+
+            if (count($view['settings']['branding']) === 0) {
+                $view['settings']['branding'] = $data['branding'];
             }
         }
 
@@ -140,6 +205,23 @@ class ViewsSettings extends BasePackage
         if (isset($data['head_meta_description'])) {
             $view['settings']['head']['meta']['description'] = $data['head_meta_description'];
             unset($data['head_meta_description']);
+        }
+        if (isset($data['head_link_href_favicons'])) {
+            if (is_string($data['head_link_href_favicons']) && $data['head_link_href_favicons'] !== '') {
+                $data['head_link_href_favicons'] = $this->helper->decode($data['head_link_href_favicons'], true);
+            } else {
+                $data['head_link_href_favicons'] = $view['settings']['head']['link']['href']['favicons'];
+            }
+        } else if (isset($data['settings']['head']['link']['href']['favicons'])) {//Coming from Devtools
+            if ($currentSettings) {
+                $data['head_link_href_favicons'] = $currentSettings['settings']['head']['link']['href']['favicons'];
+            } else {
+                $data['head_link_href_favicons'] = $data['settings']['head']['link']['href']['favicons'];
+            }
+        }
+        if (isset($data['head_link_href_favicons'])) {
+            $view['settings']['head']['link']['href']['favicons'] = $data['head_link_href_favicons'];
+            unset($data['head_link_href_favicons']);
         }
         if (isset($data['copyright_name'])) {
             $view['settings']['footer']['copyright']['name'] = $data['copyright_name'];

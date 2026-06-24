@@ -88,10 +88,10 @@
                                     'tabInclude'        : 'profile/form/locale',
                                     'tabIncludeParams'  : ['profile' : profile, 'account' : account]
                                 ],
-                                'address'   :
+                                'addresses'   :
                                 [
-                                    'tabTitle'          : 'Address',
-                                    'tabInclude'        : 'profile/form/address',
+                                    'tabTitle'          : 'Addresses',
+                                    'tabInclude'        : 'profile/form/addresses',
                                     'tabIncludeParams'  : ['profile' : profile, 'account' : account]
                                 ],
                                 'security'   :
@@ -118,6 +118,11 @@
                                 [
                                     'tabTitle'          : 'Notifications',
                                     'tabInclude'        : 'profile/form/notifications'
+                                ],
+                                'env'   :
+                                [
+                                    'tabTitle'          : 'Env',
+                                    'tabInclude'        : 'profile/form/env'
                                 ]
                             ]
                     ]
@@ -307,8 +312,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-account_id'                      : { },
         '{{componentId}}-{{sectionId}}-account_email'                   : { },
         '{{componentId}}-{{sectionId}}-account_role'                    : { },
-        '{{componentId}}-{{sectionId}}-first_name'                      : { },
-        '{{componentId}}-{{sectionId}}-last_name'                       : { },
+        '{{componentId}}-{{sectionId}}-account_username'                : { },
         '{{componentId}}-{{sectionId}}-contact_phone'                   : {
             afterInit: function() {
                 Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
@@ -328,17 +332,12 @@ dataCollectionSection =
                     .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_mobile'));
             }
         },
-        '{{componentId}}-{{sectionId}}-contact_other'                   : { },
-        '{{componentId}}-{{sectionId}}-secondary_email'                 : { },
-        '{{componentId}}-{{sectionId}}-cc_emails_to_secondary_email'    : { },
-        '{{componentId}}-{{sectionId}}-contact_notes'                   : { },
-        '{{componentId}}-{{sectionId}}-locale_country_id'               : {
+        '{{componentId}}-{{sectionId}}-locale_country_iso3'             : {
             placeholder : 'SELECT COUNTRY'
         },
-        '{{componentId}}-{{sectionId}}-locale_timezone_id'              : {
+        '{{componentId}}-{{sectionId}}-locale_timezone'                 : {
             placeholder : 'SELECT TIMEZONE'
         },
-        '{{componentId}}-{{sectionId}}-address_id'                      : { },
         '{{componentId}}-{{sectionId}}-current_password'                : {
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-twofa_otp-switch_to_email').click(function() {
@@ -387,13 +386,13 @@ dataCollectionSection =
                 }
 
                 $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-                    if (e.target.hash === '#core-profile-main-tabs-notifications') {
+                    if (e.target.hash === '#{{componentId}}-{{sectionId}}-tabs-notifications') {
                         fixGrid();
                     }
                 });
 
                 $('#{{componentId}}-{{sectionId}}-form-fields').on('select_node.jstree', function(e, data) {
-                    if (data.node.li_attr["data-tabid"] === 'core-profile-main-tabs-notifications') {
+                    if (data.node.li_attr["data-tabid"] === '{{componentId}}-{{sectionId}}-tabs-notifications') {
                         fixGrid();
                     }
                 });
@@ -563,7 +562,7 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscriptionAll] + '-unsubscribeall').click(function(e) {
                             e.preventDefault();
 
-                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-subscriptions-view-unsubscribeall') {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscriptionAll] + '-unsubscribeall') {
                                 denyPermitAll(null, null, false, true);
                             } else {
                                 denyPermitAll(this, false, null, null);
@@ -571,7 +570,7 @@ dataCollectionSection =
                         });
                         $('#{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscriptionAll] + '-subscribeall').click(function(e) {
                             e.preventDefault();
-                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-subscriptions-view-subscribeall') {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscriptionAll] + '-subscribeall') {
                                 denyPermitAll(this, true, null, true);
                             } else {
                                 denyPermitAll(this, true, null, null);
@@ -653,33 +652,14 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules       : {
-                '{{componentId}}-{{sectionId}}-account_email'               : 'required',
-                '{{componentId}}-{{sectionId}}-status'                      : 'required',
                 '{{componentId}}-{{sectionId}}-first_name'                  : 'required',
-                '{{componentId}}-{{sectionId}}-last_name'                   : 'required',
-                '{{componentId}}-{{sectionId}}-designation'                 : 'required',
-                '{{componentId}}-{{sectionId}}-manager_full_name'           : 'required',
-                '{{componentId}}-{{sectionId}}-type_id'                     : 'required',
-                '{{componentId}}-{{sectionId}}-hire_date'                   : 'required',
-                '{{componentId}}-{{sectionId}}-work_type_id'                : 'required',
-                '{{componentId}}-{{sectionId}}-contact_location_id'         : 'required',
-                '{{componentId}}-{{sectionId}}-contact_phone'               : 'required',
-                '{{componentId}}-{{sectionId}}-contact_mobile'              : 'required'
+                '{{componentId}}-{{sectionId}}-last_name'                   : 'required'
             },
             messages    : {
-                '{{componentId}}-{{sectionId}}-account_email'               : 'Please select an account',
-                '{{componentId}}-{{sectionId}}-status'                      : 'Please select a status',
                 '{{componentId}}-{{sectionId}}-first_name'                  : 'Please enter first name',
-                '{{componentId}}-{{sectionId}}-last_name'                   : 'Please enter last name',
-                '{{componentId}}-{{sectionId}}-designation'                 : 'Please select a designation',
-                '{{componentId}}-{{sectionId}}-manager_full_name'           : 'Please select a manager',
-                '{{componentId}}-{{sectionId}}-type_id'                     : 'Please select employee type',
-                '{{componentId}}-{{sectionId}}-hire_date'                   : 'Please select hiring date',
-                '{{componentId}}-{{sectionId}}-work_type_id'                : 'Please select work type',
-                '{{componentId}}-{{sectionId}}-contact_location_id'         : 'Please select a location',
-                '{{componentId}}-{{sectionId}}-contact_phone'               : 'Please enter phone number',
-                '{{componentId}}-{{sectionId}}-contact_mobile'              : 'Please enter mobile number'
+                '{{componentId}}-{{sectionId}}-last_name'                   : 'Please enter last name'
             }
         }
     });
+
 </script>

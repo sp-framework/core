@@ -47,15 +47,27 @@ var BazContentLoader = function() {
                     }
                 }
 
+                var showWarning = false;
+                var title;
+
                 if (window['dataCollection']['env']['wizard'] === true) {
+                    showWarning = true;
+                    title = '<span class="text-warning"> Cancel wizard?</span>';
+                } else if (window['dataCollection']['env']['mutexLock'] && window['dataCollection']['env']['mutexLock']['self']) {
+                    showWarning = true;
+                    title = '<span class="text-warning"> Cancel modification of entry?</span>';
+                }
+
+                if (showWarning) {
                     var swalSound = window.dataCollection.env.sounds.swalSound;
                     Swal.fire({
-                        title                       : '<span class="text-warning"> Quit current wizard?</span>',
+                        title                       : title,
                         icon                        : 'question',
                         background                  : 'rgba(0,0,0,.8)',
                         backdrop                    : 'rgba(0,0,0,.6)',
                         buttonsStyling              : false,
                         confirmButtonText           : 'Yes',
+                        cancelButtonText            : 'No',
                         customClass                 : {
                             'confirmButton'             : 'btn btn-warning text-uppercase',
                             'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
@@ -68,9 +80,25 @@ var BazContentLoader = function() {
                             swalSound.play();
                         }
                     }).then((result) => {
-                        //eslint-disable-next-line
-                        console.log(result);
                         if (result.value) {
+                            //Release and delete mutex entry from env
+                            if (window['dataCollection']['env']['mutexLock'] && window['dataCollection']['env']['mutexLock']['self']) {
+                                var postData = { };
+                                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                postData['mutexLock'] = window['dataCollection']['env']['mutexLock'];
+
+                                var url = window['dataCollection']['env']['rootPath'] + window['dataCollection']['env']['currentRoute'] + '/releaseMutex';
+
+                                $.post(url, postData, function(response) {
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
+                                    }
+                                }, 'json');
+
+                                delete(window['dataCollection']['env']['mutexLock']);
+                            }
+
                             loadAjax($(this), options); //do the magic
                         }
                     });

@@ -1,0 +1,73 @@
+
+{% set widgetHtmlCode = '' %}
+{% if pagewidget['settings']['html_code'] is defined %}
+    {% set widgetHtmlCode = pagewidget['settings']['html_code'] %}
+{% elseif widget['settings']['html_code'] is defined %}
+    {% set widgetHtmlCode = widget['settings']['html_code'] %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'html_code',
+                'fieldLabel'                     : 'Widget HTML Code',
+                'fieldType'                      : 'trumbowyg',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Design widget using the tool provided or click on < > and write/paste HTML code.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 65535,
+                'fieldValue'                     : widgetHtmlCode
+            ]
+        )}}
+    </div>
+</div>
+
+<script>
+/* globals paginatedPNotify BazHelpers BazContentFields */
+var dataCollectionComponent, dataCollectionSection;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+
+dataCollectionSection['{{componentId}}-{{sectionId}}-html_code'] = { };
+
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules'] = { };
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages'] = { };
+}
+
+dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-html_code'] = 'required';
+dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-html_code'] = 'Please enter HTML Code!';
+
+$(document).ready(function() {
+    BazContentFields.init({
+        'componentId'   : "{{componentId}}",
+        'sectionId'     : "{{componentId}}-{{sectionId}}",
+        'fieldId'       : '{{componentId}}-{{sectionId}}-html_code'
+    });
+});
+</script>

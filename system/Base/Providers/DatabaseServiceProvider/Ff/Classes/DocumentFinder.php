@@ -3,6 +3,7 @@
 namespace System\Base\Providers\DatabaseServiceProvider\Ff\Classes;
 
 use Exception;
+use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\ConditionsHandler;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\IOException;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\InvalidArgumentException;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Query;
@@ -28,7 +29,7 @@ class DocumentFinder
 
     protected $minMultiWordsChars = 4;
 
-    public function __construct(string $storePath, array $queryBuilderProperties, string $primaryKey, $store)
+    public function __construct(string $storePath, array $queryBuilderProperties, string $primaryKey, &$store)
     {
         $this->storePath = $storePath;
 
@@ -84,52 +85,144 @@ class DocumentFinder
         //both conditions data will be searched. This needs to be extended to include keywords like "OR" and "AND"
         if ($this->storeConfiguration['readIndex']) {
             if (count($conditions) > 0) {
-                foreach ($conditions as $conditionKey => $condition) {
-                    $conditionArr = $condition;
+                foreach ($conditions as $conditionKey => $conditionArr) {
+                    if (is_array($conditionArr[0])) {
+                        if (count($conditionArr) > 1) {
+                            $this->processIndexes($conditionArr[0], $found, $skip, $limit);
 
-                    if (is_array($condition[0])) {
-                        $found = $this->processIndexes($condition[0], $found, $skip, $limit);
-
-                        if (count($found) > 0) {
-                            //Once our first condition is met, we do not process index anymore. We just process the data of first condition
+                            //Once our first condition is met, we do not process index any more. We just process the data of first condition
                             //This is like filtering. ex: we first search for data meeting one condition and once we have the data, we filter it
                             //using following conditions.
-                            unset($condition[0]);
+                            // Else if it is OR search, we add more data to found and then strip it down.
+                            $conditionsCount = [];
+                            if (count($found) === 0) {
+                                foreach ($conditionArr as $conditionArrKey => $conditionArrCondition) {
+                                    if ($conditionArrCondition === 'AND' || $conditionArrCondition === 'OR') {
+                                        continue;
+                                    }
 
-                            foreach ($condition as $conditionArr) {
-                                //OR Condition
-                                if (is_string($conditionArr[1]) && strtolower($conditionArr[1]) === 'or') {
-                                    foreach ($found as $foundKey => $foundValue) {
-                                        if (isset($foundValue[$conditionArr[0][0]]) &&
-                                            isset($foundValue[$conditionArr[2][0]])
-                                        ) {
-                                            if ($foundValue[$conditionArr[0][0]] === $conditionArr[0][2] ||
-                                                $foundValue[$conditionArr[2][0]] === $conditionArr[2][2]
-                                            ) {
+                                    if (!is_array($conditionArrCondition[0])) {
+                                        if (isset($conditionsCount[$conditionArrCondition[0]])) {
+                                            array_push($conditionsCount[$conditionArrCondition[0]], $conditionArrKey);
+                                        } else {
+                                            $conditionsCount[$conditionArrCondition[0]] = [$conditionArrKey];
+                                        }
+
+                                        $this->processIndexes($conditionArrCondition, $found, $skip, $limit);
+                                    } else {
+                                        foreach ($conditionArrCondition as $conditionArrConditionKey => $conditionArrConditionValue) {
+                                            if ($conditionArrConditionValue === 'AND' || $conditionArrConditionValue === 'OR') {
                                                 continue;
                                             }
 
-                                            unset($found[$foundKey]);
+                                            if (isset($conditionsCount[$conditionArrConditionValue[0]])) {
+                                                array_push($conditionsCount[$conditionArrConditionValue[0]], $conditionArrConditionKey);
+                                            } else {
+                                                $conditionsCount[$conditionArrConditionValue[0]] = [$conditionArrConditionKey];
+                                            }
+
+                                            $this->processIndexes($conditionArrConditionValue, $found, $skip, $limit);
                                         }
                                     }
-                                } else {//AndCondition
-                                    foreach ($found as $foundKey => $foundValue) {
-                                        if (isset($foundValue[$conditionArr[0]])) {
-                                            if ($foundValue[$conditionArr[0]] !== $conditionArr[2]) {
+                                }
+                            }
+
+                            if (count($found) > 0) {
+                                $conditionArrKey = null;
+
+                                foreach ($conditionArr as $conditionArrKey => $conditionArrConditions) {
+                                    if (is_string($conditionArrConditions) &&
+                                               (strtolower($conditionArrConditions) === 'and' ||
+                                               strtolower($conditionArrConditions) === 'or')
+                                    ) {
+                                        continue;
+                                    } else if (isset($conditionArrConditions[1]) &&
+                                               is_string($conditionArrConditions[1]) &&
+                                               strtolower($conditionArrConditions[1]) === 'or'
+                                    ) {//OR Condition
+                                        foreach ($found as $foundKey => $foundValue) {
+                                            if (isset($foundValue[$conditionArrConditions[0][0]]) &&
+                                                isset($foundValue[$conditionArrConditions[2][0]])
+                                            ) {
+                                                if (ConditionsHandler::verifyCondition($conditionArrConditions[0][1], $foundValue[$conditionArrConditions[0][0]], $conditionArrConditions[0][2])
+                                                ) {
+                                                    continue;
+                                                }
+                                                if (ConditionsHandler::verifyCondition($conditionArrConditions[2][1], $foundValue[$conditionArrConditions[2][0]], $conditionArrConditions[2][2])
+                                                ) {
+                                                    continue;
+                                                }
+
+                                                unset($found[$foundKey]);
+                                            }
+                                        }
+                                    } else {//AndCondition
+                                        foreach ($found as $foundKey => $foundValue) {
+                                            if (isset($conditionsCount[$conditionArrConditions[0][0]]) &&
+                                                count($conditionsCount[$conditionArrConditions[0][0]]) > 1
+                                            ) {//OR conditions (multiple AND conditions)
+                                                $match = false;
+
+                                                foreach ($conditionsCount[$conditionArrConditions[0][0]] as $conditionsCountIndex => $conditionsCountKey) {
+                                                    if (ConditionsHandler::verifyCondition($conditionArr[$conditionsCountKey][1], $foundValue[$conditionArrConditions[0][0]], $conditionArr[$conditionsCountKey][2])
+                                                    ) {
+                                                        if (strtolower($conditionArr[1]) === 'or') {
+                                                            $match = true;
+
+                                                            break;
+                                                        } else if (strtolower($conditionArr[1]) === 'and') {
+                                                            if ($conditionsCountIndex === count($conditionsCount[$conditionArrConditions[0][0]]) - 1) {
+                                                                $match = true;
+
+                                                                break;
+                                                            }
+
+                                                            continue;
+                                                        }
+                                                    }
+
+                                                    if (strtolower($conditionArr[1]) === 'and') {//If the first condition is not met.
+                                                        break;
+                                                    }
+                                                }
+
+                                                if (!$match) {
+                                                    unset($found[$foundKey]);
+                                                }
+                                            } else {
+                                                if (ConditionsHandler::verifyCondition($conditionArrConditions[1], $foundValue[$conditionArrConditions[0]], $conditionArrConditions[2])) {
+                                                    continue;
+                                                }
+
                                                 unset($found[$foundKey]);
                                             }
                                         }
                                     }
                                 }
                             }
+                        } else {
+                            $this->processIndexes($conditionArr[0], $found, $skip, $limit);
                         }
                     } else {
                         $this->processIndexes($conditionArr, $found, $skip, $limit);
                     }
                 }
             }
+            if (count($found) > 0) {
+                if (!$this->store->criteriaCount) {
+                    $this->store->criteriaCount = count($found);
+                }
 
-            $found = msort($found, 'id');
+                $found = msort($found, 'id');
+
+                if (count($conditions) > 0) {
+                    $indexSearched = true;
+                }
+            } else {
+                if (count($conditions) > 0) {
+                    $this->store->criteriaCount = null;
+                }
+            }
         }
 
         if (!$indexSearched && count($found) === 0) {
@@ -211,18 +304,29 @@ class DocumentFinder
                 self::skip($found, $skip);
                 self::limit($found, $limit);
             }
+
+            if ($indexSearched && count($orderBy) > 0) {
+                self::sort($found, $orderBy);
+            }
         }
 
         return $found;
     }
 
-    protected function processIndexes($conditionArr, &$found, $skip, $limit)
+    protected function processIndexes($conditionArr, &$found, $skip = 0, $limit = 0)
     {
+        if (is_array($conditionArr[0])) {
+            return [];
+        }
+
+        //Search for ID
+        if (!in_array('id', $this->storeConfiguration['indexes'])) {
+            array_push($this->storeConfiguration['indexes'], 'id');
+        }
+
         if (isset($conditionArr[0]) &&
             in_array($conditionArr[0], $this->storeConfiguration['indexes'])
         ) {
-            $indexSearched = true;
-
             //trim % (like), change space to + for multikeyword search.
             if (is_string($conditionArr[2])) {
                 $keyword = str_replace(' ', '+', strtolower(trim($conditionArr[2], '%')));
@@ -230,7 +334,7 @@ class DocumentFinder
                 $keyword = $conditionArr[2];
             }
 
-            if ($this->multiWords === true && str_contains($keyword, '+')) {
+            if ($this->multiWords === true && !is_array($keyword) && str_contains($keyword, '+')) {
                 $keywordArr = explode('+', $keyword);
 
                 foreach ($keywordArr as $key => $keyword) {
@@ -241,55 +345,208 @@ class DocumentFinder
                     if (is_string($keyword)) {
                         $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
                     } else {
+                        if (is_bool($keyword)) {
+                            if ($keyword === true) {
+                                $keyword = 'true';
+                            } else {
+                                $keyword = 'false';
+                            }
+                        }
+
                         $indexChars = $keyword;
                     }
 
-                    $found = array_replace($found, $this->searchIndexes($conditionArr, $indexChars, $skip, $limit, $keyword));
+                    $found = array_replace($found, $this->searchIndexes($conditionArr, $indexChars, $keyword, $skip, $limit));
+                }
+
+                if (count($found) > 0) {//match all keyword to narrow down search.
+                    foreach ($found as $foundKey => $foundArr) {
+                        $fieldString = strtolower($foundArr[$conditionArr[0]]);
+
+                        $foundAllKeywords = true;
+
+                        foreach ($keywordArr as $key => $keyword) {
+                            if (!str_contains($fieldString, $keyword)) {
+                                $foundAllKeywords = false;
+
+                                break;
+                            }
+                        }
+
+                        if (!$foundAllKeywords) {
+                            unset($found[$foundKey]);
+                        }
+                    }
                 }
             } else {
                 if (is_string($keyword)) {
+                    if (strlen($keyword) === 10 &&
+                        str_contains($keyword, '-') &&
+                        substr_count($keyword, '-') === 2
+                    ) {
+                        $keywordIsDate = new \DateTime($keyword);
+
+                        if ($keywordIsDate) {
+                            $indexChars = $conditionArr[2] = $keyword = $keywordIsDate->getTimestamp();
+                            // trace([$conditionArr]);
+                            $found = array_replace($found, $this->searchIndexes($conditionArr, $indexChars, $keyword, $skip, $limit));
+
+                            return $found ?? [];
+                        }
+                    }
+
                     if (strlen($keyword) < $this->minIndexChars) {
                         return [];
                     }
 
                     $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
                 } else {
+                    if (is_bool($keyword)) {
+                        if ($keyword === true) {
+                            $keyword = 'true';
+                        } else {
+                            $keyword = 'false';
+                        }
+                    }
+
                     $indexChars = $keyword;
                 }
 
-                $found = array_replace($found, $this->searchIndexes($conditionArr, $indexChars, $skip, $limit, $keyword));
+                $found = array_replace($found, $this->searchIndexes($conditionArr, $indexChars, $keyword, $skip, $limit));
             }
         }
 
         return $found ?? [];
     }
 
-    protected function searchIndexes($condition, $indexChars, $skip, $limit, $keyword)
+    protected function searchIndexes($condition, $indexChars, $keyword, $skip = 0, $limit = 0)
     {
-        try {
-            $indexFile = IoHelper::getFileContent(
-                $this->storeConfiguration['indexesPath'] . $condition[0] . '/' . $indexChars . '.json'
-            );
+        if ($condition[1] === '<' || $condition[1] === '<=' || $condition[1] === '>' || $condition[1] === '>=' || strtolower($condition[1]) === 'between') {
+            if ($condition[0] === 'id') {
+                $scanDir = scandir($this->storeConfiguration['storePath'] . 'data/');
+            } else {
+                $scanDir = scandir($this->storeConfiguration['indexesPath'] . $condition[0]);
+            }
 
-            $indexFile = strtolower($indexFile);
+            $files = [];
 
-            $indexJson = json_decode($indexFile, true);
+            array_walk($scanDir, function($file) use (&$files, $condition) {
+                if ($file !== '..' && $file !== '.') {
+                    $fileName = (int) str_replace('.json', '', $file);
 
-            if (count($indexJson) > 0) {
-                if ($limit && count($indexJson) > 0) {
-                    self::skip($indexJson, $skip);
-                    self::limit($indexJson, $limit);
+                    if ($condition[1] === '<') {
+                        if ($fileName < (int) $condition[2]) {
+                            array_push($files, $fileName);
+                        }
+                    } else if ($condition[1] === '<=') {
+                        if ($fileName <= (int) $condition[2]) {
+                            array_push($files, $fileName);
+                        }
+                    } else if ($condition[1] === '>') {
+                        if ($fileName > (int) $condition[2]) {
+                            array_push($files, $fileName);
+                        }
+                    } else if ($condition[1] === '>=') {
+                        if ($fileName >= (int) $condition[2]) {
+                            array_push($files, $fileName);
+                        }
+                    } else if (strtolower($condition[1]) === 'between') {
+                        if ($fileName >= (int) $condition[2][0] &&
+                            $fileName <= (int) $condition[2][1]
+                        ) {
+                            array_push($files, $fileName);
+                        }
+                    }
+                }
+            });
+
+            sort($files);
+
+            if ($condition[0] === 'id') {
+                $this->processIndexJson($condition, $files, $found, null, $skip, $limit);
+            } else {
+                $indexJson = [];
+
+                foreach ($files as $file) {
+                    $indexFile = IoHelper::getFileContent(
+                        $this->storeConfiguration['indexesPath'] . $condition[0] . '/' . $file . '.json'
+                    );
+
+                    $indexFile = strtolower($indexFile);
+
+                    $fileJson = json_decode($indexFile, true);
+
+                    if (count($fileJson) > 0) {
+                        foreach ($fileJson as $dataIds) {
+                            $indexJson = array_merge($indexJson, $dataIds);
+                        }
+                    }
                 }
 
-                if (isset($indexJson[$keyword])) {
-                    if (count($indexJson[$keyword]) === 1) {
-                        $indexIdData = $this->store->findById($indexJson[$keyword][0]);
+                if (count($indexJson) > 0) {
+                    $this->store->criteriaCount = count($indexJson);
 
-                        if ($indexIdData) {
-                            $found[$indexIdData['id']] = $indexIdData;
-                        }
-                    } else {
-                        foreach ($indexJson[$keyword] as $id) {
+                    $this->processIndexJson($condition, $indexJson, $found, null, $skip, $limit);
+                }
+            }
+        } else {
+            try {
+                $indexFile = IoHelper::getFileContent(
+                    $this->storeConfiguration['indexesPath'] . $condition[0] . '/' . $indexChars . '.json'
+                );
+
+                $indexFile = strtolower($indexFile);
+
+                $indexJson = json_decode($indexFile, true);
+
+                if (count($indexJson) > 0) {
+                    $this->processIndexJson($condition, $indexJson, $found, $keyword, $skip, $limit);
+                }
+            } catch (\Exception $e) {
+                $found = [];
+            }
+        }
+
+        return $found ?? [];
+    }
+
+    protected function processIndexJson($condition, $indexJson, &$found, $keyword = null, $skip = 0, $limit = 0)
+    {
+        if ($limit && count($indexJson) > 0) {
+            self::skip($indexJson, $skip);
+            self::limit($indexJson, $limit);
+        }
+
+        if (isset($indexJson[$keyword])) {
+            if (count($indexJson[$keyword]) === 1) {
+                $this->store->criteriaCount = 1;
+
+                $indexIdData = $this->store->findById($indexJson[$keyword][0]);
+
+                if ($indexIdData) {
+                    $found[$indexIdData['id']] = $indexIdData;
+                }
+            } else {
+                foreach ($indexJson[$keyword] as $id) {
+                    $indexIdData = $this->store->findById($id);
+
+                    if ($indexIdData) {
+                        $found[$indexIdData['id']] = $indexIdData;
+                    }
+                }
+            }
+        } else {
+            foreach ($indexJson as $key => $ids) {
+                if (is_array($ids) && $limit && count($ids) > $limit) {
+                    self::skip($ids, $skip);
+                    self::limit($ids, $limit);
+                }
+
+                if (strtolower($condition[1]) === 'like') {
+                    $key = strtolower($key);
+
+                    if (str_starts_with($key, $indexChars)) {
+                        foreach ($ids as $id) {
                             $indexIdData = $this->store->findById($id);
 
                             if ($indexIdData) {
@@ -297,46 +554,34 @@ class DocumentFinder
                             }
                         }
                     }
-                } else {
-                    foreach ($indexJson as $key => $ids) {
-                        if ($limit && count($ids) > $limit) {
-                            self::skip($ids, $skip);
-                            self::limit($ids, $limit);
-                        }
+                } else if ($condition[1] === '=' ||
+                           $condition[1] === '==='
+                ) {
+                    $key = strtolower($key);
 
-                        $key = strtolower($key);
+                    if ($key === $indexChars) {
+                        foreach ($ids as $id) {
+                            $indexIdData = $this->store->findById($id);
 
-                        if (strtolower($condition[1]) === 'like') {
-                            if (str_starts_with($key, $indexChars)) {
-                                foreach ($ids as $id) {
-                                    $indexIdData = $this->store->findById($id);
-
-                                    if ($indexIdData) {
-                                        $found[$indexIdData['id']] = $indexIdData;
-                                    }
-                                }
-                            }
-                        } else if ($condition[1] === '=' ||
-                                   $condition[1] === '==='
-                        ) {
-                            if ($key === $indexChars) {
-                                foreach ($ids as $id) {
-                                    $indexIdData = $this->store->findById($id);
-
-                                    if ($indexIdData) {
-                                        $found[$indexIdData['id']] = $indexIdData;
-                                    }
-                                }
+                            if ($indexIdData) {
+                                $found[$indexIdData['id']] = $indexIdData;
                             }
                         }
                     }
+                } else if ($condition[1] === '<' ||
+                           $condition[1] === '<=' ||
+                           $condition[1] === '>' ||
+                           $condition[1] === '>=' ||
+                           strtolower($condition[1]) === 'between'
+                ) {
+                    $indexIdData = $this->store->findById($ids);
+
+                    if ($indexIdData) {
+                        $found[$indexIdData['id']] = $indexIdData;
+                    }
                 }
             }
-        } catch (\Exception $e) {
-            $found = [];
         }
-
-        return $found ?? [];
     }
 
     protected function getDataPath(): string

@@ -394,7 +394,7 @@ class Clients extends BasePackage
         }
         $emailData['body'] = $emailData['body'] . 'Client ID: ' . $newClient['client_id'] . '<br>' . 'Client Secret: ' . $clientSecret;
 
-        return $this->basepackages->emailqueue->addToQueue($emailData);
+        return $this->basepackages->emailqueue->addQueue($emailData);
     }
 
     public function checkCallCount(&$client, $types = [])

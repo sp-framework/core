@@ -397,8 +397,18 @@ class Router
 		$this->appDefaults['app'] = $this->appInfo['route'];
 		$this->appDefaults['app_type'] = $this->appInfo['app_type'];
 		if (!$this->isApi) {
-			$this->appDefaults['component'] =
-				$this->components->getComponentById($this->appInfo['default_component'])['route'];
+			if (isset($this->appInfo['default_component_guests']) && $this->appInfo['default_component_guests'] != 0) {
+				$defaulComponentForGuests = $this->components->getComponentById($this->appInfo['default_component_guests']);
+
+				if ($defaulComponentForGuests) {
+					$this->appDefaults['component'] = $defaulComponentForGuests['route'];
+				} else {
+					$this->appDefaults['component'] = 'home';
+				}
+			} else {
+				$this->appDefaults['component'] = 'home';
+			}
+
 			$this->appDefaults['errorComponent'] =
 				isset($this->appInfo['errors_component']) && $this->appInfo['errors_component'] != 0 ?
 				$this->components->getComponentById($this->appInfo['errors_component'])['route'] :

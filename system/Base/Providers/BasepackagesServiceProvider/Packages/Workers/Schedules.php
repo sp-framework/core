@@ -15,7 +15,17 @@ class Schedules extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('schedules', 'core')) {
+                $this->schedules = $this->opCache->getCache('schedules', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('schedules', $this->schedules, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }
@@ -194,15 +204,20 @@ class Schedules extends BasePackage
         return false;
     }
 
-    public function getWeekdays()
+    public function getWeekdays($includeWeekends = true)
     {
-        return
+        $weekDays = [];
+
+        if ($includeWeekends) {
+            $weekDays['0'] =
+                [
+                    'id'        => '0',
+                    'name'      => 'Sunday'
+                ];
+        }
+
+        $weekDays = array_replace($weekDays,
             [
-                '0'                 =>
-                    [
-                        'id'        => '0',
-                        'name'      => 'Sunday'
-                    ],
                 '1'                 =>
                     [
                         'id'        => '1',
@@ -227,13 +242,19 @@ class Schedules extends BasePackage
                     [
                         'id'        => '5',
                         'name'      => 'Friday'
-                    ],
-                '6'                 =>
-                    [
-                        'id'        => '6',
-                        'name'      => 'Saturday'
                     ]
-            ];
+            ]
+        );
+
+        if ($includeWeekends) {
+            $weekDays['6'] =
+                [
+                    'id'        => '6',
+                    'name'      => 'Saturday'
+                ];
+        }
+
+        return $weekDays;
     }
 
     public function getMonths()

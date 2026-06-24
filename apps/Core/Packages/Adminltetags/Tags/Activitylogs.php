@@ -25,8 +25,14 @@ class Activitylogs extends Adminltetags
 
     protected function generateContent()
     {
-        if (!isset($this->params['activityLogs'])) {
+        if (!isset($this->params['activityLogs']['data'])) {
             throw new \Exception('Error: activityLogs (array) missing');
+        }
+
+        if (count($this->params['activityLogs']['data']) === 0) {
+             $this->content .= 'No activity logs available for this ID.';
+
+            return true;
         }
 
         if (isset($this->params['activityLogs']['paginationCounters'])) {
@@ -46,12 +52,8 @@ class Activitylogs extends Adminltetags
             }
 
             $this->content .=
-                '<div class="row ml-4 mr-4">
-                    <div class="col">
-                        Showing <span class="activityLogs-shown">' . $start . ' to ' . $to . '</span> out of <span class="active-logs-total">' . $this->params['activityLogs']['paginationCounters']['filtered_items'] . '</span>
-                    </div>
-                    <div class="col">';
-
+                '<div class="row pt-2 pl-4 pr-4">
+                    <div class="col">' .
             $leftDisabled = '';
             $rightDisabled = '';
 
@@ -59,17 +61,17 @@ class Activitylogs extends Adminltetags
                 $this->params['activityLogs']['paginationCounters']['current'] === 1 &&
                 $this->params['activityLogs']['paginationCounters']['last'] === 1
             ) {
-                $leftDisabled = 'disabled';
-                $rightDisabled = 'disabled';
+                $leftDisabled = 'disabled text-muted';
+                $rightDisabled = 'disabled text-muted';
             } else if ($this->params['activityLogs']['paginationCounters']['first'] === 1 &&
                        $this->params['activityLogs']['paginationCounters']['current'] === 1 &&
                        $this->params['activityLogs']['paginationCounters']['last'] > 1
             ) {
-                $leftDisabled = 'disabled';
+                $leftDisabled = 'disabled text-muted';
                 $rightDisabled = '';
             } else if ($this->params['activityLogs']['paginationCounters']['current'] === $this->params['activityLogs']['paginationCounters']['last']) {
                 $leftDisabled = '';
-                $rightDisabled = 'disabled';
+                $rightDisabled = 'disabled text-muted';
             }
 
             $this->content .=
@@ -80,7 +82,10 @@ class Activitylogs extends Adminltetags
                     <li class="page-item">
                         <a class="page-link activity-logs-next ' . $rightDisabled . '" href="#"><i class="fas fa-chevron-right"></i></a>
                     </li>
-                </ul>';
+                </ul>
+                <span class="text-uppercase float-right mr-3" style="position: relative;top: 3px;font-size: 17px;">
+                Showing <span class="activityLogs-shown">' . $start . ' to ' . $to . '</span> out of <span class="active-logs-total">' . $this->params['activityLogs']['paginationCounters']['filtered_items'] . '</span>
+                </span>';
 
             $this->content .=
                     '</div>
@@ -88,19 +93,19 @@ class Activitylogs extends Adminltetags
         }
 
         $this->content .=
-            '<div class="row">
+            '<div id="timeline-div" class="row">
                 <div class="col">
                     <div class="timeline">';
 
-        foreach ($this->params['activityLogs'] as $logsKey => $logs) {
+        foreach ($this->params['activityLogs']['data'] as $logsKey => $logs) {
             if ($logsKey === 'paginationCounters') {
                 continue;
             }
 
-            if ($logs['activity_type'] === '1') {
+            if ($logs['activity_type'] == '1') {
                 $icon = 'plus';
                 $bg = 'primary';
-            } else if ($logs['activity_type'] === '2') {
+            } else if ($logs['activity_type'] == '2') {
                 $icon = 'edit';
                 $bg = 'warning';
             }
@@ -108,7 +113,11 @@ class Activitylogs extends Adminltetags
             if (isset($logs['account_id']) && $logs['account_id'] == 0) {
                 $title = '<span><i class="fas fa-fw fa-robot"></i> ' . $logs['account_full_name'] . ' </span>';
             } else {
-                $title = '<span><i class="fas fa-fw fa-user"></i> ' . $logs['account_full_name'] . ' (' . $logs['account_email'] . ') </span>';
+                if ($logs['account_portrait'] !== '') {
+                    $title = $logs['account_portrait'] . '<span class="ml-2">' . $logs['account_full_name'] . ' (' . $logs['account_email'] . ') </span>';
+                } else {
+                    $title = '<span><i class="fas fa-fw fa-user"></i> ' . $logs['account_full_name'] . ' (' . $logs['account_email'] . ') </span>';
+                }
             }
 
             $logContent = '<dl class="row">';
@@ -116,19 +125,19 @@ class Activitylogs extends Adminltetags
             foreach ($logs['log'] as $logKey => $log) {
                 if (!in_array($logKey, $this->params['disableKeys'])) {
                     if (array_key_exists($logKey, $this->params['replaceValues'])) {
-                        $log = $this->params['replaceValues'][$logKey][$log];
+                        $log = $this->params['replaceValues'][$logKey];
                     }
                     if (array_key_exists($logKey, $this->params['replaceKeys'])) {
                         $logKey = $this->params['replaceKeys'][$logKey];
                     }
 
-                    $logKey = str_replace('_', ' ', $logKey);
+                    if (in_array($logKey, $this->params['isJson'])) {
+                        if (is_array($log)) {
+                            $log = $this->helper->encode($log);
+                        }
 
-                    if (is_array($log)) {
-                        $log = $this->helper->encode($log);
-
-                        if ($log === '[]') {
-                            $log = '';
+                        if ($log === '[]' || $log === '{}') {
+                            continue;
                         }
 
                         $jsonLog = $log;
@@ -157,8 +166,10 @@ class Activitylogs extends Adminltetags
                                 </script>';
                     }
 
+                    $logTitle = str_replace('_', ' ', $logKey);
+
                     $logContent .=
-                        '<dt class="col-md-4 text-uppercase">' . $logKey . '</dt>
+                        '<dt class="col-md-4 text-uppercase">' . $logTitle . '</dt>
                         <dd id="' . $logKey . '-' . $logsKey . '" class="col-md-8">: ' . $log . '</dd>';
                 }
             }
@@ -167,19 +178,18 @@ class Activitylogs extends Adminltetags
 
             $this->content .=
                 '<div>
-                    <i class="fas fa-fw fa-' . $icon . ' bg-' . $bg . '"></i>
+                    <i class="fas fa-fw fa-' . $icon . ' bg-' . $bg . '" style="border-radius: 0.25rem"></i>
                     <div class="timeline-item">
-                        <span class="time"><i class="fas fa-clock"></i> ' . $logs['created_at'] .'</span>
-                        <h6 class="timeline-header text-secondary">' .  $title . '</h6>
+                        <span class="time p-2"><i class="fa fa-fw fa-clock"></i> ' . $logs['created_at'] .'</span>
+                        <h6 class="timeline-header p-2">' .  $title . '</h6>
                         <div class="timeline-body">' . $logContent . '</div>
-                        <div class="timeline-footer"></div>
                     </div>
                 </div>';
         }
 
         $this->content .=
                         '<div>
-                            <i class="fas fa-fw fa-clock bg-secondary"></i>
+                            <i class="fas fa-fw fa-clock bg-secondary" style="border-radius: 0.25rem"></i>
                         </div>
                     </div>
                 </div>
@@ -196,11 +206,16 @@ class Activitylogs extends Adminltetags
                 $(".activity-logs-previous, .activity-logs-next").click(function(e) {
                     e.preventDefault();
 
-                    var url = "' . $this->links->url('crypto/trades/getActivityLogs') . '";
+                    $("#baz-content").empty();
+                    $("#loader").attr("hidden", false);
+
+                    var url = "' . $this->links->url($this->params['activityLogs']['postLink']) . '";
 
                     var postData = { };
                     postData[$("#security-token").attr("name")] = $("#security-token").val();
-                    postData["id"] = $("#' . $this->params['componentId'] . '-main-id").val();
+                    postData["id"] = ' . $this->params['activityLogs']['id'] . ';
+                    postData["packageClass"] = "' . $this->params['activityLogs']['packageClass'] . '";
+                    postData["postLink"] = "' . $this->params['activityLogs']['postLink'] . '";
 
                     if ($(this).is(".activity-logs-previous")) {
                         postData["page"] = paginationCounters["previous"];
@@ -208,13 +223,9 @@ class Activitylogs extends Adminltetags
                         postData["page"] = paginationCounters["next"];
                     }
 
-                    $.post(url, postData, function(response) {
-                        if (response.responseCode == 0) {
-                            if (response.responseData) {
-                                $("#activity-logs").empty().html(response.responseData.logs);
-                            }
-                        }
-                    }, "json");
+                    $("#baz-content").load(url, postData, function() {
+                        $("#loader").attr("hidden", true);
+                    });
                 });
             </script>';
     }

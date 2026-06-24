@@ -21,8 +21,8 @@ class CitiesComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $countriesArr = $this->basepackages->geoCountries->getAll()->geoCountries;
-        $statesArr = $this->basepackages->geoStates->getAll()->geoStates;
+        $countriesArr = $this->basepackages->geoCountries->geoCountries;
+        $statesArr = $this->basepackages->geoStates->geoStates;
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
@@ -48,7 +48,7 @@ class CitiesComponent extends BaseComponent
                 // 'includeQ'              => true,
                 'actionsToEnable'       =>
                 [
-                    'view'      => 'system/geo/cities',
+                    'edit'      => 'system/geo/cities',
                 ]
             ];
 
@@ -87,11 +87,11 @@ class CitiesComponent extends BaseComponent
             $this->geoCities,
             'system/geo/cities/view',
             null,
-            ['name', 'longitude', 'latitude', 'postcode', 'state_id', 'country_id'],
+            ['name', 'longitude', 'latitude', 'state_id', 'country_id'],
             true,
-            ['name', 'longitude', 'latitude', 'postcode', 'state_id', 'country_id'],
+            ['name', 'longitude', 'latitude', 'state_id', 'country_id'],
             $controlActions,
-            ['state_id'=>'State','postcode'=>'post code', 'country_id'=>'country'],
+            ['state_id'=>'State','country_id'=>'country'],
             $replaceColumns,
             'name',
             // $dtAdditionControlButtons
@@ -142,29 +142,6 @@ class CitiesComponent extends BaseComponent
             }
 
             $this->basepackages->geoCities->searchCities($searchQuery);
-
-            $this->addResponse(
-                $this->basepackages->geoCities->packagesData->responseMessage,
-                $this->basepackages->geoCities->packagesData->responseCode,
-                $this->basepackages->geoCities->packagesData->responseData ?? []
-            );
-        } else {
-            $this->addResponse('Search Query Missing', 1);
-        }
-    }
-
-    public function searchPostCodeAction()
-    {
-        $this->requestIsPost();
-
-        if ($this->postData()['search']) {
-            $searchQuery = $this->postData()['search'];
-
-            if (strlen($searchQuery) < 3) {
-                return;
-            }
-
-            $this->basepackages->geoCities->searchPostCodes($searchQuery);
 
             $this->addResponse(
                 $this->basepackages->geoCities->packagesData->responseMessage,

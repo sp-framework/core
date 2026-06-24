@@ -1,7 +1,9 @@
 {% if city['id'] is defined %}
     {% set title = 'City (' ~ city['name'] ~ ')' %}
+    {% set cityId = city['id'] %}
 {% else %}
     {% set title = 'New City' %}
+    {% set cityId = city['id'] %}
 {% endif %}
 
 {{adminltetags.useTag('content',
@@ -21,6 +23,10 @@
         'cardBodyInclude'               : 'cities/form',
         'formButtons'                   :
         [
+            'updateButtonId'                : cityId,
+            'updateActionUrl'               : 'system/geo/cities/update',
+            'updateSuccessRedirectUrl'      : 'system/geo/cities',
+            'cancelActionUrl'               : 'system/geo/cities',
             'closeActionUrl'                : 'system/geo/cities'
         ]
     ]

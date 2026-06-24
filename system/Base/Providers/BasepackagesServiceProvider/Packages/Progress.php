@@ -22,6 +22,8 @@ class Progress extends BasePackage
 
     protected $details = [];
 
+    protected $progressData = [];
+
     public function init($container = null, $fileName = null)
     {
         if ($container) {
@@ -50,6 +52,7 @@ class Progress extends BasePackage
         }
 
         $progressFile = $this->readProgressFile();
+
         if ($progressFile) {
             return $progressFile;
         }
@@ -62,8 +65,12 @@ class Progress extends BasePackage
         return $this->readProgressFile();
     }
 
-    public function registerMethods(array $methods)
+    public function registerMethods(array $methods, $deleteFile = false)
     {
+        if ($deleteFile) {
+            $this->deleteProgressFile();
+        }
+
         foreach ($methods as $key => $method) {
             if (!is_array($method)) {
                 throw new \Exception('Each entry of method needs to have method and text (description)');
@@ -82,11 +89,11 @@ class Progress extends BasePackage
                 array_push($progressFile['processes'], $method);
             }
 
-            $this->writeProgressFile($progressFile['processes'], true);
+            $this->writeProgressFile(methods: $progressFile['processes'], register: true);
 
             return true;
         } else {
-            $this->writeProgressFile($methods, true);
+            $this->writeProgressFile(methods: $methods, register: true);
 
             return true;
         }
@@ -130,7 +137,7 @@ class Progress extends BasePackage
                 }
             }
 
-            $this->writeProgressFile($progressFile['processes'], false, true);
+            $this->writeProgressFile(methods: $progressFile['processes'], unregister: true);
 
             return true;
         }
@@ -216,13 +223,9 @@ class Progress extends BasePackage
                     if ($child && isset($progressFileMethod['childs'])) {
                         foreach ($progressFileMethod['childs'] as $childKey => $childValue) {
                             if ($childValue['method'] === $child) {
-                                if ($callResult !== null) {
-                                    unset($progressFile['processes'][$progressFileKey]['childs'][$childKey]);
-                                }
-
                                 $runners['child'] = true;
                                 $runners['remainingChilds'] = count($progressFile['processes'][$progressFileKey]['childs']);
-                                $currentProcess = current($progressFileMethod['childs']);
+                                $currentProcess = $progressFileMethod['childs'][$childKey];
 
                                 if (isset($currentProcess['remoteWeb']) && $currentProcess['remoteWeb'] === true && $counters) {
                                     $currentProcess = array_merge($currentProcess, ['remoteWebCounters' => $counters]);
@@ -234,7 +237,15 @@ class Progress extends BasePackage
                                 if ($text) {
                                     $runners['running']['text'] = $text;
                                 }
-                                $runners['next'] = next($progressFileMethod['childs']);
+                                if (isset($progressFileMethod['childs'][$childKey + 1])) {
+                                    $runners['next'] = $progressFileMethod['childs'][$childKey + 1];
+                                } else {
+                                    $runners['next'] = false;
+                                }
+
+                                if ($callResult !== null) {
+                                    unset($progressFile['processes'][$progressFileKey]['childs'][$childKey]);
+                                }
 
                                 break;
                             }
@@ -244,11 +255,7 @@ class Progress extends BasePackage
                             unset($progressFile['processes'][$progressFileKey]);
                         }
                     } else {
-                        if ($callResult !== null) {
-                            unset($progressFile['processes'][$progressFileKey]);
-                        }
-
-                        $currentProcess = current($progressFile['processes']);
+                        $currentProcess = $progressFile['processes'][$progressFileKey];
 
                         if (isset($currentProcess['remoteWeb']) && $currentProcess['remoteWeb'] === true && $counters) {
                             $currentProcess = array_merge($currentProcess, ['remoteWebCounters' => $counters]);
@@ -257,10 +264,20 @@ class Progress extends BasePackage
                         }
 
                         $runners['running'] = $currentProcess;
-                        if ($text) {
+
+                        if ($text && $runners['running']) {
                             $runners['running']['text'] = $text;
                         }
-                        $runners['next'] = next($progressFile['processes']);
+
+                        if (isset($progressFile['processes'][$progressFileKey + 1])) {
+                            $runners['next'] = $progressFile['processes'][$progressFileKey + 1];
+                        } else {
+                            $runners['next'] = false;
+                        }
+
+                        if ($callResult !== null) {
+                            unset($progressFile['processes'][$progressFileKey]);
+                        }
                     }
 
                     break;
@@ -277,7 +294,9 @@ class Progress extends BasePackage
                 $callResult = true;
             }
 
-            $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult, $child, $counters);
+            $this->writeProgressFile(
+                methods: $progressFile['processes'], update: true, runners: $runners, method: $method, callResult: $callResult, child: $child, counters: $counters
+            );
 
             if ($callResult === true) {
                 $this->sendNotification($callResult, $counters);
@@ -326,7 +345,7 @@ class Progress extends BasePackage
 
     protected function checkNotificationTunnel()
     {
-        if (!$this->notificationsTunnel && isset($this->apps)) {
+        if (!$this->notificationsTunnel && isset($this->apps) && $this->apps->getAppInfo()) {
             $account = $this->basepackages->accounts->getAccountById($this->access->auth->account()['id']);
 
             if ($account && isset($account['tunnels']['notifications_tunnel'])) {
@@ -474,7 +493,7 @@ class Progress extends BasePackage
         if ($progressFile) {
             $progressFile['preCheckComplete'] = $complete;
 
-            $this->writeProgressFile($progressFile['processes'], false, false, false, null, $progressFile);
+            $this->writeProgressFile(methods: $progressFile['processes'], progressFile: $progressFile);
         }
     }
 
@@ -565,7 +584,7 @@ class Progress extends BasePackage
                 $progressFile['pid'] = null;
             }
 
-            $this->writeProgressFile(methods: [],progressFile: $progressFile);
+            $this->writeProgressFile(methods: [], progressFile: $progressFile);
 
             $this->addResponse('Successfully terminating process');
 
@@ -585,14 +604,16 @@ class Progress extends BasePackage
             }
         }
 
-        if ($this->opCache) {
-            return $this->opCache->getCache($this->progressFileName, 'progress');
-        } else {
-            try {
-                return $this->helper->decode($this->localContent->read('/var/progress/' . $this->progressFileName . '.json'), true);
-            } catch (\ErrorException | FilesystemException | UnableToReadFile | \InvalidArgumentException $exception) {
-                return false;
-            }
+        if (count($this->progressData) > 0) {
+            return $this->progressData;
+        }
+
+        try {
+            $this->progressData = $this->helper->decode($this->localContent->read('/var/progress/' . $this->progressFileName . '.json'), true);
+
+            return $this->progressData;
+        } catch (\ErrorException | FilesystemException | UnableToReadFile | \InvalidArgumentException $exception) {
+            return false;
         }
     }
 
@@ -702,23 +723,27 @@ class Progress extends BasePackage
 
         $file['notifications_tunnel'] = $this->notificationsTunnel;
 
-        if ($register) {
+        if ($register || $unregister) {
             $file['pid'] = 0;
         }
 
-        if (!array_key_exists('pid', $file)) {
-            $file['pid'] = getmypid();
+        if ($update) {
+            if (!array_key_exists('pid', $file)) {
+                $file['pid'] = getmypid();
+            }
+
+            if ($file['pid'] == 0 && count($file['processes']) !== 0) {
+                $file['pid'] = getmypid();
+            } else if (count($file['processes']) === 0) {
+                $file['pid'] = 0;
+            }
         }
 
         $file['errors'] = $this->errors;
 
-        if ($this->opCache) {
-            if ($progressFile) {
-                $this->opCache->resetCache($this->progressFileName, $file, 'progress');
-            } else {
-                $this->opCache->setCache($this->progressFileName, $file, 'progress');
-            }
-        } else {
+        $this->progressData = array_replace($this->progressData, $file);
+
+        if ($register || $unregister || (!$register && !$unregister && $progressFile) || ($file['total'] === $file['completed'])) {
             try {
                 $this->localContent->write('var/progress/' . $this->progressFileName . '.json' , $this->helper->encode($file));
             } catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
@@ -733,18 +758,14 @@ class Progress extends BasePackage
             $this->checkProcessIsRunning();
         }
 
-        if (!$this->progressFileName) {
-            $this->progressFileName = $this->session->getId();
+        $this->progressData = [];
+
+        try {
+            $this->localContent->delete('var/progress/' . $this->progressFileName . '.json');
+        } catch (\ErrorException | FilesystemException | UnableToDeleteFile $exception) {
+            throw $exception;
         }
 
-        if ($this->opCache) {
-            $this->opCache->removeCache($this->progressFileName, 'progress');
-        } else {
-            try {
-                $this->localContent->delete('var/progress/' . $this->progressFileName . '.json');
-            } catch (\ErrorException | FilesystemException | UnableToDeleteFile $exception) {
-                throw $exception;
-            }
-        }
+        return true;
     }
 }

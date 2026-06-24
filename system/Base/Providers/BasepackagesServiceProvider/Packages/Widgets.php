@@ -13,29 +13,68 @@ class Widgets extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('widgets', 'core')) {
+                $this->widgets = $this->opCache->getCache('widgets', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('widgets', $this->widgets, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }
 
-    public function getWidgetsTree()
+    public function getWidgetsTree($componentName = 'dashboards')
     {
         $componentsArr = $this->modules->components->components;
 
         $widgetsTree = [];
 
         foreach ($componentsArr as $componentKey => $component) {
+            if ($componentName === 'dashboards' &&
+                $component['app_type'] !== $this->apps->getAppInfo()['app_type']
+            ) {
+                continue;
+            }
+
+            if ($componentName === 'dashboards' &&
+                strtolower($component['name']) === 'pages'
+            ) {
+                continue;
+            }
+
+            if ($componentName === 'pages' &&
+                strtolower($component['name']) !== 'pages'
+            ) {
+                continue;
+            }
+
             $componentWidgets = $this->getWidgetsByComponentId($component['id']);
 
             if (count($componentWidgets) > 0) {
-                $widgetsTree[$componentKey]['id'] = $component['id'];
-                $widgetsTree[$componentKey]['title'] = $component['name'];
+                if ($componentName === 'dashboards') {
+                    $widgetsTree[$componentKey]['id'] = $component['id'];
+                    $widgetsTree[$componentKey]['title'] = $component['name'];
 
-                foreach ($componentWidgets as $key => $componentWidget) {
-                    $widgetsTree[$componentKey]['childs'][$key]['id'] = $componentWidget['id'];
-                    $widgetsTree[$componentKey]['childs'][$key]['title'] = $componentWidget['name'];
-                    $widgetsTree[$componentKey]['childs'][$key]['data']['method'] = $componentWidget['method'];
-                    $widgetsTree[$componentKey]['childs'][$key]['data']['component_id'] = $componentWidget['component_id'];
+                    foreach ($componentWidgets as $key => $componentWidget) {
+                        $widgetsTree[$componentKey]['childs'][$key]['id'] = $componentWidget['id'];
+                        $widgetsTree[$componentKey]['childs'][$key]['title'] = $componentWidget['name'];
+                        $widgetsTree[$componentKey]['childs'][$key]['data']['method'] = $componentWidget['method'];
+                        $widgetsTree[$componentKey]['childs'][$key]['data']['component_id'] = $componentWidget['component_id'];
+                        $widgetsTree[$componentKey]['childs'][$key]['data']['app_type'] = $componentWidget['app_type'];
+                    }
+                } else if ($componentName === 'pages') {
+                    foreach ($componentWidgets as $key => $componentWidget) {
+                        $widgetsTree[$key]['id'] = $componentWidget['id'];
+                        $widgetsTree[$key]['name'] = $componentWidget['name'] . ' (' . $componentWidget['app_type'] . ')';
+                        $widgetsTree[$key]['data']['method'] = $componentWidget['method'];
+                        $widgetsTree[$key]['data']['component_id'] = $componentWidget['component_id'];
+                        $widgetsTree[$key]['data']['app_type'] = $componentWidget['app_type'];
+                    }
                 }
             }
         }
@@ -43,19 +82,37 @@ class Widgets extends BasePackage
         return $widgetsTree;
     }
 
-    public function getWidget(int $id, $task = null, $dashboardWidget = [])
+    public function getWidget(int $id, $task = null, $dashboardPageWidget = [])
     {
-        $widget = $this->getById($id);
+        if (isset($this->widgets[$id])) {
+            $widget = $this->widgets[$id];
+        } else {
+            $widget = $this->getById($id);
+        }
 
+        if (!isset($widget)) {
+            return false;
+        }
         if (!$task) {
             return $widget;
         }
+
+        if ($task === 'content' &&
+            $this->apps->getAppInfo()['app_type'] !== $widget['app_type']
+        ) {
+            return ['error' => 'Requested widget does not belong to this app type!'];
+        }
+
+        // if ($this->opCache && isset($dashboardPageWidget['getWidgetData']) && isset($widget['content']) && $task === 'content') {
+        //     return $widget;
+        // }
 
         if ($widget['settings']) {
             if (is_string($widget['settings'])) {
                 $widget['settings'] = $this->helper->decode($widget['settings'], true);
             }
         }
+
         $widgetMethod = $widget['method'];
 
         $component = $this->modules->components->getComponentById($widget['component_id']);
@@ -64,31 +121,57 @@ class Widgets extends BasePackage
             if (class_exists($component['class'])) {
                 $componentObj = new $component['class'];
 
-                $componentObj->checkComponentWidgets();
+                try {
+                    $componentObj->checkComponentWidgets($widget['app_type']);
+                } catch (\throwable $e) {
+                    return ['error' => $e->getMessage()];
+                }
+            }
 
-                $widgetClass = $componentObj->widgets->init($componentObj, $component);
+            if ($componentObj->widgets) {
+                $widgetsReflection = new \ReflectionClass($componentObj->widgets);
+
+                if (isset($widgetMethod) && $widgetsReflection->hasMethod($widgetMethod)) {
+                    if ($task === 'info') {
+                        try {
+                            $widget['info'] = $componentObj->widgets->info($widget);
+                        } catch (\throwable $e) {
+                            $widget['info'] = $e->getMessage();
+                        }
+                    } else if ($task === 'settings') {
+                        try {
+                            if (count($dashboardPageWidget) > 0) {
+                                $widget['settings'] = $componentObj->widgets->settings($widget, $dashboardPageWidget);
+                            } else {
+                                $widget['settings'] = $componentObj->widgets->settings($widget);
+                            }
+                        } catch (\throwable $e) {
+                            $widget['settings'] = $e->getMessage();
+                        }
+                    } else if ($task === 'content') {
+                        try {
+                            $widget['content'] = $componentObj->widgets->$widgetMethod($widget, $dashboardPageWidget);
+
+                            // if ($this->opCache && isset($dashboardPageWidget['getWidgetData'])) {
+                            //     $this->widgets[$id] = $widget;
+
+                            //     $this->opCache->setCache('widgets', $this->widgets, 'core');
+                            // }
+                        } catch (\throwable $e) {
+                            $widget['content'] = $e->getMessage();
+                        }
+                    }
+
+                    return $widget;
+                }
+
+                return ['error' => 'Widget method does not exists!'];
             }
         } catch (\Exception $e) {
             throw $e;
         }
 
-        if ($widgetClass) {
-            $widgetsReflection = new \ReflectionClass($widgetClass);
-
-            if (isset($widgetMethod) && $widgetsReflection->hasMethod($widgetMethod)) {
-                if ($task === 'info') {
-                    $widget['info'] = $widgetClass->info($widget);
-                } else if ($task === 'content') {
-                    $widget['content'] = $widgetClass->$widgetMethod($widget, $dashboardWidget);
-                }
-
-                return $widget;
-            }
-
-            return false;
-        }
-
-        return false;
+        return ['error' => 'Error processing widget!'];
     }
 
     public function getWidgetsByComponentId($componentId)
@@ -102,5 +185,18 @@ class Widgets extends BasePackage
         }
 
         return $widgets;
+    }
+
+    public function getWidgetByMethodAndAppType($method, $appType)
+    {
+        foreach($this->widgets as $widget) {
+            if ($widget['method'] === $method &&
+                $widget['app_type'] === $appType
+            ) {
+                return $widget;
+            }
+        }
+
+        return false;
     }
 }

@@ -178,7 +178,7 @@ class Templates extends BasePackage
         }
 
         return
-            $this->tag->getDocType() .
+            $this->assets->get('doctype')->getCodes()[0]->getContent() .
             '
             <html lang="en">
                 <head>
@@ -196,7 +196,7 @@ class Templates extends BasePackage
                         <div class="row">
                             <div class="col">
                                 <span class="brand-link">
-                                    <img src="http://' . $this->domains->getDomainById(1)['name'] . '/dash/default/images/baz/logo/justlogo33x30.png" alt="Bazaari Logo" class="brand-image">
+                                    <img src="http://' . $this->domains->getDomainById(1)['name'] . '/core/default/images/baz/logo/justlogo33x30.png" alt="Bazaari Logo" class="brand-image">
                                 </span>
                             </div>
                         </div>

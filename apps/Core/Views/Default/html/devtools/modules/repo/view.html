@@ -1,8 +1,9 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set repoHtml = '' %}
 {% if remoteModules|length > 0 %}
     {% for remoteModule in remoteModules %}
         {% set moduleSynced = '-' %}
+        {% set moduleOptions = '-' %}
         {% if remoteModule['synced'] != false %}
             {% if remoteModule['module_type'] == 'bundles' %}
                 {% set url = links.url('devtools/modules/q/bundles/true/' ~ '/id/' ~ remoteModule['synced']) %}
@@ -15,16 +16,28 @@
                 '</button>'
             %}
         {% endif %}
+        {% set modulePermissionIcon = 'eye' %}
+        {% set modulePermissionColor = 'primary' %}
+        {% set moduleVisibility = 'public' %}
+        {% if remoteModule['private'] %}
+            {% set modulePermissionIcon = 'eye-slash' %}
+            {% set modulePermissionColor = 'secondary' %}
+            {% set moduleVisibility = 'private' %}
+        {% endif %}
+        {% set moduleOptions =
+            '<button href="#" type="button" data-repo="' ~ remoteModule['name'] ~ '" data-id="' ~ remoteModule['synced'] ~ '" data-visibility="' ~ moduleVisibility ~ '" data-type="' ~ remoteModule['module_type'] ~ '" class="ml-1 mr-1 text-white btn btn-' ~ modulePermissionColor ~ ' btn-xs toggleVisibility">' ~
+            '   <i class="fas fa-fw fa-xs fa-' ~ modulePermissionIcon ~ '"></i>' ~
+            '</button>' ~
+            '<button href="#" type="button" data-repo="' ~ remoteModule['name'] ~ '" class="ml-1 mr-1 text-white btn btn-danger btn-xs removeModule">' ~
+            '    <i class="fas fa-fw fa-xs fa-trash"></i>' ~
+            '</button>'
+        %}
         {% set repoHtml = repoHtml ~ '<tr>' ~
         '           <td>' ~  remoteModule['name'] ~ '</td>' ~
         '           <td>' ~  remoteModule['module_type'] ~ '</td>' ~
         '           <td><a href="' ~  remoteModule['html_url'] ~ '" target="blank">' ~  remoteModule['html_url'] ~ '</td>' ~
         '           <td id="{{componentId}}-{{sectionId}}-repo-modules-' ~ remoteModule['name'] ~ '">' ~  moduleSynced ~ '</td>' ~
-        '           <td id="{{componentId}}-{{sectionId}}-repo-modules-options-' ~ remoteModule['name'] ~ '">' ~
-        '               <button href="#" type="button" data-repo="' ~ remoteModule['name'] ~ '" class="ml-1 mr-1 text-white btn btn-danger btn-xs removeModule">' ~
-        '                   <i class="fas fa-fw fa-xs fa-trash"></i>' ~
-        '               </button>' ~
-        '           </td>' ~
+        '           <td id="{{componentId}}-{{sectionId}}-repo-modules-options-' ~ remoteModule['name'] ~ '">' ~ moduleOptions ~ '</td>' ~
         '       </tr>' %}
     {% endfor %}
 {% endif %}
@@ -168,6 +181,87 @@ dataCollectionSectionForm['funcs']['init'] = function() {
         }, 'json');
     }
 
+    $('.toggleVisibility').off();
+    $('.toggleVisibility').click(function(e) {
+        e.preventDefault();
+
+        var thisButton = $(this);
+
+        Swal.fire({
+            title                       : '<span class="text-warning"> Toggle visibility of Repo?</span>',
+            icon                        : 'question',
+            background                  : 'rgba(0,0,0,.8)',
+            backdrop                    : 'rgba(0,0,0,.6)',
+            buttonsStyling              : false,
+            confirmButtonText           : 'Yes',
+            customClass                 : {
+                'confirmButton'             : 'btn btn-warning btn-sm text-uppercase',
+                'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+            },
+            showCancelButton            : true,
+            keydownListenerCapture      : true,
+            allowOutsideClick           : true,
+            allowEscapeKey              : true,
+            didOpen                     : function() {
+                dataCollection.env.sounds.swalSound.play();
+            }
+        }).then((result) => {
+            if (result.value) {
+                if ($(thisButton).data('visibility') === 'public') {
+                    $(thisButton).children('i').removeClass('fa-eye');
+                } else if ($(thisButton).data('visibility') === 'private') {
+                    $(thisButton).children('i').removeClass('fa-eye-slash');
+                }
+
+                $(thisButton).children('i').addClass('fa-spin fa-cog');
+                $(thisButton).attr('disabled', true);
+
+                var postData = { };
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                postData['api_id'] = dataCollectionSectionForm['vars']['apiId'];
+                postData['repo'] = $(thisButton).data('repo');
+                postData['id'] = $(thisButton).data('id');
+                postData['module_type'] = $(thisButton).data('type');
+
+                $.post('{{links.url("devtools/modules/toggleVisibilityRepo")}}', postData, function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+
+                    if (response.responseCode == 0) {
+                        paginatedPNotify('success', {'text': response.responseMessage});
+
+                        if ($(thisButton).data('visibility') === 'public') {
+                            $(thisButton).data('visibility', 'private');
+                            $(thisButton).attr('data-visibility', 'private');
+                            $(thisButton).children('i').addClass('fa-eye-slash');
+                            $(thisButton).removeClass('btn-primary').addClass('btn-secondary');
+                        } else if ($(thisButton).data('visibility') === 'private') {
+                            $(thisButton).data('visibility', 'public');
+                            $(thisButton).attr('data-visibility', 'public');
+                            $(thisButton).children('i').addClass('fa-eye');
+                            $(thisButton).removeClass('btn-secondary').addClass('btn-primary');
+                        }
+                    } else {
+                        paginatedPNotify('error', {'text': response.responseMessage});
+
+                        if ($(thisButton).data('visibility') === 'public') {
+                            $(thisButton).children('i').addClass('fa-eye');
+                        } else if ($(thisButton).data('visibility') === 'private') {
+                            $(thisButton).children('i').addClass('fa-eye-slash');
+                        }
+                    }
+
+                    $(thisButton).children('i').removeClass('fa-spin fa-cog');
+
+                    $(thisButton).attr('disabled', false);
+                }, 'json');
+            }
+
+        });
+    });
+
     $('.editModule').off();
     $('.editModule').click(function(e) {
         e.preventDefault();
@@ -200,3 +294,4 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
+<!-- htmlmin:ignore -->

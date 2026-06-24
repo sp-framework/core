@@ -15,7 +15,17 @@ class Scopes extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('scopes', 'core')) {
+                $this->scopes = $this->opCache->getCache('scopes', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('scopes', $this->scopes, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }

@@ -301,7 +301,7 @@ class Agent extends BasePackage
         $emailData['subject'] = 'Agent verification code for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $verificationCode;
 
-        return $this->basepackages->emailqueue->addToQueue($emailData);
+        return $this->basepackages->emailqueue->addQueue($emailData);
     }
 
     public function verifyVerficationCode(array $data)

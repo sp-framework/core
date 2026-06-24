@@ -1,17 +1,12 @@
-{% set firstNameDisabled = false %}
-{% set lastNameDisabled = false %}
-{% set canUpload = true %}
-{% set canAvatar = true %}
-{% set canRemove = true %}
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
-        {% if profile['portrait'] is defined and profile['portrait'] !== '' %}
-            {% set portraitLink = links.url('system/storages/q/uuid/' ~ profile['portrait'] ~ '/w/200') %}
+        {% if profile['contact']['portrait'] is defined and profile['contact']['portrait'] != '' %}
+            {% set portraitLink = links.url('system/storages/q/uuid/' ~ profile['contact']['portrait'] ~ '/w/200') %}
         {% else %}
             {% set portraitLink = '' %}
         {% endif %}
-        {% if profile['initials_avatar']['large'] is defined and profile['initials_avatar']['large'] !== '' %}
-            {% set initialsAvatar = profile['initials_avatar'] %}
+        {% if profile['contact']['initials_avatar']['large'] is defined and profile['contact']['initials_avatar']['large'] != '' %}
+            {% set initialsAvatar = profile['contact']['initials_avatar'] %}
         {% else %}
             {% set initialsAvatar = '' %}
         {% endif %}
@@ -24,15 +19,17 @@
                 'fieldId'                        : 'portrait',
                 'fieldLabel'                     : false,
                 'fieldType'                      : 'files/croppie',
-                'fieldValue'                     : profile['portrait'],
+                'fieldValue'                     : profile['contact']['portrait'],
                 'imageType'                      : 'portrait',
                 'initialsAvatar'                 : initialsAvatar,
                 'storageType'                    : 'private',
-                'upload'                         : canUpload,
-                'avatar'                         : canAvatar,
-                'remove'                         : canRemove,
+                'upload'                         : true,
+                'avatar'                         : true,
+                'remove'                         : true,
                 'recover'                        : true,
-                'portraitLink'                   : portraitLink
+                'portraitLink'                   : portraitLink,
+                'filePackageClass'               : 'System_Base_Providers_BasepackagesServiceProvider_Packages_Users_Profiles',
+                'filePackageRowId'               : profile['id']
             ]
         )}}
     </div>
@@ -79,6 +76,8 @@
                     ]
                 )}}
             </div>
+        </div>
+        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -109,48 +108,25 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'first_name',
-                        'fieldLabel'                     : 'First Name',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'First Name',
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : firstNameDisabled,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : profile['first_name']
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'last_name',
-                        'fieldLabel'                     : 'Last Name',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Last Name',
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : lastNameDisabled,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : profile['last_name']
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_username',
+                        'fieldLabel'                            : 'Account Username',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Account Username',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Account Username',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldRequired'                         : false,
+                        'fieldDisabled'                         : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 50,
+                        'fieldValue'                            : account['username']
                     ]
                 )}}
             </div>

@@ -19,7 +19,9 @@ class ServiceProviderApps extends BaseModel
 
     public $app_type;
 
-    public $default_component;
+    public $default_component_guests;
+
+    public $default_component_users;
 
     public $errors_component;
 
@@ -46,6 +48,8 @@ class ServiceProviderApps extends BaseModel
     public $ip_filter_default_action;
 
     public $menu_structure;
+
+    public $use_app_db;
 
     public $settings;
 

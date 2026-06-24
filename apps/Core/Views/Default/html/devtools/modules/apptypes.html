@@ -1,9 +1,5 @@
 {% set moduleApp_typeDisabled = false %}
 {% set createRepoDisabled = true %}
-{% set moduleDashboardsChecked = false %}
-{% if module['dashboards'] is defined and module['dashboards'] == true %}
-    {% set moduleDashboardsChecked = true %}
-{% endif %}
 {% set moduleInstallChecked = false %}
 {% if module['module_details']['installed'] is defined and module['module_details']['installed'] == true %}
     {% set moduleInstallChecked = true %}
@@ -95,29 +91,6 @@
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
                 'fieldValue'                     : moduleName
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'dashboards',
-                'fieldLabel'                     : 'Has Dashboards?',
-                'fieldHelp'                      : true,
-                'fieldDisabled'                  : false,
-                'fieldHelpTooltipContent'        : 'Does app type have dashboards? Dashboards make use of basepackage dashboards to create multiple dashboards and widgets for them.',
-                'fieldType'                      : 'checkbox',
-                'fieldCheckboxType'              : 'primary',
-                'fieldCheckboxChecked'           : moduleDashboardsChecked,
-                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazScan'                   : true
             ]
         )}}
     </div>

@@ -148,7 +148,7 @@ class Countries
         }
     }
 
-    public function registerSelectedCountryStatesAndCities($ff, $localContent, $country, $ip2location, $helper)
+    public function registerSelectedCountryStatesAndCities($ff, $localContent, $country, $ip2location = null, $helper)
     {
         // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
         // Timeout 3600
@@ -168,6 +168,7 @@ class Countries
 
         $statesStore = $ff->store('basepackages_geo_states');
         $citiesStore = $ff->store('basepackages_geo_cities');
+        $postcodesStore = $ff->store('basepackages_geo_postcodes');
 
         if ($ip2location) {
             $ipv4Store = $ff->store('basepackages_geo_cities_ip2locationv4');
@@ -188,6 +189,11 @@ class Countries
                 if (isset($state['cities'])) {
                     $cities = $state['cities'];
                     unset($state['cities']);
+                }
+
+                if (isset($state['postcodes'])) {
+                    $postcodes = $state['postcodes'];
+                    unset($state['postcodes']);
                 }
 
                 $statesStore->updateOrInsert($state, false);
@@ -239,6 +245,19 @@ class Countries
                         $citiesStore->updateOrInsert($city, false);
                     }
                 }
+
+                if (isset($postcodes)) {
+                    foreach ($postcodes as $key => $postcode) {
+                        if (!isset($postcode['id'])) {
+                            continue;
+                        }
+
+                        $postcode['state_id'] = $state['id'];
+                        $postcode['country_id'] = $country['id'];
+
+                        $postcodesStore->updateOrInsert($postcode, false);
+                    }
+                }
             }
 
             $localContent->delete($this->sourceDir . $country['iso2'] . '.json');
@@ -246,6 +265,7 @@ class Countries
             $countriesStore->count(true);
             $statesStore->count(true);
             $citiesStore->count(true);
+            $postcodesStore->count(true);
 
             $country['installed'] = 1;
             $country['enabled'] = 1;

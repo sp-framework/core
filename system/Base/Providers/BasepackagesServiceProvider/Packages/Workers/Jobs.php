@@ -28,61 +28,26 @@ class Jobs extends BasePackage
             return false;
         }
 
-        if (is_array($job['response_code']) && count($job['response_code']) === 1) {
-            $job['response_code'] = $job['response_code'][array_key_first($job['response_code'])];
-        } else if (is_array($job['response_code']) && count($job['response_code']) > 1) {
-            $job['response_code'] = $this->helper->encode($job['response_code']);
-        }
+        if ($job['job_log_mode'] == '1') {
+            if (is_array($job['response_code']) && count($job['response_code']) === 1) {
+                $job['response_code'] = $job['response_code'][array_key_first($job['response_code'])];
+            } else if (is_array($job['response_code']) && count($job['response_code']) > 1) {
+                $job['response_code'] = $this->helper->encode($job['response_code']);
+            }
 
-        if (is_array($job['response_message']) && count($job['response_message']) === 1) {
-            $job['response_message'] = $job['response_message'][array_key_first($job['response_message'])];
-        } else if (is_array($job['response_message']) && count($job['response_message']) > 1) {
-            $job['response_message'] = $this->helper->encode($job['response_message']);
-        }
+            if (is_array($job['response_message']) && count($job['response_message']) === 1) {
+                $job['response_message'] = $job['response_message'][array_key_first($job['response_message'])];
+            } else if (is_array($job['response_message']) && count($job['response_message']) > 1) {
+                $job['response_message'] = $this->helper->encode($job['response_message']);
+            }
 
-        if (is_array($job['response_data'])) {
-            $job['response_data'] = $this->helper->encode($job['response_data']);
+            if (is_array($job['response_data'])) {
+                $job['response_data'] = $this->helper->encode($job['response_data']);
+            }
         }
-
-        $apiModel = BasepackagesApiClientServicesCalls::class;
 
         if (is_string($job['run_on'])) {
             $job['run_on'] = $this->helper->decode($job['run_on'], true);
-        }
-
-        if (isset($job['run_on'][0]) && $job['run_on'][0] !== '' && $job['run_on'][0] != '0' && $job['run_on'][0] !== '-') {
-            $start = $job['run_on'][0];
-            $timeRan = Carbon::createFromFormat('Y-m-d H:i:s', $start);
-            $timeRan->addSeconds((float) round($job['execution_time'] ?? 0));
-            $end = $timeRan->format('Y-m-d H:i:s');
-
-            if ($this->config->databasetype === 'db') {
-                $callsObj = $apiModel::find(
-                    [
-                        'conditions'        => 'called_at BETWEEN :start: AND :end:',
-                        'bind'              =>
-                            [
-                                'start'     => $start,
-                                'end'       => $end
-                            ]
-                    ]
-                );
-                $callsArr = $callsObj->toArray();
-            } else {
-                $apiStore = $this->ff->store((new $apiModel)->getSource());
-
-                $callsArr = $apiStore->findBy(['called_at', 'BETWEEN', [$start, $end]]);
-            }
-
-            if ($callsArr && count($callsArr) > 0) {
-                $calls = [];
-
-                foreach ($callsArr as $key => $call) {
-                    $calls[$call['id']] = $call;
-                }
-
-                $job['calls'] = $calls;
-            }
         }
 
         return $job;
@@ -112,5 +77,189 @@ class Jobs extends BasePackage
         } else {
             $this->addResponse('Error updating job', 1);
         }
+    }
+
+    public function getJobByMode($task)
+    {
+        if ($task['job_log_mode'] == '1') {
+            return false;
+        }
+
+        $time = \Carbon\Carbon::now();
+
+        if ($task['job_log_mode'] == '2') {
+            $time = $time->startOfHour()->timestamp;
+        } else if ($task['job_log_mode'] == '3') {
+            $time = $time->startOfDay()->timestamp;
+        } else if ($task['job_log_mode'] == '4') {
+            $time = $time->startOfMonth()->timestamp;
+        } else if ($task['job_log_mode'] == '5') {
+            $time = $time->startOfYear()->timestamp;
+        }
+
+        if (!is_int($time)) {
+            return false;
+        }
+
+        if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'conditions'    => 'task_id = :task_id: AND job_log_mode = :job_log_mode: AND job_log_time = :job_log_time',
+                    'bind'          =>
+                        [
+                            'task_id'       => $task['id'],
+                            'job_log_mode'  => $task['job_log_mode'],
+                            'job_log_time'  => $time
+                        ]
+                ];
+
+            $job = $this->getByParams($conditions);
+        } else {
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+            $job = $this->ffStore->findBy([['task_id', '=', $task['id']], ['job_log_mode', '=', $task['job_log_mode']], ['job_log_time', '=', $time]]);
+        }
+
+        if ($job && count($job) > 0) {
+            return $job[0];
+        }
+
+        return false;
+    }
+
+    public function getRunningJobs()
+    {
+        if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'conditions'    => 'status = :status:',
+                    'bind'          =>
+                        [
+                            'status'        => 2
+                        ]
+                ];
+
+            $jobs = $this->getByParams($conditions);
+        } else {
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+            $jobs = $this->ffStore->findBy(['status', '=', 2]);
+        }
+
+        return $jobs;
+    }
+
+    public function terminateJob($data)
+    {
+        if (!$this->access->auth->check()) {
+            $this->addResponse('Only logged in users can terminate jobs!', 1);
+
+            return false;
+        }
+
+        $job = $this->getById((int) $data['id']);
+
+        if (!$job) {
+            $this->addResponse('Job with ID not found', 1);
+
+            return false;
+        }
+
+        if (!$job['can_terminate']) {
+            $this->addResponse('Job cannot be terminated.', 1);
+
+            return false;
+        }
+
+        //Get Process ID from task
+        $task = $this->basepackages->workers->tasks->getById((int) $job['task_id']);
+
+        if (!$task) {
+            $this->addResponse('Task with ID not found', 1);
+
+            return false;
+        }
+
+        if ($task['exec_type'] !== 'raw' && $job['status'] != '2') {
+            $this->addResponse('Job is no longer running.');
+
+            return true;
+        }
+
+        if ($job['pid'] && $job['pid'] > 0) {
+            $call = $this->basepackages->workers->calls->getById((int) $job['cid']);
+
+            if (!$call) {
+                $this->addResponse('Call with ID not found', 1);
+
+                return false;
+            }
+
+            $call = new $call['class'];
+
+            if ($call->terminate($task, $job)) {
+                $job = $this->getById((int) $data['id']);
+                $job['pid'] = null;
+                $job['status'] = 3;
+
+                $this->update($job);
+
+                $this->addResponse('Job terminated!');
+
+                return true;
+            }
+
+            $this->addResponse('Job could not be terminated!', 1);
+
+            return false;
+        } else {
+            $this->addResponse('Job is no longer running.');
+
+            return true;
+        }
+
+        $this->addResponse('Job cannot be terminated as there are other calls running along with this job. Change script type to PHP or RAW to terminate this job.', 1);
+
+        return false;
+    }
+
+    public function getJobLogs($data)
+    {
+        $job = $this->getById((int) $data['job_id']);
+
+        if (!$job) {
+            $this->addResponse('Job with ID not found', 1);
+
+            return false;
+        }
+
+        $task = $this->basepackages->workers->tasks->getById((int) $job['task_id']);
+
+        if (!$task) {
+            $this->addResponse('Task with ID not found', 1);
+
+            return false;
+        }
+
+        $logs = null;
+        if (file_exists(base_path('var/workers/output/' . $job['id'] . '.log'))) {
+            $logs = file_get_contents(base_path('var/workers/output/' . $job['id'] . '.log'));
+        } else {
+            $this->addResponse('Log file does not exists', 1);
+
+            return false;
+        }
+
+        if ($logs) {
+            $logs = str_replace(PHP_EOL, '<br>', $logs);
+
+            $this->addResponse('Log file read successfully', 0, ['logs' => $logs]);
+
+            return true;
+        }
+
+        $this->addResponse('Error reading log file.', 1);
+
+        return false;
     }
 }

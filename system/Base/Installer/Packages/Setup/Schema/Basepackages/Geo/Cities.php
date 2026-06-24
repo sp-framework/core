@@ -48,14 +48,6 @@ class Cities
                     ]
                 ),
                 new Column(
-                    'postcode',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
                     'state_id',
                     [
                         'type'          => Column::TYPE_INTEGER,

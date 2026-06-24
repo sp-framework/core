@@ -64,7 +64,7 @@ class Profiles extends BasePackage
                     $profile['settings'] = [];
                 }
 
-                $addressObj = $profileObj->getAddress();
+                $addressObj = $profileObj->getAddresses();
 
                 $profile['address'] = [];
 
@@ -80,7 +80,7 @@ class Profiles extends BasePackage
             }
         } else {
             $this->setFFRelations(true);
-            $this->setFFRelationsConditions(['address' => ['package_name', '=', 'UsersProfiles']]);
+            $this->setFFRelationsConditions(['addresses' => ['package_class', '=', str_replace('\\', '_', $this::class)], 'contact' => ['package_class', '=', str_replace('\\', '_', $this::class)]]);
 
             $profile = $this->getFirst('account_id', $accountId, false, true, null, [], true);
 
@@ -102,31 +102,11 @@ class Profiles extends BasePackage
         unset($data['id']);
 
         $data['account_id'] = $accountId;
-        $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
-        $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
-        $data['contact_phone'] = '0';
-        $data['contact_mobile'] = '0';
 
         if ($this->add($data)) {
-            //To Update Address Book
-            $profile = $this->packagesData->last;
-            $profile['address_type']        = 1;
-            $profile['is_primary']          = 1;
-            $profile['street_address']      = null;
-            $profile['street_address_2']    = null;
-            $profile['city_id']             = null;
-            $profile['city_name']           = '';
-            $profile['post_code']           = null;
-            $profile['state_id']            = null;
-            $profile['state_name']          = '';
-            $profile['country_id']          = null;
-            $profile['country_name']        = '';
-            $profile['package_name']        = 'UsersProfiles';
-            $profile['package_row_id']      = $profile['id'];
-
-            $profile['contact_address_id'] = $this->addProfileAddress($profile);
-
-            $this->update($profile);
+            $data['id'] = $this->packagesData->last['id'];
+            $this->addProfileContact($data);
+            $this->addProfileAddress();
 
             $this->addResponse('Profile added');
         } else {
@@ -138,10 +118,16 @@ class Profiles extends BasePackage
     {
         $profile = $this->getProfile((int) $data['id']);
 
+        if (!$profile) {
+            $this->addResponse('Profile not found.', 1);
+
+            return false;
+        }
+
         if (isset($data['first_name']) && isset($data['last_name'])) {
-            if (($data['first_name'] !== $profile['first_name'] ||
-                $data['last_name'] !== $profile['last_name']) ||
-                !$profile['initials_avatar']
+            if (($data['first_name'] !== $profile['contact']['first_name'] ||
+                $data['last_name'] !== $profile['contact']['last_name']) ||
+                !$profile['contact']['initials_avatar']
             ) {
                 $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
             }
@@ -149,22 +135,34 @@ class Profiles extends BasePackage
 
         unset($data['id']);
 
-        $profile = array_merge($profile, $data);
+        $profile['contact'] = array_merge($profile['contact'], $data);
 
         if (isset($data['first_name']) && isset($data['last_name'])) {
-            $profile['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+            $profile['contact']['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
         }
 
-        if ($profile['contact_phone'] === '') {
-            $profile['contact_phone'] = 0;
+        if ($profile['contact']['contact_phone'] === '') {
+            $profile['contact']['contact_phone'] = 0;
         }
-        if ($profile['contact_mobile'] === '') {
-            $profile['contact_mobile'] = 0;
+        if ($profile['contact']['contact_mobile'] === '') {
+            $profile['contact']['contact_mobile'] = 0;
         }
 
         if (is_array($profile['settings'])) {
             $profile['settings'] = $this->helper->encode($profile['settings']);
         }
+
+        $contact = $profile['contact'];
+
+        $contact['package_class'] = str_replace('\\', '_', $this::class);
+
+        $contact['package_row_id'] = $profile['id'];
+
+        $this->basepackages->contactbook->updateContact($contact);
+
+        $profile['locale_country_iso3'] = $data['locale_country_iso3'];
+
+        $profile['locale_timezone'] = $data['locale_timezone'];
 
         if ($this->update($profile)) {
             $this->addResponse('Profile updated');
@@ -181,8 +179,11 @@ class Profiles extends BasePackage
 
         if (isset($data['subscriptions']) && $data['subscriptions'] !== '') {
             $data['subscriptions'] = $this->helper->decode($data['subscriptions'], true);
+
             $this->modules->components->updateNotificationSubscriptions($data['subscriptions']);
+
             $this->modules->packages->updateNotificationSubscriptions($data['subscriptions']);
+
             unset($data['subscriptions']);
         }
 
@@ -192,34 +193,100 @@ class Profiles extends BasePackage
             $profile = $this->getProfile($this->access->auth->account()['id']);
         }
 
-        if (($data['first_name'] !== $profile['first_name'] ||
-            $data['last_name'] !== $profile['last_name']) ||
-            !$profile['initials_avatar']
+        $portrait = $profile['contact']['portrait'];
+
+        if (($data['first_name'] !== $profile['contact']['first_name'] ||
+            $data['last_name'] !== $profile['contact']['last_name']) ||
+            !$profile['contact']['initials_avatar']
         ) {
             $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
         }
 
-        $profile = array_merge($profile, $data);
+        unset($data['id']);
+        unset($data['email']);//Remove email as it can only be updated via users/account
 
-        $profile['full_name'] = $profile['first_name'] . ' ' . $profile['last_name'];
+        $profile['contact'] = array_merge($profile['contact'], $data);
 
-        if ($profile['contact_address_id']) {
-            $address = $profile;
-
-            $address['package_name'] = 'UsersProfiles';
-
-            $address['package_row_id'] = $profile['id'];
-
-            $this->basepackages->addressbook->mergeAndUpdate($address);
+        if (isset($data['first_name']) && isset($data['last_name'])) {
+            $profile['contact']['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
         } else {
-            $profile['contact_address_id'] = $this->addProfileAddress($profile);
+            $profile['contact']['full_name'] = $data['first_name'];
         }
 
-        $portrait = $this->getProfile($this->access->auth->account()['id'])['portrait'];
+        if ($profile['contact']['contact_phone'] === '') {
+            $profile['contact']['contact_phone'] = 0;
+        }
+        if ($profile['contact']['contact_mobile'] === '') {
+            $profile['contact']['contact_mobile'] = 0;
+        }
+
+        $contact = $profile['contact'];
+
+        $contact['package_class'] = str_replace('\\', '_', $this::class);
+
+        $contact['package_row_id'] = $profile['id'];
+
+        $this->basepackages->contactbook->updateContact($contact);
+
+        if (isset($data['delete_address_ids'])) {
+            if (is_string($data['delete_address_ids'])) {
+                $data['delete_address_ids'] = $this->helper->decode($data['delete_address_ids'], true);
+            }
+
+            if (count($data['delete_address_ids']) > 0) {
+                foreach ($data['delete_address_ids'] as $addressId) {
+                    $dbAddress = $this->basepackages->addressbook->getById($addressId);
+
+                    if ($dbAddress) {
+                        $this->basepackages->addressbook->removeAddress($dbAddress);
+                    }
+                }
+            }
+        }
+
+        if (isset($data['address_ids'])) {
+            if (is_string($data['address_ids'])) {
+                $data['address_ids'] = $this->helper->decode($data['address_ids'], true);
+            }
+
+            if (count($data['address_ids']) > 0) {
+                foreach ($data['address_ids'] as $addressId => $address) {
+                    if (isset($address['new']) && $address['new'] == 1) {
+                        $address['package_class'] = str_replace('\\', '_', $this::class);
+                        $address['package_row_id'] = $profile['id'];
+
+                        $this->basepackages->addressbook->addAddress($address);
+                    } else {
+                        $dbAddress = $this->basepackages->addressbook->getById($addressId);
+
+                        if ($dbAddress) {
+                            $dbAddress = array_merge($dbAddress, $data['address_ids'][$addressId]);
+
+                            $this->basepackages->addressbook->updateAddress($dbAddress);
+                        }
+                    }
+                }
+            }
+        }
 
         if (is_array($profile['settings'])) {
             $profile['settings'] = $this->helper->encode($profile['settings']);
         }
+
+        if ($this->opCache && $this->opCache->checkCache('components', 'core')) {
+            $this->opCache->removeCache('components', 'core');
+        }
+        if ($this->opCache && $this->opCache->checkCache('packages', 'core')) {
+            $this->opCache->removeCache('packages', 'core');
+        }
+
+        if ($this->opCache && $this->opCache->checkCache('account_' . $data['account_id'], 'core')) {
+            $this->opCache->removeCache('account_' . $data['account_id'], 'core');
+        }
+
+        $profile['locale_country_iso3'] = $data['locale_country_iso3'];
+
+        $profile['locale_timezone'] = $data['locale_timezone'];
 
         if ($this->update($profile)) {
             $this->basepackages->storages->changeOrphanStatus($data['portrait'], $portrait);
@@ -230,25 +297,77 @@ class Profiles extends BasePackage
         }
     }
 
-    protected function addProfileAddress($profile)
+    public function removeProfile(array $data)
     {
-        $address = $profile;
+        $profile = $this->getProfile($data['account_id']);
 
-        $address['package_name'] = $this->packageName;
+        if (isset($profile['contact']['id'])) {
+            if (isset($profile['contact']['portrait']) && $profile['contact']['portrait'] !== '') {
+                $this->basepackages->storages->changeOrphanStatus(null, $profile['contact']['portrait']);
+            }
 
-        $address['package_row_id'] = $profile['id'];
-
-        if (isset($address['id'])) {
-            unset($address['id']);
+            $this->basepackages->contactbook->removeContact($profile['contact']);
         }
 
-        $profileAddress = $this->basepackages->addressbook->addAddress($address);
-
-        if ($profileAddress) {
-            return $profileAddress['id'];
+        if (isset($profile['addresses']) && count($profile['addresses']) > 0) {
+            foreach ($profile['addresses'] as $address) {
+                if (isset($address['id'])) {
+                    $this->basepackages->addressbook->removeAddress($address);
+                }
+            }
         }
 
-        return null;
+        if ($this->remove($profile['id'])) {
+            $this->addResponse('Profile removed');
+        } else {
+            $this->addResponse('Error removing profile.', 1);
+        }
+    }
+
+    protected function addProfileContact($data)
+    {
+        $contact = [];
+        $contact['package_class'] = str_replace('\\', '_', $this::class);
+        $contact['package_row_id'] = $data['id'];
+        $contact['portrait'] = '';
+        $contact['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
+        $contact['prefix'] = '';
+        $contact['suffix'] = '';
+        $contact['first_name'] = $data['first_name'];
+        $contact['last_name'] = $data['last_name'];
+        if (isset($data['first_name']) && isset($data['last_name'])) {
+            $contact['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+        } else {
+            $contact['full_name'] = '';
+        }
+        $contact['contact_phone'] = 0;
+        $contact['contact_phone_ext'] = '';
+        $contact['contact_mobile'] = 0;
+        $contact['email'] = $data['email'];
+
+        return $this->basepackages->contactbook->addContact($contact);
+    }
+
+    protected function addProfileAddress()
+    {
+        //To Update Address Book
+        $address = [];
+        $address['address_reference']   = 'Main';
+        $address['street_address']      = null;
+        $address['street_address_2']    = null;
+        $address['street_address_3']    = null;
+        $address['street_address_4']    = null;
+        $address['city_id']             = null;
+        $address['city_name']           = '';
+        $address['post_code']           = null;
+        $address['state_id']            = null;
+        $address['state_name']          = '';
+        $address['country_id']          = null;
+        $address['country_name']        = '';
+        $address['package_class']        = str_replace('\\', '_', $this::class);
+        $address['package_row_id']      = $this->packagesData->last['id'];
+
+        return $this->basepackages->addressbook->addAddress($address);
     }
 
     public function generateAvatar(string $regenerateUsingFile = null, string $gender = 'M')
@@ -391,89 +510,121 @@ class Profiles extends BasePackage
             'remove' => 'remove'
         ];
 
-        $appsArr = $this->apps->apps;
+        if (isset($account['can_login'][$this->app['id']]) && $account['can_login'][$this->app['id']] !== 0) {
+            $notifications_modules[$this->app['id']] =
+                [
+                    'title' => strtoupper($this->app['name']),
+                    'id' => strtoupper($this->app['id'])
+                ];
 
-        foreach ($appsArr as $appKey => $app) {
-            if (isset($account['can_login'][$app['id']])) {
-                $notifications_modules[$app['id']] =
-                    [
-                        'title' => strtoupper($app['name']),
-                        'id' => strtoupper($app['id'])
-                    ];
+            $allModules = msort($this->modules->components->getComponentsForAppId($this->app['id']), 'name');
 
-                $allModules['components'] = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
-                $allModules['packages'] = msort($this->modules->packages->getPackagesForAppId($app['id']), 'display_name');
+            if ($this->app['app_type'] === 'core') {
+                $allModules = array_merge($allModules, msort($this->modules->packages->getPackagesForAppId($this->app['id']), 'display_name'));
+            }
 
-                foreach ($allModules as $moduleType => $modules) {
-                    if ($modules && count($modules) > 0) {
-                        foreach ($modules as $moduleKey => $module) {
-                            if (!isset($notifications_modules[$app['id']]['childs'][$moduleType])) {
-                                $notifications_modules[$app['id']]['childs'][$moduleType]['title'] = strtoupper($moduleType);
-                            }
+            $appHasNotifications = false;
+            if (count($allModules) > 0) {
+                foreach ($allModules as $module) {
+                    if ($this->app['app_type'] === 'core') {
+                        if (!isset($notifications_modules[$this->app['id']]['childs'][$module['module_type']])) {
+                            $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['title'] = strtoupper($module['module_type']);
+                        }
+                    }
 
-                            if ($module['notification_subscriptions'] &&
-                                !is_array($module['notification_subscriptions']) &&
-                                $module['notification_subscriptions'] !== ''
-                            ) {
-                                $module['notification_subscriptions'] = $this->helper->decode($module['notification_subscriptions'], true);
-                            }
+                    if ($module['notification_subscriptions'] &&
+                        !is_array($module['notification_subscriptions']) &&
+                        $module['notification_subscriptions'] !== ''
+                    ) {
+                        $module['notification_subscriptions'] = $this->helper->decode($module['notification_subscriptions'], true);
+                    }
 
-                            $reflector = $this->annotations->get($module['class']);
-                            $methods = $reflector->getMethodsAnnotations();
+                    $reflector = $this->annotations->get($module['class']);
+                    $methods = $reflector->getMethodsAnnotations();
 
-                            if ($methods && count($methods) > 0) {
-                                foreach ($methods as $annotation) {
-                                    if ($annotation->getAll('notification')) {
-                                        $notifications_modules[$app['id']]['childs'][$moduleType]['childs'][$moduleKey]['id'] = $module['id'];
-                                        if ($moduleType === 'packages') {
-                                            $notifications_modules[$app['id']]['childs'][$moduleType]['childs'][$moduleKey]['title'] = strtoupper($module['display_name']);
-                                        } else {
-                                            $notifications_modules[$app['id']]['childs'][$moduleType]['childs'][$moduleKey]['title'] = strtoupper($module['name']);
-                                        }
+                    if ($methods && count($methods) > 0) {
+                        foreach ($methods as $annotation) {
+                            if ($annotation->getAll('notification')) {
+                                $appHasNotifications = true;
 
-                                        $thisSubscriptions = [];
-                                        $notification_action = $annotation->getAll('notification')[0]->getArguments();
-                                        $notification_allowed_methods = $annotation->getAll('notification_allowed_methods');
+                                if ($this->app['app_type'] === 'core') {
+                                    if ($module['module_type'] === 'packages') {
+                                        $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['id'] = $module['id'];
+                                        $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['title'] = strtoupper($module['display_name']);
+                                    } else {
+                                        $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['id'] = $module['id'];
+                                        $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['title'] = strtoupper($module['name']);
+                                    }
+                                } else {
+                                    $notifications_modules[$this->app['id']]['childs'][$module['name']]['id'] = $module['id'];
+                                    $notifications_modules[$this->app['id']]['childs'][$module['name']]['title'] = strtoupper($module['name']);
+                                }
 
-                                        if (count($notification_allowed_methods) > 0) {
-                                            $notification_allowed_methods = $annotation->getAll('notification_allowed_methods')[0]->getArguments();
-                                        }
+                                $thisSubscriptions = [];
+                                $notification_action = $annotation->getAll('notification')[0]->getArguments();
+                                $notification_allowed_methods = $annotation->getAll('notification_allowed_methods');
 
-                                        $subscriptions[$notification_action['name']] = $notification_action['name'];
-                                        $thisSubscriptions[$notification_action['name']] = $notification_action['name'];
+                                if (count($notification_allowed_methods) > 0) {
+                                    $notification_allowed_methods = $annotation->getAll('notification_allowed_methods')[0]->getArguments();
+                                }
 
-                                        if (count($notification_allowed_methods) > 0) {
-                                            foreach ($notification_allowed_methods as $allowedMethodKey => $allowedMethod) {
-                                                $subscriptions[$allowedMethod] = $allowedMethod;
-                                                $thisSubscriptions[$allowedMethod] = $allowedMethod;
-                                            }
-                                        }
+                                $subscriptions[$notification_action['name']] = $notification_action['name'];
+                                $thisSubscriptions[$notification_action['name']] = $notification_action['name'];
 
-                                        if (isset($module['notification_subscriptions'][$app['id']])) {
-                                            foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
-                                                if (isset($module['notification_subscriptions'][$app['id']][$subscriptionValue])) {
+                                if (count($notification_allowed_methods) > 0) {
+                                    foreach ($notification_allowed_methods as $allowedMethodKey => $allowedMethod) {
+                                        $subscriptions[$allowedMethod] = $allowedMethod;
+                                        $thisSubscriptions[$allowedMethod] = $allowedMethod;
+                                    }
+                                }
 
-                                                    if ($subscriptionValue === 'email') {
-                                                        if (isset($module['notification_subscriptions'][$app['id']][$subscriptionValue][$account['id']])) {
-                                                            $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 1;
-                                                        } else {
-                                                            $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 0;
-                                                        }
+                                if (isset($module['notification_subscriptions'][$this->app['id']])) {
+                                    foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
+                                        if (isset($module['notification_subscriptions'][$this->app['id']][$subscriptionValue])) {
+
+                                            if ($subscriptionValue === 'email') {
+                                                if (isset($module['notification_subscriptions'][$this->app['id']][$subscriptionValue][$account['id']])) {
+                                                    if ($this->app['app_type'] === 'core') {
+                                                        $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 1;
                                                     } else {
-                                                        if (in_array($account['id'], $module['notification_subscriptions'][$app['id']][$subscriptionValue])) {
-                                                            $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 1;
-                                                        } else {
-                                                            $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 0;
-                                                        }
+                                                        $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 1;
                                                     }
                                                 } else {
-                                                    $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 0;
+                                                    if ($this->app['app_type'] === 'core') {
+                                                        $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                                    } else {
+                                                        $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 0;
+                                                    }
+                                                }
+                                            } else {
+                                                if (in_array($account['id'], $module['notification_subscriptions'][$this->app['id']][$subscriptionValue])) {
+                                                    if ($this->app['app_type'] === 'core') {
+                                                        $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 1;
+                                                    } else {
+                                                        $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 1;
+                                                    }
+                                                } else {
+                                                    if ($this->app['app_type'] === 'core') {
+                                                        $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                                    } else {
+                                                        $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 0;
+                                                    }
                                                 }
                                             }
                                         } else {
-                                            foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
-                                                $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 0;
+                                            if ($this->app['app_type'] === 'core') {
+                                                $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                            } else {
+                                                $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 0;
                                             }
+                                        }
+                                    }
+                                } else {
+                                    foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
+                                        if ($this->app['app_type'] === 'core') {
+                                            $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                        } else {
+                                            $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 0;
                                         }
                                     }
                                 }
@@ -482,9 +633,13 @@ class Profiles extends BasePackage
                     }
                 }
 
-                if (!isset($notifications_modules[$app['id']]['childs'])) {
-                    unset($notifications_modules[$app['id']]);
+                if (!isset($notifications_modules[$this->app['id']]['childs'])) {
+                    unset($notifications_modules[$this->app['id']]);
                 }
+            }
+
+            if (!$appHasNotifications) {
+                unset($notifications_modules[$this->app['id']]);
             }
         }
 

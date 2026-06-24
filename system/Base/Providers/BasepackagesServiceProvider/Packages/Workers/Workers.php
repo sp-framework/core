@@ -15,7 +15,17 @@ class Workers extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('workers', 'core')) {
+                $this->workers = $this->opCache->getCache('workers', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('workers', $this->workers, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }
@@ -63,5 +73,19 @@ class Workers extends BasePackage
 
             return $workers;
         }
+    }
+
+    public function forceReleaseWorkers($workersBeingUsedByJobs)
+    {
+        //We check for jobs that are running and release all other workers.
+        foreach ($this->workers as $worker) {
+            if (!in_array($worker['id'], $workersBeingUsedByJobs)) {
+                $worker['status'] = 0;
+
+                $this->update($worker);
+            }
+        }
+
+        return true;
     }
 }

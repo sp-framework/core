@@ -17,6 +17,31 @@
         'dtFilterShowQuickFilter'   : true,
         'dtFilterButtons'           : ['edit', 'delete', 'add', 'clone', 'reset'],
         'dtFilters'                 : table['filters'],
+        'dtSecondaryButtons'      :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'tasks' : {
+                            'title'                   : 'Tasks',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/tasks')
+                        },
+                        'schedules' : {
+                            'title'                   : 'Schedules',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/schedules')
+                        }
+                    }
+            },
         'dtFilterColumns'           : table['filterColumns'],
         'dtTable'                   : table,
         'dtColumns'                 : table['columns'],
@@ -26,8 +51,80 @@
         'dtStateSave'               : false,
         'dtBordered'                : false,
         'dtHideIdColumn'            : true,
-        'dtNoOfColumnsToShow'       : 6,
+        'dtNoOfColumnsToShow'       : 7,
         'dtTableCompact'            : true,
         'dtZeroRecords'             : 'No jobs data available. Jobs are scheduled via tasks.'
     ]
 )}}
+<script>
+/* globals Swal paginatedPNotify BazCore BazNotifications */
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
+    initFuncs();
+    BazCore.bazContent();
+}
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
+    initFuncs();
+    BazCore.bazContent();
+}
+
+function initFuncs() {
+    $('.rowTerminate').each(function(index,row) {
+        $(row).off();
+        $(row).click(function(e) {
+            e.preventDefault();
+
+            var thisButton = this;
+            var url = $(this).attr('href');
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            Swal.fire({
+                title                       : '<span class="text-danger"> Terminate job with ID :' + dataToSend.id + '?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Terminate',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    window.dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        url         : url,
+                        method      : 'post',
+                        dataType    : 'json',
+                        data        : dataToSend,
+                        success     : function(response) {
+                            if (response.responseCode === 0) {
+                                paginatedPNotify('info', {
+                                    title           : response.responseMessage,
+                                });
+                                window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                            } else {
+                                paginatedPNotify('error', {
+                                    title           : response.responseMessage,
+                                });
+                            }
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    });
+}
+</script>

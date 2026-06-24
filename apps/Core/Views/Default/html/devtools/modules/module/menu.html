@@ -983,6 +983,8 @@ dataCollectionSection =
             // getAppTypeMenus
             $('#{{componentId}}-{{sectionId}}-app_type').off('select2:select');
             $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function(e) {
+                dataCollectionSectionForm['vars']['module_app_type'] = e.params.data.id;
+                dataCollectionSectionForm['func']['toggleDependenciesModules']();
                 getAppTypeMenus(e.params.data.id);
             });
 

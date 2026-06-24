@@ -26,12 +26,19 @@ class Apis extends BasePackage
 
     public static $trackCounter = 0;
 
+    protected static $webCalls = [];
+
     protected $httpOptions = [
         'debug'           => false,
         'http_errors'     => true,
         'timeout'         => 10,
         'verify'          => false
     ];
+
+    public function getWebCalls()
+    {
+        return self::$webCalls;
+    }
 
     public function init($apiConfig = null, $apiClientServices = null, $httpOptions = null, $monitorProgress = null)
     {
@@ -79,7 +86,11 @@ class Apis extends BasePackage
 
             $api = (new ApiClientServices)->init();
 
-            $api->apiStats->updateApiCallStats($method, $apiConfig['id'], $stats->getHandlerStats(), $errorCode);
+            $webCall = $api->apiStats->updateApiCallStats($method, $apiConfig['id'], $stats->getHandlerStats(), $errorCode);
+
+            if ($webCall) {
+                array_push(\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis::$webCalls, $webCall);
+            }
         };
 
         if (strtolower($apiConfig['provider']) === 'github') {

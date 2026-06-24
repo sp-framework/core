@@ -1,0 +1,27 @@
+{% for meta in assets.get('meta').getCodes() %}
+    {% if meta.getType() === 'charset' %}
+        <meta charset="{{meta.getContent()}}">
+    {% else %}
+        <meta name="{{meta.getType()}}" content="{{meta.getContent()}}">
+    {% endif %}
+{% endfor %}
+{{assets.get('title').getCodes()[0].getContent()}}
+{{assets.outputCss('headLinks')}}
+{{assets.outputJs('headJs')}}
+{% set favicon = null %}
+{% if assets.get('favicons') and assets.get('favicons').getCodes()|length > 0 %}
+    {% for codes in assets.get('favicons').getCodes() %}
+        {% if codes.getType() == 'ico' %}
+            <link rel="shortcut icon" type="image/x-icon" href="{{links.images(codes.getContent())}}">
+            {% set favicon = codes.getContent() %}
+        {% elseif codes.getType() == '16' %}
+            <link rel="icon" type="image/png" sizes="16x16" href="{{links.images(codes.getContent())}}">
+        {% elseif codes.getType() == '32' %}
+            <link rel="icon" type="image/png" sizes="32x32" href="{{links.images(codes.getContent())}}">
+        {% elseif codes.getType() == '180' %}
+            <link rel="apple-touch-icon" sizes="180x180" href="{{links.images(codes.getContent())}}">
+        {% elseif codes.getType() == 'manifest' %}
+            <link rel="manifest" href="{{links.images(codes.getContent())}}">
+        {% endif %}
+    {% endfor %}
+{% endif %}

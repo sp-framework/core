@@ -1,0 +1,36 @@
+{% set infoNoWidgets = '' %}
+{% set infoWidgetError = 'hidden' %}
+{% set infoWidgetLoader = 'hidden' %}
+{% set infoWidgetInfo = 'hidden' %}
+{% set infoWidget = '' %}
+{% if pagewidget['info'] is defined %}
+    {% set infoNoWidgets = 'hidden' %}
+    {% set infoWidgetInfo = '' %}
+    {% set infoWidget = pagewidget['info'] %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-widget-no-widgets" {{infoNoWidgets}}>
+            <div class="col">
+                <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select widget to show information.</h6>
+            </div>
+        </div>
+        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-widget-error" {{infoWidgetError}}>
+            <div class="col">
+                <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading widget information. Please contact administrator.</h6>
+            </div>
+        </div>
+        <div class="row text-center" id="{{componentId}}-{{sectionId}}-widget-loader" {{infoWidgetLoader}}>
+            <div class="col">
+                <div class="fa-2x">
+                    <i class="fa fa-cog fa-spin"></i> Loading...
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div id="{{componentId}}-{{sectionId}}-widget-info" {{infoWidgetInfo}}>{{infoWidget}}</div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -14,6 +14,8 @@ class JobsComponent extends BaseComponent
     public function initialize()
     {
         $this->jobs = $this->basepackages->workers->jobs;
+
+        $this->tasks = $this->basepackages->workers->tasks;
     }
 
     /**
@@ -27,6 +29,12 @@ class JobsComponent extends BaseComponent
 
                 if (!$job) {
                     return $this->throwIdNotFound();
+                }
+
+                $task = $this->tasks->getById((int) $job['task_id']);
+
+                if ($task) {
+                    $this->view->task = $task;
                 }
 
                 $this->view->job = $job;
@@ -64,11 +72,11 @@ class JobsComponent extends BaseComponent
             $this->jobs,
             'system/workers/jobs/view',
             $conditions,
-            ['task_id', 'worker_id', 'run_on', 'status', 'execution_time'],
+            ['task_id', 'worker_id', 'run_on', 'status', 'total_execution_time', 'can_terminate'],
             true,
-            ['task_id', 'worker_id', 'run_on', 'status', 'execution_time'],
+            ['task_id', 'worker_id', 'run_on', 'status', 'total_execution_time', 'can_terminate'],
             $controlActions,
-            ['task_id'=>'task', 'worker_id'=>'worker'],
+            ['task_id' => 'task', 'worker_id' => 'worker', 'can_terminate' => 'terminate'],
             $replaceColumns,
             'id',
             null,
@@ -86,6 +94,7 @@ class JobsComponent extends BaseComponent
             $data = $this->formatTask($dataKey, $data);
             $data = $this->formatWorker($dataKey, $data);
             $data = $this->formatRunon($dataKey, $data);
+            $data = $this->formatTerminate($dataKey, $data);
             $data = $this->formatStatus($dataKey, $data);
         }
 
@@ -105,7 +114,7 @@ class JobsComponent extends BaseComponent
         } else if ($data['status'] == '4') {
             $data['status'] = '<span class="badge badge-danger text-uppercase">Error!</span>';
         } else if ($data['status'] == '5') {
-            $data['status'] = '<span class="badge badge-warning text-uppercase">Rescheduled!</span>';
+            $data['status'] = '<span class="badge badge-warning text-uppercase">Rescheduled (No worker)</span>';
         }
 
         return $data;
@@ -143,10 +152,49 @@ class JobsComponent extends BaseComponent
             $data['run_on'] = $this->helper->decode($data['run_on']);
         }
 
-        if (is_array($data['run_on']) && isset($data['run_on'][0])) {
-            $data['run_on'] = $data['run_on'][0];
+        if ($data['run_on'] && is_array($data['run_on'])) {
+            $data['run_on'] = $this->helper->last($data['run_on']);
         }
 
         return $data;
+    }
+
+    protected function formatTerminate($rowId, $data)
+    {
+        if ($data['can_terminate'] && $data['status'] == '2') {
+            $data['can_terminate'] =
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-remove-__control-' . $rowId . '" href="' . $this->links->url('system/workers/jobs/terminate/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-danger btn-xs rowTerminate text-uppercase" data-notificationtextfromcolumn="id">
+                    <i class="fas fa-fw fa-xs fa-circle-xmark"></i>
+                </a>';
+        } else {
+            $data['can_terminate'] = '-';
+        }
+
+        return $data;
+    }
+
+    public function terminateAction()
+    {
+        $this->requestIsPost();
+
+        $this->jobs->terminateJob($this->postData());
+
+        $this->addResponse(
+            $this->jobs->packagesData->responseMessage,
+            $this->jobs->packagesData->responseCode
+        );
+    }
+
+    public function getJobLogsAction()
+    {
+        $this->requestIsPost();
+
+        $this->jobs->getJobLogs($this->postData());
+
+        $this->addResponse(
+            $this->jobs->packagesData->responseMessage,
+            $this->jobs->packagesData->responseCode,
+            $this->jobs->packagesData->responseData ?? [],
+        );
     }
 }

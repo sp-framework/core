@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
+use Phalcon\Filter\Validation\Validator\Email;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersCalls;
 
@@ -13,15 +14,29 @@ class Calls extends BasePackage
 
     public $calls;
 
+    protected $jobRunOn;
+
     protected $startTime;
 
     protected $stopTime;
+
+    protected $jobResultPackagesData;
 
     public function init(bool $resetCache = false)
     {
         $this->setFFRelations(true);
 
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('calls', 'core')) {
+                $this->calls = $this->opCache->getCache('calls', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('calls', $this->calls, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }
@@ -85,74 +100,147 @@ class Calls extends BasePackage
         }
     }
 
-    public function updateJobTask($status, $args)
+    // Task Statuses
+    // 1 - Scheduled
+    // 2 - Running
+    // 3 - Success
+    // 4 - Error
+    // 5 - Rescheduled (Due to No Workers)
+
+    // Job Statuses
+    // 1 - Scheduled
+    // 2 - Running
+    // 3 - Success
+    // 4 - Error
+    // 5 - Warning
+    public function updateJobTask($status, &$args)
     {
         $this->updateJob($status, $args);
 
         $this->updateTask($status, $args);
     }
 
-    protected function updateJob($status, $args)
+    protected function updateJob($status, &$args)
     {
+        if (!$this->jobRunOn) {
+            $this->jobRunOn = date('Y-m-d H:i:s');
+        }
+
         if (isset($args['job'])) {
             $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
+            $task = $this->basepackages->workers->tasks->getById($args['task']['id'], false, false);
 
-            if ($job['status'] != 4) {
-                $job['status'] = $status;
+            $job['status'] = $status;
+
+            if (method_exists($this, 'terminate')) {
+                $job['can_terminate'] = true;
             }
 
-            if ($status == 2) {
+            if ($job['status'] == 2) {
                 $this->startTime = microtime(true);
                 if ($job['run_on']) {
                     if (is_string($job['run_on'])) {
                         $job['run_on'] = $this->helper->decode($job['run_on'], true);
                     }
-                    if (!in_array(date('Y-m-d H:i:s'), $job['run_on'])) {
-                        array_push($job['run_on'], date('Y-m-d H:i:s'));
+                    if (!in_array($this->jobRunOn, $job['run_on'])) {
+                        array_push($job['run_on'], $this->jobRunOn);
                     }
                 } else {
-                    $job['run_on'] = [date('Y-m-d H:i:s')];
+                    $job['run_on'] = [$this->jobRunOn];
                 }
-            } else if ($status == 3) {
+            } else if ($job['status'] == 3) {
                 $this->stopTime = microtime(true);
 
-                if ($job['execution_time']) {
-                    $job['execution_time'] = round($job['execution_time'] + round($this->stopTime - $this->startTime, 3), 3);
+                if (isset($job['execution_times'])) {
+                    if (is_string($job['execution_times'])) {
+                        $job['execution_times'] = $this->helper->decode($job['execution_times'], true);
+                    }
+                }
+
+                $job['execution_times'][$this->jobRunOn] = round($this->stopTime - $this->startTime, 3);
+
+                if (isset($job['total_execution_time'])) {
+                    $job['total_execution_time'] = round($job['total_execution_time'] + round($this->stopTime - $this->startTime, 3), 3);
                 } else {
-                    $job['execution_time'] = round($this->stopTime - $this->startTime, 3);
+                    $job['total_execution_time'] = round($this->stopTime - $this->startTime, 3);
                 }
             }
 
-            $this->basepackages->workers->jobs->update($job, false);
+            $this->basepackages->workers->jobs->updateJob($job);
+
+            $args['job'] = $this->basepackages->workers->jobs->packagesData->last;
         }
     }
 
-    protected function updateTask($status, $args)
+    protected function updateTask($status, &$args)
     {
         if (isset($args['task'])) {
+            $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
             $task = $this->basepackages->workers->tasks->getById($args['task']['id'], false, false);
 
-            if ($status == 2) {
-                $task['status'] = 2;
-            } else if ($status == 3) {
+            $job['status'] = $status;
+            $task['status'] = $status;
+
+            if ($status == 3) {
                 $task['status'] = 1;
+
                 $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
 
                 if (is_string($job['run_on'])) {
                     $job['run_on'] = $this->helper->decode($job['run_on'], true);
                 }
 
+                if (!isset($job['run_on'][0])) {
+                    $job['run_on'] = [$this->jobRunOn];
+                }
+
                 $task['previous_run'] = $job['run_on'][0];
+            }
+
+            if ($task['status'] == 4) {
+                $task['enabled'] = false;
             }
 
             $task['via_job'] = 1;
 
-            $this->basepackages->workers->tasks->updateTask($task, false);
+            $this->basepackages->workers->tasks->updateTask($task);
+
+            $args['task'] = $this->basepackages->workers->tasks->packagesData->last;
+
+            if ($status == 3 || $status == 4) {//Send email on success or error
+                $task['status'] = 2;
+                $job['status'] = 2;
+
+                $this->basepackages->workers->tasks->updateTask($task);
+                $this->basepackages->workers->jobs->updateJob($job);
+
+                $args['task'] = $this->basepackages->workers->tasks->packagesData->last;
+                $args['job'] = $this->basepackages->workers->jobs->packagesData->last;
+
+                $this->emailTaskResult($args);
+
+                $task['status'] = $status;
+                $job['status'] = $status;
+
+                if ($status == 3) {
+                    $task['status'] = 1;
+                }
+
+                $this->basepackages->workers->tasks->updateTask($task);
+                $this->basepackages->workers->jobs->updateJob($job);
+
+                $args['task'] = $this->basepackages->workers->tasks->packagesData->last;
+                $args['job'] = $this->basepackages->workers->jobs->packagesData->last;
+            }
         }
     }
 
-    public function addJobResult($packagesData, $args)
+    public function addJobResult($packagesData, &$args)
     {
+        $this->jobResultPackagesData = $packagesData;
+
+        $this->addResponse($packagesData->responseMessage ?? 'OK', $packagesData->responseCode ?? 0, $packagesData->responseData ?? []);
+
         if (isset($args['job'])) {
             $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
 
@@ -162,9 +250,18 @@ class Calls extends BasePackage
                 }
             }
 
+            $merge = false;
+            if ($args['task']['job_log_mode'] != '1') {
+                $merge = true;
+            }
+
             if (isset($args['schedule']['type']) &&
                 $args['schedule']['type'] === 'everyxseconds'
             ) {
+                $merge = true;
+            }
+
+            if ($merge) {
                 $responseCode = [];
                 $responseMessage = [];
                 $responseData = [];
@@ -199,7 +296,6 @@ class Calls extends BasePackage
                     $job['response_message'] = $this->helper->encode($responseMessage);
                 }
 
-
                 if (isset($packagesData->responseData)) {
                     $responseData[$jobRunOn] = $packagesData->responseData;
                 }
@@ -210,6 +306,10 @@ class Calls extends BasePackage
                     $job['response_data'] = $this->helper->encode($responseData);
                 }
             } else {
+                $job['response_code'] = 0;
+                $job['response_message'] = 'Ok';
+                $job['response_data'] = $this->helper->encode([]);
+
                 if (isset($packagesData->responseCode)) {
                     $job['response_code'] = $this->helper->encode([$packagesData->responseCode]);
                 }
@@ -223,7 +323,9 @@ class Calls extends BasePackage
                 }
             }
 
-            $this->basepackages->workers->jobs->update($job, false);
+            $this->basepackages->workers->jobs->updateJob($job);
+
+            $args['job'] = $this->basepackages->workers->jobs->packagesData->last;
         }
     }
 
@@ -247,7 +349,7 @@ class Calls extends BasePackage
 
                 $this->addJobResult($thisCall->packagesData, $args);
 
-                $thisCall->updateJobTask(3, $args);
+                $thisCall->updateJobTask(4, $args);
 
                 return false;
             }
@@ -256,5 +358,68 @@ class Calls extends BasePackage
         }
 
         return false;
+    }
+
+    protected function emailTaskResult($args)
+    {
+        $emailSent = [];
+
+        if (isset($args['task']['email_service_id']) && $args['task']['email'] !== '') {
+            $emailAddresses = explode(',', $args['task']['email']);
+
+            foreach ($emailAddresses as $emailAddress) {
+                $this->validation->init()->add('email', Email::class, ["message" => "Please enter valid email address."]);
+
+                $validated = $this->validation->validate(['email' => $emailAddress])->jsonSerialize();
+
+                if (count($validated) === 0) {
+                    try {
+                        $emailSettings = $this->basepackages->emailservices->getById($args['task']['email_service_id']);
+
+                        if ($emailSettings && $this->basepackages->email->setup($emailSettings)) {
+                            $emailSettings = $this->basepackages->email->getEmailSettings();
+
+                            $this->basepackages->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
+                            $this->basepackages->email->setRecipientTo($emailAddress, $emailAddress);
+                            $this->basepackages->email->setSubject(strtoupper('Job result for task : ' . $args['task']['name'] . '. Job ID : ' . $args['job']['id']));
+                            $this->basepackages->email->setBody(printArrayList($this->jobResultPackagesData));
+
+                            $logs = $this->basepackages->email->sendNewEmail();
+
+                            if ($logs === true) {
+                                $emailSent[$emailAddress] = 'Email sent successfully';
+                            } else {
+                                $emailSent[$emailAddress] = $logs;
+                            }
+                        } else {
+                            $messages = 'Error: Email service not configured!';
+
+                            $emailSent[$emailAddress] = $messages;
+                        }
+                    } catch (\throwable $e) {
+                        trace([$e]);
+                        $emailSent[$emailAddress] = $e->getMessage();
+                    }
+
+                    continue;
+                }
+
+                $messages = 'Error: ';
+
+                foreach ($validated as $key => $value) {
+                    $messages .= $emailAddress . ' : ' . $value['message'];
+                }
+
+                $emailSent[$emailAddress] = $messages;
+            }
+        }
+
+        if (count($emailSent) > 0) {
+            $lastRunOn = $this->helper->last($args['job']['run_on']);
+
+            $args['job']['email_results'][$lastRunOn] = $emailSent;
+
+            $this->basepackages->workers->jobs->updateJob($args['job']);
+        }
     }
 }

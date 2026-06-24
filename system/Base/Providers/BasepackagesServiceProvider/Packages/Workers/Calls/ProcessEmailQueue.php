@@ -14,31 +14,35 @@ class ProcessEmailQueue extends Calls
 
     public function run(array $args = [])
     {
-        $thisCall = $this;
+        $this->updateJobTask(2, $args);
 
-        return function() use ($thisCall, $args) {
-            $thisCall->updateJobTask(2, $args);
+        $this->args = $this->extractCallArgs($this, $args);
 
-            $this->args = $this->extractCallArgs($thisCall, $args);
+        if (!$this->args) {
+            $this->packagesData->responseCode = 1;
 
-            if (!$this->args) {
-                return;
-            }
+            $this->packagesData->responseMessage = 'Call function arguments missing';
 
-            if (!isset($this->args['priority'])) {
-                $thisCall->packagesData->responseCode = 1;
+            $this->addJobResult($this->packagesData, $args);
 
-                if (!isset($this->args['priority'])) {
-                    $thisCall->packagesData->responseMessage = 'Parameters priority missing';
-                }
+            $this->updateJobTask(4, $args);
 
-                $this->addJobResult($thisCall->packagesData, $args);
+            return;
+        }
 
-                $thisCall->updateJobTask(3, $args);
+        if (!isset($this->args['priority'])) {
+            $this->packagesData->responseCode = 1;
 
-                return;
-            }
+            $this->packagesData->responseMessage = 'Call function argument "priority" missing';
 
+            $this->addJobResult($this->packagesData, $args);
+
+            $this->updateJobTask(4, $args);
+
+            return;
+        }
+
+        try {
             if (isset($this->args['confidential']) && $this->args['confidential'] == 'true') {
                 $this->basepackages->emailqueue->processQueue((int) $this->args['priority'], true);
             } else {
@@ -47,7 +51,21 @@ class ProcessEmailQueue extends Calls
 
             $this->addJobResult($this->basepackages->emailqueue->packagesData, $args);
 
-            $thisCall->updateJobTask(3, $args);
-        };
+            if ($this->basepackages->emailqueue->packagesData->responseCode == 0) {
+                $this->updateJobTask(3, $args);
+            } else {
+                $this->updateJobTask(4, $args);
+            }
+        } catch (\throwable $e) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = $e->getMessage();
+
+            $this->addJobResult($this->packagesData, $args);
+
+            $this->updateJobTask(4, $args);
+
+            return;
+        }
     }
 }

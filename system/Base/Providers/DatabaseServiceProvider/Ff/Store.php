@@ -59,7 +59,15 @@ class Store
 
     public $data;
 
-    protected $ff;
+    public $ff;
+
+    public $criteriaCount = null;
+
+    protected $app;
+
+    protected $opCache;
+
+    protected $lockFile = null;
 
     const dataDirectory = "data/";
 
@@ -276,6 +284,11 @@ class Store
         return (int) $counters['lastId'];
     }
 
+    public function getLast()
+    {
+        return $this->findById($this->getLastInsertedId());
+    }
+
     public function getStorePath(): string
     {
         return $this->storePath;
@@ -286,7 +299,7 @@ class Store
         return $this->storeName;
     }
 
-    public function findAll(array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false): array
+    public function findAll(array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false, $relationsStores = []): array
     {
         try {
             $qb = $this->createQueryBuilder();
@@ -307,7 +320,7 @@ class Store
             if ($dataArr && count($dataArr) > 0) {
                 if ($getRelations) {
                     foreach ($dataArr as &$data) {
-                        $data = $this->getRelations($data, $relationsConditions);
+                        $data = $this->getRelations($data, $relationsConditions, $relationsStores);
                     }
                 }
             }
@@ -320,20 +333,20 @@ class Store
         return $this->data;
     }
 
-    public function findById($id, $getRelations = false, $relationsConditions = false)
+    public function findById($id, $getRelations = false, $relationsConditions = false, $relationsStores = [])
     {
         $id = $this->checkAndStripId($id);
 
         try {
             $content = IoHelper::getFileContent($this->getDataPath() . "$id.json");
         } catch (Exception $exception) {
-            return null;
+            return false;
         }
 
         $data = @json_decode($content, true);
 
         if ($getRelations) {
-            $data = $this->getRelations($data, $relationsConditions);
+            $data = $this->getRelations($data, $relationsConditions, $relationsStores);
         }
 
         $this->data = $data;
@@ -341,8 +354,17 @@ class Store
         return $data;
     }
 
-    public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false): array
+    public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false, $relationsStores = []): array
     {
+        if (count($criteria) === 1 &&
+            $criteria[0][0] === 'id' &&
+            $criteria[0][1] === '='
+        ) {
+            $criteria[0][2] = preg_replace('/[^0-9]/', '', $criteria[0][2]);
+
+            return [$this->findById((int) $criteria[0][2])];
+        }
+
         try {
             $qb = $this->createQueryBuilder();
 
@@ -363,7 +385,7 @@ class Store
             if ($dataArr && count($dataArr) > 0) {
                 if ($getRelations) {
                     foreach ($dataArr as &$data) {
-                        $data = $this->getRelations($data, $relationsConditions);
+                        $data = $this->getRelations($data, $relationsConditions, $relationsStores);
                     }
                 }
             }
@@ -376,8 +398,14 @@ class Store
         return $this->data;
     }
 
-    public function findOneBy(array $criteria, $getRelations = false, $relationsConditions = false)
+    public function findOneBy(array $criteria, $getRelations = false, $relationsConditions = false, $relationsStores = [])
     {
+        if (count($criteria) === 1 &&
+            $criteria[0][0] === 'id'
+        ) {
+            return [$this->findById((int) $criteria[0][2])];
+        }
+
         $qb = $this->createQueryBuilder();
 
         $qb->where($criteria);
@@ -385,7 +413,7 @@ class Store
         $result = $qb->getQuery()->first();
 
         if ($getRelations) {
-            $result = $this->getRelations($result, $relationsConditions);
+            $result = $this->getRelations($result, $relationsConditions, $relationsStores);
         }
 
         $this->data = (!empty($result)) ? $result : null;
@@ -453,7 +481,7 @@ class Store
 
             $current = $this->findById((int) $data[$this->primaryKey]);
 
-            if ($autoGenerateIdOnInsert && $current === null) {
+            if ($autoGenerateIdOnInsert && !$current) {
                 $data[$this->primaryKey] = $this->increaseCounterAndGetNextId();
 
                 $insert = true;
@@ -535,7 +563,7 @@ class Store
 
                 $current = $this->findById((int) $document[$this->primaryKey]);
 
-                if ($autoGenerateIdOnInsert && $current === null) {
+                if ($autoGenerateIdOnInsert && !$current) {
                     $document[$this->primaryKey] = $this->increaseCounterAndGetNextId();
 
                     $insert = true;
@@ -734,7 +762,23 @@ class Store
             //     $this->ff->addToSync($this->model, (int) $id, 'remove');
             // }
 
-            return (!file_exists($this->getDataPath() . "$id.json") || true === @unlink($this->getDataPath() . "$id.json"));
+            $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
+            $this->opCache = $this->ff->request->getDi()->getShared('opCache');
+            if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+                $this->opCache->removeCache(null, 'core');
+            }
+
+            if (file_exists($this->getDataPath() . "$id.json")) {
+                $delete = @unlink($this->getDataPath() . "$id.json");
+
+                if ($delete) {
+                    $this->count(true);
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -985,7 +1029,7 @@ class Store
         return $this->data;
     }
 
-    public function getRelations($data, $relationsConditions = false)
+    public function getRelations($data, $relationsConditions = false, $relationsStores = [])
     {
         if (count($data) === 0) {
             return $data;
@@ -1020,6 +1064,14 @@ class Store
             }
 
             if ($relation['type'] === 'hasOne' || $relation['type'] === 'hasMany') {
+                if (count($relationsStores) > 0) {
+                    if (isset($relation['table']) &&
+                        !in_array($relation['table'], $relationsStores)
+                    ) {
+                        continue;
+                    }
+                }
+
                 if (isset($relation['fields']) &&
                     count($relation['fields']) > 0 &&
                     count($relation['fields']) % 2 == 0
@@ -1027,7 +1079,6 @@ class Store
                     $fieldsArr = $this->ff->helper->chunk($relation['fields'], 2);
 
                     $criteria = [];
-
                     if (count($fieldsArr) === 1) {
                         foreach ($fieldsArr as $fieldArr) {
                             array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
@@ -1039,15 +1090,21 @@ class Store
                     }
 
                     if (isset($relationsConditions[$relation['alias']])) {//Relation with condition
-                        array_push($criteria, [$relationsConditions[$relation['alias']]]);
+                        array_push($criteria, $relationsConditions[$relation['alias']]);
                     }
 
                     try {
-                        $directRelationStoreData = $this->relationStores[$relation['table']]->findBy($criteria);
+                        if (count($criteria) === 1 &&
+                            $criteria[0][0] === 'id'
+                        ) {
+                            $directRelationStoreData = [$this->relationStores[$relation['table']]->findById((int) $criteria[0][2])];
+                        } else {
+                            $directRelationStoreData = $this->relationStores[$relation['table']]->findBy($criteria);
+                        }
 
                         if ($directRelationStoreData && count($directRelationStoreData) > 0) {
                             if ($relation['type'] === 'hasOne') {
-                                $data[$relation['alias']] = $directRelationStoreData[0];
+                                $data[$relation['alias']] = $directRelationStoreData[array_key_first($directRelationStoreData)];
                             } else if ($relation['type'] === 'hasMany') {
                                 $data[$relation['alias']] = $directRelationStoreData;
                             }
@@ -1059,6 +1116,15 @@ class Store
                     }
                 }
             } else if ($relation['type'] === 'hasOneThrough' || $relation['type'] === 'hasManyThrough') {
+                if (count($relationsStores) > 0) {
+                    if (isset($relation[0]['table']) && isset($relation[1]['table']) &&
+                        !in_array($relation[0]['table'], $relationsStores) &&
+                        !in_array($relation[1]['table'], $relationsStores)
+                    ) {
+                        continue;
+                    }
+                }
+
                 if (isset($relation[0]['fields']) &&
                     count($relation[0]['fields']) > 0 &&
                     count($relation[0]['fields']) % 2 == 0
@@ -1082,7 +1148,13 @@ class Store
                     }
 
                     try {
-                        $intermediateStoreDataArr = $this->relationStores[$relation[0]['table']]->findBy($criteria);
+                        if (count($criteria) === 1 &&
+                            $criteria[0][0] === 'id'
+                        ) {
+                            $intermediateStoreDataArr = [$this->relationStores[$relation[0]['table']]->findById((int) $criteria[0][2])];
+                        } else {
+                            $intermediateStoreDataArr = $this->relationStores[$relation[0]['table']]->findBy($criteria);
+                        }
                     } catch (\Exception $e) {
                         continue;
                     }
@@ -1100,6 +1172,7 @@ class Store
                                 $fieldsArr = $this->ff->helper->chunk($relation[1]['fields'], 2);
 
                                 $criteria = [];
+
                                 if (count($fieldsArr) === 1) {
                                     foreach ($fieldsArr as $fieldArr) {
                                         array_push($criteria, [$fieldArr[1], '=', $intermediateStoreData[$fieldArr[0]]]);
@@ -1111,11 +1184,17 @@ class Store
                                 }
 
                                 try {
-                                    $finalRelationStoreData = $this->relationStores[$relation[1]['table']]->findBy($criteria);
+                                    if (count($criteria) === 1 &&
+                                        $criteria[0][0] === 'id'
+                                    ) {
+                                        $finalRelationStoreData = [$this->relationStores[$relation[1]['table']]->findById($criteria[0][2])];
+                                    } else {
+                                        $finalRelationStoreData = $this->relationStores[$relation[1]['table']]->findBy($criteria);
+                                    }
 
                                     if ($finalRelationStoreData && count($finalRelationStoreData) > 0) {
                                         if ($relation['type'] === 'hasOneThrough') {
-                                            $data[$relation['alias']] = $finalRelationStoreData[0];
+                                            $data[$relation['alias']] = $finalRelationStoreData[array_key_first($finalRelationStoreData)];
                                         } else if ($relation['type'] === 'hasManyThrough') {
                                             $data[$relation['alias']] = $finalRelationStoreData;
                                         }
@@ -1142,7 +1221,9 @@ class Store
 
     public function count($recount = false, $criteria = null): int
     {
-        if ($criteria) {
+        if ($criteria && !is_null($this->criteriaCount)) {
+            return $this->criteriaCount;
+        } else if ($criteria) {
             $data = $this->findBy($criteria);
 
             if ($data && is_array($data)) {
@@ -1479,13 +1560,7 @@ class Store
 
     protected function validateData(array $data)
     {
-        if (!$this->validateData) {
-            $data = $this->normalizeData($data);
-
-            return $data;
-        }
-
-        if (!isset($data['id']) && count($this->uniqueFields) > 0) {
+        if (count($this->uniqueFields) > 0) {//Search for unique data
             $criteria = [];
 
             $storeSchemaProperties = $this->getStoreSchema()['properties'];
@@ -1511,28 +1586,33 @@ class Store
 
                 if ($found && count($found) > 0) {
                     foreach ($found as $foundArr) {
-                        $match = false;
+                        if (isset($data['id']) &&
+                            $data['id'] == $foundArr['id']
+                        ) {
+                            continue;
+                        }
 
                         foreach ($criteria as $criteriaArr) {
-                            if (isset($foundArr[$criteriaArr[0]]) && $foundArr[$criteriaArr[0]] === $criteriaArr[2]) {
-                                $match = true;
-                            } else {
-                                $match = false;
+                            if (isset($foundArr[$criteriaArr[0]]) && $foundArr[$criteriaArr[0]] !== $criteriaArr[2]) {
+                                continue 2;
                             }
                         }
 
-                        if ($match) {
-                            $duplicate = $foundArr['id'];
+                        $duplicate = $foundArr['id'];
 
-                            break;
-                        }
+                        break;
                     }
                 }
-
                 if ($duplicate) {
                     throw new IOException("Duplicate entry with ID: $duplicate found for field: $uniqueField. $uniqueField should be unique. Store: " . $this->storeName);
                 }
             }
+        }
+
+        if (!$this->validateData) {
+            $data = $this->normalizeData($data, true);
+
+            return $data;
         }
 
         if ($this->storeSchema === null) {
@@ -1634,13 +1714,11 @@ class Store
                     if (array_key_exists('format', $property)) {
                         if ($property['format'] === 'json') {
                             if (is_string($data[$propertyKey])) {
-                                $utils = new Utils();
-
-                                if (!$utils->validateJson(['json' => $data[$propertyKey]])) {
-                                    throw new \Exception($utils->packagesData->responseMessage);
+                                try {
+                                    $data[$propertyKey] = json_decode($data[$propertyKey], true);
+                                } catch (\throwable $e) {
+                                    throw $e;
                                 }
-
-                                $data[$propertyKey] = json_decode($data[$propertyKey], true);
                             }
                         }
                     }
@@ -1680,7 +1758,13 @@ class Store
 
                         if ($type === 'integer') {
                             if (is_string($data[$propertyKey])) {
-                                $data[$propertyKey] = (int) $data[$propertyKey];
+                                if ($data[$propertyKey] !== '') {
+                                    $data[$propertyKey] = (int) $data[$propertyKey];
+                                } else {
+                                    if (!in_array($propertyKey, $schema['required'])) {
+                                        $data[$propertyKey] = null;
+                                    }
+                                }
                             }
                         }
 
@@ -1898,5 +1982,56 @@ class Store
         $this->validateData = $validateData;
 
         return $this->getValidateData();
+    }
+
+    public function lockStore($timeout = 10)
+    {
+        if (!file_exists($this->storePath . 'lock')) {
+            IoHelper::writeContentToFile($this->storePath . 'lock', '');
+        }
+
+        $lockFilePath = $this->storePath . 'lock';
+
+        $this->lockFile = fopen($lockFilePath, 'w+');
+
+        if ($this->lockFile === false) {
+            return false;
+        }
+
+        $startTime = microtime(true);
+
+        while (!flock($this->lockFile, LOCK_EX | LOCK_NB)) {
+            if ((microtime(true) - $startTime) > $timeout) {
+                fclose($this->lockFile);
+
+                return false;
+            }
+
+            usleep(100000); // Wait 100ms before retrying
+        }
+
+        return $this->lockFile;
+    }
+
+    public function releaseStoreLock()
+    {
+        if ($this->storeIsLocked()) {
+            flock($this->lockFile, LOCK_UN);
+
+            fclose($this->lockFile);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function storeIsLocked()
+    {
+        if (is_resource($this->lockFile)) {
+            return true;
+        }
+
+        return false;
     }
 }

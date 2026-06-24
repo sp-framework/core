@@ -182,6 +182,26 @@ class CoreComponent extends BaseComponent
 
             $this->view->ffStores = $ffStores;
 
+            $this->view->countries = $this->basepackages->geoCountries->getAll()->geoCountries;
+
+            $this->view->timezones = $this->basepackages->geoTimezones->getAll()->geoTimezones;
+
+            if (!isset($core['settings']['locale']['country_iso3']) ||
+                (isset($core['settings']['locale']['country_iso3']) && $core['settings']['locale']['country_iso3'] === '')
+            ) {
+                if ($this->config->locale->country_iso3) {
+                    $core['settings']['locale']['country_iso3'] = $this->config->locale->country_iso3;
+                }
+            }
+
+            if (!isset($core['settings']['locale']['timezone']) ||
+                (isset($core['settings']['locale']['timezone']) && $core['settings']['locale']['timezone'] === '')
+            ) {
+                if ($this->config->locale->timezone) {
+                    $core['settings']['locale']['timezone'] = $this->config->locale->timezone;
+                }
+            }
+
             $this->view->core = $core;
         }
     }

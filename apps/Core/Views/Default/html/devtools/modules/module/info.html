@@ -56,6 +56,9 @@
     {% set moduleDescription = '' %}
     {% set moduleModule_type = type %}
     {% set moduleApp_type = '' %}
+    {% if selectedAppType is defined %}
+        {% set moduleApp_type = selectedAppType %}
+    {% endif %}
     {% set moduleCategory = '' %}
     {% set moduleApiId = '0' %}
     {% set moduleVersion = '0.0.0' %}
@@ -466,29 +469,31 @@
             </div>
         {% endif %}
         {% if type != 'views' %}
-            <div class="col-md-2">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'run_install_uninstall',
-                        'fieldLabel'                     : 'Run Install/Uninstall script?',
-                        'fieldHelp'                      : true,
-                        'fieldDisabled'                  : false,
-                        'fieldHelpTooltipContent'        : 'If installed is checked, install method of the Install.php script will be executed. If installed is unchecked, uninstall method of the Install.php script will be executed.',
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'danger',
-                        'fieldCheckboxChecked'           : false,
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
+            {% if module['name']|lower == 'core' or module['app_type']|lower != 'core' %}
+                <div class="col-md-2">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'run_install_uninstall',
+                            'fieldLabel'                     : 'Run Install/Uninstall script?',
+                            'fieldHelp'                      : true,
+                            'fieldDisabled'                  : false,
+                            'fieldHelpTooltipContent'        : 'If installed is checked, install method of the Install.php script will be executed. If installed is unchecked, uninstall method of the Install.php script will be executed.',
+                            'fieldType'                      : 'checkbox',
+                            'fieldCheckboxType'              : 'danger',
+                            'fieldCheckboxChecked'           : false,
+                            'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldBazJstreeSearch'           : true,
+                            'fieldBazScan'                   : true
+                        ]
+                    )}}
+                </div>
+            {% endif %}
         {% endif %}
     {% endif %}
 </div>

@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Tunnels
 {
@@ -43,5 +44,19 @@ class Tunnels
                     )
                 ]
             ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'account_id'
+                ],
+                'INDEX'
+            )
+        ];
     }
 }

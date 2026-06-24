@@ -8,13 +8,13 @@ class BasepackagesAddressBook extends BaseModel
 {
     public $id;
 
-    public $package_name;
+    public $package_class;
 
     public $package_row_id;
 
-    public $address_type;
+    public $seq;
 
-    public $is_primary;
+    public $address_reference;
 
     public $attention_to;
 
@@ -22,9 +22,15 @@ class BasepackagesAddressBook extends BaseModel
 
     public $street_address_2;
 
+    public $street_address_3;
+
+    public $street_address_4;
+
     public $city_id;
 
     public $city_name;
+
+    public $post_code_id;
 
     public $post_code;
 

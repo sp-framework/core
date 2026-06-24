@@ -13,7 +13,17 @@ class Packages extends BasePackage
 
 	public function init(bool $resetCache = false)
 	{
-		$this->getAll($resetCache);
+		if ($this->opCache) {
+			if (!$resetCache && $this->opCache->checkCache('packages', 'core')) {
+				$this->packages = $this->opCache->getCache('packages', 'core');
+			} else {
+				$this->getAll($resetCache);
+
+				$this->opCache->setCache('packages', $this->packages, 'core');
+			}
+		} else {
+			$this->getAll($resetCache);
+		}
 
 		return $this;
 	}
@@ -272,6 +282,10 @@ class Packages extends BasePackage
 		}
 
 		foreach ($this->apps->apps as $appId => $app) {
+			if ($app['app_type'] !== 'core') {
+				continue;
+			}
+
 			if (!isset($subscriptions[$appId]) ||
 				!isset($subscriptions[$appId]['packages'])
 			) {
@@ -292,7 +306,7 @@ class Packages extends BasePackage
 						foreach ($packageSubscriptions as $subscriptionKey => $subscriptionValue) {
 							if (isset($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey])) {
 								if ($subscriptionValue == 1) {
-									if ($subscriptionKey == 'email') {
+									if ($subscriptionKey === 'email') {
 										if (!isset($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']])) {
 											$this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']] = $account['email'];
 										}
@@ -302,7 +316,7 @@ class Packages extends BasePackage
 										}
 									}
 								} else if ($subscriptionValue == 0) {
-									if ($subscriptionKey == 'email') {
+									if ($subscriptionKey === 'email') {
 										if (isset($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']])) {
 											unset($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']]);
 										}
@@ -336,7 +350,7 @@ class Packages extends BasePackage
 
 									if (in_array($subscriptionKey, $notification_allowed_methods)) {
 										if ($subscriptionValue == 1) {
-											if ($subscriptionKey == 'email') {
+											if ($subscriptionKey === 'email') {
 												$this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']] = [$account['email']];
 											}
 										} else {
@@ -346,12 +360,18 @@ class Packages extends BasePackage
 								}
 							}
 						}
+
+						if (!isset($packageSubscriptions['email'])) {
+							if (isset($this->packages[$packageId]['notification_subscriptions'][$appId]['email'][$account['id']])) {
+								unset($this->packages[$packageId]['notification_subscriptions'][$appId]['email'][$account['id']]);
+							}
+						}
 					} else {
 						$this->packages[$packageId]['notification_subscriptions'][$appId] = [];
 
 						foreach ($packageSubscriptions as $notificationKey => $notification) {
 							if ($notification == 1) {
-								if ($notificationKey == 'email') {
+								if ($notificationKey === 'email') {
 									$this->packages[$packageId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id'] => $account['email']];
 								} else {
 									$this->packages[$packageId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id']];
@@ -366,7 +386,7 @@ class Packages extends BasePackage
 
 					foreach ($packageSubscriptions as $notificationKey => $notification) {
 						if ($notification == 1) {
-							if ($notificationKey == 'email') {
+							if ($notificationKey === 'email') {
 								$this->packages[$packageId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id'] => $account['email']];
 							} else {
 								$this->packages[$packageId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id']];
@@ -422,6 +442,10 @@ class Packages extends BasePackage
 			}
 		} catch (\Exception $e) {
 			throw $e;
+		}
+
+		if ($this->opCache && $this->opCache->checkCache('packages', 'core')) {
+			$this->opCache->removeCache('packages', 'core');
 		}
 
 		return true;

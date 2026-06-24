@@ -78,65 +78,89 @@
                         ]
                     )}}
                 </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'view_layout',
+                            'fieldLabel'                     : 'Select View Layout',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select View layout.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDataSelect2Options'        : viewssettings['settings']['layouts'],
+                            'fieldDataSelect2OptionsKey'     : 'view',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': activeViewLayout
+                        ]
+                    )}}
+                </div>
             </div>
             <hr>
-            {% if viewssettings['settings']['branding'] is defined and viewssettings['settings']['branding']|length > 0 %}
-                <div class="row">
-                    <div class="col">
-                        {{adminltetags.useTag('fields',
-                            [
-                                'component'                             : component,
-                                'componentName'                         : componentName,
-                                'componentId'                           : componentId,
-                                'sectionId'                             : sectionId,
-                                'fieldId'                               : 'branding',
-                                'fieldLabel'                            : 'Branding',
-                                'fieldLabelLegend'                      : true,
-                                'fieldHidden'                           : false,
-                                'fieldType'                             : 'html',
-                                'fieldBazScan'                          : false,
-                                'fieldBazPostOnCreate'                  : false,
-                                'fieldBazPostOnUpdate'                  : false,
-                                'fieldBazJstreeSearch'                  : true,
-                                'fieldHtmlContent'                      : ''
-                            ]
-                        )}}
-                    </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'upload_branding',
+                            'fieldLabel'                            : 'Branding',
+                            'fieldLabelLegend'                      : true,
+                            'fieldHidden'                           : false,
+                            'fieldType'                             : 'html',
+                            'fieldBazScan'                          : false,
+                            'fieldBazPostOnCreate'                  : false,
+                            'fieldBazPostOnUpdate'                  : false,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldHtmlContent'                      : ''
+                        ]
+                    )}}
                 </div>
-                <div class="row">
-                    {% for brandKey, brand in viewssettings['settings']['branding'] %}
-                        {% if brand['maxWidth'] is not defined %}
-                            {% set brand['maxWidth'] = 0 %}
-                        {% endif %}
-                        {% if brand['maxHeight'] is not defined %}
-                            {% set brand['maxHeight'] = 0 %}
-                        {% endif %}
-                        <div class="col">
-                            {{adminltetags.useTag('fields',
-                                [
-                                    'component'                      : component,
-                                    'componentName'                  : componentName,
-                                    'componentId'                    : componentId,
-                                    'sectionId'                      : sectionId,
-                                    'fieldId'                        : brandKey,
-                                    'fieldLabel'                     : brandKey ~ ' logo',
-                                    'fieldType'                      : 'files/croppie',
-                                    'fieldValue'                     : brand['brand'],
-                                    'imageType'                      : 'logo',
-                                    'storageType'                    : 'public',
-                                    'uploadDirectory'                : 'public/' ~ viewssettings['app_type'] ~ '/' ~ viewssettings['view_name'] ~ '/images/assets',
-                                    'isPointer'                      : true,
-                                    'upload'                         : true,
-                                    'remove'                         : true,
-                                    'maxWidth'                       : brand['maxWidth'],
-                                    'maxHeight'                      : brand['maxHeight'],
-                                    'logoLink'                       : brand['brand']
-                                ]
-                            )}}
-                        </div>
-                    {% endfor %}
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                                 : component,
+                            'componentName'                             : componentName,
+                            'componentId'                               : componentId,
+                            'sectionId'                                 : sectionId,
+                            'fieldId'                                   : 'branding',
+                            'fieldType'                                 : 'files/dropzone',
+                            'fieldLabel'                                : false,
+                            'fieldDropzoneLabel'                        : 'Upload Brand Images',
+                            'fieldDropzonePreviewLabel'                 : 'Uploaded Images',
+                            'fieldRequired'                             : false,
+                            'fieldHelp'                                 : true,
+                            'fieldHelpTooltipContent'                   : 'Max: 10.',
+                            'fieldDropzonePreviewHelpTooltipContent'    : 'Drag and drop to change sequence of assets. Sequence starts from 0. Developers will use this sequence as index value to include the asset in the template.',
+                            'fieldAdditionalClass'                      : 'mb-1',
+                            'fieldBazScan'                              : true,
+                            'fieldBazPostOnCreate'                      : true,
+                            'fieldBazPostOnUpdate'                      : true,
+                            'attachments'                               : viewssettings['settings']['branding'],
+                            'maxAttachments'                            : 10,
+                            'storage'                                   : storage,
+                            'uploadDirectory'                           : 'assets/' ~ viewssettings['id'],
+                            'allowedUploads'                            : 'images',
+                            'tableMaxHeight'                            : 600,
+                            'noPreview'                                 : false,
+                            'setOrphan'                                 : false,
+                            'sortable'                                  : true,
+                            'upload'                                    : true
+                        ]
+                    )}}
                 </div>
-            {% endif %}
+            </div>
             <hr>
             <div class="row">
                 <div class="col">
@@ -201,7 +225,7 @@
                             'fieldBazPostOnCreate'           : true,
                             'fieldBazPostOnUpdate'           : true,
                             'fieldDataInputMaxLength'        : 4096,
-                            'fieldTextareaRows'              : 5,
+                            'fieldTextareaRows'              : 4,
                             'fieldValue'                     : viewssettings['settings']['head']['meta']['keywords']
                         ]
                     )}}
@@ -224,8 +248,33 @@
                             'fieldBazPostOnCreate'           : true,
                             'fieldBazPostOnUpdate'           : true,
                             'fieldDataInputMaxLength'        : 4096,
-                            'fieldTextareaRows'              : 5,
+                            'fieldTextareaRows'              : 4,
                             'fieldValue'                     : viewssettings['settings']['head']['meta']['description']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'head_link_href_favicons',
+                            'fieldLabel'                     : 'Site Favicons',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 4096,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Enter site favicons. JSON Format.',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4096,
+                            'fieldTextareaRows'              : 8,
+                            'fieldValue'                     : viewssettings['settings']['head']['link']['href']['favicons']
                         ]
                     )}}
                 </div>
@@ -447,6 +496,7 @@
     </fieldset>
 </form>
 {% set apps = json_encode(apps) %}
+{% set viewssettings = escaper.js(json_encode(viewssettings, 16)) %}
 <script>
 /* globals paginatedPNotify BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -475,6 +525,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['apps'] = JSON.parse('{{apps}}');
+dataCollectionSectionForm['vars']['viewssettings'] = JSON.parse('{{viewssettings}}');
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -559,9 +610,18 @@ dataCollectionSection =
                 });
             }
         },
+        '{{componentId}}-{{sectionId}}-view_layout'                             : {
+            placeholder: "SELECT VIEW LAYOUT"
+        },
         '{{componentId}}-{{sectionId}}-head_title'                              : { },
         '{{componentId}}-{{sectionId}}-head_meta_keywords'                      : { },
         '{{componentId}}-{{sectionId}}-head_meta_description'                   : { },
+        '{{componentId}}-{{sectionId}}-head_link_href_favicons'                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-head_link_href_favicons')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['viewssettings']['settings']['head']['link']['href']['favicons'], null, 4));
+            }
+        },
         '{{componentId}}-{{sectionId}}-copyright_name'                          : { },
         '{{componentId}}-{{sectionId}}-copyright_site'                          : { },
         '{{componentId}}-{{sectionId}}-copyright_fromYear'                      : { },

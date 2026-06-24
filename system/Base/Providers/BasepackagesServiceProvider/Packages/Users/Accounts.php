@@ -8,11 +8,13 @@ use System\Base\BasePackage;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsEnv;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSecurity;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
 
 class Accounts extends BasePackage
 {
@@ -24,14 +26,18 @@ class Accounts extends BasePackage
 
     public function getAccountById(int $id)
     {
+        if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+            return $this->opCache->getCache('account_' . $id, 'core');
+        }
+
         $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
         $this->setFFRelations(true);
 
         $this->setFFRelationsConditions(
             [
-                'api_clients' => [['revoked', '=', false]],
-                'identifier'  => [['session_id', '=', $this->session->getId()]]
+                'api_clients' => ['revoked', '=', false],
+                'identifier'  => ['session_id', '=', $this->session->getId()]
             ]
         );
 
@@ -70,19 +76,24 @@ class Accounts extends BasePackage
                 $account['tunnels'] = $this->model->gettunnels()->toArray();
             }
 
+            $account['env'] = [];
+            if ($this->model->getenv()) {
+                $account['env'] = $this->model->getenv()->toArray();
+            }
+
             $account['profile'] = [];
-            if ($account['profile_package_name'] === 'UsersProfiles') {
+            if ($account['profile_package_class'] === str_replace('\\', '_', Profiles::class)) {
                 if ($this->model->getProfile()) {
                     $account['profile'] = $this->model->getProfile()->toArray();
                 }
-            } else {
-                $profilePackage = $this->modules->packages->getPackageByName($account['profile_package_name']);
+            // } else {
+            //     $profilePackage = $this->modules->packages->getPackageByName($account['profile_package_class']);
 
-                if ($profilePackage) {
-                    $profilePackageClass = new $profilePackage['class']();
+            //     if ($profilePackage) {
+            //         $profilePackageClass = new $profilePackage['class']();
 
-                    $account['profile'] = $profilePackageClass->getById((int) $account['profile_package_row_id']);
-                }
+            //         $account['profile'] = $profilePackageClass->getById((int) $account['profile_package_row_id']);
+            //     }
             }
 
             $account['role'] = [];
@@ -107,18 +118,30 @@ class Accounts extends BasePackage
                 $account['api_user'] = $this->model->getApiUser()->toArray();
             }
 
+            if ($this->opCache) {
+                $this->opCache->setCache('account_' . $id, $account, 'core');
+            }
+
             return $account;
         } else {
             if ($this->ffData) {
-                if ($this->ffData['profile_package_name'] !== 'UsersProfiles') {
-                    $profilePackage = $this->modules->packages->getPackageByName($this->ffData['profile_package_name']);
+                // if ($this->ffData['profile_package_class'] !== str_replace('\\', '_', Profiles::class)) {
+                //     $profilePackage = $this->modules->packages->getPackageByName($this->ffData['profile_package_class']);
 
-                    if ($profilePackage) {
-                        $profilePackageClass = new $profilePackage['class']();
+                //     if ($profilePackage) {
+                //         $profilePackageClass = new $profilePackage['class']();
 
-                        $this->ffData['profile'] = $profilePackageClass->getById((int) $this->ffData['profile_package_row_id']);
-                    }
-                }
+                //         $getProfileMethod = 'get' . (new \ReflectionClass($profilePackageClass))->getShortName();
+
+                //         if (method_exists($profilePackageClass, $getProfileMethod)) {
+                //             $this->ffData['profile'] = $profilePackageClass->$getProfileMethod((int) $this->ffData['profile_package_row_id']);
+
+                //             if (isset($this->ffData['profile']['contact'])) {
+                //                 $this->ffData['contact'] = $this->ffData['profile']['contact'];
+                //             }
+                //         }
+                //     }
+                // }
 
                 if ($this->ffData['api_clients'] && is_array($this->ffData['api_clients']) && count($this->ffData['api_clients']) > 0) {
                     foreach ($this->ffData['api_clients'] as &$client) {
@@ -129,6 +152,10 @@ class Accounts extends BasePackage
                 }
 
                 $this->ffData = $this->jsonData($this->ffData, true);
+
+                if ($this->opCache) {
+                    $this->opCache->setCache('account_' . $id, $this->ffData, 'core');
+                }
 
                 return $this->ffData;
             }
@@ -157,7 +184,7 @@ class Accounts extends BasePackage
         $account = $this->checkAccountBy($data['email']);
 
         if ($account) {
-            if (isset($data['profile_package_name']) && $data['profile_package_name'] !== 'UsersProfiles') {
+            if (isset($data['profile_package_class']) && $data['profile_package_class'] !== str_replace('\\', '_', Profiles::class)) {
                 $account = array_merge($account, $data);
 
                 $account['account_id'] = $account['id'];
@@ -186,8 +213,8 @@ class Accounts extends BasePackage
 
         $data['password_set_on'] = time();
 
-        if (!isset($data['profile_package_name'])) {
-            $data['profile_package_name'] = 'UsersProfiles';
+        if (!isset($data['profile_package_class'])) {
+            $data['profile_package_class'] = str_replace('\\', '_', Profiles::class);
         }
         if (!isset($data['profile_package_row_id'])) {
             $data['profile_package_row_id'] = '0';
@@ -204,7 +231,7 @@ class Accounts extends BasePackage
 
             $this->basepackages->profiles->addProfile($data);
 
-            if ($data['profile_package_name'] === 'UsersProfiles') {
+            if ($data['profile_package_class'] === str_replace('\\', '_', Profiles::class)) {
                 $data['profile_package_row_id'] = $this->basepackages->profiles->packagesData->last['id'];
 
                 $this->update($data);
@@ -306,13 +333,21 @@ class Accounts extends BasePackage
             $data['twofa_otp_secret'] = null;
         }
 
-        if (!isset($data['profile_package_name']) ||
-            $data['profile_package_name'] === ''
+        if (!isset($data['profile_package_class']) ||
+            $data['profile_package_class'] === ''
         ) {
-            $data['profile_package_name'] = 'UsersProfiles';
+            if (isset($account['profile_package_class'])) {
+                $data['profile_package_class'] = $account['profile_package_class'];
+            } else {
+                $data['profile_package_class'] = str_replace('\\', '_', Profiles::class);
+            }
         }
         if (!isset($data['profile_package_row_id'])) {
-            $data['profile_package_row_id'] = (int) $account['profile_package_row_id'];
+            if (isset($account['profile_package_row_id'])) {
+                $data['profile_package_row_id'] = $account['profile_package_row_id'];
+            } else {
+                $data['profile_package_row_id'] = (int) $account['profile_package_row_id'];
+            }
         }
 
         if ($this->update($data)) {
@@ -324,7 +359,9 @@ class Accounts extends BasePackage
                 $this->emailNewPassword($data['email'], $password);
             }
 
-            $this->basepackages->profiles->updateProfileViaAccount($data);
+            if ($data['profile_package_class'] === str_replace('\\', '_', Profiles::class)) {
+                $this->basepackages->profiles->updateProfileViaAccount($data);
+            }
 
             $this->addUpdateSecurity($account['id'], $data);
 
@@ -342,6 +379,10 @@ class Accounts extends BasePackage
                  (isset($data['status']) && $data['status'] === '0')
             ) {
                 $this->removeRelatedData($accountObj, $account, false, false);
+            }
+
+            if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core')) {
+                $this->opCache->removeCache('account_' . $data['id'], 'core');
             }
         } else {
             $this->addResponse('Error updating account.', 1);
@@ -371,12 +412,18 @@ class Accounts extends BasePackage
                 if ($this->remove($data['id'], true, true, ['role'])) {
                     $this->addResponse('Removed account for ID: ' . $account['email']);
 
+                    if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core')) {
+                        $this->opCache->removeCache('account_' . $data['id'], 'core');
+                    }
+
+                    $this->removeRelatedData($accountObj, $account);
+
                     return true;
                 } else {
                     $this->addResponse('Error removing account.', 1);
                 }
             } else if ($this->ffStore && $this->ffData) {
-                $account = $this->ffData;
+                $account = $this->getAccountById((int) $data['id']);
 
                 if ($this->ffData['id'] != $data['id']) {
                     $this->addResponse('Account with id not found', 1);
@@ -388,6 +435,12 @@ class Accounts extends BasePackage
 
                 if ($this->remove($data['id'], true, true, ['role'])) {
                     $this->addResponse('Removed account for ID: ' . $account['email']);
+
+                    if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core')) {
+                        $this->opCache->removeCache('account_' . $data['id'], 'core');
+                    }
+
+                    $this->removeRelatedData($accountObj, $account);
 
                     return true;
                 } else {
@@ -414,6 +467,9 @@ class Accounts extends BasePackage
         $data['override_role'] = '0';
         $data['permissions'] = $this->helper->encode([]);
         $data['force_pwreset'] = '1';
+        $data['status'] = '1';
+        $data['profile_package_class'] = str_replace('\\', '_', Profiles::class);
+        $data['profile_package_row_id'] = '0';
         $data['status'] = '1';
 
         $data['email'] = strtolower($data['email']);
@@ -458,7 +514,9 @@ class Accounts extends BasePackage
         $identifiers = true,
         $agents = true,
         $tunnels = true,
-        $api_clients = true
+        $api_clients = true,
+        $env = true,
+        $profile = true,
     ) {
         if ($security) {
             if ($this->config->databasetype === 'db' &&
@@ -466,7 +524,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getsecurity()->delete();
             } else {
-                if ($account['security'] &&
+                if (isset($account['security']) &&
                     is_array($account['security']) &&
                     count($account['security']) > 0
                 ) {
@@ -486,7 +544,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getcanlogin()->delete();
             } else {
-                if ($account['canlogin'] &&
+                if (isset($account['canlogin']) &&
                     is_array($account['canlogin']) &&
                     count($account['canlogin']) > 0
                 ) {
@@ -508,7 +566,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getidentifiers()->delete();
             } else {
-                if ($account['identifier'] &&
+                if (isset($account['identifier']) &&
                     is_array($account['identifier']) &&
                     count($account['identifier']) > 0
                 ) {
@@ -528,7 +586,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getagents()->delete();
             } else {
-                if ($account['agents'] &&
+                if (isset($account['agents']) &&
                     is_array($account['agents']) &&
                     count($account['agents']) > 0
                 ) {
@@ -550,7 +608,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getsessions()->delete();
             } else {
-                if ($account['sessions'] &&
+                if (isset($account['sessions']) &&
                     is_array($account['sessions']) &&
                     count($account['sessions']) > 0
                 ) {
@@ -572,7 +630,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->gettunnels()->delete();
             } else {
-                if ($account['tunnels'] &&
+                if (isset($account['tunnels']) &&
                     is_array($account['tunnels']) &&
                     count($account['tunnels']) > 0
                 ) {
@@ -598,7 +656,7 @@ class Accounts extends BasePackage
                     }
                 }
             } else {
-                if ($account['api_clients'] &&
+                if (isset($account['api_clients']) &&
                     is_array($account['api_clients']) &&
                     count($account['api_clients']) > 0
                 ) {
@@ -615,6 +673,34 @@ class Accounts extends BasePackage
             }
         }
 
+        if ($env) {
+            if ($this->config->databasetype === 'db' &&
+                $accountObj->getenv()
+            ) {
+                $accountObj->getenv()->delete();
+            } else {
+                if (isset($account['env']) &&
+                    is_array($account['env']) &&
+                    count($account['env']) > 0
+                ) {
+                    $envStore = $this->ff->store((new BasepackagesUsersAccountsEnv)->getSource());
+                    $envCheck = $envStore->findById($account['env']['id']);
+
+                    if ($envCheck) {
+                        $envStore->deleteById($account['env']['id'], false);
+                    }
+                }
+            }
+        }
+
+        if ($profile) {
+            if (isset($account['profile']) &&
+                is_array($account['profile']) &&
+                count($account['profile']) > 0
+            ) {
+                $this->basepackages->profiles->removeProfile($account['profile']);
+            }
+        }
         return true;
     }
 
@@ -699,6 +785,219 @@ class Accounts extends BasePackage
 
             return true;
         }
+
+        return false;
+    }
+
+    public function checkEnv($id, $getRouteParams = true, $getAppParams = false, $getUserEnv = false)
+    {
+        $envModel = new BasepackagesUsersAccountsEnv;
+
+        if ($this->config->databasetype === 'db') {
+            $accountEnv = $envModel::findFirst(['account_id = ' . $id]);
+        } else {
+            $envStore = $this->ff->store($envModel->getSource());
+
+            $accountEnv = $envStore->findOneBy(['account_id', '=', $id]);
+        }
+
+        $routeArr = explode('/q/', $this->request->getURI());
+        if ($this->domains->domain['exclusive_to_default_app']) {
+            $route = str_replace('/' . $this->apps->getAppInfo()['route'], '', $routeArr[0]);
+        } else {
+            $route = $routeArr[0];
+        }
+
+        if ($accountEnv) {
+            if ($getRouteParams) {
+                if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']][$route];
+                } else {
+                    return false;
+                }
+            }
+
+            if ($getAppParams) {
+                if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']];
+                } else {
+                    return false;
+                }
+            }
+
+            if ($getUserEnv) {
+                if (isset($accountEnv)) {
+                    return $accountEnv;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function updateEnv($id, $params = [], $getRouteParams = true, $getAppParams = false)
+    {
+        $envModel = new BasepackagesUsersAccountsEnv;
+
+        if ($this->config->databasetype === 'db') {
+            $accountEnv = $envModel::findFirst(['account_id = ' . $id]);
+        } else {
+            $envStore = $this->ff->store($envModel->getSource());
+
+            $accountEnv = $envStore->findOneBy(['account_id', '=', $id]);
+        }
+
+        $routeArr = explode('/q/', $this->request->getURI());
+        if ($this->domains->domain['exclusive_to_default_app']) {
+            $route = str_replace('/' . $this->apps->getAppInfo()['route'], '', $routeArr[0]);
+        } else {
+            $route = $routeArr[0];
+        }
+
+        //We do not add update/remove env
+        if (str_ends_with($route, 'update') || str_ends_with($route, 'remove')) {
+            return true;
+        }
+
+        if (isset($this->postData()['quick_filter']) && isset($this->postData()['conditions'])) {
+            $params['params']['conditions'] = $this->postData()['conditions'];
+            $params['pageParams']['conditions'] = $this->postData()['conditions'];
+        }
+
+        if ($accountEnv) {
+            $update = false;
+
+            if (!isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                $accountEnv['params'][$this->apps->getAppInfo()['id']] = [];
+
+                $update = true;
+            }
+
+            if (count($params) > 0) {
+                if (!isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+                    $accountEnv['params'][$this->apps->getAppInfo()['id']][$route] = [];
+                }
+
+                if (count($accountEnv['params'][$this->apps->getAppInfo()['id']][$route]) > 0) {
+                    $accountEnv['params'][$this->apps->getAppInfo()['id']][$route]
+                        = array_merge(
+                            $accountEnv['params'][$this->apps->getAppInfo()['id']][$route],
+                            $params
+                        );
+                } else {
+                    $accountEnv['params'][$this->apps->getAppInfo()['id']][$route] = $params;
+                }
+
+                $update = true;
+            }
+
+            if ($this->config->databasetype === 'db') {
+                if ($update) {
+                    $accountEnv->assign($accountEnv);
+
+                    $accountEnv->update();
+                }
+            } else {
+                if ($update) {
+                    $envStore->setValidateData(false);
+
+                    $envStore->update($accountEnv);
+                }
+            }
+        } else {
+            $accountEnv['account_id'] = $id;
+
+            if (count($params) > 0) {
+                $accountEnv['params'][$this->apps->getAppInfo()['id']][$route] = $params;
+            } else {
+                $accountEnv['params'] = $this->helper->encode([$this->apps->getAppInfo()['id'] => []]);
+            }
+
+            if ($this->config->databasetype === 'db') {
+                $envModel->assign($accountEnv);
+
+                $envModel->create();
+            } else {
+                $envStore->insert($accountEnv);
+            }
+        }
+
+        if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+            $this->opCache->removeCache('account_' . $id, 'core');
+        }
+
+        if ($getRouteParams || $getAppParams) {
+            return $this->checkEnv($id, $getRouteParams, $getAppParams);
+        }
+
+        if ($this->config->databasetype === 'db') {
+            return $accountEnv->getLast()->toArray();
+        } else {
+            return $envStore->getLast();
+        }
+    }
+
+    public function removeEnvRouteParams($data)
+    {
+        if ($this->access->auth->check()) {
+            $id = $this->access->auth->account()['id'];
+        } else {
+            $this->addResponse('User not logged in or account not found!', 1);
+
+            return false;
+        }
+
+        $envModel = new BasepackagesUsersAccountsEnv;
+
+        if ($this->config->databasetype === 'db') {
+            $accountEnv = $envModel::findFirst(['account_id = ' . $id]);
+        } else {
+            $envStore = $this->ff->store($envModel->getSource());
+
+            $accountEnv = $envStore->findOneBy(['account_id', '=', $id]);
+        }
+
+        $routeArr = explode('/q/', $this->request->getURI());
+        if ($this->domains->domain['exclusive_to_default_app']) {
+            $route = str_replace('/' . $this->apps->getAppInfo()['route'], '', $routeArr[0]);
+        } else {
+            $route = $routeArr[0];
+        }
+
+        $update = false;
+        if (isset($data['remove_all'])) {
+            if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                $accountEnv['params'][$this->apps->getAppInfo()['id']] = [];
+            }
+
+            $update = true;
+        } else {
+            if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$data['route']])) {
+                unset($accountEnv['params'][$this->apps->getAppInfo()['id']][$data['route']]);
+            }
+
+            $update = true;
+        }
+
+        if ($update) {
+            if ($this->config->databasetype === 'db') {
+                $accountEnv->assign($accountEnv);
+
+                $accountEnv->update();
+            } else {
+                $envStore->setValidateData(false);
+
+                $envStore->update($accountEnv);
+            }
+
+            $this->addResponse('Remove route params');
+
+            return true;
+        }
+
+        $this->addResponse('Not able to remove route params', 1);
 
         return false;
     }
@@ -841,13 +1140,13 @@ class Accounts extends BasePackage
         }
     }
 
-    public function checkAccountBy(string $username, $getSecurity = false, $by = 'email')
+    public function checkAccountBy($byValue, $getSecurity = false, $by = 'email')
     {
         if ($getSecurity) {
             $this->setFFRelations(true);
         }
 
-        $this->getFirst($by, $username, true);
+        $this->getFirst($by, $byValue, true);
 
         if ($this->model) {
             $account = $this->model->toArray();
@@ -1049,7 +1348,7 @@ class Accounts extends BasePackage
         $emailData['subject'] = 'OTP for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $password;
 
-        return $this->basepackages->emailqueue->addToQueue($emailData);
+        return $this->basepackages->emailqueue->addQueue($emailData);
     }
 
     public function removeAccountAgents(array $data)
@@ -1239,7 +1538,7 @@ class Accounts extends BasePackage
 
                     if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                         $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
-                        $components[strtolower($app['id'])]['childs'][$key]['title'] = $component['name'];
+                        $components[strtolower($app['id'])]['childs'][$key]['title'] = strtoupper($component['name']);
                     }
                 }
             }
@@ -1272,8 +1571,9 @@ class Accounts extends BasePackage
                 }
 
                 if ($account['security']['permissions'] && $account['security']['permissions'] !== '') {
-                    if (is_string($account['security']['permissions'])) {
-                        $permissionsArr = $this->helper->decode($account['security']['permissions'], true);
+                    $permissionsArr = $account['security']['permissions'];
+                    if (is_string($permissionsArr)) {
+                        $permissionsArr = $this->helper->decode($permissionsArr, true);
                     }
                 } else {
                     $permissionsArr = [];

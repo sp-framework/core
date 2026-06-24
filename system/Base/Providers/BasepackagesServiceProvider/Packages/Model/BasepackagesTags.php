@@ -14,7 +14,7 @@ class BasepackagesTags extends BaseModel
 
     public $swatch;
 
-    public $package_name;
+    public $package_class;
 
     public $package_row_ids;
 }

@@ -1,0 +1,17 @@
+<li class="nav-item">
+    {% if access.auth.account()['profile']['settings']['notifications']['mute'] is defined %}
+        {% if access.auth.account()['profile']['settings']['notifications']['mute'] == true %}
+            {% set notificationIcon = 'bell-slash' %}
+        {% elseif access.auth.account()['profile']['settings']['notifications']['mute'] == false %}
+            {% set notificationIcon = 'bell' %}
+        {% else %}
+            {% set notificationIcon = 'bell' %}
+        {% endif %}
+    {% else %}
+        {% set notificationIcon = 'bell' %}
+    {% endif %}
+    <a id="notifications-button" class="nav-link contentAjaxLink" href="{{links.url('system/notifications')}}" role="button">
+        <i class="fa fa-fw fa-{{notificationIcon}}"></i>
+        <span id="notifications-button-counter" class="badge badge-info navbar-badge"></span>
+    </a>
+</li>

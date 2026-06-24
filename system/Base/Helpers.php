@@ -243,24 +243,24 @@ if (!function_exists('xmlToArray')) {
 }
 
 if (!function_exists('checkCtype')) {
-    function checkCtype($str, $ctype = 'alnum', $ignoreChars = null) {
+    function checkCtype($str, $ctype = 'alnum', $ignoreChars = null, $replaceChars = true) {
         if (!$ignoreChars) {
-            $ignoreChars = [' ', '&amp;', '&', ',', ':', ';'];
+            $ignoreChars = [' ', '&amp;', '&', '.', ',', ':', ';', '&#64;', '@'];
         }
 
         $string = trim(str_replace($ignoreChars, '' , $str));
 
         if ($ctype === 'alnum') {
             if (ctype_alnum($string)) {
-                return $string;
+                return ($replaceChars === true ? $string : $str);
             }
         } else if ($ctype === 'alpha') {
             if (ctype_alpha($string)) {
-                return $string;
+                return ($replaceChars === true ? $string : $str);
             }
         } else if ($ctype === 'digits') {
             if (ctype_digit($string)) {
-                return $string;
+                return ($replaceChars === true ? $string : $str);
             }
         }
 
@@ -663,5 +663,56 @@ if (!function_exists('numberFormatPrecision')) {
         }
 
         return (float) $response;
+    }
+}
+
+if (!function_exists('findKeysByValue')) {
+    function findKeysByValue(array $array, $search, array $keys = []) {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $subPath = findKeysByValue($value, $search, array_merge($keys, [$key]));
+                if (!empty($subPath)) {
+                    return $subPath;
+                }
+            } elseif ($value === $search) {
+                $keys = array_merge($keys, [$key]);
+            }
+        }
+
+        return $keys;
+    }
+}
+
+if (!function_exists('findKeyLocation')) {
+    function findKeyLocation(array $array, $searchKey, array $path = []) {
+        foreach ($array as $key => $value) {
+            $currentPath = array_merge($path, [$key]);
+
+            if ($key === $searchKey) {
+                return $currentPath;
+            }
+
+            if (is_array($value)) {
+                $result = findKeyLocation($value, $searchKey, $currentPath);
+                if ($result !== null) {
+                    return $result;
+                }
+            }
+        }
+
+        return null;
+    }
+}
+
+if (!function_exists('command_exists')) {
+    function command_exists(string $command): bool
+    {
+        // Determine the OS and appropriate command validation utility
+        $isWindows = (false !== stripos(PHP_OS, 'win'));
+        $testCommand = $isWindows ? "where " . escapeshellarg($command) : "command -v " . escapeshellarg($command);
+
+        $output = shell_exec($testCommand);
+
+        return !is_null($output) && trim($output) !== '';
     }
 }

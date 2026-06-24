@@ -33,13 +33,15 @@ class BasepackagesWorkersTasks extends BaseModel
 
     public $call_args;
 
-    public $pid;
-
     public $previous_run;
 
     public $next_run;
 
     public $force_next_run;
+
+    public $job_log_mode;
+
+    public $email_service_id;
 
     public $email;
 

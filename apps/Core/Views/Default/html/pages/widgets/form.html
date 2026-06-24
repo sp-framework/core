@@ -1,0 +1,237 @@
+{% set pagewidgetWidgetDisabled = false %}
+{% if pagewidget['id'] is defined %}
+    {% set pagewidgetId = pagewidget['id'] %}
+    {% set pagewidgetName = pagewidget['name'] %}
+    {% set pagewidgetWidgetId = pagewidget['widget_id'] %}
+    {% set pagewidgetWidgetDisabled = true %}
+{% else %}
+    {% set pagewidgetId = '' %}
+    {% set pagewidgetName = '' %}
+    {% set pagewidgetWidgetId = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Page Widget ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Page Widget ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : pagewidgetId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Page Widget Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Page Widget Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : pagewidgetName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'widget_id',
+                        'fieldLabel'                           : 'Page Widget',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'There are available widgets for pages.',
+                        'fieldRequired'                        : true,
+                        'fieldDisabled'                        : pagewidgetWidgetDisabled,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : widgetsTree,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : pagewidgetWidgetId
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'widgets/form/info'
+                                ],
+                                'settings'   :
+                                [
+                                    'tabTitle'          : 'Settings',
+                                    'tabInclude'        : 'widgets/form/settings'
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals paginatedPNotify GridStack Swal BazContentFields Pace BazCore BazContentLoader */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-name'                                : { },
+        '{{componentId}}-{{sectionId}}-widget_id'                           : {
+            'placeholder'   : 'SELECT WIDGET',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-widget_id').on('select2:select', function (e) {
+                    $('#{{componentId}}-{{sectionId}}-widget-no-widgets').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-widget-error').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-widget-loader').attr('hidden', false);
+                    $('#{{componentId}}-{{sectionId}}-widget-no-widget-settings').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-widget-settings-error').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-widget-settings-loader').attr('hidden', false);
+
+                    var url = '{{links.url("pages/widgets/q/widgetinfo/true/id/' + e.params.data.id + '")}}';
+
+                    $('#{{componentId}}-{{sectionId}}-widget-info').load(url, null, function (response, status, xhr) {
+                        if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
+                            $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                            $('#security-token').val(xhr.getResponseHeader('token'));
+                        }
+
+                        if (status === 'success') {
+                            $('#{{componentId}}-{{sectionId}}-widget-loader').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-widget-info').attr('hidden', false);
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-widget-error').attr('hidden', false);
+                        }
+                    });
+
+                    url = '{{links.url("pages/widgets/q/widgetsettings/true/id/' + e.params.data.id + '")}}';
+
+                    $('#{{componentId}}-{{sectionId}}-widget-settings').load(url, null, function (response, status, xhr) {
+                        if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
+                            $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                            $('#security-token').val(xhr.getResponseHeader('token'));
+                        }
+
+                        if (status === 'success') {
+                            $('#{{componentId}}-{{sectionId}}-widget-settings-loader').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-widget-settings').attr('hidden', false);
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-widget-settings-error').attr('hidden', false);
+                        }
+                    });
+                });
+            }
+        },
+    });
+
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules'] = { };
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages'] = { };
+}
+
+dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules'] =
+    $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules'], {
+        '{{componentId}}-{{sectionId}}-name'                        : 'required',
+        '{{componentId}}-{{sectionId}}-widget_id'                   : 'required'
+    });
+dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages'] =
+    $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages'], {
+        '{{componentId}}-{{sectionId}}-name'                        : 'Please enter widget name',
+        '{{componentId}}-{{sectionId}}-widget_id'                   : 'Please select widget',
+    });
+dataCollectionSection['{{componentId}}-{{sectionId}}-form']['onSubmit'] =
+    function() {
+        var dataToSubmit = { };
+        dataToSubmit['settings'] = { };
+
+        for (var dataKey in dataCollectionSection['dataToSubmit']) {
+            if (dataKey === 'id' || dataKey === 'name' || dataKey === 'widget_id') {
+                dataToSubmit[dataKey] = dataCollectionSection['dataToSubmit'][dataKey];
+            } else if (dataKey === $('#security-token').attr('name')) {
+                dataToSubmit[$('#security-token').attr('name')] = $('#security-token').attr('value');
+            } else {
+                if (dataCollectionSection['dataToSubmit'][dataKey].startsWith("{")) {
+                    try {
+                        dataCollectionSection['dataToSubmit'][dataKey] = JSON.parse(dataCollectionSection['dataToSubmit'][dataKey]);
+                    } catch (e) {
+                        paginatedPNotify('error', {text : "Error while processing JSON content of " + $('#{{componentId}}-{{sectionId}}-' + dataKey).siblings('label').text()});
+
+                        return false;
+                    }
+                }
+
+                dataToSubmit['settings'][dataKey] = dataCollectionSection['dataToSubmit'][dataKey];
+            }
+        }
+
+        dataCollectionSection['dataToSubmit'] = dataToSubmit;
+
+        return true;
+    }
+</script>

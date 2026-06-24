@@ -15,6 +15,23 @@ class GeoStates extends BasePackage
 
     protected $countries;
 
+    public function init(bool $resetCache = false)
+    {
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('geoStates', 'core')) {
+                $this->geoStates = $this->opCache->getCache('geoStates', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('geoStates', $this->geoStates, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
+
+        return $this;
+    }
+
     public function searchStates(string $stateQueryString)
     {
         if ($this->config->databasetype === 'db') {
@@ -108,5 +125,35 @@ class GeoStates extends BasePackage
         $this->addResponse('Ok', 0, ['states' => $searchStates]);
 
         return $searchStates;
+    }
+
+    public function addState(array $data)
+    {
+        if ($this->add($data)) {
+            $this->addResponse('State added');
+
+            return true;
+        }
+
+        $this->addResponse('Error Adding State', 1);
+    }
+
+    public function updateState(array $data)
+    {
+        $state = $this->getById($data['id']);
+
+        if (!$state) {
+            $this->addResponse('State with ID does not exists', 1);
+
+            return;
+        }
+
+        if ($this->update($data)) {
+            $this->addResponse('State updated');
+
+            return true;
+        }
+
+        $this->addResponse('Error Updating State', 1);
     }
 }

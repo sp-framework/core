@@ -14,9 +14,21 @@ class Storages extends BasePackage
 
     public $storage;
 
+    public $storageInfo;
+
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('storages', 'core')) {
+                $this->storages = $this->opCache->getCache('storages', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('storages', $this->storages, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }
@@ -135,6 +147,25 @@ class Storages extends BasePackage
         return $this->initStorage($public)->getById($id);
     }
 
+    public function getAbsolutePath($fileOrUUID)
+    {
+        if (is_array($fileOrUUID)) {
+            $file = $fileOrUUID;
+        } else {
+            $file = $this->getFileInfo($uuid);
+        }
+
+        if ($file) {
+            if ($this->storageInfo['type'] !== 'local') {
+                throw new \Exception('File is not on a local storage!');
+            }
+
+            return base_path($this->storageInfo['permission'] . '/' . $this->storageInfo['id'] . '/data/' . $file['uuid_location'] . $file['uuid']);
+        }
+
+        return false;
+    }
+
     public function getFileInfo($uuid, $orgFileName = null, $like = false)
     {
         $fileInfo = $this->initStorage(false)->getFileInfo($uuid, $orgFileName, $like);
@@ -148,12 +179,12 @@ class Storages extends BasePackage
         return false;
     }
 
-    public function storeFile($type = null, $directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false)
+    public function storeFile($type = null, $directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false, $packageInfo = [])
     {
         $this->initStorage($this->checkPublic($type));
 
         if ($this->storage) {
-            if ($this->storage->store($directory, $file, $fileName, $size, $mimeType, $addToDbOnly)) {
+            if ($this->storage->store($directory, $file, $fileName, $size, $mimeType, $addToDbOnly, $packageInfo)) {
                 $storageData = $this->storage->packagesData->responseData['storageData'];
 
                 if ($addToDbOnly) {
@@ -165,7 +196,7 @@ class Storages extends BasePackage
                         $fileType = $fileInfo[0]['type'];
                     }
 
-                    if (in_array($fileType, $this->storage->storage['allowed_image_mime_types'])) {
+                    if (isset($fileType) && in_array($fileType, $this->storage->storage['allowed_image_mime_types'])) {
                         if (isset($this->request->getPost()['getpubliclinks'])) {
                             $widths = explode(',', $this->request->getPost()['getpubliclinks']);
 
@@ -178,16 +209,23 @@ class Storages extends BasePackage
                             }
                         }
 
-                        $this->packagesData->responseMessage = 'Files Uploaded!';
-
-                    } else if (in_array($fileType, $this->storage->storage['allowed_file_mime_types'])) {
+                        if ($this->storage->packagesData->responseCode === 0) {
+                            $this->packagesData->responseMessage = 'Files Uploaded!';
+                        } else {
+                            $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
+                        }
+                    } else if (isset($fileType) && in_array($fileType, $this->storage->storage['allowed_file_mime_types'])) {
                         if (isset($this->request->getPost()['getpubliclinks'])) {
                             $storageData['publicLinks'] = [];
 
                             array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], null));
                         }
 
-                        $this->packagesData->responseMessage = 'Files Uploaded!';
+                        if ($this->storage->packagesData->responseCode === 0) {
+                            $this->packagesData->responseMessage = 'Files Uploaded!';
+                        } else {
+                            $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
+                        }
                     }
                 }
 
@@ -208,11 +246,11 @@ class Storages extends BasePackage
         }
     }
 
-    public function removeFile(string $uuid, $type = null, $purge = null)
+    public function removeFile(string $uuid, $type = null, $purge = null, $removeDb = null, $removeFile = null)
     {
         $this->initStorage($this->checkPublic($type));
 
-        if ($this->storage->removeFile($uuid, $this->checkPurge($purge))) {
+        if ($this->storage->removeFile($uuid, $this->checkPurge($purge), $removeDb, $removeFile)) {
             $this->addResponse($this->storage->packagesData->responseMessage, $this->storage->packagesData->responseCode);
 
             return true;
@@ -250,6 +288,12 @@ class Storages extends BasePackage
         } else {
             return false;
         }
+
+        if (!$storage) {
+            throw new \Exception('Storage not configured!');
+        }
+
+        $this->storageInfo = $storage;
 
         if ($storage['type'] === 'local') {
             $this->storage = (new Local())->initLocal($storage);
@@ -295,7 +339,7 @@ class Storages extends BasePackage
         return $this->initStorage()->getPublicLink($uuid, $width);
     }
 
-    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
+    public function changeOrphanStatus($newUUID = null, $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
     {
         return $this->initStorage()->changeOrphanStatus($newUUID, $oldUUID, $array, $status, $orgFileName, $like);
     }

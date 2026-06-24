@@ -7,16 +7,18 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\ApiClientServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\ApiClientServicesCalls;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis\Repos;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\ContactBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards\Widgets as DashboardsWidgets;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Email\Queue as EmailQueue;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Email\Services as EmailServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Filters;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV4;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV6;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Holidays;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Postcodes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Regions;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
@@ -24,8 +26,11 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\ImportExport;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Messenger;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Murls;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Mutex;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Pages;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Pages\Widgets as PagesWidgets;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLocal;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Tags;
@@ -33,6 +38,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Templates;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Agents;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\CanLogin;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Env;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Identifiers;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Security;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Sessions;
@@ -79,13 +85,16 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\ApiClientSe
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\ApiClientServices\BasepackagesApiClientServicesCalls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesContactBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesDashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesFilters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMenus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMurls;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMutex;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesPages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesStorages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesTags;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesTemplates;
@@ -98,13 +107,16 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\Basepac
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv6;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoHolidays;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoPostcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Messenger\BasepackagesMessenger;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Pages\BasepackagesPagesWidgets;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Storages\BasepackagesStoragesLocal;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsEnv;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSecurity;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
@@ -190,6 +202,14 @@ class Schema
                         'schema'    => new Tags,
                         'model'     => new BasepackagesTags,
                     ],
+                'basepackages_pages'                        => [
+                        'schema'    => new Pages,
+                        'model'     => new BasepackagesPages,
+                    ],
+                'basepackages_pages_widgets'                => [
+                        'schema'    => new PagesWidgets,
+                        'model'     => new BasepackagesPagesWidgets,
+                    ],
                 'basepackages_email_services'               => [
                         'schema'    => new EmailServices,
                         'model'     => new BasepackagesEmailServices,
@@ -226,6 +246,10 @@ class Schema
                         'schema'    => new Tunnels,
                         'model'     => new BasepackagesUsersAccountsTunnels,
                     ],
+                'basepackages_users_accounts_env'           => [
+                        'schema'    => new Env,
+                        'model'     => new BasepackagesUsersAccountsEnv,
+                    ],
                 'basepackages_users_profiles'               => [
                         'schema'    => new Profiles,
                         'model'     => new BasepackagesUsersProfiles,
@@ -241,6 +265,10 @@ class Schema
                 'basepackages_murls'                        => [
                         'schema'    => new Murls,
                         'model'     => new BasepackagesMurls,
+                    ],
+                'basepackages_mutex'                        => [
+                        'schema'    => new Mutex,
+                        'model'     => new BasepackagesMutex,
                     ],
                 'basepackages_filters'                      => [
                         'schema'    => new Filters,
@@ -266,6 +294,10 @@ class Schema
                         'schema'    => new Cities,
                         'model'     => new BasepackagesGeoCities,
                     ],
+                'basepackages_geo_postcodes'                => [
+                        'schema'    => new Postcodes,
+                        'model'     => new BasepackagesGeoPostcodes,
+                    ],
                 'basepackages_geo_cities_ip2locationv4'     => [
                         'schema'    => new CitiesIp2LocationV4,
                         'model'     => new BasepackagesGeoCitiesIp2locationv4,
@@ -281,6 +313,10 @@ class Schema
                 'basepackages_address_book'                 => [
                         'schema'    => new AddressBook,
                         'model'     => new BasepackagesAddressBook,
+                    ],
+                'basepackages_contact_book'                 => [
+                        'schema'    => new ContactBook,
+                        'model'     => new BasepackagesContactBook,
                     ],
                 'basepackages_storages'                     => [
                         'schema'    => new Storages,

@@ -42,6 +42,13 @@ class FilesHash
                         'type'          => Column::TYPE_JSON,
                         'notNull'       => true,
                     ]
+                ),
+                new Column(
+                    'release_pending',
+                    [
+                        'type'          => Column::TYPE_BOOLEAN,
+                        'notNull'       => false,
+                    ]
                 )
             ],
             'indexes' => [
@@ -57,6 +64,21 @@ class FilesHash
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
             ]
+        ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'module_type',
+                    'module_id'
+                ],
+                'INDEX'
+            )
         ];
     }
 }

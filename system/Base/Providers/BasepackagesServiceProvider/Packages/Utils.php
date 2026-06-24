@@ -537,10 +537,10 @@ class Utils extends BasePackage
         return $data['json'];
     }
 
-    public function setMicroTimer($reference, $calculateMemoryUsage = false, $resetMicroTimers = false)
+    public function setMicroTimer($reference, $calculateMemoryUsage = false, $resetMicroTimer = false)
     {
-        if ($resetMicroTimers) {
-            $this->resetMicroTimers();
+        if ($resetMicroTimer) {
+            $this->resetMicroTimer();
         }
 
         $microtime['reference'] = $reference;

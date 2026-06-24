@@ -21,7 +21,7 @@ class RegionsComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $regionsArr = $this->basepackages->geoRegions->getAll()->geoRegions;
+        $regionsArr = $this->basepackages->geoRegions->geoRegions;
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {

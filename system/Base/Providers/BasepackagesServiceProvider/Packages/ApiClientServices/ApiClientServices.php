@@ -28,6 +28,8 @@ class ApiClientServices extends BasePackage
 
     public $monitorProgress;
 
+    public $usedApi;
+
     public function init()
     {
         $this->packageName = 'apiClientServices';
@@ -43,6 +45,8 @@ class ApiClientServices extends BasePackage
         }
 
         $this->apiStats = new ApiClientServicesStats;
+
+        $this->getAll();
 
         return $this;
     }
@@ -97,14 +101,14 @@ class ApiClientServices extends BasePackage
 
         $apis = $this->modules->packages->getPackagesForCategory('appsApis');
 
-        if ($this->apps->getAppInfo()['app_type'] === 'core') {
+        if (($this->apps->getAppInfo() && $this->apps->getAppInfo()['app_type'] === 'core') || PHP_SAPI !== 'cli') {
             $basepackagesApis = $this->modules->packages->getPackagesForCategory('basepackagesApis');
             $apis = array_merge($basepackagesApis, $apis);
         }
 
         if ($apis && is_array($apis) && count($apis) > 0) {
             foreach ($apis as $api) {
-                if ($this->apps->getAppInfo()['app_type'] !== $api['app_type']) {
+                if ($this->apps->getAppInfo() && $this->apps->getAppInfo()['app_type'] !== $api['app_type']) {
                     continue;
                 }
 
@@ -132,7 +136,7 @@ class ApiClientServices extends BasePackage
 
     protected function registerApiLocations()
     {
-        if ($this->apps->app['app_type'] === 'core') {
+        if (($this->apps->app && $this->apps->app['app_type'] === 'core') || PHP_SAPI !== 'cli') {
             $this->apiLocations =
                 [
                     'basepackages'    =>
@@ -197,7 +201,11 @@ class ApiClientServices extends BasePackage
         if ($data['provider'] === 'github' || $data['provider'] === 'gitea') {
             $data['location'] = 'basepackages';
         }
-        $data['app_type'] = $this->apps->getAppInfo()['app_type'];
+        $data['app_type'] = 'core';
+
+        if ($this->apps->getAppInfo()) {
+            $data['app_type'] = $this->apps->getAppInfo()['app_type'];
+        }
 
         $data = $this->encryptPassToken($data);
 
@@ -211,13 +219,16 @@ class ApiClientServices extends BasePackage
             $this->switchApiModel();
 
             if ($this->add($data)) {
-
                 $data['id'] = $apiId;
 
                 $this->apiStats->initApiCallStats($data);
 
                 $this->addResponse('Added ' . $data['name'] . ' API');
             } else {
+                $this->switchApiModel($data);
+
+                $this->remove($apiId);
+
                 $this->addResponse('Error adding new API.', 1);
             }
         }
@@ -231,7 +242,11 @@ class ApiClientServices extends BasePackage
         if ($data['provider'] === 'github' || $data['provider'] === 'gitea') {
             $data['location'] = 'basepackages';
         }
-        $data['app_type'] = $this->apps->getAppInfo()['app_type'];
+        $data['app_type'] = 'core';
+
+        if ($this->apps->getAppInfo()) {
+            $data['app_type'] = $this->apps->getAppInfo()['app_type'];
+        }
 
         $data = $this->encryptPassToken($data);
 
@@ -401,7 +416,7 @@ class ApiClientServices extends BasePackage
 
         if ($apiClass) {
             try {
-                return (new $apiClass())->init($config, $this, $this->httpOptions, $this->monitorProgress);
+                return $this->usedApi = (new $apiClass())->init($config, $this, $this->httpOptions, $this->monitorProgress);
             } catch (\Exception $e) {
                 throw $e;
             }
@@ -480,7 +495,11 @@ class ApiClientServices extends BasePackage
     public function getApiByAppType($appType = null)
     {
         if (!$appType) {
-            $appType = $this->apps->getAppInfo()['app_type'];
+            $appType = 'core';
+
+            if ($this->apps->getAppInfo()) {
+                $appType = $this->apps->getAppInfo()['app_type'];
+            }
         }
 
         $apisArr = $this->getAll()->apiClientServices;

@@ -29,132 +29,25 @@ class Profiles
                         ]
                     ),
                     new Column(
-                        'portrait',
+                        'locale_country_iso3',
                         [
                             'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 1024,
+                            'size'          => 3,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
-                        'initials_avatar',
-                        [
-                            'type'          => Column::TYPE_JSON,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'first_name',
+                        'locale_timezone',
                         [
                             'type'          => Column::TYPE_VARCHAR,
                             'size'          => 50,
-                            'notNull'       => true,
-                        ]
-                    ),
-                    new Column(
-                        'last_name',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 50,
-                            'notNull'       => true,
-                        ]
-                    ),
-                    new Column(
-                        'full_name',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 100,
-                            'notNull'       => true,
-                        ]
-                    ),
-                    new Column(
-                        'contact_address_id',
-                        [
-                            'type'          => Column::TYPE_INTEGER,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'contact_phone',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 100,
-                            'notNull'       => true,
-                        ]
-                    ),
-                    new Column(
-                        'contact_phone_ext',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 20,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'contact_mobile',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 100,
-                            'notNull'       => true,
-                        ]
-                    ),
-                    new Column(
-                        'contact_fax',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 100,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'secondary_email',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 100,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'cc_emails_to_secondary_email',
-                        [
-                            'type'          => Column::TYPE_TINYINTEGER,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'contact_other',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 200,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'contact_notes',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 2048,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'locale_country_id',
-                        [
-                            'type'          => Column::TYPE_SMALLINTEGER,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'locale_timezone_id',
-                        [
-                            'type'          => Column::TYPE_SMALLINTEGER,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
                         'settings',
                         [
-                            'type'          => Column::TYPE_TEXT,
+                            'type'          => Column::TYPE_JSON,
                             'notNull'       => false,
                         ]
                     )
@@ -169,5 +62,19 @@ class Profiles
                     )
                 ]
             ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'account_id'
+                ],
+                'INDEX'
+            )
+        ];
     }
 }

@@ -68,7 +68,7 @@ class ImportExport extends BasePackage
 
         if ($this->add($data)) {
             if (isset($data['file'])) {
-                $this->basepackages->storages->changeOrphanStatus($data['file'], null, true);
+                $this->basepackages->storages->changeOrphanStatus($data['file'], null, null, true);
             }
 
             $task = $this->basepackages->workers->tasks->findByCallArgs($data['type'], 'process');
@@ -284,7 +284,9 @@ class ImportExport extends BasePackage
                 $csvString,
                 $name,
                 $size,
-                'text/csv'
+                'text/csv',
+                false,
+                ['package_class' => str_replace('\\', '_', $this::class), 'package_row_id' => $data['id']]
             )
         ) {
             $this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->responseData['uuid']);
@@ -697,6 +699,6 @@ class ImportExport extends BasePackage
             $emailData['body'] = ucfirst($task['type']) . ' request ID:' . $task['id'] . ' execution complete.';
         }
 
-        $this->basepackages->emailqueue->addToQueue($emailData);
+        $this->basepackages->emailqueue->addQueue($emailData);
     }
 }

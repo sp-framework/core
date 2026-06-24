@@ -7,6 +7,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\AddressBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\ApiClientServices;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\BackupRestore;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Barcodes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\ContactBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Dashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailQueue;
@@ -15,16 +16,21 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoHolidays;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoPostcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\HouseKeeping;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Maintenance;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Messenger;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Murls;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Mutex;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Pages;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\PagesWidgets;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Progress;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Qrcodes;
@@ -70,9 +76,13 @@ class Basepackages
 
 	protected $geoCities;
 
+	protected $geoPostcodes;
+
 	protected $storages;
 
 	protected $addressbook;
+
+	protected $contactbook;
 
 	protected $activityLogs;
 
@@ -108,9 +118,17 @@ class Basepackages
 
 	protected $murls;
 
+	protected $mutex;
+
 	protected $maintenance;
 
 	protected $tags;
+
+	protected $pages;
+
+	protected $pageswidgets;
+
+	protected $houseKeeping;
 
 	public function __construct()
 	{
@@ -225,6 +243,13 @@ class Basepackages
 		return $this->geoCities;
 	}
 
+	protected function initGeoPostcodes()
+	{
+		$this->geoPostcodes = (new GeoPostcodes())->init();
+
+		return $this->geoPostcodes;
+	}
+
 	protected function initStorages()
 	{
 		$this->storages = (new Storages())->init();
@@ -237,6 +262,13 @@ class Basepackages
 		$this->addressbook = (new AddressBook())->init();
 
 		return $this->addressbook;
+	}
+
+	protected function initContactbook()
+	{
+		$this->contactbook = (new ContactBook())->init();
+
+		return $this->contactbook;
 	}
 
 	protected function initActivityLogs()
@@ -358,6 +390,13 @@ class Basepackages
 		return $this->murls;
 	}
 
+	protected function initMutex()
+	{
+		$this->mutex = (new Mutex())->init();
+
+		return $this->mutex;
+	}
+
 	protected function initMaintenance()
 	{
 		$this->maintenance = (new Maintenance())->init();
@@ -370,5 +409,26 @@ class Basepackages
 		$this->tags = (new Tags())->init();
 
 		return $this->tags;
+	}
+
+	protected function initPages()
+	{
+		$this->pages = (new Pages())->init();
+
+		return $this->pages;
+	}
+
+	protected function initPagesWidgets()
+	{
+		$this->pageswidgets = (new PagesWidgets())->init();
+
+		return $this->pageswidgets;
+	}
+
+	protected function initHouseKeeping()
+	{
+		$this->houseKeeping = (new HouseKeeping())->init();
+
+		return $this->houseKeeping;
 	}
 }

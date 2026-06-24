@@ -14,8 +14,6 @@ class BasepackagesGeoCities extends BaseModel
 
     public $longitude;
 
-    public $postcode;
-
     public $state_id;
 
     public $country_id;

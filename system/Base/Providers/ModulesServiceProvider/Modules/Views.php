@@ -42,7 +42,17 @@ class Views extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('views', 'core')) {
+                $this->views = $this->opCache->getCache('views', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('views', $this->views, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         $this->setApp();
 
@@ -534,6 +544,8 @@ class Views extends BasePackage
 
         $this->view['view_modules_version'] = $viewsModulesVersion = implode('.', $viewsModulesVersion);
 
+        $this->setFFValidation(false);
+
         $this->update($this->view);
 
         return $viewsModulesVersion;
@@ -569,6 +581,7 @@ class Views extends BasePackage
         $this->buildAssetsHeadCss();
         $this->buildAssetsHeadJs();
         $this->buildAssetsBranding();
+        $this->buildAssetsFavicons();
         $this->buildAssetsFooter();
         $this->buildAssetsFooterJs();
     }
@@ -596,12 +609,12 @@ class Views extends BasePackage
         $title = $this->tag->newInstance('title');
 
         if (isset($this->viewSettings['head']['title'])) {
-            $title->set($this->viewSettings['head']['title'] . ' - ' . ucfirst($this->app['name']));
+            $title->set($this->viewSettings['head']['title']);
         } else {
             $title->set(ucfirst($this->app['name']));
         }
 
-        if (isset($this->componentName)) {
+        if (isset($this->componentName) && strtolower($this->componentName) !== 'home') {
             $title->append(' - ' . $this->componentName);
         }
 
@@ -654,16 +667,20 @@ class Views extends BasePackage
                     $link['local'] = true;
                 }
 
-                if (!isset($link['route'])) {
+                if (!isset($link['route']) && $link['local']) {
                     $link['route'] = '/';
                 }
 
-                if ($link['route'] === '/' || $link['route'] === $this->extractRoute()) {
+                if (isset($link['route']) &&
+                    ($link['route'] === '/' || $link['route'] === $this->extractRoute())
+                ) {
                     if ($this->config->dev) {
                         $this->assetsCollections['headLinks']->addCss($link['asset']);
                     } else {
                         $this->assetsCollections['headLinks']->addCss($link['asset'], $link['local'], false, [], $this->assetsVersion);
                     }
+                } else {
+                    $this->assetsCollections['headLinks']->addCss($link['asset'], $link['local'], false);
                 }
             }
         }
@@ -689,16 +706,20 @@ class Views extends BasePackage
                     $script['local'] = true;
                 }
 
-                if (!isset($script['route'])) {
+                if (!isset($script['route']) && $script['local']) {
                     $script['route'] = '/';
                 }
 
-                if ($script['route'] === '/' || $script['route'] === $this->extractRoute()) {
+                if (isset($script['route']) &&
+                    ($script['route'] === '/' || $script['route'] === $this->extractRoute())
+                ) {
                     if ($this->config->dev) {
                         $this->assetsCollections['headJs']->addJs($script['asset']);
                     } else {
                         $this->assetsCollections['headJs']->addJs($script['asset'], $script['local'], true, [], $this->assetsVersion);
                     }
+                } else {
+                    $this->assetsCollections['headJs']->addJs($script['asset'], $script['local'], false);
                 }
             }
         }
@@ -708,18 +729,33 @@ class Views extends BasePackage
     {
         $this->assetsCollections['branding'] = $this->assets->collection('branding');
 
-        if (is_array($this->viewSettings['branding']) && count($this->viewSettings['branding']) > 0) {
+        if (isset($this->viewSettings['branding']) && is_array($this->viewSettings['branding']) && count($this->viewSettings['branding']) > 0) {
             foreach ($this->viewSettings['branding'] as $key => $brand) {
                 if (isset($brand['brand'])) {
-                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand', $brand['brand']));
-
-                    if (!isset($brand['maxWidth']) && !isset($brand['maxHeight'])) {
+                    if (!isset($brand['maxWidth'])) {
                         $brand['maxWidth'] = 200;
+                    }
+
+                    if (!isset($brand['maxHeight'])) {
                         $brand['maxHeight'] = 50;
                     }
-                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand-maxWidth', $brand['maxWidth']));
-                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand-maxHeight', $brand['maxHeight']));
+
+                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand', $brand['brand'], true, $brand));
                 }
+            }
+        }
+    }
+
+    protected function buildAssetsFavicons()
+    {
+        $this->assetsCollections['favicons'] = $this->assets->collection('favicons');
+
+        if (isset($this->viewSettings['head']['link']['href']['favicons']) &&
+            is_array($this->viewSettings['head']['link']['href']['favicons']) &&
+            count($this->viewSettings['head']['link']['href']['favicons']) > 0
+        ) {
+            foreach ($this->viewSettings['head']['link']['href']['favicons'] as $key => $icon) {
+                $this->assetsCollections['favicons']->addInline(new Inline($key, $icon));
             }
         }
     }
@@ -753,16 +789,20 @@ class Views extends BasePackage
                     $script['local'] = true;
                 }
 
-                if (!isset($script['route'])) {
+                if (!isset($script['route']) && $script['local']) {
                     $script['route'] = '/';
                 }
 
-                if ($script['route'] === '/' || $script['route'] === $this->extractRoute()) {
+                if (isset($script['route']) &&
+                    ($script['route'] === '/' || $script['route'] === $this->extractRoute())
+                ) {
                     if ($this->config->dev) {
                         $this->assetsCollections['footerJs']->addJs($script['asset']);
                     } else {
                         $this->assetsCollections['footerJs']->addJs($script['asset'], $script['local'], true, [], $this->assetsVersion);
                     }
+                } else {
+                    $this->assetsCollections['footerJs']->addJs($script['asset'], $script['local'], false);
                 }
             }
         }

@@ -1,68 +1,89 @@
+{% set jobTask = [] %}
+{% set jobJob = [] %}
+{% if task is defined and task['exec_type'] == 'raw' %}
+    {% set jobTask = task %}
+    <div class="row mb-2">
+        <div class="col">
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'buttonType'                     : 'button',
+                    'buttons'                        :
+                        [
+                            'logs'          : [
+                                'title'                    : 'View Logs',
+                                'size'                     : 'xs',
+                                'type'                     : 'info',
+                                'icon'                     : 'clipboard-list',
+                                'position'                 : 'left'
+                            ],
+                            'terminate'          : [
+                                'title'                    : 'Terminate',
+                                'size'                     : 'xs',
+                                'type'                     : 'danger',
+                                'icon'                     : 'circle-xmark',
+                                'position'                 : 'right'
+                            ]
+                        ]
+                ]
+            )}}
+            {{adminltetags.useTag('modal',
+                [
+                    'component'                 : component,
+                    'componentName'             : componentName,
+                    'componentId'               : componentId,
+                    'sectionId'                 : sectionId,
+                    'modalId'                   : 'logs-modal',
+                    'modalBodyContent'          : '',
+                    'modalType'                 : 'info',
+                    'modalSize'                 : 'xl',
+                    'modalHeader'               : true,
+                    'modalHeaderCloseButton'    : true,
+                    'modalFooter'               : true,
+                    'modalEscClose'             : true,
+                    'modalTitle'                : '<i class="fa fas fa-fw fa-clipboard-list"></i> Logs'
+                ]
+            )}}
+        </div>
+    </div>
+{% endif %}
 {% if job['id'] is defined %}
+    {% set jobJob = job %}
     {% set jobResult = '' %}
-    {% if job['response_code'] is defined and job['response_code'] !== '' %}
+    {% if job['response_code'] is defined %}
+        {% if is_array(job['response_code']) %}
+            {% set job['response_code'] = helper.encode(job['response_code']) %}
+        {% endif %}
         {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-code"><strong class="text-uppercase">Code: </strong> ' ~ job['response_code'] ~ '</div><br>' %}
     {% else %}
         {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-code"><strong class="text-uppercase">Code: </strong> -</div><br>' %}
     {% endif %}
-    {% if job['response_message'] is defined and job['response_message'] !== '' %}
+    {% if job['response_message'] is defined %}
+        {% if is_array(job['response_message']) %}
+            {% set job['response_message'] = helper.encode(job['response_message']) %}
+        {% endif %}
         {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message"><strong class="text-uppercase">Message: </strong> ' ~ job['response_message'] ~ '</div><br>' %}
     {% else %}
         {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message"><strong class="text-uppercase">Message: </strong> -</div><br>' %}
     {% endif %}
-    {% if job['response_data'] is defined and job['response_data'] !== '' %}
+    {% if job['response_data'] is defined %}
+        {% if is_array(job['response_data']) %}
+            {% set job['response_data'] = helper.encode(job['response_data']) %}
+        {% endif %}
         {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data"><strong class="text-uppercase">Data: </strong> ' ~ job['response_data'] ~ '</div><br>' %}
-        {% set jobResult = jobResult ~ '<button class="btn btn-xs btn-info mr-1" id="' ~ componentId ~ '-' ~ sectionId ~ '-format-data" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-magic"></i> FORMAT DATA</button><br><br>' %}
     {% else %}
         {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data"><strong class="text-uppercase">Data: </strong> -</div><br>' %}
     {% endif %}
-    {% if job['calls'] is defined and job['calls']|length > 0 %}
-        {% set jobCallsArr = json_encode(job['calls'], 16) %}
-        {% set rows = '' %}
-        {% for jobCall in job['calls'] %}
-            {% set rows = rows ~ '<tr>' %}
-                {% set columns = '<td>' ~ jobCall['called_at'] ~ '</td><td>' ~ jobCall['call_method'] ~ '</td>' %}
-                {% if jobCall['call_response_code'] != '200' %}
-                    {% set columns = columns ~ '<td><span class="badge badge-danger text-uppercase">' ~ jobCall['call_response_code'] ~ '</span></td>' %}
-                {% else %}
-                    {% set columns = columns ~ '<td><span class="badge badge-success text-uppercase">' ~ jobCall['call_response_code'] ~ '</span></td>' %}
-                {% endif %}
-                {% set columns = columns ~ '<td>' ~ jobCall['call_exec_time'] ~ '</td>' %}
-                {% set rows = rows ~ columns %}
-            {% set rows = rows ~ '</tr>' %}
-            {% if jobCall['call_stats'] is defined and jobCall['call_stats'] !== '' %}
-                {% set rows = rows ~ '<tr>' %}
-                    {% set button = '<br><br><button class="btn btn-xs btn-info mr-1" id="' ~ componentId ~ '-' ~ sectionId ~ '-format-call-stat-' ~ jobCall['id'] ~'" data-id="' ~ jobCall['id'] ~ '" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-magic"></i> FORMAT CALL DATA</button><br>' %}
-                    {% set rows = rows ~  '<td id="' ~ componentId ~ '-' ~ sectionId ~ '-call-stat-' ~ jobCall['id'] ~ '" colspan="4" class="text-wrap text-truncate" style="max-width: 200px;">' ~ jobCall['call_stats'] ~ button ~ '</td>' %}
-                {% set rows = rows ~ '</tr>' %}
-            {% endif %}
-            {% if jobCall['call_error'] is defined and jobCall['call_error'] !== '' %}
-                {% set rows = rows ~ '<tr>' %}
-                    {% set button = '<br><br><button class="btn btn-xs btn-info mr-1" id="' ~ componentId ~ '-' ~ sectionId ~ '-format-call-stat-' ~ jobCall['id'] ~'" data-id="' ~ jobCall['id'] ~ '" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-magic"></i> FORMAT CALL DATA</button><br>' %}
-                    {% set rows = rows ~  '<td id="' ~ componentId ~ '-' ~ sectionId ~ '-call-stat-' ~ jobCall['id'] ~ '" colspan="4" class="text-wrap text-truncate" style="max-width: 200px;">' ~ jobCall['call_error'] ~ button ~ '</td>' %}
-                {% set rows = rows ~ '</tr>' %}
-            {% endif %}
-        {% endfor %}
-        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-calls" class="mb-1"><strong class="text-uppercase">Total # of API Calls <span class="badge badge-success text-uppercase" style="top: -2px;position: relative;">' ~ job['calls']|length ~ '</span></strong></div>
-            <div class="table-responsive p-0" style="height:600px">
-                <table id="' ~ componentId ~ '-' ~ sectionId ~ '-call-details-table" class="table table-head-fixed table-hover table-striped table-sm text-nowrap">
-                    <thead>
-                        <tr>
-                            <th>CALLED AT</th>
-                            <th>METHOD</th>
-                            <th>RESPONSE CODE</th>
-                            <th>EXECUTION TIME</th>
-                        </tr>
-                    </thead>
-                    <tbody>'
-                        ~ rows ~
-                    '</tbody>
-                </table>
-            </div>'
-        %}
-    {% else %}
-        {% set jobCallsArr = json_encode('[]', 64) %}
+    {% if job['email_results'] is defined %}
+        {% if is_array(job['email_results']) %}
+            {% set job['email_results'] = helper.encode(job['email_results']) %}
+        {% endif %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-email"><strong class="text-uppercase">Email Results: </strong> ' ~ job['email_results'] ~ '</div><br>' %}
     {% endif %}
+    {% set jobResult = jobResult ~ '<button class="btn btn-xs btn-info mr-1" id="' ~ componentId ~ '-' ~ sectionId ~ '-format-data" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-wand-magic-sparkles"></i> FORMAT DATA</button><br><br>' %}
     <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
         <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
             <div class="row">
@@ -88,8 +109,11 @@
             </div>
         </fieldset>
     </form>
-    <script>
-/* globals BazHelpers */
+{% endif %}
+{% set jobTask = json_encode(jobTask, 16) %}
+{% set jobJob = json_encode(jobJob, 16) %}
+<script>
+/* globals BazHelpers paginatedPNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -113,15 +137,15 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
     dataCollectionSectionForm =
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
-var jobCallsArr = '{{jobCallsArr}}';
 
-//eslint-disable-next-line
-var jobCalls = jobCallsArr.replaceAll('\"', '"');
-//eslint-disable-next-line
-jobCalls = jobCalls.replaceAll('\\/', '/');
-jobCalls = jobCalls.replaceAll('"{', '{');
-jobCalls = jobCalls.replaceAll('}"', '}');
-jobCalls = JSON.parse(jobCalls);
+if (!dataCollectionSectionForm['vars']) {
+    dataCollectionSectionForm['vars'] = { };
+}
+if (!dataCollectionSectionForm['funcs']) {
+    dataCollectionSectionForm['funcs'] = { };
+}
+dataCollectionSectionForm['vars']['task'] = JSON.parse('{{jobTask}}');
+dataCollectionSectionForm['vars']['job'] = JSON.parse('{{jobJob}}');
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -139,6 +163,7 @@ dataCollectionSection =
                         var data = found[0].replaceAll('\"', '"');
                         //eslint-disable-next-line
                         data = data.replaceAll('\\', '\\\\\\\\');
+
                         var obj = JSON.parse(data);
 
                         if (obj) {
@@ -155,6 +180,7 @@ dataCollectionSection =
                         data = found[0].replaceAll('\"', '"');
                         //eslint-disable-next-line
                         data = data.replaceAll('\\', '\\\\\\\\');
+
                         obj = JSON.parse(data);
 
                         if (obj) {
@@ -171,6 +197,7 @@ dataCollectionSection =
                         data = found[0].replaceAll('\"', '"');
                         //eslint-disable-next-line
                         data = data.replaceAll('\\', '\\\\\\\\');
+
                         obj = JSON.parse(data);
 
                         if (obj) {
@@ -178,32 +205,101 @@ dataCollectionSection =
                         }
                     }
 
+                    html = '{{job["email_results"]}}';
+                    regex = /{.*}/g;
+                    found = html.match(regex);
+
+                    if (found) {
+                        //eslint-disable-next-line
+                        data = found[0].replaceAll('\"', '"');
+                        //eslint-disable-next-line
+                        data = data.replaceAll('\\', '\\\\\\\\');
+
+                        obj = JSON.parse(data);
+
+                        if (obj) {
+                            $('#{{componentId}}-{{sectionId}}-email').html('<strong class="text-uppercase">EMAIL RESULTS: </strong>' + BazHelpers.createHtmlList({'obj': obj}));
+                        }
+                    }
+
                     $(this).attr('hidden', true);
                 });
 
-                if (typeof jobCalls === 'object' && jobCalls !== null) {
-                    for (var call in jobCalls) {
-                        if ($('#{{componentId}}-{{sectionId}}-format-call-stat-' + call)) {
-                            $('#{{componentId}}-{{sectionId}}-format-call-stat-' + call).click(function(e) {
-                                e.preventDefault();
+                $('#{{componentId}}-{{sectionId}}-logs').off();
+                $('#{{componentId}}-{{sectionId}}-logs').click(function(e) {
+                    e.preventDefault();
 
-                                var callId = $(this).data('id');
+                    if (dataCollectionSectionForm['vars']['job']['id']) {
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['job_id'] = dataCollectionSectionForm['vars']['job']['id'];
 
-                                var html;
+                        $.post('{{links.url("system/workers/jobs/getJobLogs")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $("#security-token").attr("name", response.tokenKey);
+                                $("#security-token").val(response.token);
+                            }
 
-                                if (jobCalls[callId]['call_stats']) {
-                                    html = jobCalls[callId]['call_stats'];
-                                } else if (jobCalls[callId]['call_error']) {
-                                    html = jobCalls[callId]['call_error'];
+                            if (response.responseCode === 0) {
+                                if (response.responseData.logs) {
+                                    $('#{{componentId}}-{{sectionId}}-logs-modal .modal-body').empty().html(response.responseData.logs);
+
+                                    $('#{{componentId}}-{{sectionId}}-logs-modal').modal('show');
                                 }
+                            } else if (response.responseCode === 1) {
+                                paginatedPNotify('error', {'text' : response.responseMessage});
+                            }
+                        }, 'json');
 
-                                $('#{{componentId}}-{{sectionId}}-call-stat-' + callId).html(BazHelpers.createHtmlList({'obj': html}));
-
-                                $(this).attr('hidden', true);
-                            });
-                        }
                     }
-                }
+                });
+
+
+                $('#{{componentId}}-{{sectionId}}-terminate').off();
+                $('#{{componentId}}-{{sectionId}}-terminate').click(function(e) {
+                    e.preventDefault();
+
+                    if (dataCollectionSectionForm['vars']['job']['id']) {
+                        Swal.fire({
+                            title                       : '<span class="text-danger"> Terminate job with ID :' + dataCollectionSectionForm['vars']['job']['id'] + '?</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Terminate',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                window.dataCollection.env.sounds.swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                var postData = { };
+                                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                postData['id'] = dataCollectionSectionForm['vars']['job']['id'];
+
+                                $.post('{{links.url("system/workers/jobs/terminate")}}', postData, function(response) {
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
+                                    }
+
+                                    if (response.responseCode === 0) {
+                                        paginatedPNotify('success', {'text' : response.responseMessage});
+                                    } else if (response.responseCode === 1) {
+                                        paginatedPNotify('error', {'text' : response.responseMessage});
+                                    }
+                                }, 'json');
+                            }
+                        });
+                    }
+                });
             }
         },
         '{{componentId}}-{{sectionId}}-form'                    : {
@@ -214,4 +310,3 @@ dataCollectionSection =
         }
     });
 </script>
-{% endif %}

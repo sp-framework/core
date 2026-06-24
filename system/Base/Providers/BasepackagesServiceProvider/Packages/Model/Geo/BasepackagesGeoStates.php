@@ -10,8 +10,6 @@ class BasepackagesGeoStates extends BaseModel
 
     public $name;
 
-    public $state_code;
-
     public $latitude;
 
     public $longitude;

@@ -1,3 +1,4 @@
+{% set taskEmailDisabled = true %}
 {% if task['id'] is defined %}
     {% set taskId = task['id'] %}
     {% set taskName = task['name'] %}
@@ -9,6 +10,7 @@
     {% set taskDescription = task['description'] %}
     {% set taskPriority = task['priority'] %}
     {% set taskSchedule = task['schedule_id'] %}
+    {% set taskJobLogsMode = task['job_log_mode'] %}
     {% set taskScheduleDisabled = false %}
     {% if task['enabled'] == 1 %}
         {% set taskEnableChecked = true %}
@@ -24,6 +26,8 @@
     {% set taskExecType = task['exec_type'] %}
     {% set taskCall = task['cid'] %}
     {% set taskCallArgs = task['call_args'] %}
+    {% set taskEmailServiceId = task['email_service_id'] %}
+    {% set taskEmail = task['email'] %}
 {% else %}
     {% set taskId = '' %}
     {% set taskName = '' %}
@@ -31,12 +35,18 @@
     {% set taskDescription = '' %}
     {% set taskPriority = '' %}
     {% set taskSchedule = '' %}
+    {% set taskJobLogsMode = '' %}
     {% set taskEnableChecked = false %}
     {% set taskEnableDisabled = false %}
     {% set taskScheduleDisabled = false %}
     {% set taskExecType = 'call' %}
     {% set taskCall = '' %}
     {% set taskCallArgs = '' %}
+    {% set taskEmailServiceId = '' %}
+    {% set taskEmail = '' %}
+{% endif %}
+{% if taskEmail != 0 or taskEmail != '' %}
+    {% set taskEmailDisabled = false %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -178,6 +188,30 @@
                         'fieldDataSelect2OptionsValue'          : 'name',
                         'fieldDataSelect2OptionsArray'          : true,
                         'fieldDataSelect2OptionsSelected'       : taskSchedule
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'job_log_mode',
+                        'fieldLabel'                            : 'Job Log Mode',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : "Select how job is logged. Per run - logs every time task is executed. Per hour, logs all task run happened in the hour in one job. Per day, logs all task run happened in the day in one job.",
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : jobLogsModes,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : taskJobLogsMode
                     ]
                 )}}
             </div>
@@ -325,6 +359,53 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'email_service_id',
+                        'fieldLabel'                            : 'Use Email Service',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : "Email service that will be used to send result email to users.",
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : emailservices,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : taskEmailServiceId
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'email',
+                        'fieldLabel'                            : 'Email Task Result',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Email task result to email addresses. Comma separated for multiple addresses.',
+                        'fieldDisabled'                         : taskEmailDisabled,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 2048,
+                        'fieldValue'                            : taskEmail
+                    ]
+                )}}
+            </div>
+        </div>
     </fieldset>
 </form>
 <script>
@@ -380,9 +461,25 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-description'             : { },
         '{{componentId}}-{{sectionId}}-exec_type'               : { },
         '{{componentId}}-{{sectionId}}-call_args'               : { },
+        '{{componentId}}-{{sectionId}}-email_service_id'        : {
+            placeholder: "SELECT EMAIL SERVICE",
+            allowClear: true,
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-email_service_id').on('select2:select', function(e) {
+                    $('#{{componentId}}-{{sectionId}}-email').attr('disabled', false);
+                });
+                $('#{{componentId}}-{{sectionId}}-email_service_id').on('select2:clear', function(e) {
+                    $('#{{componentId}}-{{sectionId}}-email').attr('disabled', true);
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-email'                   : { },
         '{{componentId}}-{{sectionId}}-priority'                : { },
         '{{componentId}}-{{sectionId}}-schedule_id'             : {
             placeholder : "SELECT SCHEDULE"
+        },
+        '{{componentId}}-{{sectionId}}-job_log_mode'            : {
+            placeholder : "SELECT JOB LOG MODE"
         },
         '{{componentId}}-{{sectionId}}-cid'                     : {
             placeholder : "SELECT FUNCTION TO CALL",

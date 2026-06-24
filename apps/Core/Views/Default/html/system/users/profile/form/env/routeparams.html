@@ -1,0 +1,26 @@
+{% set rows = '' %}
+{% if accountEnv is defined and accountEnv|length > 0 %}
+    {% for route, param in accountEnv %}
+        {% set rows = rows ~ '<tr data-route="' ~ route ~ '">' %}
+        {% set rows = rows ~ '<td>' ~ route ~ '</td>' %}
+        {% set rows = rows ~ '<td><button class="btn btn-xs btn-danger mr-1 clearParamRow" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-trash"></i></button></td>' %}
+        {% set rows = rows ~ '</tr>' %}
+    {% endfor %}
+{% endif %}
+<div id="{{componentId}}-{{sectionId}}-params" class="row mb-1">
+    <div class="col">
+        <button class="btn btn-xs btn-danger float-right routes" id="{{componentId}}-{{sectionId}}-clear-all-routes" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-trash"></i> CLEAR ALL ROUTES</button>
+    </div>
+</div>
+<br>
+<div class="table-responsive p-0" style="max-height:450px">
+    <table id="{{componentId}}-{{sectionId}}-params-details-table" class="table table-head-fixed table-hover table-striped table-sm text-nowrap">
+        <thead>
+            <tr>
+                <th>ROUTE</th>
+                <th>ACTION</th>
+            </tr>
+        </thead>
+        <tbody>{{rows}}</tbody>
+    </table>
+</div>

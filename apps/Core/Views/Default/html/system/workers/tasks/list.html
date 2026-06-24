@@ -23,7 +23,32 @@
                 'buttonType'            : 'button',
                 'buttons'               :
                     {
-                        'add-business' : {
+                        'jobs' : {
+                            'title'                   : 'Jobs',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/jobs')
+                        },
+                        'schedules' : {
+                            'title'                   : 'Schedules',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/schedules')
+                        }
+                    }
+            },
+        'dtSecondaryButtons'    :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'add-task' : {
                             'title'                   : 'Add New Task',
                             'size'                    : 'sm',
                             'type'                    : 'primary',

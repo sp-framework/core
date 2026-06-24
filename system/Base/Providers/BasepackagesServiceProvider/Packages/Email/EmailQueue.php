@@ -32,10 +32,22 @@ class EmailQueue extends BasePackage
         return $this;
     }
 
-    public function addToQueue(array $data)
+    public function addQueue(array $data)
     {
         if (isset($data['confidential']) && $data['confidential'] == 1) {
             $data = $this->encryptBody($data);
+        }
+
+        $queueEmailSettings = $this->basepackages->email->getEmailSettings();
+
+        if (!isset($data['from'])) {
+            $data['from'] = $queueEmailSettings['from_address'];
+
+            if (isset($queueEmailSettings['from_name']) && $queueEmailSettings['from_name'] !== '') {
+                $data['from'] = $data['from'] . '|' . $queueEmailSettings['from_name'];
+            } else {
+                $data['from'] = $queueEmailSettings['from_address'] . '|' . $queueEmailSettings['from_name'];
+            }
         }
 
         if ($this->add($data)){
@@ -62,6 +74,29 @@ class EmailQueue extends BasePackage
         }
     }
 
+
+    public function updateQueue(array $data)
+    {
+        $email = $this->getById($data['id']);
+
+        if (!$email) {
+            $this->addResponse('Email with ID not found', 1);
+
+            return false;
+        }
+
+        $email['status'] = $data['status'];
+        $email['priority'] = $data['priority'];
+
+        if ($this->update($email)) {
+            $this->addResponse('Updated');
+
+            return;
+        }
+
+        $this->addResponse('Error removing email.', 1);
+    }
+
     public function getLock()
     {
         return $this->queueLock;
@@ -69,11 +104,19 @@ class EmailQueue extends BasePackage
 
     public function processQueue($processPriority = 0, $confidential = false, $id = null)
     {
+        $emailServices = $this->basepackages->emailservices->getAll()->emailServices;
+
+        if (count($emailServices) === 0) {
+            $this->addResponse('No email service available!', 1);
+
+            return;
+        }
         if ($this->queueLock === true && $processPriority === $this->priorityToProcess) {
             $this->addResponse('Another process is clearing the queue, please wait...', 1);
 
             return;
         }
+
         if ($processPriority != 0) {
             $this->priorityToProcess = (int) $processPriority;
         } else {
@@ -138,22 +181,97 @@ class EmailQueue extends BasePackage
                 } else {
                     $queueEmailSettings = $this->basepackages->email->getEmailSettings();
 
-                    $this->basepackages->email->setSender($queueEmailSettings['from_address'], $queueEmailSettings['from_address']);
+                    //Set Sender
+                    if (isset($queueEmail['from']) && $queueEmail['from'] !== '') {
+                        $queueEmail['from'] = str_replace(' ', '', $queueEmail['from']);//Trim
+                        $fromAddressArr = explode('|', $queueEmail['from']);
 
+                        if (count($fromAddressArr) === 2) {
+                            if ($fromAddressArr[0] !== '' && $fromAddressArr[1] !== '') {
+                                $this->basepackages->email->setSender($fromAddressArr[0], $fromAddressArr[1]);
+                            }
+                        } else if (count($fromAddressArr) === 1) {
+                            if ($fromAddressArr[0] !== '') {
+                                $this->basepackages->email->setSender($fromAddressArr[0], $fromAddressArr[0]);
+                            }
+                        }
+                    } else {
+                        $fromAddress = $queueEmailSettings['from_address'];
+
+                        if (!isset($queueEmailSettings['from_name']) || (isset($queueEmailSettings['from_name']) && $queueEmailSettings['from_name'] === '')) {
+                            $fromName = $queueEmailSettings['from_name'] = $queueEmailSettings['from_address'];
+                        } else {
+                            $fromName = $queueEmailSettings['from_name'];
+                        }
+
+                        $this->basepackages->email->setSender($fromAddress, $fromName);
+                    }
+
+                    //Set To
                     if (is_string($queueEmail['to_addresses'])) {
                         $queueEmail['to_addresses'] = $this->helper->decode($queueEmail['to_addresses'], true);
                     }
-                    if (count($queueEmail['to_addresses']) > 1) {
-                        foreach ($queueEmail['to_addresses'] as $key => $toAddress) {
-                            $this->basepackages->email->setRecipientTo($toAddress, $toAddress);
-                        }
-                    } else {
-                        $this->basepackages->email->setRecipientTo($this->helper->first($queueEmail['to_addresses']), $this->helper->first($queueEmail['to_addresses']));
-                    }
-                    $queueEmail['to_addresses'] = $this->helper->encode($queueEmail['to_addresses']);
+                    foreach ($queueEmail['to_addresses'] as $toAddress) {
+                        $toAddress = str_replace(' ', '', $toAddress);//Trim
+                        $toAddressArr = explode('|', $toAddress);
 
+                        if (count($toAddressArr) === 2) {
+                            if ($toAddressArr[0] !== '' && $toAddressArr[1] !== '') {
+                                $this->basepackages->email->setRecipientTo($toAddressArr[0], $toAddressArr[1]);
+                            }
+                        } else if (count($toAddressArr) === 1) {
+                            if ($toAddressArr[0] !== '') {
+                                $this->basepackages->email->setRecipientTo($toAddressArr[0], $toAddressArr[0]);
+                            }
+                        }
+                    }
+
+                    //Set CC
+                    if (isset($queueEmail['cc_addresses'])) {
+                        if (is_string($queueEmail['cc_addresses'])) {
+                            $queueEmail['cc_addresses'] = $this->helper->decode($queueEmail['cc_addresses'], true);
+                        }
+                        foreach ($queueEmail['cc_addresses'] as $ccAddress) {
+                            $ccAddress = str_replace(' ', '', $ccAddress);//Trim
+                            $ccAddressArr = explode('|', $ccAddress);
+
+                            if (count($ccAddressArr) === 2) {
+                                if ($ccAddressArr[0] !== '' && $ccAddressArr[1] !== '') {
+                                    $this->basepackages->email->setRecipientCc($ccAddressArr[0], $ccAddressArr[1]);
+                                }
+                            } else if (count($ccAddressArr) === 1) {
+                                if ($ccAddressArr[0] !== '') {
+                                    $this->basepackages->email->setRecipientCc($ccAddressArr[0], $ccAddressArr[0]);
+                                }
+                            }
+                        }
+                    }
+
+                    //Set BCC
+                    if (isset($queueEmail['bcc_addresses'])) {
+                        if (is_string($queueEmail['bcc_addresses'])) {
+                            $queueEmail['bcc_addresses'] = $this->helper->decode($queueEmail['bcc_addresses'], true);
+                        }
+                        foreach ($queueEmail['bcc_addresses'] as $bccAddress) {
+                            $bccAddress = str_replace(' ', '', $bccAddress);//Trim
+                            $bccAddressArr = explode('|', $bccAddress);
+
+                            if (count($bccAddressArr) === 2) {
+                                if ($bccAddressArr[0] !== '' && $bccAddressArr[1] !== '') {
+                                    $this->basepackages->email->setRecipientBcc($bccAddressArr[0], $bccAddressArr[1]);
+                                }
+                            } else if (count($bccAddressArr) === 1) {
+                                if ($bccAddressArr[0] !== '') {
+                                    $this->basepackages->email->setRecipientBcc($bccAddressArr[0], $bccAddressArr[0]);
+                                }
+                            }
+                        }
+                    }
+
+                    //Set Subject
                     $this->basepackages->email->setSubject($queueEmail['subject']);
 
+                    //Set encryption
                     if (isset($queueEmail['confidential']) && $queueEmail['confidential'] == 1) {
                         $queueEmail = $this->decryptBody($queueEmail);
                         $this->basepackages->email->setBody($queueEmail['body']);
@@ -162,17 +280,38 @@ class EmailQueue extends BasePackage
                         $this->basepackages->email->setBody($queueEmail['body']);
                     }
 
+                    //Set Attachments
+                    if (isset($queueEmail['attachments']) && is_array($queueEmail['attachments']) && count($queueEmail['attachments']) > 0) {
+                        foreach ($queueEmail['attachments'] as $attachment) {
+                            $file = $this->basepackages->storages->getFileInfo($attachment);
+
+                            if ($file) {
+                                $path = $this->basepackages->storages->getAbsolutePath($file);
+
+                                if ($path) {
+                                    $this->basepackages->email->addAttachments($path, $file['org_file_name']);
+                                }
+                            }
+                        }
+                    }
+
+                    //Set Logs
                     $logs = $this->basepackages->email->sendNewEmail();
 
                     if ($logs === true) {
                         $queueEmail['status'] = self::STATUS_SENT;
-                        $queueEmail['logs'] = 'Sent';
+                        $queueEmail['logs'] = 'Sent successfully!';
                         $queueEmail['sent_on'] = date("F j, Y, g:i a");
 
-                        array_push($queueProcessedIds, $queueEmail['id']);
+                    } else {
+                        $queueEmail['status'] = self::STATUS_ERROR;
 
-                        $this->update($queueEmail);
+                        $queueEmail['logs'] = $logs;
                     }
+
+                    array_push($queueProcessedIds, $queueEmail['id']);
+
+                    $this->update($queueEmail);
                 }
             }
         }
@@ -188,7 +327,7 @@ class EmailQueue extends BasePackage
         $this->addResponse('Queue processed successfully.', 0, ['queueProcessedIds' => $queueProcessedIds]);
     }
 
-    public function requeue(array $data)
+    public function reQueue(array $data)
     {
         $email = $this->getById($data['id']);
 
@@ -207,17 +346,7 @@ class EmailQueue extends BasePackage
             return;
         }
 
-        $this->addResponse('Error re-queuing message');
-    }
-
-    public function removeFromQueue(array $data)
-    {
-        //
-    }
-
-    public function changePriority(array $data)
-    {
-        //
+        $this->addResponse('Error re-queuing message', 1);
     }
 
     protected function decryptBody(array $data)

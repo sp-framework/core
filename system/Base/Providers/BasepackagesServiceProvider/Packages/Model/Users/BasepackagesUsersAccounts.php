@@ -5,9 +5,10 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users
 use System\Base\BaseModel;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiUsers;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesContactBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsEnv;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSecurity;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
@@ -29,7 +30,7 @@ class BasepackagesUsersAccounts extends BaseModel
 
     public $domain;
 
-    public $profile_package_name;
+    public $profile_package_class;
 
     public $profile_package_row_id;
 
@@ -107,15 +108,15 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        $this->modelRelations['address']['relationObj'] = $this->hasOneThrough(
+        $this->modelRelations['contact']['relationObj'] = $this->hasOneThrough(
             'id',
             BasepackagesUsersProfiles::class,
             'account_id',
             'id',
-            BasepackagesAddressBook::class,
+            BasepackagesContactBook::class,
             'package_row_id',
             [
-                'alias'         => 'address'
+                'alias'         => 'contact'
             ]
         );
 
@@ -147,6 +148,15 @@ class BasepackagesUsersAccounts extends BaseModel
             'id',
             [
                 'alias'         => 'role'
+            ]
+        );
+
+        $this->modelRelations['env']['relationObj'] = $this->hasOne(
+            'id',
+            BasepackagesUsersAccountsEnv::class,
+            'account_id',
+            [
+                'alias'         => 'env'
             ]
         );
 

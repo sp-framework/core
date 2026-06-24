@@ -28,8 +28,10 @@ class BasepackagesApiClientServicesApisReposGitea extends BaseModel
 
     public $sync;
 
-    public function onConstruct()
+    public function init($app = null)
     {
-        $this->setSource('basepackages_api_client_services_apis_repos');
+        $this->setTableSource('basepackages_api_client_services_apis_repos');
+
+        return $this;
     }
 }

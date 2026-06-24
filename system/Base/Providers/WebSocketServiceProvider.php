@@ -15,7 +15,8 @@ class WebSocketServiceProvider implements ServiceProviderInterface
             function () use ($container) {
                 $config = $container->getShared('config');
                 $helper = $container->getShared('helper');
-                return (new Wss($config, $helper))->init();
+                $logger = $container->getShared('logger');
+                return (new Wss($config, $helper, $logger))->init();
             }
         );
     }

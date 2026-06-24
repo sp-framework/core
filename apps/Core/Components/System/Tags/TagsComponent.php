@@ -27,11 +27,17 @@ class TagsComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $tag = $this->basepackages->tags->getById((int) $this->getData()['id']);
 
-                $this->view->tag = $tag;
-
-                if (!$this->view->tag) {
+                if (!$tag) {
                     return $this->throwIdNotFound();
                 }
+
+                $package = $this->modules->packages->getPackageByClass(str_replace('_', '\\', $tag['package_class']));
+
+                if ($package) {
+                    $tag['package_class'] = $package['name'];
+                }
+
+                $this->view->tag = $tag;
             }
 
             $this->view->pick('tags/view');
@@ -55,6 +61,12 @@ class TagsComponent extends BaseComponent
                 function ($dataArr) {
                     if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
                         foreach ($dataArr as &$data) {
+                            $package = $this->modules->packages->getPackageByClass(str_replace('_', '\\', $data['package_class']));
+
+                            if ($package) {
+                                $data['package_class'] = $package['display_name'];
+                            }
+
                             $data['package_row_ids'] = count($data['package_row_ids']);
                             $data['name'] = '<span class="badge text-sm" style="background-color: ' . $data['swatch'] . '">' . $data['name'] . '</span>';
                         }
@@ -70,8 +82,8 @@ class TagsComponent extends BaseComponent
             package : $this->tags,
             postUrl : 'system/tags/view',
             postUrlParams : null,
-            columnsForTable : ['name', 'package_name', 'swatch', 'package_row_ids'],
-            columnsForFilter : ['name', 'package_name', 'swatch'],
+            columnsForTable : ['name', 'package_class', 'swatch', 'package_row_ids'],
+            columnsForFilter : ['name', 'package_class', 'swatch'],
             controlActions : $controlActions,
             dtReplaceColumnsTitle : ['package_row_ids' => '# of times used'],
             dtReplaceColumns :$replaceColumns,

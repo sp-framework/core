@@ -1,7 +1,9 @@
 {% if state['id'] is defined %}
     {% set title = 'State (' ~ state['name'] ~ ')' %}
+    {% set stateId = state['id'] %}
 {% else %}
     {% set title = 'New State' %}
+    {% set stateId = '' %}
 {% endif %}
 
 {{adminltetags.useTag('content',
@@ -21,6 +23,10 @@
         'cardBodyInclude'               : 'states/form',
         'formButtons'                   :
         [
+            'updateButtonId'                : stateId,
+            'updateActionUrl'               : 'system/geo/states/update',
+            'updateSuccessRedirectUrl'      : 'system/geo/states',
+            'cancelActionUrl'               : 'system/geo/states',
             'closeActionUrl'                : 'system/geo/states'
         ]
     ]

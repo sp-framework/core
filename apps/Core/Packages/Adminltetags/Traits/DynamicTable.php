@@ -22,7 +22,8 @@ trait DynamicTable {
         $resetCache = false,
         $enableCache = true,
         $packageData = [],
-        $excludeColumns = []
+        $excludeColumns = [],
+        $quickFilterConditions = null//Quick conditions function if needed to modify the conditions received
     ) {
         if (gettype($package) === 'string') {
             $package = $this->usePackage($package);
@@ -145,6 +146,12 @@ trait DynamicTable {
 
             if ($postUrlParams) {
                 $conditions = array_replace($conditions, $postUrlParams);
+            }
+
+            if (isset($this->postData()['quick_filter']) && isset($this->postData()['conditions']) && $quickFilterConditions && is_callable($quickFilterConditions)) {
+                $conditions['conditions'] = $quickFilterConditions();
+            } else if (isset($this->postData()['quick_filter']) && isset($this->postData()['conditions'])) {
+                $conditions['conditions'] = $this->postData()['conditions'];
             }
 
             try {

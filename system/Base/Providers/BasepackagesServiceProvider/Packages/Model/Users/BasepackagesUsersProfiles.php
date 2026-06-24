@@ -4,7 +4,9 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users
 
 use System\Base\BaseModel;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesContactBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
 
 class BasepackagesUsersProfiles extends BaseModel
 {
@@ -14,37 +16,9 @@ class BasepackagesUsersProfiles extends BaseModel
 
     public $account_id;
 
-    public $portrait;
+    public $locale_country_iso3;
 
-    public $initials_avatar;
-
-    public $first_name;
-
-    public $last_name;
-
-    public $full_name;
-
-    public $contact_address_id;
-
-    public $contact_phone;
-
-    public $contact_phone_ext;
-
-    public $contact_mobile;
-
-    public $contact_fax;
-
-    public $secondary_email;
-
-    public $cc_emails_to_secondary_email;
-
-    public $contact_other;
-
-    public $contact_notes;
-
-    public $locale_country_id;
-
-    public $locale_timezone_id;
+    public $locale_timezone;
 
     public $settings;
 
@@ -59,16 +33,31 @@ class BasepackagesUsersProfiles extends BaseModel
             ]
         );
 
-        $this->modelRelations['address']['relationObj'] = $this->hasOne(
+        $this->modelRelations['contact']['relationObj'] = $this->hasOne(
+            'id',
+            BasepackagesContactBook::class,
+            'package_row_id',
+            [
+                'alias'                 => 'contact',
+                'params'                => [
+                    'conditions'        => 'package_class = :package_class:',
+                    'bind'              => [
+                        'package_class'  => str_replace('\\', '_', Profiles::class)
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['addresses']['relationObj'] = $this->hasMany(
             'id',
             BasepackagesAddressBook::class,
             'package_row_id',
             [
-                'alias'                 => 'address',
+                'alias'                 => 'addresses',
                 'params'                => [
-                    'conditions'        => 'package_name = :package_name:',
+                    'conditions'        => 'package_class = :package_class:',
                     'bind'              => [
-                        'package_name'  => 'UsersProfiles'
+                        'package_class'  => str_replace('\\', '_', Profiles::class)
                     ]
                 ]
             ]

@@ -3706,7 +3706,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
     }
 });
 
-/* globals define exports BazContentFieldsValidator BazContentFields paginatedPNotify Pace BazCore BazContentLoader */
+/* globals define exports BazContentFieldsValidator BazContentFields paginatedPNotify Pace BazCore BazContentLoader Swal */
 /*
 * @title                    : BazContentSectionWithForm
 * @description              : Baz Lib for Content (Sections With Form)
@@ -3802,8 +3802,9 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                         'componentId'   : componentId,
                         'sectionId'     : sectionId
                     });
-                    this._initSectionButtonsAndActions();
                 }
+
+                this._initSectionButtonsAndActions();
 
                 if ($('.btn-tool-reset-cache').length === 1) {
                     if (dataCollection.env.currentId == '0') {
@@ -3821,6 +3822,61 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
 
                         BazCore.bazContent();
                     }
+                }
+
+                if ($('.btn-tool-unlock').length === 1) {
+                    $('.btn-tool-unlock').off();
+                    $('.btn-tool-unlock').click(function(e) {
+                        e.preventDefault();
+
+                        var thisButton = this;
+                        var swalSound = window.dataCollection.env.sounds.swalSound;
+
+                        Swal.fire({
+                            title                       : '<span class="text-warning"> Force remove lock?</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            cancelButtonText            : 'No',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-warning text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                //Release and delete mutex entry from env
+                                var postData = { };
+                                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                postData['mutexLock'] = window['dataCollection']['env']['mutexLock'];
+                                postData['forceRelease'] = true;
+
+                                var url = window['dataCollection']['env']['rootPath'] + window['dataCollection']['env']['currentRoute'] + '/releaseMutex';
+
+                                $.post(url, postData, function(response) {
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
+                                    }
+
+                                    if (response.responseCode == '0') {
+                                        $(thisButton).parents('.card-header').removeClass('bg-warning').addClass('bg-primary');
+                                        $(thisButton).siblings().children().removeClass('text-primary').addClass('text-white');
+                                        $(thisButton).remove();
+                                        delete(window['dataCollection']['env']['mutexLock']);
+                                    }
+                                }, 'json');
+                            }
+                        });
+                    });
                 }
             };
 
@@ -3858,6 +3914,80 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                 BazContentFieldsValidator.cancelValidatingForm(validationObject);//cancel any form validation as jstree has changed
             }
 
+            _proto._processSubTrees = function _processSubTrees(parentTab, hasParent = false) {
+                var tabId = $(parentTab).attr('href').replace('#', '');
+                tabIds.push(tabId);
+                var tabName = $(parentTab).html().toUpperCase();
+
+                types[tabId] = {"icon" : "fas fa-fw fa-chevron-right"};
+
+                if ($($('#' + tabId + ' .card-header')[0]).find('li a').length > 0) {
+                    if (hasParent) {
+                        $(formJsTreeSelector).
+                            find('[data-tabid="' + hasParent + '"]').
+                            append(
+                                '<ul>' +
+                                '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                                '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                                '</li>' +
+                                '</ul>'
+                            );
+                    } else {
+                        $(formJsTreeSelector).
+                            find('ul').
+                            first().
+                            append(
+                                '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                                '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                                '</li>'
+                            );
+                    }
+
+                    $($('#' + tabId + ' .card-header')[0]).find('li a').each(function() {
+                        that._processSubTrees(this, tabId);
+                    });
+                } else {
+                    if (hasParent) {
+                        $(formJsTreeSelector).
+                            find('[data-tabid="' + hasParent + '"]').
+                            append(
+                                '<ul>' +
+                                '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                                '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                                '</li>' +
+                                '</ul>'
+                            );
+                    } else {
+                        $(formJsTreeSelector).
+                            find('ul').
+                            first().
+                            append(
+                                '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                                '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                                '</li>'
+                            );
+
+                        return;
+                    }
+
+                    that._populateTree(tabId);
+                }
+            }
+
+            _proto._populateTree = function _populateTree(tabId) {
+                $('#' + tabId).find("[jstree-search]").each(function() {
+                    if ($(this).attr('jstree-search') !== '') {
+                        $('[data-tabid="' + tabId + '-ul"]').append(
+                            '<li data-tabid="' + tabId +
+                                '" data-jstreeid="' + $(this)[0].id +
+                                '" data-jstree=' + '{"type":' + '"item"}>' +
+                                $(this).attr('jstree-search') +
+                            '</li>'
+                        );
+                    }
+                });
+            }
+
             _proto._buildFormJsTree = function _buildFormJsTree() {
                 formJsTreeSelector = $('#' + sectionId + '-form-fields');
 
@@ -3870,49 +4000,11 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                 types.item = {"icon" : "fas fa-fw fa-angle-right"};
 
                 // Grab Fields from Tabs Note: attr "jstree-search" is used to populate tree
-                $('#' + sectionId + '-form .nav-tabs li a').each(function() {
-                    if ($(this).data('jstree') == false) {
-                        return;
-                    }
-
-                    var tabId = $(this).attr('href').replace('#', '');
-                    tabIds.push(tabId);
-                    var tabName = $(this).html().toUpperCase();
-
-                    types[tabId] = {"icon" : "fas fa-fw fa-chevron-right"};
-
-                    $(formJsTreeSelector).
-                        find('ul').
-                        first().
-                        append(
-                            '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
-                            '<ul data-tabid="' + tabId + '-ul"></ul>' +
-                            '</li>'
-                        );
-
-                    // $('#' + sectionId + '-form-fields li:contains("' + tabName + '")').first().append('<ul></ul>');
-
-                    $('#' + tabId).find("[jstree-search]").each(function() {
-                        var fieldId = this.id.replace('-jstreesearch', '');
-
-                        if ($(this).attr('jstree-search') !== '') {
-                            if (!$('#' + fieldId).parents('.form-group').hasClass('d-none') &&
-                                $('#' + fieldId).attr('disabled') !== 'disabled'
-                            ) {
-                                    // $('#' + sectionId + '-form-fields li:contains("' + tabName + '")').
-                                    // find('ul').
-                                    // first().
-                                    $('[data-tabid="' + tabId + '-ul"]').append(
-                                        '<li data-tabid="' + tabId +
-                                            '" data-jstreeid="' + $(this)[0].id +
-                                            '" data-jstree=' + '{"type":' + '"item"}>' +
-                                            $(this).attr('jstree-search') +
-                                        '</li>'
-                                );
-                            }
-                        }
+                if ($('#' + sectionId + '-tabs-tabLinks li a').length > 0) {
+                    $('#' + sectionId + '-tabs-tabLinks li a').each(function() {
+                        that._processSubTrees(this);
                     });
-                });
+                }
 
                 dataCollection[componentId][sectionId][sectionId + '-form-fields'] =
                     $.extend(dataCollection[componentId][sectionId][sectionId + '-form-fields'], {
@@ -3942,28 +4034,33 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                 // Init jstree selection process
                 $(formJsTreeSelector).on('select_node.jstree', function() {
                     var selfId = $(this).jstree('get_selected',true)[0];
-                    // if (selfId.parent === '#') {
-                        $(formJsTreeSelector).jstree('open_node', selfId);
-                    // } else {
-                        $(tabIds).each(function(index,tabId) {
-                            var tab = $('#' + sectionId + '-form').find('[href="#' + tabId + '"]');
 
-                            $(tab).removeClass('active');
-                            $(tab).attr('area-selected', false);
-                            $('#' + tabId).removeClass('active show');
-                        })
+                    $(formJsTreeSelector).jstree('open_node', selfId);
 
-                        var activateTab = $('#' + sectionId + '-form').find('[href="#' + selfId.data.tabid + '"]');
-                        $(activateTab).addClass('active');
-                        $(activateTab).attr('area-selected', true);
+                    $(tabIds).each(function(index,tabId) {
+                        var tab = $('#' + sectionId + '-form').find('[href="#' + tabId + '"]');
 
-                        $('#' + selfId.data.tabid).addClass('active show');
+                        $(tab).removeClass('active');
+                        $(tab).attr('aria-selected', false);
+                        $('#' + tabId).removeClass('active show');
+                    })
 
-                        $('#' + selfId.data.jstreeid).parent().addClass('bg-info disabled animated fadeIn');
-                        setTimeout(function() {
-                            $('#' + selfId.data.jstreeid).parent().removeClass('bg-info disabled animated fadeIn');
-                        }, 2000);
-                    // }
+                    var activateTab = $('#' + sectionId + '-form').find('[href="#' + selfId.data.tabid + '"]');
+
+                    $(activateTab).parents('.tab-pane').each(function() {
+                        $(this).addClass('active show');
+                        $('#' + sectionId + '-form').find('[href="#' + $(this)[0].id + '"]').addClass('active');
+                    });
+
+                    $(activateTab).addClass('active');
+                    $(activateTab).attr('aria-selected', true);
+
+                    $('#' + selfId.data.tabid).addClass('active show');
+
+                    $('#' + selfId.data.jstreeid).parent().addClass('bg-info disabled animated fadeIn');
+                    setTimeout(function() {
+                        $('#' + selfId.data.jstreeid).parent().removeClass('bg-info disabled animated fadeIn');
+                    }, 2000);
                 });
             }
 
@@ -4024,17 +4121,17 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                         //         }
                         //     });
                         // } else {
-                            var sectionToObj = that._sectionToObj();
+                            that._sectionToObj();
 
                             if (dataCollection[componentId][sectionId][sectionId + '-form']['onSubmit']) {
                                 if (dataCollection[componentId][sectionId][sectionId + '-form']['onSubmit']()) {
-                                    that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(sectionToObj));
+                                    that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(dataCollection[componentId][sectionId]['dataToSubmit']));
                                 } else {
                                     $(mainButton).attr('disabled', false);
                                     $(mainButton).children('i').attr('hidden', true);
                                 }
                             } else {
-                                that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(sectionToObj));
+                                that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(dataCollection[componentId][sectionId]['dataToSubmit']));
                             }
 
                         // }
@@ -4093,6 +4190,10 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                             }
                                             if ($(thisButtonId).is('.updateData')) {
                                                 $('body').trigger('sectionWithFormDataUpdated');
+                                                //Delete mutex entry from env
+                                                if (window['dataCollection']['env']['mutexLock'] && window['dataCollection']['env']['mutexLock']['self']) {
+                                                    delete(window['dataCollection']['env']['mutexLock']);
+                                                }
                                             }
                                             if (dataCollection[componentId] && dataCollection[componentId][sectionId][sectionId + '-form']['onSuccessResponse']) {
                                                 dataCollection[componentId] && dataCollection[componentId][sectionId][sectionId + '-form']['onSuccessResponse'](response);
@@ -4118,7 +4219,6 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
             }
 
             _proto._sectionToObj = function _sectionToObj() {
-
                 if (!dataCollection[componentId][sectionId]['data']) {
                     dataCollection[componentId][sectionId]['data'] = { };
                 }
@@ -4321,16 +4421,13 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                 dataCollection[componentId][sectionId]['BazContentSectionWithForm'] = $(this).data(DATA_KEY);
                 options = $.extend({}, Default, options);
 
-                if (!dataCollection[componentId][sectionId]['BazContentSectionWithForm']) {
-                    dataCollection[componentId][sectionId]['BazContentSectionWithForm'] = new BazContentSectionWithForm($(this), options);
-                    $(this).data(DATA_KEY, typeof options === 'string' ? 'options need to be an object and not string' : options);
-                    dataCollection[componentId][sectionId]['BazContentSectionWithForm']._init(options);
-                } else {
+                if (dataCollection[componentId][sectionId]['BazContentSectionWithForm']) {
                     delete dataCollection[componentId][sectionId]['BazContentSectionWithForm'];
-                    dataCollection[componentId][sectionId]['BazContentSectionWithForm'] = new BazContentSectionWithForm($(this), options);
-                    $(this).data(DATA_KEY, typeof options === 'string' ? 'options need to be an object and not string' : options);
-                    dataCollection[componentId][sectionId]['BazContentSectionWithForm']._init(options);
                 }
+
+                dataCollection[componentId][sectionId]['BazContentSectionWithForm'] = new BazContentSectionWithForm($(this), options);
+                $(this).data(DATA_KEY, typeof options === 'string' ? 'options need to be an object and not string' : options);
+                dataCollection[componentId][sectionId]['BazContentSectionWithForm']._init(options);
             };
 
         return BazContentSectionWithForm;
@@ -5621,7 +5718,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
             that,
             thisOptions,
             datatableOptions,
-            swalSound;
+            swalSound,
+            selectedId;
         var listColumns = { };
         var filter, query;
 
@@ -5641,7 +5739,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
             _proto._init = function _init(options) {
                 componentId = $(this._element).parents('.component')[0].id;
                 sectionId = $(this._element)[0].id;
-                query = '';
+                query = { };
 
                 dataCollection = window['dataCollection'];
                 // pnotifySound = dataCollection.env.sounds.pnotifySound
@@ -5699,13 +5797,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         $('#' + sectionId + '-filter-alert').remove();
                     }
 
-
                     if (thisOptions.listOptions.postParams.order) {
-                        query = { };
-                        query['conditions'] = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
+                        query['filter'] = $('#' + sectionId + '-filter-filters option:selected').data('value');
                         query['order'] = thisOptions.listOptions.postParams.order;
                     } else {
-                        query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
+                        query['filter'] = $('#' + sectionId + '-filter-filters option:selected').data('value');
                     }
 
                     that._filterRunAjax(
@@ -5837,24 +5933,36 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     resetFilters();
                 });
-                function resetFilters() {
-                    query = '';
-                    var defaultFilter = null;
+                function resetFilters(quick = false) {
+                    query = { };
 
-                    $('#' + sectionId + '-filter-filters').children().each(function(index, filter) {
-                        if ($(filter).data()['account_id'] != 0 &&
-                            $(filter).data()['is_default'] == 1
-                        ) {
-                            query = $(filter).data()['conditions'];
-                            defaultFilter = filter;
-                            return false;
-                        } else if ($(filter).data()['account_id'] == 0 &&
-                                   $(filter).data()['is_default'] == 1
-                        ) {
-                            query = $(filter).data()['conditions'];
-                            defaultFilter = filter;
+                    if (quick) {
+                        query['filter'] = $('#' + sectionId + '-filter-filters').find('[data-value="' + $('#' + sectionId + '-filter-filters').val() + '"]').data('value');
+                    } else {
+                        var defaultFilter = null;
+
+                        $('#' + sectionId + '-filter-filters').children().each(function(index, filter) {
+                            if ($(filter).data()['account_id'] != 0 &&
+                                $(filter).data()['is_default'] == 1
+                            ) {
+                                query['filter'] = $(filter).data('value');
+                                defaultFilter = filter;
+                                return false;
+                            } else if ($(filter).data()['account_id'] == 0 &&
+                                       $(filter).data()['is_default'] == 1
+                            ) {
+                                query['filter'] = $(filter).data('value');
+                                defaultFilter = filter;
+                            }
+                        });
+                        toggleFilterButtons(sectionId + '-filter');
+
+                        if (defaultFilter) {
+                            $('#' + sectionId + '-filter-filters').val($(defaultFilter).val());
+                            $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
+                            $('#' + sectionId + '-delete').addClass('disabled');
                         }
-                    });
+                    }
 
                     that._filterRunAjax(
                         1,
@@ -5862,12 +5970,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         query
                     );
 
-                    toggleFilterButtons(sectionId + '-filter');
-
-                    if (defaultFilter) {
-                        $('#' + sectionId + '-filter-filters').val($(defaultFilter).val());
-                        $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
-                        $('#' + sectionId + '-delete').addClass('disabled');
+                    //Reset Quick Filters
+                    if ($('#listing-filters-quick').length === 1) {
+                        $('#' + sectionId + '-filter-quick').attr('disabled', true);
+                        $('#' + sectionId + '-filter-quick').val('');
+                        $('#' + sectionId + '-filter-search').attr('disabled', true);
+                        $('#' + sectionId + '-filter-clear').attr('disabled', true);
+                        $('#' + sectionId + '-filter-quick-prepend-dropdown-button span').text('SELECT FIELD');
+                        selectedId = null;
+                        dataType = null;
                     }
                 }
 
@@ -5992,7 +6103,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     var columns = { };
 
                     $.each(conditionsColumns, function(index, column) {
-
                         columns[index] = { };
                         columns[index][0] = { };
                         columns[index][0]['id'] = sectionId + '-filter-andor';
@@ -6121,7 +6231,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                 //Enable/Disable Operators as per field type (numeric/alphanumeric)
                 $('#' + sectionId + '-field').on('select2:select', function(e) {
-
                     var options = $('#' + sectionId + '-filter-operator').children();
 
                     if ($(e.params.data.element).data()['number'] == true) {
@@ -6210,7 +6319,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 });
 
                 $('#' + sectionId + '-default').click(function() {
-
                     var postData = { };
                     postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -6289,7 +6397,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 $('#' + sectionId + '-save-add, #' + sectionId + '-save-update').click(function(e) {
                     e.preventDefault();
 
-                    query = '';
+                    var queryConditions = '';
 
                     var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
 
@@ -6298,13 +6406,13 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     $.each(tableData, function(index, data) {
                         if (index === 0) {
-                            query +=
+                            queryConditions +=
                                 '-|' +
                                 data[sectionId + '-filter-field'] + '|' +
                                 data[sectionId + '-filter-operator'] + '|' +
                                 data[sectionId + '-filter-value'] + '&';
                         } else {
-                            query +=
+                            queryConditions +=
                                 data[sectionId + '-filter-andor'] + '|' +
                                 data[sectionId + '-filter-field'] + '|' +
                                 data[sectionId + '-filter-operator'] + '|' +
@@ -6327,7 +6435,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     var postData = { };
                     postData['id'] = $('#' + sectionId + '-filter-id').val();
                     postData['name'] = filterName;
-                    postData['conditions'] = query;
+                    postData['conditions'] = queryConditions;
                     postData['component_id'] = $(selectedFilter).data()['component_id'];
                     postData['filter_type'] = '1';
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -6354,7 +6462,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 'title' : response.responseMessage
                             });
                             if (response.filters) {
-                                redoFiltersOptions(query, sectionId, response);
+                                redoFiltersOptions(queryConditions, sectionId, response);
                             }
                         } else {
                             paginatedPNotify('error', {
@@ -6366,19 +6474,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             $('#security-token').val(response.token);
                         }
                     }, 'json');
-
-                    //Make Filter Call
-                    $('#' + sectionId + '-filter-modal').modal('hide');
-                    that._filterRunAjax(
-                        1,
-                        datatableOptions.paginationCounters.limit,
-                        query
-                    );
-
-                    clearStoredData();
                 });
 
-                function redoFiltersOptions(query, sectionId, data) {
+                function redoFiltersOptions(queryConditions, sectionId, data) {
                     var filtersOptions = '';
 
                     $.each(data.filters, function(index, filter) {
@@ -6407,8 +6505,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             }
                         }
 
-                        if (filter['conditions'] === query) {
+                        if (filter['conditions'] === queryConditions) {
                             filtersOptions += 'selected';
+                            query = { };
+                            query['filter'] = filter['id'];
                         }
 
                         filtersOptions += '>' + filterName;
@@ -6416,6 +6516,16 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     });
                     $('#' + sectionId + '-filter-filters').empty().append(filtersOptions);
                     toggleFilterButtons(sectionId + '-filter');
+
+                    //Make Filter Call
+                    $('#' + sectionId + '-filter-modal').modal('hide');
+                    that._filterRunAjax(
+                        1,
+                        datatableOptions.paginationCounters.limit,
+                        query
+                    );
+
+                    clearStoredData();
                 }
 
                 function clearStoredData() {
@@ -6450,8 +6560,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     clearStoredData();
                 });
 
+                //Quick Filters
                 if ($('#listing-filters-quick').length === 1) {
-                    var dataType, selectedId;
+                    var dataType;
 
                     $('#listing-filters-quick a').click(function(e) {
                         e.preventDefault();
@@ -6459,6 +6570,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         $('#' + sectionId + '-filter-quick').attr('disabled', false);
                         $('#' + sectionId + '-filter-quick').val('');
                         $('#' + sectionId + '-filter-search').attr('disabled', false);
+                        $('#' + sectionId + '-filter-clear').attr('disabled', false);
 
                         $('#' + sectionId + '-filter-quick-prepend-dropdown-button span').text($(this).text().toUpperCase());
 
@@ -6471,16 +6583,24 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         e.preventDefault();
 
                         if (dataType == 0) {
-                            query = '-|' + selectedId + '|equals|' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
+                            query['conditions'] = '-|' + selectedId + '|equals|' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
                         } else {
-                            query = '-|' + selectedId + '|like|%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
+                            query['conditions'] = '-|' + selectedId + '|like|%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
                         }
+
+                        query['quick_filter'] = true;
 
                         that._filterRunAjax(
                             1,
                             datatableOptions.paginationCounters.limit,
                             query
                         );
+                    });
+
+                    $('#' + sectionId + '-clear').click(function(e) {
+                        e.preventDefault();
+
+                        resetFilters(true);
                     });
                 }
             }
@@ -6763,6 +6883,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     $('#listing-data-loader').hide();
                     $('#listing-primary-buttons').attr('hidden', false);
                     $('#listing-secondary-buttons').attr('hidden', false);
+                    $('#listing-additional-fields').attr('hidden', false);
                     $('#listing-filters').attr('hidden', false);
                     that._tableInit(false);
                     that._registerEvents();
@@ -6785,13 +6906,44 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         $('#listing-data-loader').hide();
                         $('#listing-primary-buttons').attr('hidden', false);
                         $('#listing-secondary-buttons').attr('hidden', false);
+                        $('#listing-additional-fields').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
                         $.extend(thisOptions.listOptions.datatable, JSON.parse(response.rows));
-                        $('body').trigger(
-                            {
-                                'type'     : 'sectionWithListingLoaded'
+
+                        if (response.routeEnv && response.routeEnv.pageParams) {
+                            if (response.routeEnv.pageParams.limit) {
+                                thisOptions.listOptions.datatable.iDisplayLength = response.routeEnv.pageParams.limit;
                             }
-                        );
+
+                            if (response.routeEnv.pageParams.conditions && response.routeEnv.pageParams.conditions !== '') {
+                                if ($('#' + sectionId + '-filter-filters').find('[data-conditions="' + response.routeEnv.pageParams.conditions + '"]').length > 0) {
+                                    $('#' + sectionId + '-filter-filters').val(
+                                        $('#' + sectionId + '-filter-filters').find('[data-conditions="' + response.routeEnv.pageParams.conditions + '"]').val()
+                                    );
+                                    dataCollection.env['customConditions'] = [];
+                                } else {//Custom condition
+                                    var conditions = response.routeEnv.pageParams.conditions.substring(0, response.routeEnv.pageParams.conditions.length - 1);
+                                    var conditionsRows = conditions.split('&');
+                                    var customConditions = [];
+
+                                    $.each(conditionsRows, function(index, row) {
+                                        customConditions[index] = row.split('|');
+                                    });
+
+                                    dataCollection.env['customConditions'] = customConditions;
+
+                                    $('#' + sectionId + '-filter-quick').attr('disabled', false);
+                                    $('#' + sectionId + '-filter-search').attr('disabled', false);
+                                    $('#' + sectionId + '-filter-clear').attr('disabled', false);
+                                    $('#' + sectionId + '-filter-quick-prepend-dropdown-button span')
+                                        .text($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).text().toUpperCase());
+                                    selectedId = dataCollection.env['customConditions'][0][1];
+                                    $('#' + sectionId + '-filter-quick').val(dataCollection.env['customConditions'][0][3].replace(/%/g, ''));
+                                }
+
+                                filter = true;
+                            }
+                        }
                     }
                 }).done(function(response) {
                     if (response.tokenKey && response.token) {
@@ -6812,6 +6964,12 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             }
                         }
                     }
+
+                    $('body').trigger(
+                        {
+                            'type'     : 'sectionWithListingLoaded'
+                        }
+                    );
                 });
                     // TODO: fix card-body height when more rows are loaded.
                     // TODO: BULK Edit/Delete
@@ -6851,7 +7009,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                 if (!reDraw) {
                     // Pagination
-                    if (datatableOptions.pagination && datatableOptions.paginationCounters.filtered_items > 20) {
+                    if (datatableOptions.pagination) {
                         $.extend(thisOptions.listOptions.datatable, {
                             paging : true,
                             pagingType : 'simple',
@@ -6880,6 +7038,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     }
 
                     thisOptions['datatable'] = $('#' + thisOptions.listOptions.tableName).DataTable(datatableOptions);
+                    thisOptions['datatableContainer'] = $('#' + thisOptions.listOptions.tableName).DataTable().table().container();
 
                     if (thisOptions.customFunctions.afterTableInit) {
                         if (datatableOptions.headerClass) {
@@ -6946,7 +7105,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     });
 
                 } else { //redraw used on pagination prev and next
-
                     if (thisOptions.customFunctions.beforeRedraw) {
                         thisOptions.customFunctions.beforeRedraw();
                     }
@@ -6979,207 +7137,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
             //Register __control(Action buttons)
             _proto._registerEvents = function() {
-                // customSwitch Toggle Function
-                // $('#' + sectionId + '-table .custom-switch input').each(function(index,rowSwitchInput) {
-                //     $(rowSwitchInput).click(function() {
-                //         var rowSwitchInputId = $(rowSwitchInput)[0].id;
-                //         var url = dataCollection.env.rootPath + 'index.php?route=' + $(rowSwitchInput).data('switchactionurl');
-                //         var columnId = $(rowSwitchInput).data('columnid');
-                //         var checked = $(rowSwitchInput).is('[checked]');
-                //         var columnsDataToInclude = $(rowSwitchInput).data('switchactionincludecolumnsdata').split(',');
-                //         var rowData;
-                //         rowData = thisOptions['datatable'].row($(this).parents('tr')).data();
-                //         if (checked) {
-                //             rowData[columnId] = 0;
-                //             $(rowSwitchInput).attr('checked', false);
-                //             document.getElementById(rowSwitchInputId).checked = false;
-                //         } else {
-                //             rowData[columnId] = 1;
-                //             $(rowSwitchInput).attr('checked', true);
-                //             document.getElementById(rowSwitchInputId).checked = true;
-                //         }
-                //         var name = $(rowSwitchInput).parents('td').siblings('.data-' + $(rowSwitchInput).data('notificationtextfromcolumn')).html();
-                //         var switchOnText = name + ' enabled';
-                //         var switchOffText = name + ' disabled';
-                //         if (checked) {
-                //             Swal.fire({
-                //                 title                       : '<span class="text-danger"> Disable ' + name + '?</span>',
-                //                 icon                        : 'question',
-                //                 background                  : 'rgba(0,0,0,.8)',
-                //                 backdrop                    : 'rgba(0,0,0,.6)',
-                //                 customClass                 : {
-                //                     'confirmButton'             : 'btn btn-danger text-uppercase',
-                //                     'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                //                 },
-                //                 buttonsStyling              : false,
-                //                 confirmButtonText           : 'Disable',
-                //                 showCancelButton            : true,
-                //                 keydownListenerCapture      : true,
-                //                 allowOutsideClick           : false,
-                //                 allowEscapeKey              : false,
-                //                 onOpen                      : function() {
-                //                     swalSound.play();
-                //                 }
-                //             }).then((result) => {
-                //                 if (result.value) {
-                //                     runAjax(false, switchOffText);
-                //                 } else {
-                //                     $(rowSwitchInput).attr('checked', true);
-                //                     document.getElementById(rowSwitchInputId).checked = true;
-                //                 }
-                //             });
-                //         } else {
-                //             runAjax(true, switchOnText);
-                //         }
-                //         function runAjax(status, notificationText) {
-                //             var dataToSubmit = { };
-                //             for (var data in rowData) {
-                //                 if (columnsDataToInclude.includes(data)) {
-                //                     dataToSubmit[data] = rowData[data];
-                //                 }
-                //             }
-                //             $.ajax({
-                //                 url         : url,
-                //                 method      : 'post',
-                //                 data        : dataToSubmit,
-                //                 dataType    : 'json',
-                //                 success     : function(response) {
-                //                     if (response.responseCode === 0) {
-                //                         paginatedPNotify('success', {
-                //                             title           : notificationText,
-                //                             cornerClass     : 'ui-pnotify-sharp'
-                //                         });
-                //                         $(rowSwitchInput).attr('checked', status);
-                //                         document.getElementById(rowSwitchInputId).checked = true;
-                //                     } else {
-                //                         paginatedPNotify('error', {
-                //                             title           : 'Error!',
-                //                             cornerClass     : 'ui-pnotify-sharp'
-                //                         });
-                //                         $(rowSwitchInput).attr('checked', false);
-                //                         document.getElementById(rowSwitchInputId).checked = false;
-                //                     }
-                //                     pnotifySound.play();
-                //                     if (response.tokenKey && response.token) {
-                //                         $('#security-token').attr('name', response.tokenKey);
-                //                         $('#security-token').val(response.token);
-                //                     }
-                //                 }
-                //             });
-                //         }
-                //     });
-                // });
-
-                // RadioButtons
-                // $('#' + sectionId + '-table .btn-group-toggle label').each(function(index,radioButtonsLabel) {
-                //     $(radioButtonsLabel).click(function() {
-                //         var currentCheckedId, currentCheckedLabel;
-                //         $(this).siblings('label').children('input').each(function(index,sibling) {
-                //             if (sibling.checked) {
-                //                 currentCheckedId = sibling.id;
-                //                 currentCheckedLabel = sibling.parentElement;
-                //             } else if (sibling.defaultChecked) {
-                //                 currentCheckedId = sibling.id;
-                //                 currentCheckedLabel = sibling.parentElement;
-                //             }
-                //         });
-                //         var thisId = $(this).children('input')[0].id;
-                //         var url = dataCollection.env.rootPath + 'index.php?route=' + $(this).children('input').data('radiobuttonsactionurl');
-                //         var columnId = $(this).children('input').data('columnid');
-                //         var dataValue = $(this).children('input').data('value');
-                //         var checked = false;
-                //         if ($(this).children('input').is('[checked]') || $(this).children('input')[0].defaultChecked) {
-                //             checked = true;
-                //         }
-                //         var radioChangeText = $(this).parents('td').siblings('.data-' + $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
-                //                                 $(this).children('input').data('columnid') + ' changed';
-                //         if (!checked) {
-                //             Swal.fire({
-                //                 title                       : '<span class="text-danger"> Change ' +
-                //                                                 $(this).parents('td').siblings('.data-' +
-                //                                                 $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
-                //                                                 $(this).children('input').data('columnid') +
-                //                                                 '?</span>',
-                //                 icon                        : 'question',
-                //                 background                  : 'rgba(0,0,0,.8)',
-                //                 backdrop                    : 'rgba(0,0,0,.6)',
-                //                 buttonsStyling              : false,
-                //                 confirmButtonText           : 'Change',
-                //                 customClass                 : {
-                //                     'confirmButton'             : 'btn btn-danger text-uppercase',
-                //                     'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                //                 },
-                //                 showCancelButton            : true,
-                //                 keydownListenerCapture      : true,
-                //                 allowOutsideClick           : false,
-                //                 allowEscapeKey              : false,
-                //                 onOpen                      : function() {
-                //                     swalSound.play();
-                //                 }
-                //             }).then((result) => {
-                //                 if (result.value) {
-                //                     runAjax(false, radioChangeText);
-                //                 } else {
-                //                     $(this).removeClass('focus active');
-                //                     $('#' + currentCheckedId).attr('checked', true);
-                //                     document.getElementById(currentCheckedId).checked = true;
-                //                     $(currentCheckedLabel).addClass('focus active');
-                //                 }
-                //             });
-                //         }
-
-                //         function runAjax(status, notificationText) {
-                //             var columnsDataToInclude = $('#' + thisId).data('radiobuttonsactionincludecolumnsdata').split(',');
-                //             var rowData = thisOptions['datatable'].row($('#' + thisId).parents('tr')).data();
-                //             var dataToSubmit = { };
-                //             for (var data in rowData) {
-                //                 if (columnsDataToInclude.includes(data)) {
-                //                     if (columnId === data) {
-                //                         dataToSubmit[data] = dataValue;
-                //                     } else {
-                //                         dataToSubmit[data] = rowData[data];
-                //                     }
-                //                 }
-                //             }
-                //             $.ajax({
-                //                 url         : url,
-                //                 method      : 'post',
-                //                 data        : dataToSubmit,
-                //                 dataType    : 'json',
-                //                 success     : function(response) {
-                //                     if (response.responseCode === 1) {
-                //                         PNotify.removeAll();
-                //                         paginatedPNotify('success', {
-                //                             title           : notificationText,
-                //                             cornerClass     : 'ui-pnotify-sharp'
-                //                         });
-                //                         $('#' + currentCheckedId).attr('checked', false);
-                //                         document.getElementById(currentCheckedId).checked = false;
-                //                         $('#' + thisId).attr('checked', true);
-                //                         document.getElementById(thisId).checked = true;
-                //                     } else {
-                //                         paginatedPNotify('error', {
-                //                             title           : 'Error!',
-                //                             cornerClass     : 'ui-pnotify-sharp'
-                //                         });
-                //                         $('#' + thisId).parent('label').removeClass('focus active');
-                //                         $('#' + thisId).attr('checked', false);
-                //                         document.getElementById(thisId).checked = false;
-                //                         $('#' + currentCheckedId).attr('checked', true);
-                //                         document.getElementById(currentCheckedId).checked = true;
-                //                         $(currentCheckedLabel).addClass('focus active');
-                //                     }
-                //                     pnotifySound.play();
-                //                     if (response.tokenKey && response.token) {
-                //                         $('#security-token').attr('name', response.tokenKey);
-                //                         $('#security-token').val(response.token);
-                //                     }
-                //                 }
-                //             });
-                //         }
-                //     });
-                // });
-
                 // Deleting Row (element .rowRemove)
                 $('#' + sectionId + '-table .rowRemove').each(function(index,rowRemove) {
                     $(rowRemove).off();
@@ -7276,6 +7233,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 if (datatableOptions.paginationCounters.current === datatableOptions.paginationCounters.last) {
                     counters.end = datatableOptions.paginationCounters.filtered_items;
                 }
+
                 if (query && filter) {
                     $('#' + sectionId + '-table_info').empty().html(
                         "Showing " + counters.start + " to " + counters.end +
@@ -7299,6 +7257,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     filterQuery = query;
                 }
 
+                if (filterQuery['filter']) {
+                    filter = true;
+                }
+
                 thisOptions['datatable'].rows().clear().draw();
                 $('.dataTables_empty').last().html('<i class="fas fa-cog fa-spin"></i> Loading...');
 
@@ -7306,11 +7268,19 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 postData['page'] = page;
                 postData['limit'] = limit;
 
-                if (filterQuery.conditions || filterQuery.order) {
-                    postData['conditions'] = filterQuery.conditions;
+                if (filterQuery.filter || filterQuery.order) {
+                    postData['filter'] = filterQuery.filter;
                     postData['order'] = filterQuery.order;
                 } else {
-                    postData['conditions'] = filterQuery;
+                    postData['filter'] = filterQuery;
+                }
+
+                if (filterQuery.quick_filter) {
+                    postData['conditions'] = filterQuery['conditions'];
+                    postData['quick_filter'] = true;
+                    if (postData['filter']) {
+                        delete(postData['filter']);
+                    }
                 }
 
                 if (resetCache) {
@@ -7321,6 +7291,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
             }
 
             _proto._drawCallback = function() {
+                if (datatableOptions.pagination && datatableOptions.paginationCounters.filtered_items > 20) {
+                    $('.dataTables_paginate', thisOptions['datatableContainer']).show();
+                    $('.dataTables_length', thisOptions['datatableContainer']).show();
+                } else {
+                    $('.dataTables_paginate', thisOptions['datatableContainer']).hide();
+                    $('.dataTables_length', thisOptions['datatableContainer']).hide();
+                }
+
                 if (datatableOptions.pagination &&
                     datatableOptions.paginationCounters.filtered_items > 20 &&
                     (datatableOptions.paginationCounters.filtered_items !== datatableOptions.paginationCounters.limit)
@@ -10564,11 +10542,18 @@ var BazNotifications = function() {
     }
 
     function onMessage(type, response) {
+        if (response.responseData.for_user) {
+            if (response.responseData.for_user !== window.dataCollection.env.profile.email) {
+                return;
+            }
+        }
         //eslint-disable-next-line
         console.log(type, response);
         if (response.responseCode == 0) {
             if (response.responseData && response.responseData.count && response.responseData.mute !== 'undefined') {
-                getNotificationsCount(response.responseData);
+                if (response.responseData.app && response.responseData.app === window.dataCollection.env.appRoute) {
+                    getNotificationsCount(response.responseData);
+                }
             } else {
                 getNotificationsCount();
             }
@@ -10623,6 +10608,7 @@ var BazNotifications = function() {
 
     return bazNotificationsConstructor;
 }();
+
 /* exported BazMessenger */
 /* globals paginatedPNotify EmojiPicker autoComplete dayjs Swal */
 /*
@@ -12353,10 +12339,6 @@ var BazProgress = function() {
                                 $(element).attr('hidden', false);
                             }
 
-                            if (callableFunc && callableFunc['onComplete']) {
-                                callableFunc['onComplete'](response);
-                            }
-
                             downloadTotal = 0;
                             downloadedBytes = 0;
                             uploadTotal = 0;
@@ -12377,6 +12359,12 @@ var BazProgress = function() {
                             $('.progress-remote, .remote-progress-span').attr('hidden', true);
                             $('#' + $(element)[0].id + '-cancel').attr('hidden', true);
                             $('body').trigger('bazProgressComplete');
+
+                            if (callableFunc && callableFunc['onComplete']) {
+                                callableFunc['onComplete'](response);
+
+                                return;
+                            }
                         }
                     } else {
                         resetProgressCounter();

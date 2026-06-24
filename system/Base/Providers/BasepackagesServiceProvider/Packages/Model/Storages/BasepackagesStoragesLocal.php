@@ -20,6 +20,10 @@ class BasepackagesStoragesLocal extends BaseModel
 
     public $size;
 
+    public $height;
+
+    public $width;
+
     public $type;
 
     public $is_pointer;
@@ -33,4 +37,8 @@ class BasepackagesStoragesLocal extends BaseModel
     public $created;
 
     public $updated;
+
+    public $package_class;
+
+    public $package_row_id;
 }

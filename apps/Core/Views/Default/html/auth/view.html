@@ -12,7 +12,39 @@ BazCore.header({
     <div class="card m-0">
         <div class="card-body login-card-body">
             <div class="login-logo">
-                <img src="{{links.images(assets.get('branding').getCodes()[3].getContent())}}" data-rjs="3" alt="Bazaari Logo" style="height:{{assets.get('branding').getCodes()[5].getContent()}}px">
+                {% if str_contains(assets.get('branding').getCodes()[1].getContent(), 'images') %}
+                    {% set orgFileUUID = links.url(assets.get('branding').getCodes()[1].getContent(), true) %}
+                {% else %}
+                    {% set orgFileUUID = links.images(assets.get('branding').getCodes()[1].getContent(), true) %}
+                {% endif %}
+                {% if str_starts_with(assets.get('branding').getCodes()[1].getContent(), 'public') %}
+                    {% set orgFileUUID = str_replace('public/', '', orgFileUUID) %}
+                {% endif %}
+                {% set srcset = 'srcset="' ~ orgFileUUID ~ ' 1x' %}
+                {% for codes in assets.get('branding').getCodes() %}
+                    {% if codes.getAttributes()['org_file_name'] is defined %}
+                        {% if str_contains(codes.getAttributes()['org_file_name'], '-2x') %}
+                            {% set twoXUUID = links.url(codes.getContent(), true) %}
+                            {% if str_starts_with(codes.getContent(), 'public') %}
+                                {% set twoXUUID = str_replace('public/', '', twoXUUID) %}
+                            {% endif %}
+                            {% set srcset = srcset ~ ',' ~ twoXUUID ~ ' 2x' %}
+                        {% endif %}
+                        {% if str_contains(codes.getAttributes()['org_file_name'], '-3x') %}
+                            {% set threeXUUID = links.url(codes.getContent(), true) %}
+                            {% if str_starts_with(codes.getContent(), 'public') %}
+                                {% set threeXUUID = str_replace('public/', '', threeXUUID) %}
+                            {% endif %}
+                            {% set srcset = srcset ~ ',' ~ threeXUUID ~ ' 3x' %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                {% set srcset = srcset ~ '"' %}
+                {% if str_starts_with(assets.get('branding').getCodes()[1].getContent(), 'public') %}
+                    <img src="{{str_replace('public/', '', links.images(assets.get('branding').getCodes()[1].getContent(), true))}}" {{srcset}} alt="Logo" style="height:90px">
+                {% else %}
+                    <img src="{{links.url(assets.get('branding').getCodes()[1].getContent())}}" {{srcset}} alt="Logo" style="height:90px">
+                {% endif %}
             </div>
             <div id="{{componentId}}-regular" hidden>
                 <p class="login-box-msg text-sm font-weight-bold">Login to start {{appName|lower}} session</p>

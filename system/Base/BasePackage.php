@@ -48,9 +48,13 @@ abstract class BasePackage extends Controller
 
 	protected $ffRelations = false;
 
+	protected $ffRelationsStores = [];
+
 	protected $ffRelationsConditions = false;
 
 	protected $ffAddUsingUpdateOrInsert = false;
+
+	protected $mutex = false;
 
 	public function onConstruct()
 	{
@@ -81,6 +85,8 @@ abstract class BasePackage extends Controller
 
 		$this->ffRelations = false;
 
+		$this->ffRelationsStores = [];
+
 		$this->ffRelationsConditions = false;
 	}
 
@@ -103,9 +109,30 @@ abstract class BasePackage extends Controller
 		$this->ffRelationsConditions = $conditions;
 	}
 
+	public function setFFValidation($validate = true)
+	{
+		if (!$this->ffStore) {
+			$this->ffStore = $this->ff->store($this->ffStoreToUse);
+		}
+
+		$this->ffStore->setValidateData($validate);
+	}
+
 	public function init()
 	{
 		$this->app = $this->apps->getAppInfo();
+
+		if (isset($this->app['use_app_db']) && $this->app['use_app_db'] === true) {
+			if (str_starts_with(get_called_class(), 'Apps\\' . ucfirst($this->app['app_type']))) {
+				if (isset($this->modelToUse)) {
+					$modelArr = explode('\\', $this->modelToUse);
+
+					if (str_starts_with($this->helper->last($modelArr), 'Apps' . ucfirst($this->app['app_type']))) {
+						$this->setFfStoreToUse();
+					}
+				}
+			}
+		}
 
 		return $this;
 	}
@@ -166,6 +193,53 @@ abstract class BasePackage extends Controller
 		return $this->request->getPut();
 	}
 
+	public function useMutex($mutex, $timeout = null)
+	{
+		$this->mutex = $mutex;
+
+		if ($timeout) {
+			$this->basepackages->mutex->setTimeout($timeout);
+		}
+	}
+
+	protected function setMutex($data)
+	{
+		if (!$this->mutex || !isset($data['id'])) {
+			return;
+		}
+
+		if ($this->access->auth->check()) {//If user cannot update, we do not lock it.
+			if (isset($this->view->getParamsToView()['canUpdate']) &&
+				$this->view->getParamsToView()['canUpdate'] === false
+			) {//This is set before the route is executed in BaseComponent
+				return;
+			}
+		}
+
+		if (!isset($this->view->mutexLock)) {
+			$this->view->mutexLock = [];
+		}
+
+		if ($mutexLock = $this->basepackages->mutex->getMutex(str_replace('\\', '_', $this::class), $data['id'])) {
+			if ($mutexLock['parent_lock_id'] === 0) {
+				$this->view->mutexLock = $mutexLock;
+			}
+		}
+	}
+
+	protected function releaseMutex($data)
+	{
+		if (!$this->mutex || !isset($data['id'])) {
+			return;
+		}
+
+		if ($mutexLock = $this->basepackages->mutex->checkMutex(str_replace('\\', '_', $this::class), $data['id'])) {
+			if ($mutexLock['parent_lock_id'] === 0) {
+				$this->basepackages->mutex->releaseMutex($mutexLock);
+			}
+		}
+	}
+
 	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
 	{
 		$this->buildGetQueryParamsArr();
@@ -194,12 +268,14 @@ abstract class BasePackage extends Controller
 					$this->ffStore = $this->ff->store($this->ffStoreToUse);
 				}
 
-				$this->ffData = $this->ffStore->findById($id, $this->ffRelations, $this->ffRelationsConditions);
+				$this->ffData = $this->ffStore->findById($id, $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores);
 
 				$this->setFfStoreToUse();
 
 				if (is_array($this->ffData) && count($this->ffData) > 0) {
-					return $this->jsonData($this->ffData, true);
+					$this->setMutex($this->ffData);
+
+					return $this->ffData = $this->jsonData($this->ffData, true);
 				}
 
 				return false;
@@ -231,20 +307,20 @@ abstract class BasePackage extends Controller
 			try {
 				$this->model = $this->modelToUse::findFirst($parameters);
 
-				$this->cacheTools->updateIndex(
-					$this->cacheName,
-					$parameters,
-					$this->model,
-					null,
-					true
-				);
+				$this->cacheTools->updateIndex($this->cacheName, $parameters, $this->model, null, true);
 
-				if (!$returnArray) {
-					return $this->model;
-				} else {
-					return $this->model->toArray();
+				if ($returnArray) {
+					$returnArray = [];
+					$returnArray = $this->model->toArray();
+
+					$this->setMutex($returnArray);
+
+					$this->view->data = $returnArray;
+
+					return $returnArray;
 				}
 
+				return $this->model;
 			} catch (\Exception $e) {
 				throw $e;
 			}
@@ -254,16 +330,18 @@ abstract class BasePackage extends Controller
 			}
 
 			if ($by === 'id') {
-				$this->ffData = $this->jsonData($this->ffStore->findById((int) $value, $this->ffRelations, $this->ffRelationsConditions), true);
+				$this->ffData = $this->jsonData($this->ffStore->findById((int) $value, $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores), true);
 			} else {
-				$this->ffData = $this->jsonData($this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations, $this->ffRelationsConditions), true);
+				$this->ffData = $this->jsonData($this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores), true);
 			}
 
 			$this->setFfStoreToUse();
 
 			if (is_array($this->ffData) && count($this->ffData) > 0) {
+				$this->setMutex($this->ffData);
+
 				if ($returnArray) {
-					return $this->ffData;
+					return $this->ffData = $this->jsonData($this->ffData, true);
 				}
 
 				return $this->ffStore;
@@ -285,7 +363,7 @@ abstract class BasePackage extends Controller
 					$this->ffStore = $this->ff->store($this->ffStoreToUse);
 				}
 
-				$allPackages = $this->ffStore->findAll(null, null, null, $this->ffRelations, $this->ffRelationsConditions);
+				$allPackages = $this->ffStore->findAll(null, null, null, $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores);
 
 				$this->setFfStoreToUse();
 			}
@@ -392,6 +470,10 @@ abstract class BasePackage extends Controller
 			}
 
 			if (count($relationColumns) > 0) {
+				foreach ($relationColumns as $relationColumn) {
+					array_push($this->ffRelationsStores, $relationColumn['relationStore']);
+				}
+
 				$this->ffRelations = true;
 			}
 
@@ -422,14 +504,14 @@ abstract class BasePackage extends Controller
 			if (isset($params['conditions']) && is_array($params['conditions']) && count($params['conditions']) > 0) {
 				$this->ffData =
 					$this->ffStore->findBy(
-						$params['conditions'], $order, $limit, $offset, $this->ffRelations, $this->ffRelationsConditions
+						$params['conditions'], $order, $limit, $offset, $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores
 					);
 			} else if (isset($params['conditions']) &&
 					   ((is_array($params['conditions']) && count($params['conditions']) === 0) ||
 						 $params['conditions'] === ''
 					   )
 			) {
-				$this->ffData = $this->ffStore->findAll($order, $limit, $offset, $this->ffRelations, $this->ffRelationsConditions);
+				$this->ffData = $this->ffStore->findAll($order, $limit, $offset, $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores);
 			} else {
 				throw new \Exception('getByParams needs parameter conditions (array) to be set.');
 			}
@@ -443,6 +525,10 @@ abstract class BasePackage extends Controller
 			if (is_array($this->ffData) && count($this->ffData) > 0) {
 				if (isset($params['columns']) && count($params['columns']) > 0) {//Filter Data as per requested columns
 					foreach ($this->ffData as $ffDataKey => $ffData) {
+						if (!$ffData) {
+							continue;
+						}
+
 						foreach ($ffData as $ffDataColumnKey => $ffDataColumnValue) {
 							if (!in_array($ffDataColumnKey, $params['columns'])) {
 								unset($this->ffData[$ffDataKey][$ffDataColumnKey]);
@@ -503,40 +589,54 @@ abstract class BasePackage extends Controller
 
 	public function getPaged(array $params = [], bool $resetCache = false, bool $enableCache = true, $arrayData = false)
 	{
+		if (isset($this->postData()['resetCache']) && $this->postData()['resetCache'] == 'true') {
+			$resetCache = true;
+		}
+
 		//Empty columns causes SQL error :APL0:
 		if (isset($params['columns']) && count($params['columns']) === 0) {
 			unset($params['columns']);
 		}
 
-		if (isset($this->postData()['page'])) {
-			$pageParams['currentPage'] = $this->postData()['page'];
-		} else if (isset($params['page'])) {
-			$pageParams['currentPage'] = $params['page'];
-		} else {
-			$pageParams['currentPage'] = 1;
+		if (isset($this->postData()['filter'])) {
+			$filter = $this->basepackages->filters->getById((int) $this->postData()['filter']);
+
+			if ($filter) {
+				$params['conditions'] = $filter['conditions'];
+			}
 		}
 
-		if (isset($this->postData()['conditions'])) {
-			$pageParams['conditions'] = $this->postData()['conditions'];
-		} else if (isset($params['conditions'])) {
+		if (isset($params['conditions'])) {
 			$pageParams['conditions'] = $params['conditions'];
 		} else {
 			$pageParams['conditions'] = '';
 		}
 
-		if (isset($this->postData()['limit'])) {
-			$pageParams['limit'] = $this->postData()['limit'];
-		} else if (isset($params['limit'])) {
+		if (isset($params['page'])) {
+			$pageParams['currentPage'] = $params['page'];
+		} else if (isset($this->postData()['page'])) {
+			$pageParams['currentPage'] = (int) $this->postData()['page'];
+		} else {
+			$pageParams['currentPage'] = 1;
+		}
+
+		if (isset($params['limit'])) {
 			$pageParams['limit'] = $params['limit'];
+		} else if (isset($this->postData()['limit'])) {
+			$pageParams['limit'] = (int) $this->postData()['limit'];
 		} else {
 			$pageParams['limit'] = 20;
 		}
 
-		if (isset($this->postData()['resetCache']) && $this->postData()['resetCache'] == 'true') {
-			$resetCache = true;
-		}
-
-		if (isset($this->postData()['order']) &&
+		if (isset($params['order'])) {
+			$params =
+				array_merge(
+					$params,
+					[
+						'order'	=> $params['order']
+					]
+				);
+		} else if (isset($this->postData()['order']) &&
 			$this->postData()['order'] !== ''
 		) {
 			$params =
@@ -544,14 +644,6 @@ abstract class BasePackage extends Controller
 					$params,
 					[
 						'order'	=> $this->postData()['order']
-					]
-				);
-		} else if (isset($params['order'])) {
-			$params =
-				array_merge(
-					$params,
-					[
-						'order'	=> $params['order']
 					]
 				);
 		} else {
@@ -579,6 +671,32 @@ abstract class BasePackage extends Controller
 						0,
 				]
 			);
+
+		//Retrieve from Users Env
+		if ($this->access->auth->check()) {
+			if ($this->request->isPost() &&
+				(count($this->postData()) === 0 ||
+				 (!isset($this->postData()['page']) && !isset($this->postData()['limit']) &&
+				  !isset($this->postData()['filter']) && !isset($this->postData()['quick_filter'])
+				 )
+				)
+			) {
+				$envParams = $this->basepackages->accounts->checkEnv($this->access->auth->account()['id']);
+
+				if ($envParams) {
+					if (isset($envParams['params'])) {
+						$params = $envParams['params'];
+					}
+
+					if (isset($envParams['pageParams'])) {
+						$pageParams = $envParams['pageParams'];
+					}
+				}
+			}
+
+			//Add to Users Env
+			$this->basepackages->accounts->updateEnv($this->access->auth->account['id'], ['params' => $params, 'pageParams' => $pageParams]);
+		}
 
 		if (!$arrayData && isset($pageParams)) {
 			if ($this->config->databasetype === 'db') {
@@ -1066,25 +1184,24 @@ abstract class BasePackage extends Controller
 			if ($conditionArr[2] === 'between' || $conditionArr[2] === 'notbetween') {//!check this for BETWEEN
 				$valueArr = explode(',', $conditionArr[3]);
 
-				if ($conditionArr[2] === 'between') {
-					$condition .=
-						$conditionArr[1] . ' ' . $sign;
-				} else if ($conditionArr[2] === 'notbetween') {
-					$condition .=
-					'NOT ' . $conditionArr[1] . ' BETWEEN';
-				}
-
-				foreach ($valueArr as $valueKey => $valueValue) {
-					$condition .=
-						' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
-
-					$bind[
-						'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
-					] = $valueValue;
-
-					if ($this->helper->lastKey($valueArr) !== $valueKey) {
-						$condition .= ' AND';
+				if (count($valueArr) > 1) {
+					foreach ($valueArr as $valueKey => &$valueValue) {
+						if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'integer') {
+							$valueValue = (int) $valueValue;
+						} else if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'number') {
+							$valueValue = (float) $valueValue;
+						} else if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'boolean') {
+							if ($valueValue == '1') {
+								$valueValue = true;
+							} else {
+								$valueValue = false;
+							}
+						}
 					}
+
+					array_push($this->filterConditions, [$conditionArr[1], $sign, $valueArr]);
+				} else {
+					return [];//Incorrect number of values for between.
 				}
 			} else if ($conditionArr[2] === 'empty' || $conditionArr[2] === 'notempty') {//!check this for NULL or NOT NULL
 				$condition .= $conditionArr[1] . ' ' . $sign;
@@ -1180,8 +1297,9 @@ abstract class BasePackage extends Controller
 
 				$params['conditions'] = $this->filterConditions;
 				// -|name|like|%aus%&or|name|like|%ind%|&
-				// dump($params);die();
+				// trace([$params]);
 				$data = $this->getByParams($params, true, false);
+				// trace([$data]);
 			}
 		}
 		// var_dump($data);die();
@@ -1191,172 +1309,165 @@ abstract class BasePackage extends Controller
 	protected function getDbData($parameters, bool $enableCache = true, string $type = 'id', bool $returnArray = true)
 	{
 		if ($type === 'id') {
-			$this->packagesData->responseCode = 0;
-
-			$this->packagesData->responseMessage = 'Found';
-
-			if ($enableCache && $this->cacheName) {
-				$this->cacheTools->updateIndex(
-					$this->cacheName,
-					$parameters,
-					$this->model,
-					null,
-					true
-				);
-			}
-
-			return $this->model->toArray();
-
+			$list = null;
+			$id = true;
 		} else if ($type === 'params') {
-			if ($enableCache && $this->cacheName) {
-				$this->cacheTools->updateIndex(
-					$this->cacheName,
-					$parameters,
-					$this->model,
-					true,
-					null
-				);
-			}
-
-			if (!$returnArray) {
-				return $this->model;
-			} else {
-				return $this->model->toArray();
-			}
+			$list = true;
+			$id = null;
 		}
 
-		$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
+		if ($enableCache && $this->cacheName) {
+			$this->cacheTools->updateIndex($this->cacheName, $parameters, $this->model, $list, $id);
+		}
+
+		if ($returnArray) {
+			$returnArray = [];
+			$returnArray = $this->model->toArray();
+
+			$this->setMutex($returnArray);
+
+			$this->view->data = $returnArray;
+
+			return $returnArray;
+		} else {
+			return $this->model;
+		}
 
 		return false;
 	}
 
 	public function add(array $data, $resetCache = true)
 	{
-		if ($data) {
-			$data = $this->jsonData($data);
+		$data = $this->jsonData($data);
 
-			if ($this->config->databasetype === 'db') {
-				${$this->packageNameModel} = $this->useModel();
+		if ($this->config->databasetype === 'db') {
+			${$this->packageNameModel} = $this->useModel();
 
-				${$this->packageNameModel}->assign($data);
+			${$this->packageNameModel}->assign($data);
 
-				$create = ${$this->packageNameModel}->create();
-			} else {
-				if (!$this->ffStore) {
-					$this->ffStore = $this->ff->store($this->ffStoreToUse);
-				}
-
-				if ($this->ffAddUsingUpdateOrInsert) {
-					if (isset($data['id']) && (int) $data['id'] !== 0) {
-						$create = $this->ffData = $this->ffStore->updateOrInsert($data, false);
-					} else {
-						$create = $this->ffData = $this->ffStore->updateOrInsert($data);
-					}
-				} else {
-					$create = $this->ffData = $this->ffStore->insert($data);
-				}
-
-				$this->setFfStoreToUse();
-			}
-
-			if ($create) {
-				$this->packagesData->responseCode = 0;
-
-				$this->packagesData->responseMessage = "Added " . ucfirst($this->packageNameS) . "!";
-
-				if ($this->config->databasetype === 'db') {
-					$this->packagesData->last = ${$this->packageNameModel}->toArray();
-				} else {
-					$this->packagesData->last = $create;
-				}
-
-				if ($resetCache) {
-					$this->resetCache();
-				}
-
-				return true;
-			} else {
-				$this->transactionErrors = [];
-
-				foreach (${$this->packageNameModel}->getMessages() as $value) {
-					array_push($this->transactionErrors, $value->getMessage());
-				}
-
-				array_push($this->transactionErrors, $data);
-
-				throw new \Exception(
-					"Could not add " . ucfirst($this->packageNameS) . "Reasons: <br>" .
-					join(',', $this->jsonData($this->transactionErrors))
-				);
-			}
+			$create = ${$this->packageNameModel}->create();
 		} else {
-			throw new \Exception('Data array missing. Cannot add!');
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
+
+			if ($this->ffAddUsingUpdateOrInsert) {
+				if (isset($data['id']) && (int) $data['id'] !== 0) {
+					$create = $this->ffData = $this->ffStore->updateOrInsert($data, false);
+				} else {
+					$create = $this->ffData = $this->ffStore->updateOrInsert($data);
+				}
+			} else {
+				$create = $this->ffData = $this->ffStore->insert($data);
+			}
+
+			$this->setFfStoreToUse();
+		}
+
+		if ($create) {
+			if ($this->config->databasetype === 'db') {
+				$this->packagesData->last = ${$this->packageNameModel}->toArray();
+			} else {
+				$this->packagesData->last = $create;
+			}
+
+			if ($resetCache) {
+				$this->resetCache();
+			}
+
+			return true;
+		} else {
+			$this->transactionErrors = [];
+
+			foreach (${$this->packageNameModel}->getMessages() as $value) {
+				array_push($this->transactionErrors, $value->getMessage());
+			}
+
+			array_push($this->transactionErrors, $data);
+
+			throw new \Exception(
+				"Could not add " . $this->packageName . " Reasons: <br>" .
+				join(',', $this->jsonData($this->transactionErrors))
+			);
 		}
 	}
 
 	public function update(array $data, $resetCache = true)
 	{
-		if ($data) {
-			$data = $this->jsonData($data);
+		$data = $this->jsonData($data);
 
-			if (isset($data['updated_on'])) {
-				unset($data['updated_on']);
+		if (!isset($data['id'])) {
+			$this->addResponse("ID not set!", 1);
+
+			return false;
+		}
+
+		if ($this->mutex && $mutex = $this->basepackages->mutex->checkMutex(str_replace('\\', '_', $this::class), $data['id'])) {
+			if ($mutex['self'] === false) {
+				//Log here
+				$this->logger->log->error('Entry is locked by: ' . $mutex['account_name'] . '. It cannot be modified!');
+
+				$this->addResponse('Entry is locked by: ' . $mutex['account_name'] . '. It cannot be modified!', 1);
+
+				return false;
+			}
+		}
+
+		if (isset($data['updated_on'])) {
+			unset($data['updated_on']);
+		}
+
+		if ($this->config->databasetype === 'db') {
+			${$this->packageNameModel} = $this->getFirst('id', $data['id'], false, false);
+
+			if (!${$this->packageNameModel}) {
+				$this->addResponse("ID: {$data['id']} not found for package {$this->packageName}", 1);
+
+				return false;
 			}
 
-			if ($this->config->databasetype === 'db') {
-				${$this->packageNameModel} = $this->getFirst('id', $data['id'], false, false);
+			${$this->packageNameModel}->assign($data);
 
-				if (!${$this->packageNameModel}) {
-					$this->packagesData->responseCode = 1;
-
-					$this->packagesData->responseMessage = 'ID: ' . $data['id'] . " not found for package {$this->packageName}";
-
-					return;
-				}
-
-				${$this->packageNameModel}->assign($data);
-
-				$update = ${$this->packageNameModel}->update();
-			} else {
-				if (!$this->ffStore) {
-					$this->ffStore = $this->ff->store($this->ffStoreToUse);
-				}
-
-				$update = $this->ffData = $this->ffStore->update($data);
-
-				$this->setFfStoreToUse();
-			}
-
-			if ($update) {
-				$this->packagesData->responseCode = 0;
-
-				$this->packagesData->responseMessage = ucfirst($this->packageNameS) . " Updated!";
-
-				if ($this->config->databasetype === 'db') {
-					$this->packagesData->last = ${$this->packageNameModel}->toArray();
-
-					if ($resetCache && count(${$this->packageNameModel}->getUpdatedFields()) !== 0) {//Make sure we only update when we change any fields
-						$this->resetCache($this->packagesData->last['id']);
-					}
-				} else {
-					$this->packagesData->last = $update;
-				}
-
-				return true;
-			} else {
-				$this->transactionErrors = [];
-
-				foreach (${$this->packageNameModel}->getMessages() as $value) {
-					array_push($this->transactionErrors, $value->getMessage());
-				}
-
-				throw new \Exception(
-					"Could not update " . ucfirst($this->packageNameS) . "Reasons: <br>" .
-					join(',', $this->transactionErrors)
-				);
-			}
+			$update = ${$this->packageNameModel}->update();
 		} else {
-			throw new \Exception('Data array missing. Cannot update!');
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
+
+			$update = $this->ffData = $this->ffStore->update($data);
+
+			$this->setFfStoreToUse();
+		}
+
+		if ($update) {
+			if ($this->config->databasetype === 'db') {
+				$this->packagesData->last = ${$this->packageNameModel}->toArray();
+
+				if ($resetCache && count(${$this->packageNameModel}->getUpdatedFields()) !== 0) {//Make sure we only update when we change any fields
+					$this->resetCache($this->packagesData->last['id']);
+				}
+			} else {
+				$this->packagesData->last = $update;
+
+				if ($resetCache) {
+					$this->resetCache($this->packagesData->last['id']);
+				}
+			}
+
+			$this->releaseMutex($this->packagesData->last);
+
+			return true;
+		} else {
+			$this->transactionErrors = [];
+
+			foreach (${$this->packageNameModel}->getMessages() as $value) {
+				array_push($this->transactionErrors, $value->getMessage());
+			}
+
+			throw new \Exception(
+				"Could not update " . $this->packageName . " Reasons: <br>" .
+				join(',', $this->transactionErrors)
+			);
 		}
 	}
 
@@ -1379,6 +1490,10 @@ abstract class BasePackage extends Controller
 		} else {
 			//This might cause data to be encoded multiple times when being stored in the DB. check!
 			foreach ($data as $dataKey => $dataValue) {
+				if ($dataKey === 'id') {
+					$data[$dataKey] = (int) $dataValue;
+				}
+
 				if (is_array($dataValue)) {
 					$data[$dataKey] = $this->helper->encode($dataValue);
 				}
@@ -1445,11 +1560,19 @@ abstract class BasePackage extends Controller
 			} else {
 				$this->addResponse("Could not delete " . ucfirst($this->packageNameS), 1);
 			}
-		} else if ($this->ffStore && $this->ffData && $this->ffData['id'] == $id) {
-			if ($this->ffStore->deleteById((int) $id, $removeRelated, $this->ffRelationsConditions, $excludeRelatedAliases)) {
-				$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
+		} else if ($this->ffStore && $this->ffData) {
+			if (isset($this->ffData['id']) && $this->ffData['id'] == $id) {
+				if ($this->ffStore->deleteById((int) $id, $removeRelated, $this->ffRelationsConditions, $excludeRelatedAliases)) {
+					$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
 
-				return true;
+					if ($resetCache) {
+						$this->resetCache($id, true);
+					}
+
+					return true;
+				} else {
+					$this->addResponse("Could not delete " . ucfirst($this->packageNameS), 1);
+				}
 			} else {
 				$this->addResponse("Could not delete " . ucfirst($this->packageNameS), 1);
 			}
@@ -1616,7 +1739,7 @@ abstract class BasePackage extends Controller
 	protected function useModel($model = null)
 	{
 		if (!$model) {
-			return new $this->modelToUse;
+			return (new $this->modelToUse)->init($this->app);
 		}
 
 		return new $model;
@@ -1643,11 +1766,23 @@ abstract class BasePackage extends Controller
 
 	protected function resetCache(int $id = null, $removeId = false, $cacheName = null)
 	{
+		if (PHP_SAPI === 'cli') {
+			return;
+		}
+
 		if (!$cacheName) {
 			$cacheName = $this->cacheName;
 		}
 
 		$this->cacheTools->resetCache($cacheName, $id, $removeId);
+
+		if (!$this->app) {
+			$this->app = $this->apps->getAppInfo();
+		}
+
+		if ($this->opCache && $this->app['name'] === 'Core') {
+			$this->opCache->removeCache(null, 'core');
+		}
 	}
 
 	public function getModel()
@@ -2115,26 +2250,26 @@ abstract class BasePackage extends Controller
 			}
 		}
 
-		return $this->basepackages->activityLogs->addLog($this->packageName, $data, $oldData);
+		return $this->basepackages->activityLogs->addLog(str_replace('\\', '_', $this::class), $data, $oldData);
 	}
 
-	public function getActivityLogs(int $id, $newFirst = true, $page = 1, $packageName = null)
+	public function getActivityLogs(int $id, $postLink, $newFirst = true, $page = 1, $packageClass = null)
 	{
-		if ($packageName) {
-			return $this->basepackages->activityLogs->getLogs($packageName, $id, $newFirst, $page);
+		if ($packageClass) {
+			return $this->basepackages->activityLogs->getLogs($packageClass, $id, $postLink, $newFirst, $page);
 		}
 
-		return $this->basepackages->activityLogs->getLogs($this->packageName, $id, $newFirst, $page);
+		return $this->basepackages->activityLogs->getLogs(str_replace('\\', '_', $this::class), $id, $postLink, $newFirst, $page);
 	}
 
-	public function getNoteLogs(int $id, $newFirst = true, $page = 1, $packageName = null)
-	{
-		if ($packageName) {
-			return $this->basepackages->notes->getNotes($packageName, $id, $newFirst, $page);
-		}
+	// public function getNotesLogs(int $id, $newFirst = true, $page = 1, $packageName = null)
+	// {
+	// 	if ($packageName) {
+	// 		return $this->basepackages->notes->getNotes($packageName, $id, $newFirst, $page);
+	// 	}
 
-		return $this->basepackages->notes->getNotes($this->packageName, $id, $newFirst, $page);
-	}
+	// 	return $this->basepackages->notes->getNotes($this->packageName, $id, $newFirst, $page);
+	// }
 
 	protected function initStorages()
 	{
@@ -2206,35 +2341,61 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $package = null, $packageRowId = null)
+	public function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $package = null, $packageRowId = null, $component = null, $notifyNameField = null)
 	{
+		if (is_null($subscriptionType)) {
+			throw new \Exceptions('Notification subscription not set');
+		}
+
 		if (!$this->app) {
 			$this->app = $this->apps->getAppInfo();
 		}
 
-		if (!$package) {
-			$package = $this->checkPackage($this->packageName);
-		} else if ($package && is_string($package)) {
-			$package = $this->checkPackage($package);
+		if (isset($package) && isset($component)) {
+			throw new \Exception('Notification method can only have either package or component');
 		}
 
-		if ($package) {
+		if ($component) {
+			$module = $component;
+		} else {
+			if (!$package) {
+				$module = $this->checkPackage($this->packageName);
+			} else if ($package && is_string($package)) {
+				$module = $this->checkPackage($package);
+			}
+		}
+
+		if ($module) {
 			if (!$packageRowId && isset($this->packagesData->last)) {
 				$packageRowId = $this->packagesData->last['id'];
+
+				if (!$notifyNameField) {
+					$notifyNameField = 'name';
+				}
+
+				if (!isset($messageTitle)) {
+					$messageTitle = strtoupper($subscriptionType) . ': ' . strtoupper(($module['display_name'] ?? $module['name']));
+
+					if (isset($this->packagesData->last[$notifyNameField])) {
+						$messageTitle = $messageTitle . ': ' . strtoupper($this->packagesData->last[$notifyNameField]);
+					} else {
+						$messageTitle = $messageTitle . ': ' . $this->packagesData->last['id'];
+					}
+				}
 			} else if (!$packageRowId) {
 				$packageRowId = null;
 			}
 
-			if ($package['notification_subscriptions']) {
-				if (!is_array($package['notification_subscriptions'])) {
-					$package['notification_subscriptions'] = $this->helper->decode($package['notification_subscriptions'], true);
+			if ($module['notification_subscriptions']) {
+				if (!is_array($module['notification_subscriptions'])) {
+					$module['notification_subscriptions'] = $this->helper->decode($module['notification_subscriptions'], true);
 				}
 
-				if (count($package['notification_subscriptions']) === 0) {
+				if (count($module['notification_subscriptions']) === 0) {
 					return;
 				}
 
-				foreach ($package['notification_subscriptions'] as $appId => $subscriptions) {
+				foreach ($module['notification_subscriptions'] as $appId => $subscriptions) {
 					if ($subscriptionType === 'add' || $subscriptionType === 'update' || $subscriptionType === 'remove') {
 						$notificationType = 0;
 					} else if ($subscriptionType === 'warning') {
@@ -2248,20 +2409,26 @@ abstract class BasePackage extends Controller
 						count($subscriptions[$subscriptionType]) > 0
 					) {
 						foreach ($subscriptions[$subscriptionType] as $key => $aId) {
+							if ($this->access->auth->check() &&
+								$this->access->auth->account()['id'] === $aId
+							) {
+								continue;
+							}
+
 							$this->basepackages->notifications->addNotification(
 								$messageTitle,
 								$messageDetails,
 								$appId,
 								$aId,
 								null,
-								$package['display_name'] ?? $package['name'],
+								$module['display_name'] ?? $module['name'],
 								$packageRowId,
 								$notificationType
 							);
 						}
 					}
 
-					if ($package['name'] !== 'EmailServices' &&
+					if ($module['name'] !== 'EmailServices' &&
 						isset($subscriptions['email']) &&
 						count($subscriptions['email']) > 0
 					) {
@@ -2284,7 +2451,7 @@ abstract class BasePackage extends Controller
 							$domainId,
 							$appId,
 							null,
-							$package['display_name'] ?? $package['name'],
+							$module['display_name'] ?? $module['name'],
 							$packageRowId,
 							$notificationType
 						);
@@ -2425,5 +2592,16 @@ abstract class BasePackage extends Controller
 	protected function extractNumbers($string)
 	{
 		return preg_replace('/[^0-9]/', '', $string);
+	}
+
+	protected function removeSessionToken($data)
+	{
+		$token = array_keys($data, $this->security->getRequestToken());
+
+		if ($token) {
+			unset($data[$token[0]]);
+		}
+
+		return $data;
 	}
 }

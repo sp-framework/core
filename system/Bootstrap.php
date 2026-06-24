@@ -74,6 +74,8 @@ final class Bootstrap
 
         $this->config = $container->getShared('config');
 
+        date_default_timezone_set($this->config->locale->timezone);
+
         if ($this->config->debug) {
             ini_set('display_errors', 1);
             ini_set('display_startup_errors', 1);
@@ -103,28 +105,17 @@ final class Bootstrap
         } else {
             $this->error = $container->getShared('error');
 
-            $this->logger->log->info(
-                'Session ID: ' . $session->getId() . '. Connection ID: ' . $connection->getId()
-            );
-
             $application = new Application($container);
 
-            $response = $application->handle($_SERVER["REQUEST_URI"]);
+            $helper = $container->getShared('helper');
 
-            $this->logger->log->debug('Dispatched');
+            $response = $application->handle($helper->reduceSlashes($_SERVER["REQUEST_URI"]));
 
             if (!$response->isSent()) {
                 $response->send();
-
-                $this->logger->log->debug('Response Sent.');
-
             } else {
                 echo $response->getContent();
-
-                $this->logger->log->debug('Response Echoed.');
             }
-
-            $this->logger->log->info('Session End');
 
             $this->logger->commit();
         }

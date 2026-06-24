@@ -1,5 +1,6 @@
 {% if module['id'] is defined %}
     {% set moduleName = module['name'] %}
+    {% set moduleAppType = module['app_type'] %}
     {% set moduleId = module['id'] %}
     {% if clone is defined and clone == true %}
         {% set moduleId = '' %}
@@ -7,13 +8,32 @@
     {% endif %}
 {% else %}
     {% set moduleName = 'New' %}
+    {% set moduleAppType = '' %}
     {% set moduleId = '0' %}
 {% endif %}
 {% if bundle['id'] is defined %}
     {% set moduleName = bundle['name'] %}
     {% set moduleId = bundle['id'] %}
 {% endif %}
+{% set formButtons =
+    [
+        'cancelActionUrl'           : 'devtools/modules',
+        'closeActionUrl'            : 'devtools/modules'
+    ]
+%}
+{% if selectedAppType is defined and selectedAppType != '0' %}
+    {% set formButtons =
+        [
+            'cancelActionUrl'           : 'devtools/modules/q/apptype/' ~ selectedAppType,
+            'closeActionUrl'            : 'devtools/modules/q/apptype/' ~ selectedAppType
+        ]
+    %}
+{% endif %}
 {% if newrelease is defined and newrelease === true %}
+    {% set moduleChangesUrl = links.url('devtools/modules/q/changes/true') %}
+    {% if selectedAppType is defined and selectedAppType != '0' %}
+        {% set moduleChangesUrl = moduleChangesUrl ~ '/apptype/' ~ selectedAppType %}
+    {% endif %}
     {{adminltetags.useTag('content',
         [
             'component'                     : component,
@@ -26,24 +46,27 @@
             'cardFooter'                    : true,
             'cardType'                      : 'success',
             'cardIcon'                      : 'th',
-            'cardTitle'                     : 'NEW RELEASE : ' ~ moduleName ~ ' (' ~ type ~ ')',
+            'cardTitle'                     : 'NEW RELEASE : ' ~ moduleAppType ~ ' | ' ~ moduleName ~ ' (' ~ type ~ ')',
             'cardAdditionalClass'           : 'rounded-0',
             'cardBodyInclude'               : 'modules/module',
-            'formButtons'                   :
-            [
-                'cancelActionUrl'           : 'devtools/modules',
-                'closeActionUrl'            : 'devtools/modules'
-            ],
+            'formButtons'                   : formButtons,
             'formSecondaryButtons'          :
             [
                 'buttonType'                : 'button',
-                'buttons'                   : {
-                    'generate' : {
+                'buttons'                   : [
+                    'generate' : [
                         'title'                   : 'Generate',
                         'type'                    : 'success',
                         'icon'                    : 'wand-sparkles'
-                    }
-                }
+                    ],
+                    'check-for-changes' : [
+                        'title'                   : 'Check for module changes',
+                        'type'                    : 'info',
+                        'icon'                    : 'code',
+                        'buttonAdditionalClass'   : 'contentAjaxLink',
+                        'url'                     : moduleChangesUrl
+                    ]
+                ]
             ]
         ]
     )}}
@@ -63,11 +86,7 @@
             'cardTitle'                     : 'COMMIT BUNDLE JSON : ' ~ moduleName ~ ' (' ~ type ~ ')',
             'cardAdditionalClass'           : 'rounded-0',
             'cardBodyInclude'               : 'modules/module',
-            'formButtons'                   :
-            [
-                'cancelActionUrl'           : 'devtools/modules',
-                'closeActionUrl'            : 'devtools/modules'
-            ],
+            'formButtons'                   : formButtons,
             'formSecondaryButtons'          :
             [
                 'buttonType'                : 'button',
@@ -81,9 +100,56 @@
         ]
     )}}
 {% else %}
-    {% set title = 'Modules : ' ~ moduleName ~ ' (' ~ type ~ ')' %}
+    {% set formButtons =
+        [
+            'updateButtonId'                : moduleId,
+            'addActionUrl'                  : 'devtools/modules/add',
+            'addSuccessRedirectUrl'         : 'devtools/modules',
+            'updateActionUrl'               : 'devtools/modules/update',
+            'updateSuccessRedirectUrl'      : 'devtools/modules',
+            'cancelActionUrl'               : 'devtools/modules',
+            'closeActionUrl'                : 'devtools/modules'
+        ]
+    %}
+    {% if selectedAppType is defined and selectedAppType != '0' %}
+        {% set formButtons =
+            [
+                'updateButtonId'                : moduleId,
+                'addActionUrl'                  : 'devtools/modules/add',
+                'addSuccessRedirectUrl'         : 'devtools/modules/q/apptype/' ~ selectedAppType,
+                'updateActionUrl'               : 'devtools/modules/update',
+                'updateSuccessRedirectUrl'      : 'devtools/modules/q/apptype/' ~ selectedAppType,
+                'cancelActionUrl'               : 'devtools/modules/q/apptype/' ~ selectedAppType,
+                'closeActionUrl'                : 'devtools/modules/q/apptype/' ~ selectedAppType
+            ]
+        %}
+    {% endif %}
+    {% set generateReleaseUrl = links.url('devtools/modules/q/module/true/type/' ~ type ~ '/id/' ~ moduleId ~ '/newrelease/true') %}
+    {% if selectedAppType is defined and selectedAppType != '0' %}
+        {% if clone is defined and clone == false %}
+            {% set generateReleaseUrl = generateReleaseUrl ~ '/apptype/' ~ selectedAppType %}
+        {% endif %}
+    {% endif %}
+    {% set formSecondaryButtons = [] %}
+    {% if clone is defined and clone == false %}
+        {% set formSecondaryButtons =
+            [
+                'buttonType'                : 'button',
+                'buttons'                   : {
+                    'generate' : {
+                        'title'                   : 'Generate Release',
+                        'type'                    : 'success',
+                        'icon'                    : 'wand-sparkles',
+                        'buttonAdditionalClass'   : 'contentAjaxLink',
+                        'url'                     : generateReleaseUrl
+                    }
+                }
+            ]
+        %}
+    {% endif %}
+    {% set title = 'Modules : ' ~ moduleAppType ~ ' | ' ~ moduleName ~ ' (' ~ type ~ ')' %}
     {% if subview is defined and subview === true %}
-        {% set title = 'Modules : ' ~ moduleName ~ ' (SUBVIEW)' %}
+        {% set title = 'Modules : ' ~ moduleAppType ~ ' | ' ~ moduleName ~ ' (SUBVIEW)' %}
     {% endif %}
     {{adminltetags.useTag('content',
         [
@@ -100,16 +166,8 @@
             'cardTitle'                     : title,
             'cardAdditionalClass'           : 'rounded-0',
             'cardBodyInclude'               : 'modules/module',
-            'formButtons'                   :
-            [
-                'updateButtonId'                : moduleId,
-                'addActionUrl'                  : 'devtools/modules/add',
-                'addSuccessRedirectUrl'         : 'devtools/modules',
-                'updateActionUrl'               : 'devtools/modules/update',
-                'updateSuccessRedirectUrl'      : 'devtools/modules',
-                'cancelActionUrl'               : 'devtools/modules',
-                'closeActionUrl'                : 'devtools/modules'
-            ]
+            'formButtons'                   : formButtons,
+            'formSecondaryButtons'          : formSecondaryButtons
         ]
     )}}
 {% endif %}

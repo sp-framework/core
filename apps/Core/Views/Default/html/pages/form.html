@@ -1,0 +1,381 @@
+{% set fileHidden = 'hidden' %}
+{% set codeHidden = 'hidden' %}
+{% set appTypeApps = [] %}
+{% if page['id'] is defined %}
+    {% set pageId = page['id'] %}
+    {% set pageName = page['name'] %}
+    {% set pageAppType = page['app_type'] %}
+    {% set pageVisibleOnApps = page['visible_on_apps'] %}
+    {% set pageContentSource = page['content_source'] %}
+    {% set pageDescription = page['description'] %}
+    {% set pageHtmlCode = page['html_code'] %}
+    {% set pageHtmlFile = page['html_file'] %}
+    {% if page['content_source'] == 'file' %}
+        {% set fileHidden = '' %}
+    {% elseif page['content_source'] == 'code' %}
+        {% set codeHidden = '' %}
+    {% endif %}
+    {% for app in apps %}
+        {% if app['data']['app_type'] == pageAppType %}
+            {% set appTypeApps = array_merge(appTypeApps, [app]) %}
+        {% endif %}
+    {% endfor %}
+{% else %}
+    {% set pageId = '' %}
+    {% set pageName = '' %}
+    {% set pageAppType = [] %}
+    {% set pageVisibleOnApps = [] %}
+    {% set pageContentSource = '' %}
+    {% set pageDescription = '' %}
+    {% set pageHtmlCode = '' %}
+    {% set pageHtmlFile = '' %}
+    {% set appTypeApps = apps %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Page ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Page ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : pageId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Page Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Page Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : pageName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'content_source',
+                        'fieldLabel'                           : 'Page Content Source',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select page content source, either from file or from provided html code. Note: Use HTML File option to include Javascript in your html page!',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : contentSources,
+                        'fieldDataSelect2OptionsKey'           : 'source',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : pageContentSource
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'app_type',
+                        'fieldLabel'                           : 'Page App Type',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select page app type.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : appTypes,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : pageAppType
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'visible_on_apps',
+                        'fieldLabel'                           : 'Visible on Apps',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'App type.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : appTypeApps,
+                        'fieldDataSelect2Multiple'             : true,
+                        'fieldDataSelect2OptionsKey'           : 'route',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : pageVisibleOnApps
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'description',
+                        'fieldLabel'                     : 'Page Description',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 1024,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Description of the page',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : pageDescription
+                    ]
+                )}}
+            </div>
+        </div>
+        
+        <div class="row" id="html_file" {{fileHidden}}>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'html_file',
+                        'fieldLabel'                     : 'Page HTML File name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Page HTML File name without the extension. This file should be present in the files folder of the template. Example: if you are on default template and app type is Blog. Your file should be at location apps/Blog/Views/Default/html/pages/files/',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : pageHtmlFile
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row" id="html_code" {{codeHidden}}>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'html_code',
+                        'fieldLabel'                     : 'Page HTML Code',
+                        'fieldType'                      : 'trumbowyg',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Design page using the tool provided or click on < > and write/paste HTML code.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 65535,
+                        'fieldValue'                     : pageHtmlCode
+                    ]
+                )}}
+            </div>
+        </div>
+        
+    </fieldset>
+</form>
+{% set apps = escaper.js(json_encode(apps, 16)) %}
+<script>
+/* globals BazHelpers paginatedPNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-name'                                : { },
+        '{{componentId}}-{{sectionId}}-app_type'                            : {
+            'placeholder'   : 'SELECT APP TYPE',
+            afterInit: function() {
+                var apps = JSON.parse('{{apps}}');
+
+                $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function (e) {
+                    $('#{{componentId}}-{{sectionId}}-visible_on_apps').empty().trigger('change');
+
+                    for (var app in apps) {
+                        if (apps[app]['data']['app_type'] === e.params.data.id) {
+                            $('#{{componentId}}-{{sectionId}}-visible_on_apps')
+                            .append(new Option(apps[app]['name'], apps[app]['route'], false, false))
+                            .trigger('change');
+                        }
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-description'                         : { },
+        '{{componentId}}-{{sectionId}}-visible_on_apps'                     : {
+            'placeholder'   : 'SELECT APPS'
+        },
+        '{{componentId}}-{{sectionId}}-content_source'                      : {
+            'placeholder'   : 'SELECT HTML CONTENT SOURCE',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-content_source').on('select2:select', function (e) {
+                    if (e.params.data.id === 'file') {
+                        $("#html_file").attr('hidden', false);
+                        $("#html_code").attr('hidden', true);
+                    } else if (e.params.data.id === 'code') {
+                        $("#html_file").attr('hidden', true);
+                        $("#html_code").attr('hidden', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-html_file'                           : { },
+        '{{componentId}}-{{sectionId}}-html_code'                           : {
+            tagsToRemove: ['script', 'link'],
+            semantic: false
+        },
+        '{{componentId}}-{{sectionId}}-result'                              : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-test-template').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}-test-template').children().attr('hidden', false);
+
+                    var url = $(this).attr('href');
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['html_code'] = $('#{{componentId}}-{{sectionId}}-html_code').val();
+
+                    if (postData['html_code'] === '') {
+                        paginatedPNotify('error', {
+                            'title' : 'HTML Code cannot be empty.'
+                        });
+
+                        $('#{{componentId}}-{{sectionId}}-test-template').children().attr('hidden', true);
+
+                        return;
+                    }
+
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.result) {
+                                $('#{{componentId}}-{{sectionId}}-result').empty().html(response.responseData.result);
+                                $('#{{componentId}}-{{sectionId}}-result').parents('.form-group').removeClass('d-none');
+                            }
+                        } else {
+                            paginatedPNotify('error', {
+                                'title' : response.responseMessage
+                            });
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-test-template').children().attr('hidden', true);
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'required',
+                '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
+                '{{componentId}}-{{sectionId}}-visible_on_apps'             : 'required',
+                '{{componentId}}-{{sectionId}}-content_source'              : 'required',
+                '{{componentId}}-{{sectionId}}-html_file'                   : 'required',
+                '{{componentId}}-{{sectionId}}-html_code'                   : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'Please enter page name',
+                '{{componentId}}-{{sectionId}}-app_type'                    : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-visible_on_apps'             : 'Please select page visible on apps',
+                '{{componentId}}-{{sectionId}}-content_source'              : 'Please select page content source',
+                '{{componentId}}-{{sectionId}}-html_file'                   : 'Please enter html filename',
+                '{{componentId}}-{{sectionId}}-html_code'                   : 'Please enter html code',
+            },
+            onSubmitResponse : function(response) {
+                if (response && response.responseData && response.responseData.id) {
+                    $('#{{componentId}}-{{sectionId}}-addData').attr('href', $('#{{componentId}}-{{sectionId}}-addData').attr('href') + '/q/edit/true/id/' + response.responseData.id);
+                }
+
+                return true;
+            }
+        }
+    });
+</script>

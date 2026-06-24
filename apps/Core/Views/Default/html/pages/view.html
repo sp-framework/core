@@ -1,0 +1,38 @@
+{% if mode is defined and mode == 'edit' %}
+    {% if page['id'] is defined %}
+        {% set pageId = page['id'] %}
+        {% set title = 'Page (' ~ page['name'] ~ ')' %}
+    {% else %}
+        {% set pageId = '' %}
+        {% set title = 'New Page' %}
+    {% endif %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'file-code',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'pages/form',
+            'formButtons'                   :
+            [
+                'updateButtonId'                : pageId,
+                'addActionUrl'                  : 'pages/add',
+                'addSuccessRedirectUrl'         : 'pages',
+                'updateActionUrl'               : 'pages/update',
+                'updateSuccessRedirectUrl'      : 'pages/q/edit/true/id/' ~ pageId,
+                'cancelActionUrl'               : 'pages',
+                'closeActionUrl'                : 'pages'
+            ]
+        ]
+    )}}
+{% else %}
+    {{ page['html_code'] }}
+{% endif %}

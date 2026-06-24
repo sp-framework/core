@@ -10,7 +10,7 @@ class ModulesComponent extends BaseComponent
 	{
 		$this->modulesManager = $this->usePackage('manager');
 
-		$this->setModuleSettings(true);
+		$this->setModuleSettings();
 
 		$this->setModuleSettingsData([
 				'apis' => $this->modulesManager->getAvailableApis(true, false),

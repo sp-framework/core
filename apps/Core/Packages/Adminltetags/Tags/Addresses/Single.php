@@ -24,7 +24,7 @@ class Single
 
     protected $compSecId;
 
-    public function __construct($view, $tag, $links, $escaper, $params, $addressesParams)
+    public function __construct($view, $tag, $links, $escaper, $params, $addressesParams = [])
     {
         $this->view = $view;
 
@@ -54,6 +54,19 @@ class Single
 
     protected function buildSingleAddressData()
     {
+        $this->addressesParams['searchType'] =
+            isset($this->params['searchType']) ?
+            $this->params['searchType'] :
+            'city';
+
+        $fieldsArr = ['addressReference','attentionTo','streetAddress','streetAddress2','streetAddress3','streetAddress4','cityId','cityName','postCodeId','postCode','stateId','stateName','countryId','countryName'];
+        foreach ($fieldsArr as $field) {
+            $this->addressesParams[$field] =
+                isset($this->params[$field]) ?
+                $this->params[$field] :
+                '';
+        }
+
         $this->addressesParams['attentionToFieldLabel'] =
             isset($this->params['attentionToFieldLabel']) ?
             $this->params['attentionToFieldLabel'] :
@@ -68,6 +81,16 @@ class Single
             isset($this->params['streetAddress2FieldLabel']) ?
             $this->params['streetAddress2FieldLabel'] :
             'Street Address 2';
+
+        $this->addressesParams['streetAddress3FieldLabel'] =
+            isset($this->params['streetAddress3FieldLabel']) ?
+            $this->params['streetAddress3FieldLabel'] :
+            'Street Address 3';
+
+        $this->addressesParams['streetAddress4FieldLabel'] =
+            isset($this->params['streetAddress4FieldLabel']) ?
+            $this->params['streetAddress4FieldLabel'] :
+            'Street Address 4';
 
         $this->addressesParams['cityFieldLabel'] =
             isset($this->params['cityFieldLabel']) ?
@@ -89,230 +112,63 @@ class Single
             $this->params['countryFieldLabel'] :
             'Country';
 
-        $this->addressesParams['attentionToFieldHidden'] =
-            isset($this->params['attentionToFieldHidden']) &&
-                $this->params['attentionToFieldHidden'] === true ?
-            true :
-            false;
+        $fieldsArr = null;
+        $field = null;
 
-        $this->addressesParams['streetAddressFieldHidden'] =
-            isset($this->params['streetAddressFieldHidden']) &&
-                $this->params['streetAddressFieldHidden'] === true ?
-            true :
-            false;
+        $fieldsArr = ['includeAttentionTo','attentionToFieldHidden','includeStreet','streetAddressFieldHidden','streetAddress2FieldHidden','includeStreetExt','streetAddress3FieldHidden','streetAddress4FieldHidden','cityFieldHidden','postCodeFieldHidden','stateFieldHidden','countryFieldHidden','attentionToFieldDisabled','streetAddressFieldDisabled','streetAddress2FieldDisabled','streetAddress3FieldDisabled','streetAddress4FieldDisabled','cityFieldDisabled','postCodeFieldDisabled','stateFieldDisabled','countryFieldDisabled','attentionToFieldRequired','streetAddressFieldRequired','streetAddress2FieldRequired','streetAddress3FieldRequired','streetAddress4FieldRequired','cityFieldRequired','postCodeFieldRequired','stateFieldRequired','countryFieldRequired','addressReferenceFieldBazPostOnCreate','addressReferenceFieldBazPostOnUpdate','attentionToFieldBazPostOnCreate','attentionToFieldBazPostOnUpdate','streetAddressFieldBazPostOnCreate','streetAddressFieldBazPostOnUpdate','streetAddress2FieldBazPostOnCreate','streetAddress2FieldBazPostOnUpdate','streetAddress3FieldBazPostOnCreate','streetAddress3FieldBazPostOnUpdate','streetAddress4FieldBazPostOnCreate','streetAddress4FieldBazPostOnUpdate','cityFieldBazPostOnCreate','cityFieldBazPostOnUpdate','postCodeFieldBazPostOnCreate','postCodeFieldBazPostOnUpdate','stateFieldBazPostOnCreate','stateFieldBazPostOnUpdate','countryFieldBazPostOnCreate','countryFieldBazPostOnUpdate'];
 
-        $this->addressesParams['streetAddress2FieldHidden'] =
-            isset($this->params['streetAddress2FieldHidden']) &&
-                $this->params['streetAddress2FieldHidden'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['cityFieldHidden'] =
-            isset($this->params['cityFieldHidden']) &&
-                $this->params['cityFieldHidden'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['postCodeFieldHidden'] =
-            isset($this->params['postCodeFieldHidden']) &&
-                $this->params['postCodeFieldHidden'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['stateFieldHidden'] =
-            isset($this->params['stateFieldHidden']) &&
-                $this->params['stateFieldHidden'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['countryFieldHidden'] =
-            isset($this->params['countryFieldHidden']) &&
-                $this->params['countryFieldHidden'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['attentionToFieldDisabled'] =
-            isset($this->params['attentionToFieldDisabled']) &&
-                $this->params['attentionToFieldDisabled'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['streetAddressFieldDisabled'] =
-            isset($this->params['streetAddressFieldDisabled']) &&
-                $this->params['streetAddressFieldDisabled'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['streetAddress2FieldDisabled'] =
-            isset($this->params['streetAddress2FieldDisabled']) &&
-                $this->params['streetAddress2FieldDisabled'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['cityFieldDisabled'] =
-            isset($this->params['cityFieldDisabled']) &&
-                $this->params['cityFieldDisabled'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['postCodeFieldDisabled'] =
-            isset($this->params['postCodeFieldDisabled']) &&
-                $this->params['postCodeFieldDisabled'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['stateFieldDisabled'] =
-            isset($this->params['stateFieldDisabled']) &&
-                $this->params['stateFieldDisabled'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['countryFieldDisabled'] =
-            isset($this->params['countryFieldDisabled']) &&
-                $this->params['countryFieldDisabled'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['attentionToFieldRequired'] =
-            isset($this->params['attentionToFieldRequired']) &&
-                $this->params['attentionToFieldRequired'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['streetAddressFieldRequired'] =
-            isset($this->params['streetAddressFieldRequired']) &&
-                $this->params['streetAddressFieldRequired'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['streetAddress2FieldRequired'] =
-            isset($this->params['streetAddress2FieldRequired']) &&
-                $this->params['streetAddress2FieldRequired'] === true ?
-            true :
-            false;
-
-        $this->addressesParams['cityFieldRequired'] =
-            isset($this->params['cityFieldRequired']) &&
-                $this->params['cityFieldRequired'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['postCodeFieldRequired'] =
-            isset($this->params['postCodeFieldRequired']) &&
-                $this->params['postCodeFieldRequired'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['stateFieldRequired'] =
-            isset($this->params['stateFieldRequired']) &&
-                $this->params['stateFieldRequired'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['countryFieldRequired'] =
-            isset($this->params['countryFieldRequired']) &&
-                $this->params['countryFieldRequired'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['attentionToFieldBazPostOnCreate'] =
-            isset($this->params['attentionToFieldBazPostOnCreate']) &&
-                $this->params['attentionToFieldBazPostOnCreate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['attentionToFieldBazPostOnUpdate'] =
-            isset($this->params['attentionToFieldBazPostOnUpdate']) &&
-                $this->params['attentionToFieldBazPostOnUpdate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['streetAddressFieldBazPostOnCreate'] =
-            isset($this->params['streetAddressFieldBazPostOnCreate']) &&
-                $this->params['streetAddressFieldBazPostOnCreate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['streetAddressFieldBazPostOnUpdate'] =
-            isset($this->params['streetAddressFieldBazPostOnUpdate']) &&
-                $this->params['streetAddressFieldBazPostOnUpdate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['streetAddress2FieldBazPostOnCreate'] =
-            isset($this->params['streetAddress2FieldBazPostOnCreate']) &&
-                $this->params['streetAddress2FieldBazPostOnCreate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['streetAddress2FieldBazPostOnUpdate'] =
-            isset($this->params['streetAddress2FieldBazPostOnUpdate']) &&
-                $this->params['streetAddress2FieldBazPostOnUpdate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['cityFieldBazPostOnCreate'] =
-            isset($this->params['cityFieldBazPostOnCreate']) &&
-                $this->params['cityFieldBazPostOnCreate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['cityFieldBazPostOnUpdate'] =
-            isset($this->params['cityFieldBazPostOnUpdate']) &&
-                $this->params['cityFieldBazPostOnUpdate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['postCodeFieldBazPostOnCreate'] =
-            isset($this->params['postCodeFieldBazPostOnCreate']) &&
-                $this->params['postCodeFieldBazPostOnCreate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['postCodeFieldBazPostOnUpdate'] =
-            isset($this->params['postCodeFieldBazPostOnUpdate']) &&
-                $this->params['postCodeFieldBazPostOnUpdate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['stateFieldBazPostOnCreate'] =
-            isset($this->params['stateFieldBazPostOnCreate']) &&
-                $this->params['stateFieldBazPostOnCreate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['stateFieldBazPostOnUpdate'] =
-            isset($this->params['stateFieldBazPostOnUpdate']) &&
-                $this->params['stateFieldBazPostOnUpdate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['countryFieldBazPostOnCreate'] =
-            isset($this->params['countryFieldBazPostOnCreate']) &&
-                $this->params['countryFieldBazPostOnCreate'] === false ?
-            false :
-            true;
-
-        $this->addressesParams['countryFieldBazPostOnUpdate'] =
-            isset($this->params['countryFieldBazPostOnUpdate']) &&
-                $this->params['countryFieldBazPostOnUpdate'] === false ?
-            false :
-            true;
+        foreach ($fieldsArr as $field) {
+            $this->addressesParams[$field] =
+                isset($this->params[$field]) &&
+                    $this->params[$field] === true ?
+                true :
+                false;
+        }
     }
 
     protected function buildSingleAddressLayout()
     {
-        if (isset($this->params['includeAttentionTo']) && $this->params['includeAttentionTo'] === true) {
+        $this->content .=
+            '<div class="row">
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                             => $this->params['component'],
+                            'componentName'                         => $this->params['componentName'],
+                            'componentId'                           => $this->params['componentId'],
+                            'sectionId'                             => $this->params['sectionId'],
+                            'fieldId'                               => 'address_reference',
+                            'fieldLabel'                            => 'Address Reference',
+                            'fieldType'                             => 'input',
+                            'fieldHelp'                             => true,
+                            'fieldHelpTooltipContent'               => 'Address Reference. Example: Main, Shipping, etc.',
+                            'fieldHidden'                           => false,
+                            'fieldRequired'                         => true,
+                            'fieldBazScan'                          => true,
+                            'fieldBazPostOnCreate'                  => $this->addressesParams['addressReferenceFieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'                  => $this->addressesParams['addressReferenceFieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'               => 1,
+                            'fieldDataInputMaxLength'               => 100,
+                            'fieldValue'                            => $this->addressesParams['addressReference']
+                        ]
+                    ) .
+                '</div>
+            </div>';
+
+        if (isset($this->addressesParams['includeAttentionTo']) && $this->addressesParams['includeAttentionTo'] === true) {
             $this->content .= $this->inclAttentionTo();
         }
 
-        if (isset($this->params['includeStreet']) && $this->params['includeStreet'] === true) {
+        if (isset($this->addressesParams['includeStreet']) && $this->addressesParams['includeStreet'] === true) {
             $this->content .= $this->inclStreet();
         }
 
-        if (isset($this->params['searchType'])) {
-            if ($this->params['searchType'] === 'city') {
+        if (isset($this->addressesParams['includeStreetExt']) && $this->addressesParams['includeStreetExt'] === true) {
+            $this->content .= $this->inclStreetExt();
+        }
 
+        if (isset($this->addressesParams['searchType'])) {
+            if ($this->addressesParams['searchType'] === 'city') {
                 $this->content .=
                     '<div class="row">' . $this->inclCity() . $this->inclPostCode() . '</div>' .
                     '<div class="row">' . $this->inclState() . $this->inclCountry() . '</div>';
@@ -326,9 +182,7 @@ class Single
 
                 $this->content .=
                     '});</script>';
-
-            } else if ($this->params['searchType'] === 'state') {
-
+            } else if ($this->addressesParams['searchType'] === 'state') {
                 $this->content .=
                     '<div class="row">' . $this->inclState() . $this->inclCountry() . '</div>';
 
@@ -337,9 +191,7 @@ class Single
 
                 $this->content .=
                     '});</script>';
-
-            } else if ($this->params['searchType'] === 'country') {
-
+            } else if ($this->addressesParams['searchType'] === 'country') {
                 $this->content .=
                     '<div class="row">' . $this->inclCountry() . '</div>';
 
@@ -348,7 +200,6 @@ class Single
 
                 $this->content .=
                     '});</script>';
-
             }
         } else {
             $this->content .=
@@ -387,12 +238,13 @@ class Single
                             'fieldDisabled'                         => $this->addressesParams['attentionToFieldDisabled'],
                             'fieldRequired'                         => $this->addressesParams['attentionToFieldRequired'],
                             'fieldBazScan'                          => true,
-                            'fieldBazJstreeSearch'                  => true,
+                            'fieldBazJstreeSearch'                  =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'                  => $this->addressesParams['attentionToFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['attentionToFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
                             'fieldDataInputMaxLength'               => 100,
-                            'fieldValue'                            => $this->params['attentionTo']
+                            'fieldValue'                            => $this->addressesParams['attentionTo']
                         ]
                     ) .
                 '</div>
@@ -419,12 +271,13 @@ class Single
                             'fieldDisabled'                         => $this->addressesParams['streetAddressFieldDisabled'],
                             'fieldRequired'                         => $this->addressesParams['streetAddressFieldRequired'],
                             'fieldBazScan'                          => true,
-                            'fieldBazJstreeSearch'                  => true,
+                            'fieldBazJstreeSearch'                  =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'                  => $this->addressesParams['streetAddressFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddressFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
                             'fieldDataInputMaxLength'               => 100,
-                            'fieldValue'                            => $this->params['streetAddress']
+                            'fieldValue'                            => $this->addressesParams['streetAddress']
                         ]
                     ) .
                 '</div>
@@ -444,12 +297,72 @@ class Single
                             'fieldDisabled'                         => $this->addressesParams['streetAddress2FieldDisabled'],
                             'fieldRequired'                         => $this->addressesParams['streetAddress2FieldRequired'],
                             'fieldBazScan'                          => true,
-                            'fieldBazJstreeSearch'                  => true,
+                            'fieldBazJstreeSearch'                  =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'                  => $this->addressesParams['streetAddress2FieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddress2FieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
                             'fieldDataInputMaxLength'               => 100,
-                            'fieldValue'                            => $this->params['streetAddress2']
+                            'fieldValue'                            => $this->addressesParams['streetAddress2']
+                        ]
+                    ) .
+                '</div>
+            </div>';
+    }
+
+    protected function inclStreetExt()
+    {
+        return
+            '<div class="row">
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                             => $this->params['component'],
+                            'componentName'                         => $this->params['componentName'],
+                            'componentId'                           => $this->params['componentId'],
+                            'sectionId'                             => $this->params['sectionId'],
+                            'fieldId'                               => 'street_address_3',
+                            'fieldLabel'                            => $this->addressesParams['streetAddress3FieldLabel'],
+                            'fieldType'                             => 'input',
+                            'fieldHelp'                             => true,
+                            'fieldHelpTooltipContent'               => $this->addressesParams['streetAddress3FieldLabel'],
+                            'fieldHidden'                           => $this->addressesParams['streetAddress3FieldHidden'],
+                            'fieldDisabled'                         => $this->addressesParams['streetAddress3FieldDisabled'],
+                            'fieldRequired'                         => $this->addressesParams['streetAddress3FieldRequired'],
+                            'fieldBazScan'                          => true,
+                            'fieldBazJstreeSearch'                  =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
+                            'fieldBazPostOnCreate'                  => $this->addressesParams['streetAddress3FieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddress3FieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'               => 1,
+                            'fieldDataInputMaxLength'               => 100,
+                            'fieldValue'                            => $this->addressesParams['streetAddress3']
+                        ]
+                    ) .
+                '</div>
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                             => $this->params['component'],
+                            'componentName'                         => $this->params['componentName'],
+                            'componentId'                           => $this->params['componentId'],
+                            'sectionId'                             => $this->params['sectionId'],
+                            'fieldId'                               => 'street_address_4',
+                            'fieldLabel'                            => $this->addressesParams['streetAddress4FieldLabel'],
+                            'fieldType'                             => 'input',
+                            'fieldHelp'                             => true,
+                            'fieldHelpTooltipContent'               => $this->addressesParams['streetAddress4FieldLabel'],
+                            'fieldHidden'                           => $this->addressesParams['streetAddress4FieldHidden'],
+                            'fieldDisabled'                         => $this->addressesParams['streetAddress4FieldDisabled'],
+                            'fieldRequired'                         => $this->addressesParams['streetAddress4FieldRequired'],
+                            'fieldBazScan'                          => true,
+                            'fieldBazJstreeSearch'                  =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
+                            'fieldBazPostOnCreate'                  => $this->addressesParams['streetAddress4FieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddress4FieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'               => 1,
+                            'fieldDataInputMaxLength'               => 100,
+                            'fieldValue'                            => $this->addressesParams['streetAddress4']
                         ]
                     ) .
                 '</div>
@@ -473,7 +386,7 @@ class Single
                         'fieldBazScan'                          => true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['cityFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['cityFieldBazPostOnUpdate'],
-                        'fieldValue'                            => $this->params['cityId']
+                        'fieldValue'                            => $this->addressesParams['cityId']
                     ]
                 ) .
                 $this->adminLTETags->useTag('fields',
@@ -489,7 +402,8 @@ class Single
                         'fieldHelp'                             => true,
                         'fieldHelpTooltipContent'               => 'Search ' . $this->addressesParams['cityFieldLabel'] . '. If there are no search results, try fixing the spelling or use full form for the name, ex=> use Saint instead of St.',
                         'fieldBazScan'                          => true,
-                        'fieldBazJstreeSearch'                  => true,
+                        'fieldBazJstreeSearch'                  =>
+                            (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['cityFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['cityFieldBazPostOnUpdate'],
                         'fieldHidden'                           => $this->addressesParams['cityFieldHidden'],
@@ -497,7 +411,7 @@ class Single
                         'fieldRequired'                         => $this->addressesParams['cityFieldRequired'],
                         'fieldDataInputMinLength'               => 1,
                         'fieldDataInputMaxLength'               => 100,
-                        'fieldValue'                            => $this->params['cityName']
+                        'fieldValue'                            => $this->addressesParams['cityName']
                     ]
                 ) .
             '</div>';
@@ -513,6 +427,22 @@ class Single
                         'componentName'                         => $this->params['componentName'],
                         'componentId'                           => $this->params['componentId'],
                         'sectionId'                             => $this->params['sectionId'],
+                        'fieldId'                               => 'post_code_id',
+                        'fieldLabel'                            => $this->addressesParams['postCodeFieldLabel'],
+                        'fieldHidden'                           => true,
+                        'fieldType'                             => 'input',
+                        'fieldBazScan'                          => true,
+                        'fieldBazPostOnCreate'                  => $this->addressesParams['postCodeFieldBazPostOnCreate'],
+                        'fieldBazPostOnUpdate'                  => $this->addressesParams['postCodeFieldBazPostOnUpdate'],
+                        'fieldValue'                            => $this->addressesParams['postCodeId']
+                    ]
+                ) .
+                $this->adminLTETags->useTag('fields',
+                    [
+                        'component'                             => $this->params['component'],
+                        'componentName'                         => $this->params['componentName'],
+                        'componentId'                           => $this->params['componentId'],
+                        'sectionId'                             => $this->params['sectionId'],
                         'fieldId'                               => 'post_code',
                         'fieldLabel'                            => $this->addressesParams['postCodeFieldLabel'],
                         'fieldType'                             => 'input',
@@ -522,12 +452,13 @@ class Single
                         'fieldDisabled'                         => $this->addressesParams['postCodeFieldDisabled'],
                         'fieldRequired'                         => $this->addressesParams['postCodeFieldRequired'],
                         'fieldBazScan'                          => true,
-                        'fieldBazJstreeSearch'                  => true,
+                        'fieldBazJstreeSearch'                  =>
+                            (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['postCodeFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['postCodeFieldBazPostOnUpdate'],
                         'fieldDataInputMinLength'               => 1,
                         'fieldDataInputMaxLength'               => 50,
-                        'fieldValue'                            => $this->params['postCode']
+                        'fieldValue'                            => $this->addressesParams['postCode']
                     ]
                 ) .
             '</div>';
@@ -550,7 +481,7 @@ class Single
                         'fieldBazScan'                          => true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['stateFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['stateFieldBazPostOnUpdate'],
-                        'fieldValue'                            => $this->params['stateId']
+                        'fieldValue'                            => $this->addressesParams['stateId']
                     ]
                 ) .
                 $this->adminLTETags->useTag('fields',
@@ -566,7 +497,8 @@ class Single
                         'fieldHelp'                             => true,
                         'fieldHelpTooltipContent'               => 'Enter ' . $this->addressesParams['stateFieldLabel'],
                         'fieldBazScan'                          => true,
-                        'fieldBazJstreeSearch'                  => true,
+                        'fieldBazJstreeSearch'                  =>
+                            (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['stateFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['stateFieldBazPostOnUpdate'],
                         'fieldHidden'                           => $this->addressesParams['stateFieldHidden'],
@@ -574,7 +506,7 @@ class Single
                         'fieldRequired'                         => $this->addressesParams['stateFieldRequired'],
                         'fieldDataInputMinLength'               => 1,
                         'fieldDataInputMaxLength'               => 100,
-                        'fieldValue'                            => $this->params['stateName']
+                        'fieldValue'                            => $this->addressesParams['stateName']
                     ]
                 ) .
             '</div>';
@@ -597,7 +529,7 @@ class Single
                         'fieldBazScan'                          => true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['countryFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['countryFieldBazPostOnUpdate'],
-                        'fieldValue'                            => $this->params['countryId']
+                        'fieldValue'                            => $this->addressesParams['countryId']
                     ]
                 ) .
                 $this->adminLTETags->useTag('fields',
@@ -613,7 +545,8 @@ class Single
                         'fieldHelp'                             => true,
                         'fieldHelpTooltipContent'               => 'Enter ' . $this->addressesParams['countryFieldLabel'],
                         'fieldBazScan'                          => true,
-                        'fieldBazJstreeSearch'                  => true,
+                        'fieldBazJstreeSearch'                  =>
+                            (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['countryFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['countryFieldBazPostOnUpdate'],
                         'fieldHidden'                           => $this->addressesParams['countryFieldHidden'],
@@ -621,7 +554,7 @@ class Single
                         'fieldRequired'                         => $this->addressesParams['countryFieldRequired'],
                         'fieldDataInputMinLength'               => 1,
                         'fieldDataInputMaxLength'               => 100,
-                        'fieldValue'                            => $this->params['countryName']
+                        'fieldValue'                            => $this->addressesParams['countryName']
                     ]
                 ) .
             '</div>';
@@ -660,9 +593,16 @@ class Single
 
         if (isset($this->params['includeStreet']) && $this->params['includeStreet'] === true) {
             $baseJs .=
-                '"' . $this->compSecId . '-attention_to"        : { },
+                '"' . $this->compSecId . '-address_reference"   : { },
+                "' . $this->compSecId . '-attention_to"         : { },
                 "' . $this->compSecId . '-street_address"       : { },
                 "' . $this->compSecId . '-street_address_2"     : { },';
+        }
+
+        if (isset($this->params['includeStreetExt']) && $this->params['includeStreetExt'] === true) {
+            $baseJs .=
+                '"' . $this->compSecId . '-street_address_3"    : { },
+                "' . $this->compSecId . '-street_address_4"     : { },';
         }
 
         return $baseJs;
@@ -730,13 +670,7 @@ class Single
                             highlight: true,
                             resultItem: {
                                 content: (data, source) => {
-                                    var postCode = "0";
-
-                                    if (data.value.postcode) {
-                                        postCode = data.value.postcode;
-                                    }
-
-                                    source.innerHTML = data.match + " <span>(Post Code: " + postCode + ", State: " + data.value.state_name + ", Country: " + data.value.country_name + ")</span>";
+                                    source.innerHTML = data.match + " <span>(State: " + data.value.state_name + ", Country: " + data.value.country_name + ")</span>";
                                 },
                                 element: "div"
                             },
@@ -760,8 +694,6 @@ class Single
                                 $("#' . $this->compSecId . '-city_id").attr("value", feedback.selection.value.id);
                                 $("#' . $this->compSecId . '-city_name").blur();
                                 $("#' . $this->compSecId . '-city_name").val(feedback.selection.value.name);
-                                $("#' . $this->compSecId . '-post_code").val(feedback.selection.value.postcode);
-                                $("#' . $this->compSecId . '-post_code").attr("value", feedback.selection.value.postcode);
                                 $("#' . $this->compSecId . '-state_id").val(feedback.selection.value.state_id);
                                 $("#' . $this->compSecId . '-state_id").attr("value", feedback.selection.value.state_id);
                                 $("#' . $this->compSecId . '-state_name").val(feedback.selection.value.state_name);
@@ -799,13 +731,14 @@ class Single
     protected function inclPostCodeJs()
     {
         return
-            '"' . $this->compSecId . '-post_code"        : {
+            '"' . $this->compSecId . '-post_code_id"    : { },
+            "' . $this->compSecId . '-post_code"        : {
                 afterInit   : function() {
                     dataCollectionSection["' . $this->compSecId . '-form"]["autoCompleteCities"] =
                         new autoComplete({
                             data: {
                                 src: async() => {
-                                    const url = "' . $this->links->url("system/geo/cities/searchPostCode") . '";
+                                    const url = "' . $this->links->url("system/geo/postcodes/searchPostCode") . '";
 
                                     var myHeaders = new Headers();
                                     myHeaders.append("accept", "application/json");
@@ -825,7 +758,7 @@ class Single
                                     const response = await responseData.json();
 
                                     if (response.tokenKey && response.token) {
-                                        $("#security-token").attr("postcode", response.tokenKey);
+                                        $("#security-token").attr("name", response.tokenKey);
                                         $("#security-token").val(response.token);
                                     }
 
@@ -835,7 +768,7 @@ class Single
                                         return [];
                                     }
                                 },
-                                key: ["postcode"],
+                                key: ["code"],
                                 cache: false
                             },
                             selector: "#' . $this->compSecId . '-post_code",
@@ -857,13 +790,7 @@ class Single
                             highlight: true,
                             resultItem: {
                                 content: (data, source) => {
-                                    var cityName = "";
-
-                                    if (data.value.name) {
-                                        cityName = data.value.name;
-                                    }
-
-                                    source.innerHTML = data.match + " <span>(City: " + cityName + ", State: " + data.value.state_name + ", Country: " + data.value.country_name + ")</span>";
+                                    source.innerHTML = data.match + " <span>(Locality: " + data.value.name + ", State: " + data.value.state_name + ", Country: " + data.value.country_name + ")</span>";
                                 },
                                 element: "div"
                             },
@@ -883,12 +810,10 @@ class Single
                                 }
                             },
                             onSelection: feedback => {
-                                $("#' . $this->compSecId . '-city_id").val(feedback.selection.value.id);
-                                $("#' . $this->compSecId . '-city_id").attr("value", feedback.selection.value.id);
-                                $("#' . $this->compSecId . '-city_name").blur();
-                                $("#' . $this->compSecId . '-city_name").val(feedback.selection.value.name);
-                                $("#' . $this->compSecId . '-post_code").val(feedback.selection.value.postcode);
-                                $("#' . $this->compSecId . '-post_code").attr("value", feedback.selection.value.postcode);
+                                $("#' . $this->compSecId . '-post_code_id").val(feedback.selection.value.id);
+                                $("#' . $this->compSecId . '-post_code_id").attr("value", feedback.selection.value.id);
+                                $("#' . $this->compSecId . '-post_code").val(feedback.selection.value.code);
+                                $("#' . $this->compSecId . '-post_code").attr("value", feedback.selection.value.code);
                                 $("#' . $this->compSecId . '-state_id").val(feedback.selection.value.state_id);
                                 $("#' . $this->compSecId . '-state_id").attr("value", feedback.selection.value.state_id);
                                 $("#' . $this->compSecId . '-state_name").val(feedback.selection.value.state_name);
@@ -901,8 +826,6 @@ class Single
                     });
                     // On delete
                     $("#' . $this->compSecId . '-post_code").on("input propertychange", function() {
-                        $("#' . $this->compSecId . '-city_id").val(0);
-                        $("#' . $this->compSecId . '-city_id").attr("value", 0);
                         $("#' . $this->compSecId . '-state_id").val(0);
                         $("#' . $this->compSecId . '-state_id").attr("value", 0);
                         $("#' . $this->compSecId . '-state_name").val("");

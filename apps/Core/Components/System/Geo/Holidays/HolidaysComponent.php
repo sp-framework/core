@@ -4,6 +4,7 @@ namespace Apps\Core\Components\System\Geo\Holidays;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use System\Base\BaseComponent;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoHolidays;
 
 class HolidaysComponent extends BaseComponent
 {
@@ -51,7 +52,7 @@ class HolidaysComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
-                $holidayTagsArr = $this->basepackages->tags->getTagsByPackageNameAndPackageRowId('GeoHolidays', $holiday['id']);
+                $holidayTagsArr = $this->basepackages->tags->getTagsByPackageClassAndPackageRowId(str_replace('\\', '_', GeoHolidays::Class), $holiday['id']);
 
                 if (count($holidayTagsArr) > 0) {
                     foreach ($holidayTagsArr as $tag) {
@@ -68,7 +69,7 @@ class HolidaysComponent extends BaseComponent
 
             $this->view->holidayTags = $holidayTags;
 
-            $this->view->tags = $this->basepackages->tags->getTagsByPackageName('GeoHolidays');
+            $this->view->tags = $this->basepackages->tags->getTagsByPackageClass(str_replace('\\', '_', GeoHolidays::Class));
 
             $this->view->pick('holidays/view');
 
@@ -87,6 +88,8 @@ class HolidaysComponent extends BaseComponent
         $replaceColumns =
             function ($dataArr) {
                 if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+                    $states = [];
+
                     foreach ($dataArr as &$data) {
                         if ($data['is_national_holiday'] == '1') {
                             $data['is_national_holiday'] = 'Yes';
@@ -94,9 +97,17 @@ class HolidaysComponent extends BaseComponent
                         } else {
                             $data['is_national_holiday'] = 'No';
 
-                            $state = $this->basepackages->geoStates->getById($data['state_id']);
+                            if (isset($states[$data['state_id']])) {
+                                $state = $states[$data['state_id']];
+                            } else {
+                                $state = $this->basepackages->geoStates->getById($data['state_id']);
+                            }
 
                             if ($state) {
+                                if (!isset($states[$state['id']])) {
+                                    $states[$state['id']] = $state;
+                                }
+
                                 $data['state_id'] = $state['name'];
                             } else {
                                 $data['state_id'] = '-';

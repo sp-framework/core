@@ -13,7 +13,17 @@ class Middlewares extends BasePackage
 
 	public function init(bool $resetCache = false)
 	{
-		$this->getAll($resetCache);
+		if ($this->opCache) {
+			if (!$resetCache && $this->opCache->checkCache('middlewares', 'core')) {
+				$this->middlewares = $this->opCache->getCache('middlewares', 'core');
+			} else {
+				$this->getAll($resetCache);
+
+				$this->opCache->setCache('middlewares', $this->middlewares, 'core');
+			}
+		} else {
+			$this->getAll($resetCache);
+		}
 
 		return $this;
 	}

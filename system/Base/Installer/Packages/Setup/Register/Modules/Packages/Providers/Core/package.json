@@ -87,7 +87,8 @@
 					}
 				}
 			}
-		}
+		},
+		"externals" : []
 	},
 	"settings" : 
 	{
@@ -135,7 +136,14 @@
 		},
 		"timeout" : 
 		{
-			"cookies" : 86400
+			"cookies" : 86400,
+			"session_idle" : 86400,
+			"session_absolute" : 2592000
+		},
+		"locale" :
+		{
+			"country_iso3" : "",
+			"timezone" : ""
 		}
 	}
 }

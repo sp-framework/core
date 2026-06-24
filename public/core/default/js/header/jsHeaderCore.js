@@ -47,15 +47,27 @@ var BazContentLoader = function() {
                     }
                 }
 
+                var showWarning = false;
+                var title;
+
                 if (window['dataCollection']['env']['wizard'] === true) {
+                    showWarning = true;
+                    title = '<span class="text-warning"> Cancel wizard?</span>';
+                } else if (window['dataCollection']['env']['mutexLock'] && window['dataCollection']['env']['mutexLock']['self']) {
+                    showWarning = true;
+                    title = '<span class="text-warning"> Cancel modification of entry?</span>';
+                }
+
+                if (showWarning) {
                     var swalSound = window.dataCollection.env.sounds.swalSound;
                     Swal.fire({
-                        title                       : '<span class="text-warning"> Quit current wizard?</span>',
+                        title                       : title,
                         icon                        : 'question',
                         background                  : 'rgba(0,0,0,.8)',
                         backdrop                    : 'rgba(0,0,0,.6)',
                         buttonsStyling              : false,
                         confirmButtonText           : 'Yes',
+                        cancelButtonText            : 'No',
                         customClass                 : {
                             'confirmButton'             : 'btn btn-warning text-uppercase',
                             'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
@@ -68,9 +80,25 @@ var BazContentLoader = function() {
                             swalSound.play();
                         }
                     }).then((result) => {
-                        //eslint-disable-next-line
-                        console.log(result);
                         if (result.value) {
+                            //Release and delete mutex entry from env
+                            if (window['dataCollection']['env']['mutexLock'] && window['dataCollection']['env']['mutexLock']['self']) {
+                                var postData = { };
+                                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                postData['mutexLock'] = window['dataCollection']['env']['mutexLock'];
+
+                                var url = window['dataCollection']['env']['rootPath'] + window['dataCollection']['env']['currentRoute'] + '/releaseMutex';
+
+                                $.post(url, postData, function(response) {
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
+                                    }
+                                }, 'json');
+
+                                delete(window['dataCollection']['env']['mutexLock']);
+                            }
+
                             loadAjax($(this), options); //do the magic
                         }
                     });
@@ -440,6 +468,7 @@ var BazContentLoader = function() {
 
     return bazContentLoaderConstructor;
 }();
+
 /* exported BazCore */
 /* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 PNotifyFontAwesome5Fix PNotifyPaginate PNotifyMobile BazTunnels BazHelpers */
 /*
@@ -529,18 +558,18 @@ var BazCore = function() {
                         async: true,
                         cache: true
                     }).done(function() {
-                        $('body').trigger('libsLoadComplete');
-                        bazFooterFunctions(_extends(BazCore.defaults, options));
+                        bazFooterFunctions(options);
                         dataCollection.env.libsLoaded = true;
+                        $('body').trigger('libsLoadComplete');
                     });
                 });
             }
         } else if (dataCollection.env.libsLoaded === true) {
-            bazFooterFunctions(_extends(BazCore.defaults, options));
+            bazFooterFunctions(options);
         }
     }
     //Footer
-    function bazFooterFunctions() {
+    function bazFooterFunctions(options) {
         PNotify.defaultModules.set(PNotifyBootstrap4, {});
         PNotify.defaultModules.set(PNotifyFontAwesome5, {});
         PNotify.defaultModules.set(PNotifyFontAwesome5Fix, {});
@@ -555,24 +584,24 @@ var BazCore = function() {
             openMenu();
         }
 
-        if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
-            BazTunnels.init();
-        }
-        $('#body').on('bazContentLoaderAjaxComplete', function() {
-            //eslint-disable-next-line
-            console.log(dataCollection.env.wsTunnels.pusher._websocket_connected);
-            if (dataCollection.env.wsTunnels.pusher._websocket_connected !== 'undefined' &&
-                dataCollection.env.wsTunnels.pusher._websocket_connected === false
-            ) {
+        if (!options.guest) {
+            if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
                 BazTunnels.init();
             }
-        });
-        initPings();
+            $('#body').on('bazContentLoaderAjaxComplete', function() {
+                if (dataCollection.env.wsTunnels.pusher._websocket_connected !== 'undefined' &&
+                    dataCollection.env.wsTunnels.pusher._websocket_connected === false
+                ) {
+                    BazTunnels.init();
+                }
+            });
+            initPings();
+        }
     }
 
     //10 mins get update of site status. Note this is not PING, but webserver responsive time to reply with favicon.
     function initPings() {
-        BazHelpers.ping(dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost, {}, function(err, data) {
+        BazHelpers.ping(dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost, {"favicon" : "/ping.ico"}, function(err, data) {
             timerId = BazHelpers.getTimerId('ping');
 
             if (!err && data) {

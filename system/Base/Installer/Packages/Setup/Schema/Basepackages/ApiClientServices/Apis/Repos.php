@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Repos
 {
@@ -24,7 +25,7 @@ class Repos
                         'api_url',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
+                            'size'    => 100,
                             'notNull' => true,
                         ]
                     ),
@@ -32,7 +33,7 @@ class Repos
                         'org_user',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 1024,
+                            'size'    => 100,
                             'notNull' => true,
                         ]
                     ),
@@ -40,7 +41,7 @@ class Repos
                         'repo_url',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
+                            'size'    => 512,
                             'notNull' => true,
                         ]
                     ),
@@ -48,7 +49,7 @@ class Repos
                         'branch',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 512,
+                            'size'    => 100,
                             'notNull' => true,
                         ]
                     ),
@@ -72,7 +73,7 @@ class Repos
                         'password',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
+                            'size'    => 512,
                             'notNull' => false,
                         ]
                     ),
@@ -80,7 +81,7 @@ class Repos
                         'access_token',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
+                            'size'    => 512,
                             'notNull' => false,
                         ]
                     ),
@@ -88,7 +89,7 @@ class Repos
                         'authorization',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
+                            'size'    => 512,
                             'notNull' => false,
                         ]
                     ),
@@ -98,6 +99,17 @@ class Repos
                             'type'    => Column::TYPE_JSON,
                             'notNull' => false,
                         ]
+                    )
+                ],
+                'indexes' => [
+                    new Index(
+                        'column_UNIQUE',
+                        [
+                            'api_url',
+                            'org_user',
+                            'branch'
+                        ],
+                        'UNIQUE'
                     )
                 ]
             ];

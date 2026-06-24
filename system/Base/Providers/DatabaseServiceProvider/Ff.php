@@ -21,7 +21,7 @@ class Ff
 
     protected $cacheConfig = [];
 
-    protected $request;
+    public $request;
 
     public $helper;
 
@@ -175,7 +175,7 @@ class Ff
                     $schema['properties'][$column->getName()]['format'] = 'time';
                 } else if ($column->getType() === 4 || $column->getType() === 17) {//if format is date-time and is required add timestamp
                     $schema['properties'][$column->getName()]['format'] = 'date-time';
-                    if ($column->getDefault() &&
+                    if (!is_null($column->getDefault()) &&
                         $column->getDefault() === 'CURRENT_TIMESTAMP'
                     ) {
                         if (!in_array($column->getName(), $schema['required'])) {
@@ -184,13 +184,26 @@ class Ff
                     }
                 } else if ($column->getType() === 15 || $column->getType() === 16) {//json format
                     $schema['properties'][$column->getName()]['format'] = 'json';
+                } else {
+                    if (!is_null($column->getDefault())) {
+                        $schema['properties'][$column->getName()]['default'] = (string) $column->getDefault();
+                    }
                 }
             } else if (in_array($column->getType(), $contants['number'])) {
                 $type = 'number';
+                if (!is_null($column->getDefault())) {
+                    $schema['properties'][$column->getName()]['default'] = (float) $column->getDefault();
+                }
             } else if (in_array($column->getType(), $contants['integer'])) {
                 $type = 'integer';
+                if (!is_null($column->getDefault())) {
+                    $schema['properties'][$column->getName()]['default'] = (int) $column->getDefault();
+                }
             } else if ($column->getType() === 8) {//Boolean
                 $type = 'boolean';
+                if (!is_null($column->getDefault())) {
+                    $schema['properties'][$column->getName()]['default'] = (bool) $column->getDefault();
+                }
             }
 
             if (isset($schema['properties'][$column->getName()]['type']) &&
@@ -301,6 +314,7 @@ class Ff
             $config = array_merge($config, $configArr);
         }
 
+        $config['uniqueFields'] = [];
         $config['indexes'] = [];
 
         if ($tableModel) {
@@ -311,27 +325,16 @@ class Ff
             return $config;
         }
 
-        if (!isset($tableClass->columns()['columns'])) {
-            return $config;
-        }
-
-        if (is_array($tableClass->columns()['columns']) && count($tableClass->columns()['columns']) === 0) {
-            return $config;
-        }
-
-        if (!isset($tableClass->columns()['indexes']) && !method_exists($tableClass, 'indexes')) {
-            return $config;
-        }
-
-        if ((isset($tableClass->columns()['indexes']) && count($tableClass->columns()['indexes']) === 0) &&
-            (method_exists($tableClass, 'indexes') && count($tableClass->indexes()) === 0)
+        if (!isset($tableClass->columns()['columns']) ||
+            (isset($tableClass->columns()['columns']) &&
+             is_array($tableClass->columns()['columns']) &&
+             count($tableClass->columns()['columns']) === 0)
         ) {
             return $config;
         }
 
-        $config['uniqueFields'] = [];
-        $config['indexes'] = [];
-        if (isset($tableClass->columns()['indexes'])) {
+        //Unique Index
+        if (isset($tableClass->columns()['indexes']) && count($tableClass->columns()['indexes']) !== 0) {
             foreach ($tableClass->columns()['indexes'] as $index) {
                 if ($index->getType() === 'UNIQUE' && $index->getColumns() && count($index->getColumns()) > 0) {
                     $config['uniqueFields'] = $index->getColumns();
@@ -339,9 +342,10 @@ class Ff
             }
         }
 
-        if (method_exists($tableClass, 'indexes')) {
+        //Indexes
+        if ((method_exists($tableClass, 'indexes') && count($tableClass->indexes()) !== 0)) {
             $columns = [];
-            $columnsTypeToIndex = [0,2,5,7,9,14,22];//int, chars, varchars
+            $columnsTypeToIndex = [0,2,5,7,8,9,14,22];//int, chars, boolean, varchars
 
             foreach ($tableClass->columns()['columns'] as $column) {
                 $columns[$column->getName()] = $column;
@@ -615,7 +619,7 @@ class Ff
                 return true;
             }
         } else {
-            throw new \Exception('Database type set to flat file, cannot sync.');
+            throw new \Exception('Database type is not hybrid, cannot sync.');
         }
 
         return false;

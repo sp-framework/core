@@ -2,5 +2,10 @@ RewriteEngine On
 RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^((?s).*)$ index.php [QSA,L]
+# Check that the host doesn't start with www. and contains only one dot (no subdomains)
+RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteCond %{HTTP_HOST} ^([^.]+\.[^.]+)$ [NC]
+RewriteRule ^(.*)$ https://www.%1/ [R=301,L]
+
 Options -Indexes
 SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0

@@ -2,6 +2,10 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
+use League\Flysystem\UnableToDeleteDirectory;
+use League\Flysystem\UnableToDeleteFile;
 use System\Base\BasePackage;
 
 class DbInstaller extends BasePackage
@@ -10,8 +14,16 @@ class DbInstaller extends BasePackage
     {
         if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'ff') {
             foreach ($databases as $tableName => $tableClass) {
-                if ($tableClass['model'] && $tableClass['model']->getSource()) {
+                if (!isset($tableClass['schema']) || !isset($tableClass['model'])) {
+                    continue;
+                }
+
+                if (isset($tableClass['tableName'])) {
+                    $tableName = $tableClass['tableName'];
+                } else if ($tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
+                } else {
+                    continue;
                 }
 
                 if (method_exists($tableClass['schema'], 'columns')) {
@@ -92,7 +104,7 @@ class DbInstaller extends BasePackage
 
                     //Drop any indexes that are removed
                     foreach ($dbTableIndexes as $dbTableIndexKey => $dbTableIndex) {
-                        if (strtolower($dbTableIndexKey) === 'primary') {
+                        if (strtolower($dbTableIndexKey) === 'primary' || strtolower($dbTableIndexKey) === 'unique') {
                             continue;
                         }
 
@@ -112,7 +124,13 @@ class DbInstaller extends BasePackage
             $storesToIndex = [];
 
             foreach ($databases as $tableName => $tableClass) {
-                if ($tableClass['model'] && $tableClass['model']->getSource()) {
+                if (!isset($tableClass['schema'])) {
+                    continue;
+                }
+
+                if (isset($tableClass['tableName'])) {
+                    $tableName = $tableClass['tableName'];
+                } else if ($tableClass['model'] && $tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
                 }
 
@@ -122,6 +140,24 @@ class DbInstaller extends BasePackage
                 }
                 $config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model'], $tableConfigParams);
                 $schema = $this->ff->generateSchema($tableName, $tableClass['schema'], $tableClass['model']);
+
+                //Delete config and schema file
+                try {
+                    if ($this->localContent->fileExists(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/config.json')) {
+                        $this->localContent->delete(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/config.json');
+                    }
+                    if ($this->localContent->fileExists(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/schema.json')) {
+                        $this->localContent->delete(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/schema.json');
+                    }
+                    if ($this->localContent->directoryExists(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/cache')) {
+                        $this->localContent->deleteDirectory(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/cache');
+                    }
+                    if ($this->localContent->directoryExists(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/indexes')) {
+                        $this->localContent->deleteDirectory(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/indexes');
+                    }
+                } catch (FilesystemException | UnableToCheckExistence | UnableToDeleteFile | UnableToDeleteDirectory | \throwable $e) {
+                    throw $e;
+                }
 
                 $this->ff->store($tableName, $config, $schema);
 
@@ -164,7 +200,6 @@ class DbInstaller extends BasePackage
                     $this->dropTable($tableName);
                 }
             }
-
         }
 
         if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'db') {

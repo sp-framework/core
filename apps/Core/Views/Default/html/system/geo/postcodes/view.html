@@ -1,0 +1,33 @@
+{% if postcode['id'] is defined %}
+    {% set title = 'Postcode (' ~ postcode['name'] ~ ')' %}
+    {% set postcodeId = postcode['id'] %}
+{% else %}
+    {% set title = 'New Postcode' %}
+    {% set postcodeId = 'New Postcode' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'globe',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'postcodes/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : postcodeId,
+            'updateActionUrl'               : 'system/geo/postcodes/update',
+            'updateSuccessRedirectUrl'      : 'system/geo/postcodes',
+            'cancelActionUrl'               : 'system/geo/postcodes',
+            'closeActionUrl'                : 'system/geo/postcodes'
+        ]
+    ]
+)}}

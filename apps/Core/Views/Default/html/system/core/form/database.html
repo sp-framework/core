@@ -67,7 +67,7 @@
 </div>
 <small class="text-danger">Note: Switch database type only during maintenance. Switching database will truncate the destination table and initiate a sync from source to destination. This  will take a while...</small>
 <hr>
-{% if core['settings']['databasetype'] === 'hybrid' %}
+{% if core['settings']['databasetype'] == 'hybrid' %}
     {% set dbType =
         [
             'ff'   :
@@ -82,7 +82,7 @@
             ]
         ]
     %}
-{% elseif core['settings']['databasetype'] === 'ff' %}
+{% elseif core['settings']['databasetype'] == 'ff' %}
     {% set dbType =
         [
             'ff'   :
@@ -92,7 +92,7 @@
             ]
         ]
     %}
-{% elseif core['settings']['databasetype'] === 'db' %}
+{% elseif core['settings']['databasetype'] == 'db' %}
     {% set dbType =
         [
             'db'   :
@@ -113,19 +113,7 @@
                 'sectionId'                     : 'main',
                 'tabsId'                        : 'database',
                 'tabsStyle'                     : 'card-outline-tabs',
-                'tabsData'                      :
-                    [
-                        'ff'   :
-                        [
-                            'tabTitle'          : 'Flat File',
-                            'tabInclude'        : 'core/form/database/ff'
-                        ],
-                        'db'   :
-                        [
-                            'tabTitle'          : 'Db',
-                            'tabInclude'        : 'core/form/database/db'
-                        ]
-                    ]
+                'tabsData'                      : dbType
             ]
         )}}
     </div>

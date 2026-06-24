@@ -68,7 +68,9 @@ class Tasks
                 'is_on_demand'      => 0,
                 'priority'          => 10,
                 'enabled'           => 1,
-                'type'              => 0
+                'type'              => 0,
+                'job_log_mode'      => 3,
+                'status'            => 1
             ];
         array_push($taskArr, $taskEntry);
 
@@ -84,7 +86,9 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 10,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'job_log_mode'      => 3,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 
@@ -100,7 +104,9 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 10,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'job_log_mode'      => 3,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 
@@ -116,7 +122,9 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 10,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'job_log_mode'      => 3,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 
@@ -149,7 +157,9 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 10,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'job_log_mode'      => 3,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 
@@ -165,7 +175,9 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 5,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'job_log_mode'      => 3,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 
@@ -186,7 +198,6 @@ class Tasks
             $dbCall = $dbCall[0];
         }
 
-
         //DB Sync (Hybrid Mode)
         $taskEntry =
             [
@@ -199,7 +210,114 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 10,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'job_log_mode'      => 3,
+                'status'            => 0
+            ];
+        array_push($taskArr, $taskEntry);
+
+        if ($this->databasetype !== 'db') {
+            $dbCall = $callStore->findBy(['name', '=', 'ProcessSystemBackup']);
+        } else {
+            $dbCall =
+                $this->db->fetchAll(
+                    "SELECT * FROM basepackages_workers_calls WHERE name = :name",
+                    Enum::FETCH_ASSOC,
+                    [
+                        "name" => 'ProcessSystemBackup',
+                    ]
+                );
+        }
+
+        if ($dbCall && count($dbCall) > 0) {
+            $dbCall = $dbCall[0];
+        }
+
+        //System Backup
+        $taskEntry =
+            [
+                'name'              => 'System Backup',
+                'description'       => 'Run system backup once a day.',
+                'exec_type'         => 'call',
+                'cid'               => $dbCall['id'],
+                'call_args'         => '{"apps_dir":"false","systems_dir":"false","public_dir":"false","private_dir":"false","html_compiled_dir":"false","var_dir":"false","external_dir":"false","external_vendor_dir":"false","old_backups_dir":"false","database":"false","keys":"false","password_protect":"","notes":"","rclone_to_gdrive":"false","rclone_remote_drive":"","rclone_remote_path":""}',
+                'schedule_id'       => 7,//Everyday at midnight
+                'is_on_demand'      => 0,
+                'priority'          => 10,//Run before Housekeeping
+                'enabled'           => 1,
+                'type'              => 0,
+                'job_log_mode'      => 4,//Monthly logs
+                'status'            => 0
+            ];
+        array_push($taskArr, $taskEntry);
+
+        if ($this->databasetype !== 'db') {
+            $dbCall = $callStore->findBy(['name', '=', 'ProcessHousekeeping']);
+        } else {
+            $dbCall =
+                $this->db->fetchAll(
+                    "SELECT * FROM basepackages_workers_calls WHERE name = :name",
+                    Enum::FETCH_ASSOC,
+                    [
+                        "name" => 'ProcessHousekeeping',
+                    ]
+                );
+        }
+
+        if ($dbCall && count($dbCall) > 0) {
+            $dbCall = $dbCall[0];
+        }
+
+        //Housekeeping
+        $taskEntry =
+            [
+                'name'              => 'HouseKeeping',
+                'description'       => 'Run house keeping jobs on various packages like cleaning orphan files, stale sessions, etc.',
+                'exec_type'         => 'call',
+                'cid'               => $dbCall['id'],
+                'call_args'         => '{"tasks":["cleanStorageOrphans","cleanActivityLogs","cleanUnusedTags","cleanStaleSessions"]}',
+                'schedule_id'       => 7,//Everyday at midnight
+                'is_on_demand'      => 0,
+                'priority'          => 8,//Run after backup has been complete
+                'enabled'           => 1,
+                'type'              => 0,
+                'job_log_mode'      => 4,//Monthly logs
+                'status'            => 0
+            ];
+        array_push($taskArr, $taskEntry);
+
+        if ($this->databasetype !== 'db') {
+            $dbCall = $callStore->findBy(['name', '=', 'ProcessRepoSync']);
+        } else {
+            $dbCall =
+                $this->db->fetchAll(
+                    "SELECT * FROM basepackages_workers_calls WHERE name = :name",
+                    Enum::FETCH_ASSOC,
+                    [
+                        "name" => 'ProcessRepoSync',
+                    ]
+                );
+        }
+
+        if ($dbCall && count($dbCall) > 0) {
+            $dbCall = $dbCall[0];
+        }
+
+        //Check for Core updates.
+        $taskEntry =
+            [
+                'name'              => 'Check for update (Core)',
+                'description'       => 'Run monthly checks for core updates.',
+                'exec_type'         => 'call',
+                'cid'               => $dbCall['id'],
+                'call_args'         => '{"api_id":1}',
+                'schedule_id'       => 11,//Everyday at midnight
+                'is_on_demand'      => 0,
+                'priority'          => 10,//Run after backup has been complete
+                'enabled'           => 1,
+                'type'              => 0,
+                'job_log_mode'      => 5,//Yearly logs
+                'status'            => 0//Keeping disabled as API needs to be configured before enabling it.
             ];
         array_push($taskArr, $taskEntry);
 

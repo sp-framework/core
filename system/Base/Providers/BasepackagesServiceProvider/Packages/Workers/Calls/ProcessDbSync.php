@@ -13,52 +13,52 @@ class ProcessDbSync extends Calls
 
     public function run(array $args = [])
     {
-        $thisCall = $this;
+        $this->updateJobTask(2, $args);
 
-        return function() use ($thisCall, $args) {
-            $thisCall->updateJobTask(2, $args);
+        $result['syncRequest'] = $this->ff->getSyncFile();
 
-            $result['syncRequest'] = $this->ff->getSyncFile();
+        $result['result'] = $this->ff->sync();
 
-            $result['result'] = $this->ff->sync();
+        $reSync = true;
+        if ($result['result'] && isset($result['result']['errors']) && count($result['result']['errors']) === 0) {
+            $this->packagesData->responseCode = 0;
 
-            $reSync = true;
-            if ($result['result'] && isset($result['result']['errors']) && count($result['result']['errors']) === 0) {
-                $thisCall->packagesData->responseCode = 0;
+            $this->packagesData->responseMessage = 'Sync Complete';
 
-                $thisCall->packagesData->responseMessage = 'Sync Complete';
+            $this->packagesData->responseData = $result;
 
-                $thisCall->packagesData->responseData = $result;
+            $reSync = false;
+        } else {
+            $this->packagesData->responseCode = 1;
 
-                $reSync = false;
-            } else {
-                $thisCall->packagesData->responseCode = 1;
+            $this->packagesData->responseMessage = 'Error Syncing.';
 
-                $thisCall->packagesData->responseMessage = 'Error Syncing.';
+            $this->packagesData->responseData = $result;
 
-                $thisCall->packagesData->responseData = $result;
+            $this->addJobResult($this->packagesData, $args);
 
-                //Notify the Admins here
-            }
+            $this->updateJobTask(4, $args);
 
-            $this->addJobResult($thisCall->packagesData, $args);
+            return false;
+        }
 
-            $thisCall->updateJobTask(3, $args);
+        $this->addJobResult($this->packagesData, $args);
 
-            if (!$reSync) {
-                $this->ff->setSync(false);
+        $this->updateJobTask(3, $args);
 
-                $task = $this->basepackages->workers->tasks->findByCall('processdbsync');
+        if (!$reSync) {
+            $this->ff->setSync(false);
 
-                $time = Carbon::now();
+            $task = $this->basepackages->workers->tasks->findByCall('processdbsync');
 
-                $task['previous_run'] = $time->format('Y-m-d H:i:s');
-                $task['cancel'] = 'true';
+            $time = Carbon::now();
 
-                $this->basepackages->workers->tasks->forceNextRun($task);
+            $task['previous_run'] = $time->format('Y-m-d H:i:s');
+            $task['cancel'] = 'true';
 
-                $this->ff->resetSync();
-            }
-        };
+            $this->basepackages->workers->tasks->forceNextRun($task);
+
+            $this->ff->resetSync();
+        }
     }
 }

@@ -19,7 +19,17 @@ class Tasks extends BasePackage
     {
         $this->setFFRelations(true);
 
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('tasks', 'core')) {
+                $this->tasks = $this->opCache->getCache('tasks', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('tasks', $this->tasks, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }
@@ -33,7 +43,23 @@ class Tasks extends BasePackage
         $data['status'] = 0;
         $data['type'] = 1;//1 for user and 0 for system
 
-        if ($this->add($data)) {
+        if (isset($data['is_on_demand']) && $data['is_on_demand'] == '1') {
+            $data['schedule_id'] = null;
+        }
+
+        if (isset($data['email'])) {
+            $data['email'] = trim(str_replace(' ', '', $data['email']));
+        }
+
+        try {
+            $add = $this->add($data);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        if ($add) {
             $this->addResponse('Added new task ' . $data['name']);
         } else {
             $this->addResponse('Error adding new task', 1);
@@ -48,9 +74,27 @@ class Tasks extends BasePackage
             $data['priority'] = '1';
         }
 
+        if (isset($data['is_on_demand']) && $data['is_on_demand'] == '1') {
+            $data['schedule_id'] = null;
+        }
+
+        if (isset($data['email'])) {
+            $data['email'] = trim(str_replace(' ', '', $data['email']));
+        }
+
+        $data['status'] = 0;
+
         $task = array_merge($task, $data);
 
-        if ($this->update($task)) {
+        try {
+            $update = $this->update($task);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        if ($update) {
             $this->addResponse('Updated task ' . $task['name']);
         } else {
             $this->addResponse('Error updating task', 1);
@@ -91,7 +135,12 @@ class Tasks extends BasePackage
                 $this->ff->setSync(false);
             }
             $task['force_next_run'] = null;
-            $task['status'] = '1';
+            if (isset($task['is_on_demand']) && $task['is_on_demand'] == '1') {
+                $task['status'] = '0';
+            } else {
+                $task['status'] = '1';
+            }
+
             $task['next_run'] = '-';
         } else {
             $task['force_next_run'] = '1';
@@ -132,15 +181,15 @@ class Tasks extends BasePackage
             if ($task['force_next_run'] == 1) {
                 $task['org_schedule_id'] = $task['schedule_id'];
                 $task['schedule_id'] = 2;//Make it minute so it can be picked by the scheduler for next run
-                array_push($taskArr, $task);
+                $taskArr[$task['id']] = $task;
             } else if ($task['enabled'] == 1 && $task['status'] != 2) {//Enabled and not running
-                array_push($taskArr, $task);
+                $taskArr[$task['id']] = $task;
             }
         }
 
-        $sorted = msort($taskArr, 'priority', SORT_REGULAR, SORT_DESC);
+        $sorted = msort($taskArr, 'priority', SORT_REGULAR, SORT_DESC, true);
 
-        $sorted = msort($sorted, 'force_next_run', SORT_REGULAR, SORT_DESC);
+        $sorted = msort($sorted, 'force_next_run', SORT_REGULAR, SORT_DESC, true);
 
         return $sorted;
     }
@@ -196,5 +245,37 @@ class Tasks extends BasePackage
         }
 
         return false;
+    }
+
+    public function getJobLogsModes()
+    {
+        return
+            [
+                '1' =>
+                    [
+                        'id' => '1',
+                        'name'  => 'Per Job'
+                    ],
+                '2' =>
+                    [
+                        'id' => '2',
+                        'name'  => 'Per Hour'
+                    ],
+                '3' =>
+                    [
+                        'id' => '3',
+                        'name'  => 'Per Day'
+                    ],
+                '4' =>
+                    [
+                        'id' => '4',
+                        'name'  => 'Per Month'
+                    ],
+                '5' =>
+                    [
+                        'id' => '5',
+                        'name'  => 'Per Year'
+                    ]
+            ];
     }
 }

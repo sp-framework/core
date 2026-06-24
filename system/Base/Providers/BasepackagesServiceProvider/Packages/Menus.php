@@ -15,21 +15,40 @@ class Menus extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('menus', 'core')) {
+                $this->menus = $this->opCache->getCache('menus', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('menus', $this->menus, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }
 
-    public function buildMenusForApp($appId)
+    public function buildMenusForApp($app)
     {
-        $menus = $this->getMenusForApp($appId);
+        $menus = $this->getMenusForApp($app);
 
         $buildMenu = $this->buildMenus($menus);
 
         return $buildMenu;
     }
 
-    public function buildMenus($menus = null)
+    public function buildMenusForAppWithPermissions($app, $permissions)
+    {
+        $menus = $this->getMenusForApp($app);
+
+        $buildMenu = $this->buildMenus($menus, $permissions);
+
+        return $buildMenu;
+    }
+
+    public function buildMenus($menus = null, $permissions = null)
     {
         if ($menus === null) {
             $menus = $this->menus;
@@ -37,22 +56,30 @@ class Menus extends BasePackage
 
         $buildMenu = [];
 
-        foreach (msort($menus, 'sequence') as $key => $menu) {
+        foreach (msort(array: $menus, key: 'sequence', preserveKey: true) as $key => $menu) {
             if (is_string($menu['menu'])) {
                 $menu['menu'] = $this->helper->decode($menu['menu'], true);
             }
 
-            $menu = $menu['menu'];
-
-            if ($menu) {
-                $buildMenu = array_replace_recursive($buildMenu, $menu);
+            if ($permissions) {
+                if (!isset($permissions[$menu['component_id']]['view']) ||
+                    isset($permissions[$menu['component_id']]['view']) && $permissions[$menu['component_id']]['view'] === 1
+                ) {
+                    if ($menu['menu']) {
+                        $buildMenu = array_replace_recursive($buildMenu, $menu['menu']);
+                    }
+                }
+            } else {
+                if ($menu['menu']) {
+                    $buildMenu = array_replace_recursive($buildMenu, $menu['menu']);
+                }
             }
         }
 
         return $buildMenu;
     }
 
-    public function getMenusForApp($appId)
+    public function getMenusForApp($app)
     {
         $menus = [];
 
@@ -60,8 +87,9 @@ class Menus extends BasePackage
             $menu['apps'] = $this->helper->decode($menu['apps'], true);
 
             if (count($menu['apps']) > 0) {
-                if (isset($menu['apps'][$appId]) &&
-                    $menu['apps'][$appId]['enabled'] === true
+                if (isset($menu['apps'][$app['id']]) &&
+                    $menu['app_type'] === $app['app_type'] &&
+                    $menu['apps'][$app['id']]['enabled'] === true
                 ) {
                     $menus[$menu['id']] = $menu;
                 }
@@ -96,15 +124,30 @@ class Menus extends BasePackage
         return $menus;
     }
 
+    public function getMenusByComponentIdForAppType($componentId, $appType)
+    {
+        $menus = [];
+
+        foreach($this->menus as $menu) {
+            if ($menu['component_id'] === $componentId &&
+                $menu['app_type'] === $appType
+            ) {
+                return $menu;
+            }
+        }
+
+        return false;
+    }
+
     public function getMenusByRouteForAppType($route, $appType)
     {
         $menus = [];
 
         foreach($this->menus as $menu) {
-            if ($menu['route'] === strtolower($route)) {
-                if ($menu['app_type'] === $appType) {
-                    return $menu;
-                }
+            if ($menu['route'] === $route &&
+                $menu['app_type'] === $appType
+            ) {
+                return $menu;
             }
         }
 
@@ -122,6 +165,10 @@ class Menus extends BasePackage
         if (count($menus) > 0) {
             foreach ($menus as $menuId => $value) {
                 $menu = $this->getById($menuId);
+
+                if (!$menu) {
+                    continue;
+                }
 
                 if (is_string($menu['apps'])) {
                     $menu['apps'] = $this->helper->decode($menu['apps'], true);
@@ -143,9 +190,15 @@ class Menus extends BasePackage
         $this->init(true);
     }
 
-    public function addMenu(array $componentJsonFile)
+    public function addMenu(array $componentJsonFile, $component, $app = null)
     {
         $menu = $componentJsonFile['menu'];
+
+        $menuApps = [];
+
+        if ($app) {
+            $menuApps[$app['id']] = ['enabled'  => true];
+        }
 
         if (isset($menu['seq'])) {
             $sequence = $menu['seq'];
@@ -158,8 +211,9 @@ class Menus extends BasePackage
 
         $insertMenu = $this->add([
                 'menu'                  => $this->helper->encode($menu),
-                'apps'                  => $this->helper->encode([]),
+                'apps'                  => $this->helper->encode($menuApps),
                 'app_type'              => $componentJsonFile['app_type'],
+                'component_id'          => $component['id'],
                 'route'                 => $componentJsonFile['route'],
                 'sequence'              => $sequence
             ]
@@ -172,14 +226,27 @@ class Menus extends BasePackage
         }
     }
 
-    public function updateMenu($id, array $componentJsonFile)
+    public function updateMenu($id, array $componentJsonFile, $component, $app = null)
     {
         $menu = $this->getById($id);
 
-        if (is_string($menu['menu'])) {
-            $menu['menu'] = $this->helper->decode($menu['menu'], true);
-        }
+        $menuApps = [];
+
         if ($menu) {
+            if (is_string($menu['menu'])) {
+                $menu['menu'] = $this->helper->decode($menu['menu'], true);
+            }
+
+            if (is_string($menu['apps'])) {
+                $menu['apps'] = $this->helper->decode($menu['apps'], true);
+            }
+
+            $menuApps = array_merge($menuApps, $menu['apps']);
+
+            if ($app) {
+                $menuApps[$app['id']] = ['enabled'  => true];
+            }
+
             $menu = array_merge($menu['menu'], $componentJsonFile['menu']);
         } else {
             $menu = $componentJsonFile['menu'];
@@ -197,8 +264,9 @@ class Menus extends BasePackage
         $this->update([
                 'id'                    => $id,
                 'menu'                  => $this->helper->encode($menu),
-                'apps'                  => $this->helper->encode([]),
+                'apps'                  => $this->helper->encode($menuApps),
                 'app_type'              => $componentJsonFile['app_type'],
+                'component_id'          => $component['id'],
                 'route'                 => $componentJsonFile['route'],
                 'sequence'              => $sequence
             ]
@@ -207,9 +275,30 @@ class Menus extends BasePackage
         return true;
     }
 
+    public function removeMenu(array $data)
+    {
+        $menu = $this->getById($data['id']);
+
+        $remove = $this->remove($menu['id']);
+
+        if ($remove) {
+            $this->addResponse('Menu Removed');
+
+            return true;
+        }
+
+        $this->addResponse('Error removing menu', 1);
+
+        return false;
+    }
+
     protected function addSequence($menu, $sequence)
     {
-        foreach ($menu as $key => &$value) {
+        foreach ($menu as &$value) {
+            if (!is_array($value)) {
+                continue;
+            }
+
             if (!isset($value['seq'])) {
                 $value['seq'] = $sequence;
             }

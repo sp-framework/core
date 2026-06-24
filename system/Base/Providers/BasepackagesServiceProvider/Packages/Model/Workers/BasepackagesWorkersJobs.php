@@ -12,17 +12,33 @@ class BasepackagesWorkersJobs extends BaseModel
 
     public $worker_id;
 
+    public $cid;
+
+    public $pid;
+
+    public $api_call_ids;
+
     public $run_on;
 
     public $status;
 
     public $type;
 
-    public $execution_time;
+    public $execution_times;
+
+    public $total_execution_time;
+
+    public $job_log_mode;
+
+    public $job_log_time;
+
+    public $can_terminate;
 
     public $response_code;
 
     public $response_message;
 
     public $response_data;
+
+    public $email_results;
 }

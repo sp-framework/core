@@ -60,19 +60,27 @@ class IndexHandler
 
     public function setIndex($content, $remove = false, $reIndex = false)
     {
-        if (!$content) {
+        if (!$content || ($content && $content === '')) {
             return false;
         }
 
-        if (is_string($content)) {
+        if (is_string($content) && $content !== '') {
             $content = json_decode($content, true);
         }
 
-        $contentId = $content['id'];
+        if (isset($content['id'])) {
+            $contentId = $content['id'];
+        } else {
+            return false;
+        }
 
         IoHelper::createFolder($this->indexesPath, $this->folderPermissions);
 
         foreach ($this->indexes as $index) {
+            if ($index === 'id') {
+                continue;
+            }
+
             if (isset($content[$index])) {
                 IoHelper::createFolder($this->indexesPath . $index . '/', $this->folderPermissions);
 
@@ -105,6 +113,29 @@ class IndexHandler
                                 }
                             }
                         } else {
+                            if (strlen($content[$index]) === 10 &&
+                                str_contains($content[$index], '-') &&
+                                substr_count($content[$index], '-') === 2
+                            ) {
+                                try {
+                                    $indexCharsIsDate = new \DateTime($content[$index]);
+                                } catch (\throwable $e) {
+                                    continue;
+                                }
+
+                                if ($indexCharsIsDate) {
+                                    $content[$index] = $indexCharsIsDate->getTimestamp();
+
+                                    if ($reIndex) {
+                                        $this->addToReindexIndexes($contentId, $index, $content[$index], $content[$index]);
+                                    } else {
+                                        $this->writeIndex($contentId, $index, $content[$index], $content[$index], $remove);
+                                    }
+
+                                    continue;
+                                }
+                            }
+
                             $content[$index] = strtolower($content[$index]);
 
                             $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
@@ -113,7 +144,7 @@ class IndexHandler
                                 continue;
                             }
 
-                            if (!checkCtype($content[$index], 'alnum')) {//Ignore Special chars
+                            if (!checkCtype($content[$index], 'alnum', [' ', '&amp;', '&', '.', ',', ':', ';', '&#64;', '@', '-', '_'])) {//Ignore Special chars
                                 continue;
                             }
 
@@ -124,6 +155,14 @@ class IndexHandler
                             }
                         }
                     } else {
+                        if (is_bool($content[$index])) {
+                            if ($content[$index] === true) {
+                                $content[$index] = 'true';
+                            } else {
+                                $content[$index] = 'false';
+                            }
+                        }
+
                         if ($reIndex) {
                             $this->addToReindexIndexes($contentId, $index, $content[$index], $content[$index]);
                         } else {
@@ -132,6 +171,29 @@ class IndexHandler
                     }
                 } else {
                     if (is_string($content[$index])) {
+                        if (strlen($content[$index]) === 10 &&
+                            str_contains($content[$index], '-') &&
+                            substr_count($content[$index], '-') === 2
+                        ) {
+                            try {
+                                $indexCharsIsDate = new \DateTime($content[$index]);
+                            } catch (\throwable $e) {
+                                continue;
+                            }
+
+                            if ($indexCharsIsDate) {
+                                $content[$index] = $indexCharsIsDate->getTimestamp();
+
+                                if ($reIndex) {
+                                    $this->addToReindexIndexes($contentId, $index, $content[$index], $content[$index]);
+                                } else {
+                                    $this->writeIndex($contentId, $index, $content[$index], $content[$index], $remove);
+                                }
+
+                                continue;
+                            }
+                        }
+
                         if (strlen($content[$index]) < $this->minIndexChars) {
                             continue;
                         }
@@ -144,7 +206,8 @@ class IndexHandler
                             continue;
                         }
 
-                        if (!checkCtype($content[$index], 'alpha')) {//Ignore Special chars
+
+                        if (!checkCtype($content[$index], 'alnum', [' ', '&amp;', '&', '.', ',', ':', ';', '&#64;', '@', '-', '_'])) {//Ignore Special chars
                             continue;
                         }
 
@@ -154,6 +217,14 @@ class IndexHandler
                             $this->writeIndex($contentId, $index, $indexChars, $content[$index], $remove);
                         }
                     } else {
+                        if (is_bool($content[$index])) {
+                            if ($content[$index] === true) {
+                                $content[$index] = 'true';
+                            } else {
+                                $content[$index] = 'false';
+                            }
+                        }
+
                         if ($reIndex) {
                             $this->addToReindexIndexes($contentId, $index, $content[$index], $content[$index]);
                         } else {

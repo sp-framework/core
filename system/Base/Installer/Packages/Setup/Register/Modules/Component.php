@@ -2,6 +2,8 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
+use Phalcon\Db\Enum;
+
 class Component
 {
 	public function register($db, $ff, $componentFile, $menuId, $helper)
@@ -78,5 +80,37 @@ class Component
 		}
 
 		return null;
+	}
+
+	public function update($db, $ff, $componentFile, $menuId)
+	{
+		if ($db) {
+			$component =
+				$db->fetchAll(
+					"SELECT * FROM modules_components WHERE class = :class",
+					Enum::FETCH_ASSOC,
+					[
+						"class" => $componentFile['class'],
+					]
+				);
+
+			$db->updateAsDict(
+				'modules_components',
+				[
+					'menu_id' 			=> $menuId
+				],
+				"id = " . $component[0]['id']
+			);
+		}
+
+		if ($ff) {
+			$modulesStore = $ff->store('modules_components');
+
+			$component = $modulesStore->findOneBy(['class', '=', $componentFile['class']]);
+
+			$component['menu_id'] = $menuId;
+
+			$modulesStore->updateOrInsert($component);
+		}
 	}
 }

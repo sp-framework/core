@@ -26,7 +26,7 @@
                 {% set button = 'warning' %}
                 {% set class = 'rowStale' %}
             {% endif %}
-            {% set rows = rows ~ '<td><button class="btn btn-xs btn-' ~ button ~ ' ' ~ class ~ ' mr-1 clearRow" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-trash"></i></button></td>' %}
+            {% set rows = rows ~ '<td><button class="btn btn-xs btn-' ~ button ~ ' ' ~ class ~ ' mr-1 clearSessionRow" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-trash"></i></button></td>' %}
         {% else %}
             {% set rows = rows ~ '<td><span class="badge badge-info text-uppercase">This session</span></td>' %}
         {% endif %}
@@ -81,7 +81,7 @@ var staleCount = parseInt('{{stale}}');
 var verifiedCount = parseInt('{{verified}}');
 var url = '{{links.url("system/users/profile/removeAccountAgents")}}';
 
-$('.clearRow').click(function(e) {
+$('.clearSessionRow').click(function(e) {
     e.preventDefault();
 
     var verified;

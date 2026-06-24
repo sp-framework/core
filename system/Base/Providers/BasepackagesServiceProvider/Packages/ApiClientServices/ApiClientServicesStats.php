@@ -85,6 +85,8 @@ class ApiClientServicesStats extends BasePackage
         $data['call_stats'] = $this->helper->encode($callStats);
 
         $this->add($data);
+
+        return $this->packagesData->last;
     }
 
     public function getApiCallMethodStat($callMethod, $apiId)
@@ -105,12 +107,7 @@ class ApiClientServicesStats extends BasePackage
         );
 
         if ($methodEntry) {
-
             $methodEntry = $methodEntry->toArray();
-
-            if ($this->apiConfig['provider'] === 'xero') {
-                return \Carbon\Carbon::parse($methodEntry['called_at'])->setTimezone('UTC')->toDateTimeString();
-            }
 
             return $methodEntry['called_at'];
         }

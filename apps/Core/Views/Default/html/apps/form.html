@@ -46,6 +46,15 @@
             {% set authTabHidden = false %}
         {% endif %}
     {% endfor %}
+    {% set dbTabHidden = false %}
+    {% if app['id'] is defined and app['id'] == '1' %}
+        {% set dbTabHidden = true %}
+    {% endif %}
+    {% if app['use_app_db'] is defined and app['use_app_db'] == true %}
+        {% set useAppDb = true %}
+    {% else %}
+        {% set useAppDb = false %}
+    {% endif %}
     <div class="col">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -80,6 +89,12 @@
                                 'tabTitle'          : 'IP Filters',
                                 'tabInclude'        : 'apps/wizard/filters/form',
                                 'tabHidden'         : ipFilterTabHidden
+                            ],
+                            'db'   :
+                            [
+                                'tabTitle'          : 'Database',
+                                'tabInclude'        : 'apps/wizard/db/form',
+                                'tabHidden'         : dbTabHidden
                             ]
                         ]
                     ]
@@ -89,8 +104,8 @@
     </div>
 </div>
 <script>
-/* globals Sortable Swal */
-var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+/* globals Swal */
+var dataCollection, dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
     dataCollectionComponent =
@@ -160,6 +175,70 @@ dataCollectionSection =
             'placeholder'   : 'SELECT ROLES'
         },
         '{{componentId}}-{{sectionId}}-enforce_2fa'                     : { },
+        '{{componentId}}-{{sectionId}}-use_app_db'                      : {
+            afterInit: function() {
+                var checkboxChecked = $('#{{componentId}}-{{sectionId}}-use_app_db')[0].checked;
+
+                $('#{{componentId}}-{{sectionId}}-use_app_db').click(function() {
+                    var checkBox = $(this);
+                    if (checkBox[0].checked === true) {
+                        Swal.fire({
+                            title                       : '<span class="text-warning"> Switch database from app type to app?</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Switch',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-primary btn-sm text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                dataCollection.env.sounds.swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                return true;
+                            } else {
+                                checkBox[0].checked = false;
+                            }
+                        });
+                    } else {
+                        if (checkboxChecked) {
+                            Swal.fire({
+                                title                       : '<span class="text-warning"> Switch database from app to app type?</span>',
+                                icon                        : 'question',
+                                background                  : 'rgba(0,0,0,.8)',
+                                backdrop                    : 'rgba(0,0,0,.6)',
+                                buttonsStyling              : false,
+                                confirmButtonText           : 'Switch',
+                                customClass                 : {
+                                    'confirmButton'             : 'btn btn-primary btn-sm text-uppercase',
+                                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                                },
+                                showCancelButton            : true,
+                                keydownListenerCapture      : true,
+                                allowOutsideClick           : true,
+                                allowEscapeKey              : true,
+                                didOpen                     : function() {
+                                    dataCollection.env.sounds.swalSound.play();
+                                }
+                            }).then((result) => {
+                                if (result.value) {
+                                    checkBox[0].checked = false;
+                                } else {
+                                    return true;
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider, :hidden',
             rules: {
@@ -168,7 +247,8 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
                 '{{componentId}}-{{sectionId}}-registration_role_id'        : 'required',
                 '{{componentId}}-{{sectionId}}-guest_role_id'               : 'required',
-                '{{componentId}}-{{sectionId}}-default_component'           : 'required',
+                '{{componentId}}-{{sectionId}}-default_component_guests'    : 'required',
+                '{{componentId}}-{{sectionId}}-default_component_users'     : 'required',
                 '{{componentId}}-{{sectionId}}-errors_component'            : 'required',
                 '{{componentId}}-{{sectionId}}-default_dashboard'           : 'required',
                 '{{componentId}}-{{sectionId}}-api_grant_type'              : 'required'
@@ -179,19 +259,11 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-app_type'                : 'Please select app type',
                 '{{componentId}}-{{sectionId}}-registration_role_id'    : 'Please select registration role',
                 '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role',
-                '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
+                '{{componentId}}-{{sectionId}}-default_component_guests': 'Please select app default component for guests',
+                '{{componentId}}-{{sectionId}}-default_component_users' : 'Please select app default component for users',
                 '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
                 '{{componentId}}-{{sectionId}}-default_dashboard'       : 'Please select default dashboard',
                 '{{componentId}}-{{sectionId}}-api_grant_type'          : 'Please select Api Grant type'
-            },
-            onSubmit: function() {
-                if (dataCollectionSection['dataToSubmit']['api_access'] === 'apion') {
-                    dataCollectionSection['dataToSubmit']['api_access'] = 1;
-                } else {
-                    dataCollectionSection['dataToSubmit']['api_access'] = 0;
-                }
-
-                return true;
             }
         }
     });

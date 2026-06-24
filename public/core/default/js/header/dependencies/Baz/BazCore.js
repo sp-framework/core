@@ -87,18 +87,18 @@ var BazCore = function() {
                         async: true,
                         cache: true
                     }).done(function() {
-                        $('body').trigger('libsLoadComplete');
-                        bazFooterFunctions(_extends(BazCore.defaults, options));
+                        bazFooterFunctions(options);
                         dataCollection.env.libsLoaded = true;
+                        $('body').trigger('libsLoadComplete');
                     });
                 });
             }
         } else if (dataCollection.env.libsLoaded === true) {
-            bazFooterFunctions(_extends(BazCore.defaults, options));
+            bazFooterFunctions(options);
         }
     }
     //Footer
-    function bazFooterFunctions() {
+    function bazFooterFunctions(options) {
         PNotify.defaultModules.set(PNotifyBootstrap4, {});
         PNotify.defaultModules.set(PNotifyFontAwesome5, {});
         PNotify.defaultModules.set(PNotifyFontAwesome5Fix, {});
@@ -113,24 +113,24 @@ var BazCore = function() {
             openMenu();
         }
 
-        if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
-            BazTunnels.init();
-        }
-        $('#body').on('bazContentLoaderAjaxComplete', function() {
-            //eslint-disable-next-line
-            console.log(dataCollection.env.wsTunnels.pusher._websocket_connected);
-            if (dataCollection.env.wsTunnels.pusher._websocket_connected !== 'undefined' &&
-                dataCollection.env.wsTunnels.pusher._websocket_connected === false
-            ) {
+        if (!options.guest) {
+            if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
                 BazTunnels.init();
             }
-        });
-        initPings();
+            $('#body').on('bazContentLoaderAjaxComplete', function() {
+                if (dataCollection.env.wsTunnels.pusher._websocket_connected !== 'undefined' &&
+                    dataCollection.env.wsTunnels.pusher._websocket_connected === false
+                ) {
+                    BazTunnels.init();
+                }
+            });
+            initPings();
+        }
     }
 
     //10 mins get update of site status. Note this is not PING, but webserver responsive time to reply with favicon.
     function initPings() {
-        BazHelpers.ping(dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost, {}, function(err, data) {
+        BazHelpers.ping(dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost, {"favicon" : "/ping.ico"}, function(err, data) {
             timerId = BazHelpers.getTimerId('ping');
 
             if (!err && data) {

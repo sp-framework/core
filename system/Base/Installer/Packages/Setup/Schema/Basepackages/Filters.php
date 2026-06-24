@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Filters
 {
@@ -90,7 +91,43 @@ class Filters
                         'notNull' => false,
                     ]
                 ),
-            ]
+                new Column(
+                    'archived',
+                    [
+                        'type'    => Column::TYPE_BOOLEAN,
+                        'notNull' => true,
+                    ]
+                ),
+            ],
+           'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'name',
+                        'app_type',
+                        'account_id',
+                        'component_id'
+                    ],
+                    'UNIQUE'
+                )
+           ]
+        ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'app_type',
+                    'account_id',
+                    'component_id',
+                    'archived'
+                ],
+                'INDEX'
+            )
         ];
     }
 }

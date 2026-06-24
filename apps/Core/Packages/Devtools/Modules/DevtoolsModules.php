@@ -114,9 +114,9 @@ class DevtoolsModules extends BasePackage
         }
 
         try {
-            if ($this->generateNewFiles($data) &&
-                $this->updateModuleJson($data, false, $viewPublic) &&
-                $this->modules->{$data['module_type']}->add($data)
+            if ($this->modules->{$data['module_type']}->add($data) &&
+                $this->generateNewFiles($data) &&
+                $this->updateModuleJson($data, false, $viewPublic)
             ) {
                 if (strtolower($data['app_type']) !== 'core') {
                     $this->reCalculateFilesHash($this->modules->{$data['module_type']}->packagesData->last);
@@ -174,6 +174,7 @@ class DevtoolsModules extends BasePackage
                                     'newDirs'   => $this->newDirs
                                    ]
                                 );
+
                 return;
             }
         } catch (\Exception $e) {
@@ -253,6 +254,7 @@ class DevtoolsModules extends BasePackage
                 if ($module['module_type'] === 'views' && $module['is_subview'] == true) {
                     $viewPublic = false;
                 }
+
                 if ($this->updateModuleJson($data, false, $viewPublic) &&
                     $this->modules->{$data['module_type']}->update($module)
                 ) {
@@ -260,9 +262,12 @@ class DevtoolsModules extends BasePackage
                         $this->reCalculateFilesHash($this->modules->{$data['module_type']}->packagesData->last);
                     }
 
-                    if ($data['module_type'] === 'components') {
-                        $this->addUpdateComponentMenu($data);
+                    if ($data['module_type'] === 'components' && strtolower($data['app_type']) === 'core') {
+                        $this->addUpdateComponentMenu($module);
+                        $this->addUpdateComponentWidgets($module);
+                        $this->addUpdateComponentFilters($module);
                     }
+
                     if ($data['module_type'] === 'views') {
                         $viewsSettings = $this->modules->viewsSettings->getViewsSettingsByViewId($data['id']);
 
@@ -270,6 +275,9 @@ class DevtoolsModules extends BasePackage
                             foreach ($viewsSettings as $setting) {
                                 if (is_string($data['settings'])) {
                                     $data['settings'] = $this->helper->decode($data['settings'], true);
+                                }
+                                if (isset($setting['settings']['branding']) && count($setting['settings']['branding']) > 0) {
+                                    unset($data['settings']['branding']);
                                 }
 
                                 $setting['settings'] = array_replace($setting['settings'], $data['settings']);
@@ -305,7 +313,7 @@ class DevtoolsModules extends BasePackage
 
                             return;
                         } else {
-                            if (!$this->checkRepo($data)) {
+                            if (!$checkedRepo = $this->checkRepo($data)) {
                                 if (strtolower($data['app_type']) !== 'core') {
                                     $newRepo = $this->createRepo($data);
                                 }
@@ -319,8 +327,17 @@ class DevtoolsModules extends BasePackage
                                                    ]
                                                 );
 
-                                return;
+                                return true;
                             }
+
+                            $this->addResponse('Module updated & repo already exists. Run git commands locally to initialize the repo locally.',
+                                               0,
+                                               [
+                                                'newRepo'   => $checkedRepo
+                                               ]
+                                            );
+
+                            return true;
                         }
                     }
 
@@ -334,10 +351,29 @@ class DevtoolsModules extends BasePackage
                         $this->core->update($core);
                     }
 
-                    if ((isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) ||
-                        (isset($data['truncate_table']) && $data['truncate_table'] == true)
+                    if ((isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true) ||
+                        (isset($data['truncate_table']) && (bool) $data['truncate_table'] == true)
                     ) {
-                        $this->runInstallUninstallTruncateTable($data);
+                        $reinstall = false;
+                        $truncate = false;
+
+                        if ((isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true)) {
+                            $reinstall = true;
+
+                            if (strtolower($data['app_type']) === 'core' &&
+                                strtolower($data['name']) !== 'core'
+                            ) {
+                                $this->addResponse('Module updated. But, only core module can run install/uninstall!', 1);
+
+                                return;
+                            }
+                        }
+
+                        if ((isset($data['truncate_table']) && (bool) $data['truncate_table'] == true)) {
+                            $truncate = true;
+                        }
+
+                        $this->runInstallUninstallTruncateTable($data, $reinstall, $truncate);
                     }
 
                     $this->addResponse('Module updated');
@@ -352,6 +388,86 @@ class DevtoolsModules extends BasePackage
         }
 
         $this->addResponse('Error updating Module', 1);
+    }
+
+    public function bulkModule($data)
+    {
+        if (!isset($data['bulk_actions']) ||
+            (isset($data['bulk_actions']) && is_array($data['bulk_actions']) && count($data['bulk_actions']) === 0)
+        ) {
+            $this->addResponse('Provide a list of modules to perform action on.', 1);
+
+            return false;
+        }
+
+        if (!isset($data['task'])) {
+            $this->addResponse('Bulk action task not provided.', 1);
+
+            return false;
+        }
+
+        foreach ($data['bulk_actions'] as $module_type => $moduleList) {
+            if ($module_type === 'bundles') {
+                continue;
+            }
+            if ($data['task'] === 'truncate' && $module_type !== 'packages') {
+                continue;
+            }
+            if ($data['task'] === 'run_script' && $module_type === 'views') {
+                continue;
+            }
+
+            if (count($moduleList) > 0) {
+                foreach ($moduleList as $moduleId) {
+                    $moduleToUpdate = null;
+
+                    if ($module_type === 'apptypes') {
+                        $moduleToUpdate = $this->apps->types->getAppTypeById((int) $moduleId);
+                    } else {
+                        $moduleToUpdate = $this->modules->{$module_type}->getById((int) $moduleId);
+                    }
+
+                    if (isset($moduleToUpdate)) {
+                        if ($moduleToUpdate['name'] === 'Core' &&
+                            $data['task'] !== 'run_script'
+                        ) {
+                            continue;
+                        }
+
+                        try {
+                            $update = false;
+                            if ($data['task'] === 'install') {
+                                $moduleToUpdate['installed'] = 1;
+                                $update = true;
+                            } else if ($data['task'] === 'uninstall') {
+                                $moduleToUpdate['installed'] = 0;
+                                $update = true;
+                            } else if ($data['task'] === 'truncate') {
+                                $this->runInstallUninstallTruncateTable($moduleToUpdate, false, true);
+                            } else if ($data['task'] === 'run_script') {
+                                $this->runInstallUninstallTruncateTable($moduleToUpdate, true, false);
+                            }
+
+                            if ($update) {
+                                if ($module_type === 'apptypes') {
+                                    $this->apps->types->update($moduleToUpdate);
+                                } else {
+                                    $this->modules->{$module_type}->update($moduleToUpdate);
+                                }
+                            }
+                        } catch (\throwable $e) {
+                            $this->addResponse($e->getMessage(), 1);
+
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->addResponse('Bulk action performed successfully!');
+
+        return true;
     }
 
     protected function precheck($data)
@@ -553,7 +669,13 @@ class DevtoolsModules extends BasePackage
 
     public function reCalculateFilesHash($module, $remove = false, $viaGenerateRelease = false, $viaValidation = false, $force = false)
     {
+        $releasePending = false;
+
         if ($force) {
+            if (isset($module['release_pending']) && $module['release_pending'] == 'true') {
+                $releasePending = true;
+            }
+
             $module = $this->modules->{$module['module_type']}->getById($module['id']);
         }
 
@@ -596,7 +718,9 @@ class DevtoolsModules extends BasePackage
                             $hashFiles = [];
 
                             foreach ($filesToHash as $fileToHash) {
-                                if (str_ends_with($fileToHash, '/')) {
+                                if (str_ends_with($fileToHash, '#')) {//For Commenting
+                                    continue;
+                                } else if (str_ends_with($fileToHash, '/')) {
                                     $fileToHashDirList = $this->basepackages->utils->scanDir($moduleLocation . $fileToHash, true);
 
                                     if ($fileToHashDirList && count($fileToHashDirList['files']) > 0) {
@@ -610,6 +734,19 @@ class DevtoolsModules extends BasePackage
                             if (count($hashFiles) > 0) {
                                 $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $hashFiles);
                             }
+                        }
+                    } else {
+                        $files = $this->basepackages->utils->scanDir(
+                            $moduleLocation,
+                            true,
+                            [
+                                '.git/',
+                                'linter-backup/'
+                            ]
+                        );
+
+                        if ($files && count($files['files']) > 0) {
+                            $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $files['files']);
                         }
                     }
                 } else {
@@ -634,12 +771,32 @@ class DevtoolsModules extends BasePackage
                 foreach ($moduleLocationFiles['files'] as $file) {
                     $filePath = $file;
 
-                    $file = str_replace($moduleLocation, '', $file);
+                    if (count($moduleLocations) === 1) {
+                        $file = str_replace($moduleLocations[0], '', $file);
+                    } else if (count($moduleLocations) === 2) {//Main View (with public)
+                        $moduleLocation = null;
+
+                        foreach ($moduleLocations as $moduleLocation) {
+                            if (str_contains($moduleLocation, 'public/')) {
+                                $file = str_replace($moduleLocation, 'pub-', $file);
+                            } else {
+                                $file = str_replace($moduleLocation, '', $file);
+                            }
+                        }
+                    } else {
+                        $file = str_replace($moduleLocations, '', $file);
+                    }
 
                     $hash = hash_file('md5', base_path($filePath));
 
                     $filesHash['files_hash'][$file] = $hash;
                 }
+            }
+
+            if ($releasePending) {
+                $filesHash['release_pending'] = true;
+            } else {
+                $filesHash['release_pending'] = false;
             }
 
             if (isset($filesHash['id'])) {
@@ -659,6 +816,7 @@ class DevtoolsModules extends BasePackage
 
             $module['repoExists'] = false;
             $module['latestRelease'] = false;
+
             if ($this->localContent->directoryExists($moduleLocation . '.git')) {
                 if ((!isset($module['repo_details']) ||
                      !isset($module['repo_details']['latestRelease'])) ||
@@ -692,10 +850,16 @@ class DevtoolsModules extends BasePackage
             $filesHash = $this->getFilesHash($module);
 
             $module['isModified'] = false;
+            $module['releasePending'] = false;
+
             if (!$filesHash) {
                 $this->reCalculateFilesHash($module, false, false, true);
 
                 return $module;
+            }
+
+            if (isset($filesHash['release_pending']) && $filesHash['release_pending'] == true) {
+                $module['releasePending'] = true;
             }
 
             $moduleLocationFiles['files'] = [];
@@ -718,7 +882,9 @@ class DevtoolsModules extends BasePackage
                             $hashFiles = [];
 
                             foreach ($filesToHash as $fileToHash) {
-                                if (str_ends_with($fileToHash, '/')) {
+                                if (str_ends_with($fileToHash, '#')) {//For Commenting
+                                    continue;
+                                } else if (str_ends_with($fileToHash, '/')) {
                                     $fileToHashDirList = $this->basepackages->utils->scanDir($moduleLocation . $fileToHash, true);
 
                                     if ($fileToHashDirList && count($fileToHashDirList['files']) > 0) {
@@ -732,6 +898,19 @@ class DevtoolsModules extends BasePackage
                             if (count($hashFiles) > 0) {
                                 $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $hashFiles);
                             }
+                        }
+                    } else {
+                        $files = $this->basepackages->utils->scanDir(
+                            $moduleLocation,
+                            true,
+                            [
+                                '.git/',
+                                'linter-backup/'
+                            ]
+                        );
+
+                        if ($files && count($files['files']) > 0) {
+                            $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $files['files']);
                         }
                     }
                 } else {
@@ -752,22 +931,68 @@ class DevtoolsModules extends BasePackage
 
             if ($moduleLocationFiles && count($moduleLocationFiles['files']) > 0) {
                 $module['modified_files'] = [];
+                $module['modified_files']['added'] = [];
+                $module['modified_files']['removed'] = [];
+                $module['modified_files']['modified'] = [];
+
+                array_walk($filesHash['files_hash'], function($hash, $file) use ($moduleLocations, $moduleLocationFiles, &$module) {
+                    if (count($moduleLocations) === 1) {
+                        $file = $moduleLocations[0] . $file;
+                    } else if (count($moduleLocations) === 2) {//Main View (with public)
+                        $moduleLocation = null;
+
+                        foreach ($moduleLocations as $moduleLocation) {
+                            if (str_contains($moduleLocation, 'public') && str_contains($file, 'pub-')) {
+                                $file = str_replace('pub-', $moduleLocation, $file);
+                            } else if (!str_contains($moduleLocation, 'public') && !str_contains($file, 'pub-')) {
+                                $file = $moduleLocation . $file;
+                            }
+                        }
+                    } else {
+                        $file = $moduleLocation . $file;
+                    }
+
+                    if (!in_array($file, $moduleLocationFiles['files'])) {
+                        array_push($module['modified_files']['removed'], $file);
+                    }
+                });
 
                 foreach ($moduleLocationFiles['files'] as $file) {
                     $filePath = $file;
 
-                    $file = str_replace($moduleLocation, '', $file);
+                    if (count($moduleLocations) === 1) {
+                        $file = str_replace($moduleLocations[0], '', $file);
+                    } else if (count($moduleLocations) === 2) {//Main View (with public)
+                        $moduleLocation = null;
+
+                        foreach ($moduleLocations as $moduleLocation) {
+                            if (str_contains($moduleLocation, 'public/')) {
+                                $file = str_replace($moduleLocation, 'pub-', $file);
+                            } else {
+                                $file = str_replace($moduleLocation, '', $file);
+                            }
+                        }
+                    } else {
+                        $file = str_replace($moduleLocations, '', $file);
+                    }
 
                     $hash = hash_file('md5', base_path($filePath));
 
-                    if (!isset($filesHash['files_hash'][$file]) ||
-                        (isset($filesHash['files_hash'][$file]) &&
-                         $filesHash['files_hash'][$file] !== $hash)
+                    if (!isset($filesHash['files_hash'][$file])
                     ) {
-                        array_push($module['modified_files'], $file);
-
-                        $module['isModified'] = true;
+                        array_push($module['modified_files']['added'], $file);
+                    } else if (isset($filesHash['files_hash'][$file]) &&
+                               $filesHash['files_hash'][$file] !== $hash
+                    ) {
+                        array_push($module['modified_files']['modified'], $file);
                     }
+                }
+
+                if (count($module['modified_files']['added']) > 0 ||
+                    count($module['modified_files']['modified']) > 0 ||
+                    count($module['modified_files']['removed']) > 0
+                ) {
+                    $module['isModified'] = true;
                 }
             }
         } catch (\throwable | FilesystemException | UnableToCheckExistence $e) {
@@ -920,7 +1145,7 @@ class DevtoolsModules extends BasePackage
         return $moduleLocation . $routePath;
     }
 
-    protected function runInstallUninstallTruncateTable($data)
+    protected function runInstallUninstallTruncateTable($data, $reinstall, $truncate)
     {
         $moduleToReinstall = $this->modules->manager->getModuleInfo(
             [
@@ -955,19 +1180,25 @@ class DevtoolsModules extends BasePackage
                 if ($data['app_type'] === 'core') {
                     $coreInstall = new CoreInstall;
 
-                    if ($data['type'] === 'core') {
-                        if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
+                    if (!isset($data['type'])) {
+                        $data['type'] =$moduleToReinstall['module_type'];
+                    }
+
+                    if ($data['type'] === 'core' ||
+                        ($data['type'] === 'packages' && $data['name'] === 'Core')
+                    ) {
+                        if ($reinstall) {
                             $coreInstall->init()->install();
                         }
                     } else if ($data['type'] === 'packages') {
                         $moduleModel = $module->useModel();
 
-                        if (isset($data['truncate_table']) && $data['truncate_table'] == true) {
+                        if ($truncate) {
                             $coreInstall->init([$moduleModel->getSource()])->truncate();
                         }
 
-                        if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
-                            if ($data['installed'] == true) {
+                        if ($reinstall) {
+                            if ((bool) $data['installed'] == true) {
                                 $coreInstall->init([$moduleModel->getSource()])->install();
                             } else {
                                 $coreInstall->init([$moduleModel->getSource()])->uninstall();
@@ -975,14 +1206,12 @@ class DevtoolsModules extends BasePackage
                         }
                     }
                 } else {
-                    $module = new $class();
-
-                    if (isset($data['truncate_table']) && $data['truncate_table'] == true && method_exists($module, 'truncate')) {
+                    if ($truncate && method_exists($module, 'truncate')) {
                         $module->init()->truncate();
                     }
 
-                    if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
-                        if ($data['installed'] == true) {
+                    if ($reinstall) {
+                        if ((bool) $data['installed'] == true) {
                             $module->init()->install();
                         } else {
                             $module->init()->uninstall();
@@ -1027,7 +1256,6 @@ class DevtoolsModules extends BasePackage
             if (isset($appType)) {
                 $appType['name'] = $data['name'];
                 $appType['app_type'] = strtolower($data['app_type']);
-                $appType['dashboards'] = $data['dashboards'];
                 $appType['description'] = $data['description'];
                 $appType['version'] = $data['version'];
                 $appType['api_id'] = $data['api_id'];
@@ -1094,7 +1322,6 @@ class DevtoolsModules extends BasePackage
         $jsonFile = 'apps/' . ucfirst($appType['app_type']) . '/Install/type.json';
 
         $jsonContent["app_type"] = $appType["app_type"];
-        $jsonContent["dashboards"] = $appType["dashboards"];
         $jsonContent["name"] = $appType["name"];
         $jsonContent["description"] = $appType["description"];
         $jsonContent["version"] = $appType["version"];
@@ -1180,6 +1407,13 @@ class DevtoolsModules extends BasePackage
         $defaultSettings = [];
 
         return $this->helper->encode($defaultSettings);
+    }
+
+    public function getDefaultFilters()
+    {
+        $defaultFilters = [];
+
+        return $this->helper->encode($defaultFilters);
     }
 
     public function getDefaultDependencies($type, $isSubView = false)
@@ -1268,6 +1502,7 @@ class DevtoolsModules extends BasePackage
             $repo = $jsonContent['repo'];
         } else {
             $data = $this->jsonData($data, true);
+
             $jsonContent = [];
             $jsonContent["name"] = $data["name"];
             if ($data['module_type'] === 'components') {
@@ -1287,6 +1522,8 @@ class DevtoolsModules extends BasePackage
             $jsonContent["dependencies"] = $data["dependencies"];
             if ($data['module_type'] === 'components') {
                 $jsonContent["menu"] = $data["menu"];
+                $jsonContent["widgets"] = $data["widgets"];
+                $jsonContent["filters"] = $data["filters"];
             }
 
             if ($data['module_type'] === 'views') {
@@ -1299,9 +1536,6 @@ class DevtoolsModules extends BasePackage
             }
 
             $jsonContent["settings"] = $data["settings"];
-            if ($data['module_type'] === 'components') {
-                $jsonContent["widgets"] = $data["widgets"];
-            }
         }
 
         $jsonContent = $this->helper->encode($jsonContent, JSON_UNESCAPED_SLASHES);
@@ -1720,7 +1954,7 @@ $file .= '
 
     protected function generateNewMiddlewaresFiles($moduleFilesLocation, $data)
     {
-        //Package File
+        //Middleware File
         try {
             $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/Middleware.txt');
         } catch (FilesystemException | UnableToReadFile $exception) {
@@ -2025,8 +2259,14 @@ $file .= '
         return true;
     }
 
-    protected function addUpdateComponentMenu(&$data)
+    protected function addUpdateComponentMenu($data)
     {
+        if (strtolower($data['app_type']) !== 'core') {
+            return true;
+        }
+
+        $module = $this->modules->{$data['module_type']}->packagesData->last;
+
         if ($data['menu_id'] != '' && $data['menu_id'] != '0') {
             if (!isset($data['is_clone']) ||
                 (isset($data['is_clone']) && $data['is_clone'] == false)
@@ -2036,8 +2276,6 @@ $file .= '
                 if ($menu) {
                     if ($data['menu'] == 'false') {
                         $this->basepackages->menus->remove($data['menu_id']);
-
-                        $module = $this->modules->{$data['module_type']}->getById($data['id']);
 
                         $module['menu_id'] = null;
                         $module['menu'] = null;
@@ -2053,21 +2291,215 @@ $file .= '
         if ($data['menu'] != 'false' && $data['menu'] != '') {
             $data['menu'] = $this->helper->decode($data['menu'], true);
 
-            if (isset($menu)) {
-                $this->basepackages->menus->updateMenu($data['menu_id'], $data);
+            if (isset($menu) && $menu) {
+                $this->basepackages->menus->updateMenu($data['menu_id'], $data, $module);
+
+                $module['menu_id'] = $menu['id'];
+
+                $this->modules->{$data['module_type']}->update($module);
 
                 return;
             } else {
-                $menu = $this->basepackages->menus->addMenu($data);
+                $menu = $this->basepackages->menus->addMenu($data, $module);
 
                 if ($menu) {
-                    // $module = $this->modules->{$data['module_type']}->packagesData->last;
+                    $module = $this->modules->{$data['module_type']}->packagesData->last;
 
-                    // $module['menu_id'] = $menu['id'];
-                    $data['menu_id'] = $menu['id'];
+                    $module['menu_id'] = $menu['id'];
+
+                    $this->modules->{$data['module_type']}->update($module);
+                }
+            }
+        }
+    }
+
+    protected function addUpdateComponentWidgets($data)
+    {
+        if (strtolower($data['app_type']) !== 'core') {
+            return true;
+        }
+
+        if (isset($data['widgets'])) {
+            if (!is_array($data['widgets']) && $data['widgets'] !== '') {
+                $data['widgets'] = $this->helper->decode($data['widgets'], true);
+            }
+        }
+
+        if (isset($data['widgets']) &&
+            count($data['widgets']) > 0
+        ) {
+            foreach ($data['widgets'] as $widgetArr) {
+                if (!isset($widgetArr['method'])) {
+                    continue;
                 }
 
-                // $this->modules->{$data['module_type']}->update($module);
+                $widget = $this->basepackages->widgets->getWidgetByMethodAndAppType($widgetArr['method'], $data['app_type']);
+
+                if ($widget) {
+                    $widgetToUpdate =
+                        [
+                            'id'                    => $widget['id'],
+                            'name'                  => $widgetArr['name'],
+                            'method'                => $widgetArr['method'],
+                            'component_id'          => $data['id'],
+                            'app_type'              => $data['app_type'],
+                            'multiple'              => isset($widgetArr['multiple']) && $widgetArr['multiple'] === true ? 1 : 0,
+                            'max_multiple'          => isset($widgetArr['max_multiple']) ? $widgetArr['max_multiple'] : 5,//Max instances of same widget
+                            'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : $this->helper->encode([])
+                        ];
+
+                    if ($this->basepackages->widgets->update($widgetToUpdate)) {
+                        foreach ($data['widgets'] as &$dataWidget) {
+                            if ($dataWidget['method'] === $widgetToUpdate['method']) {
+                                $dataWidget['id'] = $widgetToUpdate['id'];
+                            }
+                        }
+
+                        $this->modules->components->update($data);
+                    }
+                } else {
+                    $widgetToAdd =
+                        [
+                            'name'                  => $widgetArr['name'],
+                            'method'                => $widgetArr['method'],
+                            'component_id'          => $data['id'],
+                            'app_type'              => $data['app_type'],
+                            'multiple'              => isset($widgetArr['multiple']) && $widgetArr['multiple'] === true ? 1 : 0,
+                            'max_multiple'          => isset($widgetArr['max_multiple']) ? $widgetArr['max_multiple'] : 5,//Max instances of same widget
+                            'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : $this->helper->encode([])
+                        ];
+
+                    if ($this->basepackages->widgets->add($widgetToAdd)) {
+                        $newWidget = $this->basepackages->widgets->packagesData->last;
+
+                        foreach ($data['widgets'] as &$dataWidget) {
+                            if ($dataWidget['method'] === $newWidget['method']) {
+                                $dataWidget['id'] = $newWidget['id'];
+                            }
+                        }
+
+                        $this->modules->components->update($data);
+                    }
+                }
+            }
+
+            //Remove widgets that dont exists
+            $componentWidgets = $this->basepackages->widgets->getWidgetsByComponentId((int) $data['id']);
+
+            if ($componentWidgets && count($componentWidgets) > 0) {
+                $componentWidgetsKeys = array_keys($componentWidgets);
+
+                $widget = null;
+
+                foreach ($data['widgets'] as $widget) {
+                    if (isset($widget['id'])) {
+                        if (!in_array($widget['id'], $componentWidgetsKeys)) {
+                            $this->basepackages->widgets->remove((int) $widget['id']);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected function addUpdateComponentFilters($data)
+    {
+        if (strtolower($data['app_type']) !== 'core') {
+            return true;
+        }
+
+        if (isset($data['filters'])) {
+            if (!is_array($data['filters']) && $data['filters'] !== '') {
+                $data['filters'] = $this->helper->decode($data['filters'], true);
+            }
+        }
+
+        if (isset($data['filters']) &&
+            count($data['filters']) > 0
+        ) {
+            $defaultFilter = null;
+
+            foreach ($data['filters'] as $filterArr) {
+                if (!isset($filterArr['name']) || !isset($filterArr['conditions'])) {
+                    continue;
+                }
+
+                $filter = $this->basepackages->filters->getFiltersByComponentIdAndCondition($data['id'], $filterArr['conditions']);
+
+                if ($filter) {
+                    $this->basepackages->filters->updateFilter(
+                        [
+                            'id'                => $filter['id'],
+                            'name'              => $filterArr['name'],
+                            'app_type'          => $data['app_type'],
+                            'conditions'        => $filterArr['conditions'],
+                            'component_id'      => $data['id'],
+                            'filter_type'       => 0,//System
+                            'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
+                            'auto_generated'    => 1,
+                            'account_id'        => 0
+                        ]
+                    );
+                } else {
+                    $this->basepackages->filters->addFilter(
+                        [
+                            'name'              => $filterArr['name'],
+                            'app_type'          => $data['app_type'],
+                            'conditions'        => $filterArr['conditions'],
+                            'component_id'      => $data['id'],
+                            'filter_type'       => 0,//System
+                            'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
+                            'auto_generated'    => 1,
+                            'account_id'        => 0
+                        ]
+                    );
+
+                    $filter = $this->basepackages->filters->packagesData->last;
+                }
+
+                if ($filter['is_default'] === 1) {
+                    $defaultFilter = $filter;
+                }
+            }
+
+            //Remove filters that dont exists
+            $componentFilters = $this->basepackages->filters->getFiltersForComponent((int) $data['id'], null, $data['app_type']);
+
+            if ($componentFilters && count($componentFilters) > 0) {
+                $componentFiltersConditions = [];
+
+                foreach ($data['filters'] as $filter) {
+                    if (!in_array($filter['conditions'], $componentFiltersConditions)) {
+                        array_push($componentFiltersConditions, $filter['conditions']);
+                    }
+                }
+                //Default All Filter
+                array_push($componentFiltersConditions, '');
+
+                foreach ($componentFilters as $componentFilter) {
+                    if (!in_array($componentFilter['conditions'], $componentFiltersConditions)) {
+                        $this->basepackages->filters->removeFilter($componentFilter['id']);
+
+                        continue;
+                    }
+
+                    //make sure we only make 1 default.
+                    if ($defaultFilter) {
+                        if ($defaultFilter['id'] === $componentFilter['id']) {
+                            $componentFilter['is_default'] = 1;
+                        } else {
+                            $componentFilter['is_default'] = 0;
+                        }
+
+                        $this->basepackages->filters->updateFilter($componentFilter);
+                    } else {
+                        if ($componentFilter['conditions'] === '') {
+                            $componentFilter['is_default'] = 1;
+                        }
+
+                        $this->basepackages->filters->updateFilter($componentFilter);
+                    }
+                }
             }
         }
     }
@@ -2237,7 +2669,7 @@ $file .= '
                 return $issues;
             }
 
-            $this->addResponse('No issues found with selected milestone/label', 1);
+            $this->addResponse('No closed issues found with selected milestone/label', 1);
         } catch (\Exception $e) {
             $this->addResponse($e->getMessage(), 1);
 
@@ -3939,6 +4371,98 @@ $file .= '
         return false;
     }
 
+    public function toggleVisibilityRepo($data)
+    {
+        if (!isset($data['repo'])) {
+            $this->addResponse('Repo not set', 1);
+
+            return false;
+        }
+
+        if (!$this->initApi($data)) {
+            return false;
+        }
+
+        if (!isset($data['id']) || (isset($data['id']) && $data['id'] === '')) {
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                $collection = 'RepositoryApi';
+                $method = 'repoGet';
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $collection = 'ReposApi';
+                $method = 'reposGet';
+            }
+
+            $args = [$this->apiClientConfig['org_user'], $data['repo']];
+
+            $responseArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+            if ($responseArr) {
+                $moduleSync['repo_details']['details'] = $responseArr;
+            }
+        } else {
+            $moduleSync = $this->modules->manager->getModuleInfo(
+                [
+                    'module_type'       => $data['module_type'],
+                    'module_id'         => (int) $data['id'],
+                    'sync'              => true,
+                    'getLatestRelease'  => true
+                ]
+            );
+        }
+
+        $visibility = ['private' => true];
+        if ($moduleSync['repo_details']['details']['private'] === true) {
+            $visibility = ['private' => false];
+        }
+
+        $this->apiClientConfig['repo_url'] = rtrim($this->apiClientConfig['repo_url'], '/');
+
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoUpdate';
+            $args = [$this->apiClientConfig['org_user']];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+            $collection = 'ReposApi';
+            $method = 'reposUpdate';
+            $args = [$this->apiClientConfig['org_user'], $data['repo'], $visibility];
+        }
+
+        try {
+            $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+            if (!isset($data['id']) || (isset($data['id']) && $data['id'] === '')) {
+                //Local Module does not exists, we do not do anything!
+            } else {
+                $this->modules->manager->getModuleInfo(
+                    [
+                        'module_type'       => $data['module_type'],
+                        'module_id'         => $data['id'],
+                        'sync'              => true,
+                        'getLatestRelease'  => true
+                    ]
+                );
+            }
+
+            if ($visibility['private'] === true) {
+                $this->addResponse('Repo ' . $data['repo'] . ' marked as private');
+            } else {
+                $this->addResponse('Repo ' . $data['repo'] . ' marked as public');
+            }
+
+            return true;
+        } catch (\throwable | ClientException $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            if ($e->getCode() === 401) {
+                $this->addResponse('API Authentication failed.', 1);
+            } else if (str_contains($e->getMessage(), 'Connection timed out')) {
+                $this->addResponse('Error connecting to the repository.', 1);
+            }
+
+            return false;
+        }
+    }
+
     public function removeRepo($data)
     {
         if (!isset($data['repo'])) {
@@ -3952,44 +4476,89 @@ $file .= '
         }
 
         $this->apiClientConfig['repo_url'] = rtrim($this->apiClientConfig['repo_url'], '/');
-        //Get one or core repo details, no need to loop through all repos in the org.
-        if (!str_ends_with($this->apiClientConfig['repo_url'], '/' . $this->apiClientConfig['org_user'])) {
-            $repoUrlArr = explode('/', $this->apiClientConfig['repo_url']);
 
-            $remoteModule = $this->getRemoteModule($this->helper->last($repoUrlArr));
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoDelete';
+            $args = [$this->apiClientConfig['org_user']];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+            $collection = 'ReposApi';
+            $method = 'reposDelete';
+            $args = [$this->apiClientConfig['org_user'], $data['repo']];
+        }
 
-            if (!$remoteModule) {
-                return false;
+        try {
+            $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+            $this->addResponse('Repo ' . $data['repo'] . ' deleted from remote');
+        } catch (\throwable | ClientException $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            if ($e->getCode() === 401) {
+                $this->addResponse('API Authentication failed.', 1);
+            } else if (str_contains($e->getMessage(), 'Connection timed out')) {
+                $this->addResponse('Error connecting to the repository.', 1);
             }
 
-            $modulesArr = [$remoteModule];
+            return false;
+        }
+    }
+
+    public function getDiff($data)
+    {
+        $module = $this->modules->{$data['module_type']}->getById($data['id']);
+
+        if (!$module) {
+            $this->addResponse('Module not found!', 1);
+
+            return false;
+        }
+
+        if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
+            $moduleLocations = [$this->getModuleFilesLocation($module), $this->getModuleFilesLocation($module, true)];
         } else {
-            //Process all repositories in the org as repourl and org name is the same
-            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
-                $collection = 'RepositoryApi';
-                $method = 'repoDelete';
-                $args = [$this->apiClientConfig['org_user']];
-            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
-                $collection = 'ReposApi';
-                $method = 'reposDelete';
-                $args = [$this->apiClientConfig['org_user'], $data['repo']];
-            }
+            $moduleLocations = [$this->getModuleFilesLocation($module)];
+        }
 
-            try {
-                $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+        if (count($moduleLocations) === 0) {
+            $this->addResponse('Module location not found!', 1);
 
-                $this->addResponse('Repo ' . $data['repo'] . ' deleted from remote');
-            } catch (\throwable | ClientException $e) {
-                $this->addResponse($e->getMessage(), 1);
+            return false;
+        }
 
-                if ($e->getCode() === 401) {
-                    $this->addResponse('API Authentication failed.', 1);
-                } else if (str_contains($e->getMessage(), 'Connection timed out')) {
-                    $this->addResponse('Error connecting to the repository.', 1);
+        $found = false;
+        $diff = null;
+
+        foreach ($moduleLocations as $moduleLocation) {
+            if ($this->localContent->fileExists($moduleLocation . $data['file'])) {
+                exec('cd ' . base_path($moduleLocation) . ' && git diff ' . $data['file'], $output, $result);
+
+                if ($result !== 0 || count($output) === 0) {
+                    $this->addResponse('Error while getting diff', 1, ['output' => $output]);
+
+                    return false;
                 }
 
-                return false;
+                if (count($output) > 200) {
+                    $this->addResponse('File diff > 200 lines, please use external app to view diff!', 1);
+
+                    return false;
+                }
+
+                $diff = $output;
+
+                $found = true;
+
+                break;
             }
         }
+
+        if (!$found) {
+            $this->addResponse('File not found at module location!', 1);
+
+            return false;
+        }
+
+        $this->addResponse('Diff for file', 0, ['diff' => $diff]);
     }
 }

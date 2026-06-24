@@ -55,7 +55,7 @@ class Notifications extends BasePackage
         if ($createdBy) {
             $newNotification['created_by'] = $createdBy;
         } else {
-            if (isset($this->access->auth) && $this->access->auth->account()) {
+            if ($this->access->auth->check()) {
                 $newNotification['created_by'] = $this->access->auth->account()['id'];
             } else {
                 $newNotification['created_by'] = 0;
@@ -110,7 +110,7 @@ class Notifications extends BasePackage
                         'to'                => $tunnels['notifications_tunnel'],
                         'response'          => [
                             'responseCode'      => 0,
-                            'responseData'      => $this->fetchNewNotificationsCount()
+                            'responseData'      => $this->fetchNewNotificationsCount($notification)
                         ]
                     ]
                 );
@@ -177,13 +177,18 @@ class Notifications extends BasePackage
         }
         $email['body'] = $body;
 
-        $this->basepackages->emailqueue->addToQueue($email);
+        $this->basepackages->emailqueue->addQueue($email);
     }
 
-    public function fetchNewNotificationsCount($type = 0)
+    public function fetchNewNotificationsCount($notification = null)
     {
-        if (isset($this->access->auth->account()['profile']['settings']['notifications']['mute'])) {
-            if ($this->access->auth->account()['profile']['settings']['notifications']['mute'] == true) {
+        $notificationAccount = $this->access->auth->account();
+        if ($notification && isset($notification['account_id'])) {
+            $notificationAccount = $this->basepackages->accounts->getAccountById($notification['account_id']);
+        }
+
+        if (isset($notificationAccount['profile']['settings']['notifications']['mute'])) {
+            if ($notificationAccount['profile']['settings']['notifications']['mute'] == true) {
                 $isMute = true;
             } else {
                 $isMute = false;
@@ -192,7 +197,7 @@ class Notifications extends BasePackage
             $isMute = false;
         }
 
-        $notifications = $this->getNotificationsCount($type);
+        $notifications = $this->getNotificationsCount($notification);
 
         $total = 0;
         $info = 0;
@@ -226,7 +231,9 @@ class Notifications extends BasePackage
                         'warning'   => $warning,
                         'error'     => $error
                     ],
-                'mute'  => $isMute
+                'mute'      => $isMute,
+                'app'       => $this->apps->getAppInfo()['route'],
+                'for_user'  => $notificationAccount['email']
             ];
 
         $this->addResponse('Ok', 0, $count);
@@ -234,8 +241,13 @@ class Notifications extends BasePackage
         return $count;
     }
 
-    protected function getNotificationsCount()
+    protected function getNotificationsCount($notification = null)
     {
+        $notificationAccount = $this->access->auth->account();
+        if ($notification && isset($notification['account_id'])) {
+            $notificationAccount = $this->basepackages->accounts->getAccountById($notification['account_id']);
+        }
+
         if ($this->config->databasetype === 'db') {
             $conditions =
                 [
@@ -244,7 +256,7 @@ class Notifications extends BasePackage
                     'bind'          =>
                         [
                             'appId'         => $this->apps->getAppInfo()['id'],
-                            'aId'           => $this->access->auth->account()['id'],
+                            'aId'           => $notificationAccount['id'],
                             'read'          => 0,
                             'archive'       => 0
                         ]
@@ -254,7 +266,7 @@ class Notifications extends BasePackage
                 [
                     'conditions'    => [
                         ['app_id', '=', $this->apps->getAppInfo()['id']],
-                        ['account_id', '=', $this->access->auth->account()['id']],
+                        ['account_id', '=', $notificationAccount['id']],
                         ['read', '=', 0],
                         ['archive', '=', 0]
                     ]
@@ -288,7 +300,7 @@ class Notifications extends BasePackage
 
         $profile['settings'] = $this->helper->encode($profile['settings']);
 
-        $this->basepackages->profiles->updateProfile($profile);
+        $this->basepackages->profiles->update($profile);
 
         $this->addResponse('Changed');
     }
@@ -345,6 +357,7 @@ class Notifications extends BasePackage
                     $this->removeNotification($removeData);
                 }
             }
+            $this->addResponse('Removed');
         } else {
             $this->addResponse('Task Missing', 1);
         }
@@ -434,10 +447,10 @@ class Notifications extends BasePackage
             $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->access->auth->account()['id']]]];
         }
 
-        $notification = $this->getByParams($params);
+        $notifications = $this->getByParams($params);
 
-        if (count($notification) === 1) {
-            $this->remove($notification[0]['id']);
+        if ($notifications && count($notifications) === 1) {
+            $this->remove($notifications[0]['id']);
 
             $this->addResponse('Ok');
 
