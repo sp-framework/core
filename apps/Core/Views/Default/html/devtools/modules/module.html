@@ -1036,6 +1036,56 @@ dataCollectionSection =
                     });
                 });
 
+                $('#{{componentId}}-{{sectionId}}-modules-update').off();
+                $('#{{componentId}}-{{sectionId}}-modules-update').click(function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title                       : '<span class="text-info"> Update all dependencies to latest version?</span>',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Yes',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-info btn-sm text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            dataCollection.env.sounds.swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['modules'] = JSON.stringify(dataCollectionSectionForm['vars']['bundleModules']);
+
+                            $.post('{{links.url("devtools/modules/getLatestModuleVersion")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+
+                                if (response.responseCode == 0) {
+                                    if (response.responseData && response.responseData.modules) {
+                                        dataCollectionSectionForm['vars']['bundleModules'] = response.responseData.modules;
+                                        $('#{{componentId}}-{{sectionId}}-bundle_modules').val(JSON.stringify(response.responseData.modules));
+                                        prettyfyJson();
+                                    }
+
+                                    paginatedPNotify('success', {'text': response.responseMessage});
+                                } else {
+                                    paginatedPNotify('error', {'text': 'Error while retrieving updated version modules'});
+                                }
+                            }, 'json');
+                        }
+                    });
+                });
+
                 $('#{{componentId}}-{{sectionId}}-modules-external, ' +
                   '#{{componentId}}-{{sectionId}}-modules-external-version'
                 ).on('keyup', function() {
@@ -3271,6 +3321,56 @@ dataCollectionSection =
                                     paginatedPNotify('success', {'text': response.responseMessage});
                                 } else {
                                     paginatedPNotify('error', {'text': 'Error while retrieving default dependencies'});
+                                }
+                            }, 'json');
+                        }
+                    });
+                });
+
+                $('#{{componentId}}-{{sectionId}}-dependencies-update').off();
+                $('#{{componentId}}-{{sectionId}}-dependencies-update').click(function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title                       : '<span class="text-info"> Update all dependencies to latest version?</span>',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Yes',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-info btn-sm text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            dataCollection.env.sounds.swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['modules'] = JSON.stringify(dataCollectionSectionForm['vars']['moduleDependencies']);
+
+                            $.post('{{links.url("devtools/modules/getLatestModuleVersion")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+
+                                if (response.responseCode == 0) {
+                                    if (response.responseData && response.responseData.modules) {
+                                        dataCollectionSectionForm['vars']['moduleDependencies'] = response.responseData.modules;
+                                        $('#{{componentId}}-{{sectionId}}-bundle_modules').val(JSON.stringify(response.responseData.modules));
+                                        prettyfyJson();
+                                    }
+
+                                    paginatedPNotify('success', {'text': response.responseMessage});
+                                } else {
+                                    paginatedPNotify('error', {'text': 'Error while retrieving updated version modules'});
                                 }
                             }, 'json');
                         }

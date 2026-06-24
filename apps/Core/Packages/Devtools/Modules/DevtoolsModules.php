@@ -407,7 +407,10 @@ class DevtoolsModules extends BasePackage
         }
 
         foreach ($data['bulk_actions'] as $module_type => $moduleList) {
-            if ($module_type === 'bundles') {
+            if ($data['task'] !== 'updatedependencies' && $module_type === 'bundles') {
+                continue;
+            }
+            if ($data['task'] === 'updatedependencies' && $module_type === 'apptypes') {
                 continue;
             }
             if ($data['task'] === 'truncate' && $module_type !== 'packages') {
@@ -446,13 +449,34 @@ class DevtoolsModules extends BasePackage
                                 $this->runInstallUninstallTruncateTable($moduleToUpdate, false, true);
                             } else if ($data['task'] === 'run_script') {
                                 $this->runInstallUninstallTruncateTable($moduleToUpdate, true, false);
+                            } else if ($data['task'] === 'updatedependencies') {
+                                if (isset($moduleToUpdate['bundle_modules'])) {
+                                    $moduleToUpdate['bundle_modules'] = $this->getLatestModuleVersion(['modules' => $this->helper->encode($moduleToUpdate['bundle_modules'])]);
+                                    $update = true;
+                                } else if (isset($moduleToUpdate['dependencies'])) {
+                                    $moduleToUpdate['dependencies'] = $this->getLatestModuleVersion(['modules' => $this->helper->encode($moduleToUpdate['dependencies'])]);
+                                    $update = true;
+                                }
                             }
 
                             if ($update) {
                                 if ($module_type === 'apptypes') {
                                     $this->apps->types->update($moduleToUpdate);
                                 } else {
-                                    $this->modules->{$module_type}->update($moduleToUpdate);
+                                    if ($data['task'] === 'updatedependencies') {
+                                        $viewPublic = true;
+                                        if ($moduleToUpdate['module_type'] === 'views' && $moduleToUpdate['is_subview'] == true) {
+                                            $viewPublic = false;
+                                        }
+
+                                        if ($moduleToUpdate['module_type'] !== 'bundles') {
+                                            $this->updateModuleJson($moduleToUpdate, false, $viewPublic, true);
+                                        }
+
+                                        $this->modules->{$module_type}->update($moduleToUpdate);
+                                    } else {
+                                        $this->modules->{$module_type}->update($moduleToUpdate);
+                                    }
                                 }
                             }
                         } catch (\throwable $e) {
@@ -1416,7 +1440,7 @@ class DevtoolsModules extends BasePackage
         return $this->helper->encode($defaultFilters);
     }
 
-    public function getDefaultDependencies($type, $isSubView = false)
+    public function getDefaultDependencies($type, $isSubView = false, $returnArr = false)
     {
         // For all - core, apptype
         // For components - packages, middlewares, views (only subview), externals
@@ -1475,10 +1499,87 @@ class DevtoolsModules extends BasePackage
 
         $this->addResponse('Generated default dependencies', 0, ['defaultDependencies' => $defaultDependencies]);
 
+        if ($returnArr) {
+            return $defaultDependencies;
+        }
+
         return $this->helper->encode($defaultDependencies);
     }
 
-    protected function updateModuleJson($data, $viaGenerateRelease = false, $viewPublic = false)
+    public function getLatestModuleVersion($data)
+    {
+        if (!isset($data['modules']) ||
+            (isset($data['modules']) && $data['modules'] === '')
+        ) {
+            $this->addResponse('Please provide modules', 1);
+
+            return false;
+        }
+
+        $data['modules'] = $this->helper->decode($data['modules'], true);
+
+        foreach ($data['modules'] as $moduleType => $modules) {
+            if ($moduleType === 'core') {
+                if (!isset($modules['repo'])) {
+                    continue;
+                }
+
+                $core = $this->modules->packages->getPackageByName('Core');
+
+                if ($core) {
+                    $data['modules'][$moduleType]['version'] = $core['version'];
+                }
+            } else if ($moduleType === 'apptype') {
+                if (!isset($modules['repo'])) {
+                    continue;
+                }
+
+                $appType = $this->apps->types->getAppTypeByRepo($modules['repo']);
+
+                if ($appType) {
+                    $data['modules'][$moduleType]['version'] = $appType['version'];
+                }
+            } else if ($moduleType === 'bundles') {
+                if (count($modules) > 0) {
+                    foreach ($modules as $bundleKey => $bundles) {
+                        if (!isset($bundles['repo'])) {
+                            continue;
+                        }
+
+                        $bundle = $this->modules->bundles->getBundleByRepo($bundles['repo']);
+
+                        if ($bundle) {
+                            $data['modules'][$moduleType][$bundleKey]['version'] = $bundle['version'];
+                        }
+                    }
+                }
+            } else if ($moduleType === 'externals') {
+                continue;
+            } else {
+                $moduleMethod = 'get' . ucfirst(substr($moduleType, 0, -1)) . 'ByRepo';
+
+                if (count($modules) > 0) {
+                    foreach ($modules as $modulesKey => $modulesArr) {
+                        if (!isset($modulesArr['repo'])) {
+                            continue;
+                        }
+
+                        $module = $this->modules->{$moduleType}->{$moduleMethod}($modulesArr['repo']);
+
+                        if ($module) {
+                            $data['modules'][$moduleType][$modulesKey]['version'] = $module['version'];
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->addResponse('Retrieved latest module versions', 0, ['modules' => $data['modules']]);
+
+        return $data['modules'];
+    }
+
+    protected function updateModuleJson($data, $viaGenerateRelease = false, $viewPublic = false, $viaBulkDepenenciesUpdate = false)
     {
         $jsonFile = $this->getModuleJsonFileLocation($data);
 
@@ -1500,6 +1601,16 @@ class DevtoolsModules extends BasePackage
             }
 
             $repo = $jsonContent['repo'];
+        } else if ($viaBulkDepenenciesUpdate) {
+            try {
+                $jsonContent = $this->helper->decode($this->localContent->read($jsonFile), true);
+            } catch (FilesystemException | UnableToWriteFile $exception) {
+                $this->addResponse('Unable to read json content to file: ' . $jsonFile);
+
+                return false;
+            }
+
+            $jsonContent['dependencies'] = $data['dependencies'];
         } else {
             $data = $this->jsonData($data, true);
 

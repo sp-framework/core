@@ -521,10 +521,12 @@ dataCollectionSectionForm['funcs']['editBulkButton'] = function() {
 }
 
 dataCollectionSectionForm['funcs']['enableBulkButtonsLinks'] = function() {
-    $('#{{componentId}}-{{sectionId}}-install,#{{componentId}}-{{sectionId}}-uninstall,#{{componentId}}-{{sectionId}}-truncate,' +
-      '#{{componentId}}-{{sectionId}}-run_script,#{{componentId}}-{{sectionId}}-cancel').off();
-    $('#{{componentId}}-{{sectionId}}-install,#{{componentId}}-{{sectionId}}-uninstall,#{{componentId}}-{{sectionId}}-truncate,' +
-      '#{{componentId}}-{{sectionId}}-run_script,#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
+    $('#{{componentId}}-{{sectionId}}-install,#{{componentId}}-{{sectionId}}-uninstall,#{{componentId}}-{{sectionId}}-updatedependencies,' +
+      '#{{componentId}}-{{sectionId}}-truncate,#{{componentId}}-{{sectionId}}-run_script,' +
+      '#{{componentId}}-{{sectionId}}-cancel').off();
+    $('#{{componentId}}-{{sectionId}}-install,#{{componentId}}-{{sectionId}}-uninstall,#{{componentId}}-{{sectionId}}-updatedependencies,' +
+      '#{{componentId}}-{{sectionId}}-truncate,#{{componentId}}-{{sectionId}}-run_script,' +
+      '#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
 
         e.preventDefault();
 
