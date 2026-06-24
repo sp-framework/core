@@ -438,6 +438,12 @@ class Queues extends BasePackage
             return false;
         }
 
+        if ($queue['status'] == 2) {
+            $this->addResponse('Queue is already processed, cannot update settings', 1);
+
+            return false;
+        }
+
         if ($data['settings']['backupSettings']['backup'] == 'true') {
             if ($data['settings']['backupSettings']['keys'] === true &&
                 $data['settings']['backupSettings']['password_protect'] === ''

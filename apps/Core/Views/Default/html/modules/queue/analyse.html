@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+<!-- htmlhint tag-pair:false -->
 {% set queueTasksCounterInstall = 0 %}
 {% set queueTasksCounterUpdate = 0 %}
 {% set queueTasksCounterUninstall = 0 %}
@@ -216,6 +216,65 @@
         </div>
     </div>
 {% endif %}
+{% set footer = true %}
+{% if queue['status'] == 2 %}
+    {% set footer = false %}
+{% endif %}
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'queue-settings-modal',
+            'modalBodyInclude'          : 'modules/queue/settings',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : footer,
+            'modalHeaderCloseButton'    : true,
+            'modalEscClose'             : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-cogs"></i> SETTINGS',
+            'modalFooterButtons'        :
+                [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                        [
+                            'modal-button-save' : [
+                                'title'                   : 'save',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
+                            ]
+                        ]
+                ]
+        ]
+    )}}
+</div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'queue-logs-modal',
+            'modalBodyInclude'          : 'modules/queue/logs',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalHeaderCloseButton'    : true,
+            'modalEscClose'             : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> LOGS'
+        ]
+    )}}
+</div>
 {% set queue = json_encode(queue, 16) %}
 {% set queue = str_replace('\\', '\\\\', queue) %}
 <script>
@@ -704,59 +763,3 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
-<div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : sectionId,
-            'modalId'                   : 'queue-settings-modal',
-            'modalBodyInclude'          : 'modules/queue/settings',
-            'modalSize'                 : 'xl',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalHeaderCloseButton'    : true,
-            'modalEscClose'             : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-cogs"></i> SETTINGS',
-            'modalFooterButtons'        :
-                [
-                'component'                     : component,
-                'componentName'                 : componentName,
-                'componentId'                   : componentId,
-                'parentComponentId'             : parent,
-                'sectionId'                     : sectionId,
-                'buttonType'                    : 'button',
-                'buttons'                       :
-                        [
-                            'modal-button-save' : [
-                                'title'                   : 'save',
-                                'type'                    : 'primary',
-                                'position'                : 'right',
-                                'icon'                    : 'cog fa-spin',
-                                'iconHidden'              : true
-                            ]
-                        ]
-                ]
-        ]
-    )}}
-</div>
-<div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : sectionId,
-            'modalId'                   : 'queue-logs-modal',
-            'modalBodyInclude'          : 'modules/queue/logs',
-            'modalSize'                 : 'xl',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalHeaderCloseButton'    : true,
-            'modalEscClose'             : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> LOGS'
-        ]
-    )}}
-</div>
-<!-- htmlmin:ignore -->
