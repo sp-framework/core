@@ -5,7 +5,7 @@
 	"module_type" : "packages",
 	"app_type" : "core",
 	"category" : "providers",
-	"version" : "0.0.0-rc.15",
+	"version" : "0.0.0-rc.16",
 	"repo" : "https://github.com/sp-framework/core",
 	"class" : "System\\Base\\Providers\\CoreServiceProvider\\Core",
 	"dependencies" : 
@@ -140,7 +140,7 @@
 			"session_idle" : 86400,
 			"session_absolute" : 2592000
 		},
-		"locale" :
+		"locale" : 
 		{
 			"country_iso3" : "",
 			"timezone" : ""
