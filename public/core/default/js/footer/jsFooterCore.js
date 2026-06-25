@@ -3966,8 +3966,6 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                 '<ul data-tabid="' + tabId + '-ul"></ul>' +
                                 '</li>'
                             );
-
-                        return;
                     }
 
                     that._populateTree(tabId);
@@ -4092,6 +4090,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     }
                 });
 
+                $('#' + sectionId + ' .card-footer button.addData, #' + sectionId + ' .card-footer button.updateData').off();
                 $('#' + sectionId + ' .card-footer button.addData, #' + sectionId + ' .card-footer button.updateData').click(function(e) {
                     e.preventDefault();
 

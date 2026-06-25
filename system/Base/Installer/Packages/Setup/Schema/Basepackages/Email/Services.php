@@ -111,7 +111,8 @@ class Services
                         'column_UNIQUE',
                         [
                             'host',
-                            'port'
+                            'port',
+                            'username'
                         ],
                         'UNIQUE'
                     )

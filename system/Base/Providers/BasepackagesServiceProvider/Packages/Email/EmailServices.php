@@ -117,7 +117,25 @@ class EmailServices extends BasePackage
     {
         $emailService = $this->getById($data['id']);
 
-        //Check relations before removing.
+        //Email services are assigned to Domain, check the assignment before removal.
+        foreach ($this->domains->domains as $domain) {
+            if (is_string($domain['apps'])) {
+                $domain['apps'] = $this->helper->decode($domain['apps'], true);
+            }
+
+            foreach ($domain['apps'] as $appId => $app) {
+                if (isset($app['email_service'])) {
+                    if ((int) $data['id'] === (int) $app['email_service']) {
+                        if (isset($this->apps->apps[$appId])) {
+                            $this->addResponse('Email service is being used by domain : ' . $domain['name'] . ' app : ' . $this->apps->apps[$appId]['name'], 1);
+
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
         if ($this->remove($emailService['id'])) {
             $this->addToNotification('remove', 'Removed: Email Service - ' . $emailService['name'], null, null);
 
