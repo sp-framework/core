@@ -196,7 +196,7 @@ class Auth extends BasePackage
 
         $this->clearAccountSessionId();
 
-        $this->cookies->reset();
+        $this->resetCookies();
 
         if ($this->opCache && $this->opCache->checkCache('account_' . $this->account['id'], 'core')) {
             $this->opCache->removeCache('account_' . $this->account['id'], 'core');
@@ -284,6 +284,24 @@ class Auth extends BasePackage
         }
 
         $this->sessionTools->removeSessionKey($this->getKey());
+    }
+
+    protected function resetCookies()
+    {
+        if (isset($_COOKIE)) {
+            foreach ($_COOKIE as $name => $value) {
+                if ($name === 'SP') {//We leave this for agent check.
+                    continue;
+                }
+
+                setcookie($name, '', time() - 3600, '/');
+                setcookie($name, '', time() - 3600, '/', $_SERVER['HTTP_HOST']);
+
+                unset($_COOKIE[$name]);
+            }
+        }
+
+        $this->cookies->reset();
     }
 
     public function checkAccount(array $data, $viaProfile = null)
