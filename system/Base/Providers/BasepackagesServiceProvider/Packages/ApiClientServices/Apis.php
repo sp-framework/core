@@ -223,10 +223,6 @@ class Apis extends BasePackage
                 $uploadTotal,
                 $uploadedBytes
             ) use ($monitorProgress) {
-                if ($downloadTotal === 0 && $uploadTotal === 0) {
-                    return;
-                }
-
                 $counters =
                         [
                             'downloadTotal'     => $downloadTotal,

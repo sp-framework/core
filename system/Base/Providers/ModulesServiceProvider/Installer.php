@@ -2340,10 +2340,6 @@ class Installer extends BasePackage
                 $uploadTotal,
                 $uploadedBytes
             ) {
-                if ($downloadTotal === 0 && $uploadTotal === 0) {
-                    return;
-                }
-
                 $counters =
                         [
                             'downloadTotal'     => $downloadTotal,

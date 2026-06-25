@@ -409,6 +409,12 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
         postData['process'] = 'runprocess';
     }
 
+    $('body').on('bazProgressCancelled', function() {
+        $('#{{componentId}}-{{sectionId}}-re-analyse').removeClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').children('i').attr('hidden', true);
+    });
+
     $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
         if (response.tokenKey && response.token) {
             $('#security-token').attr('name', response.tokenKey);
