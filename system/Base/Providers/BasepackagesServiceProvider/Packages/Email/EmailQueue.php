@@ -27,8 +27,6 @@ class EmailQueue extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        // $this->getAll($resetCache);
-
         return $this;
     }
 
@@ -73,7 +71,6 @@ class EmailQueue extends BasePackage
             return false;
         }
     }
-
 
     public function updateQueue(array $data)
     {
