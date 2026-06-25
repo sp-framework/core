@@ -330,7 +330,9 @@ class Middlewares extends BasePackage
 			$dependencyMiddleware = $this->getFirst('name', $dependency['name'], false, true, null, [], true);
 
 			if ($dependencyMiddleware) {
-				$dependencyMiddleware['apps'] = $this->helper->decode($dependencyMiddleware['apps'], true);
+				if (is_string($dependencyMiddleware['apps'])) {
+					$dependencyMiddleware['apps'] = $this->helper->decode($dependencyMiddleware['apps'], true);
+				}
 
 				$dependencyMiddleware['apps'][$data['id']]['enabled'] = true;
 
