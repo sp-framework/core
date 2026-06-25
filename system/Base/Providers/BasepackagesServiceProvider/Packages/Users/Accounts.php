@@ -1405,6 +1405,8 @@ class Accounts extends BasePackage
                         } else {
                             $this->addResponse('Error removing', 1);
                         }
+                    } else {
+                        $agentStore->deleteById($agent['id'], false);
                     }
 
                     return;
@@ -1496,6 +1498,8 @@ class Accounts extends BasePackage
                                 if (!$sessionStore->deleteById($session['id'])) {
                                     $removed = false;
                                 }
+                            } else {
+                                $agentStore->deleteById($agent['id'], false);
                             }
                         }
                     }

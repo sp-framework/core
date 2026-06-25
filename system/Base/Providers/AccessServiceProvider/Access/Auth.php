@@ -182,7 +182,7 @@ class Auth extends BasePackage
 
     public function logout($forced = false)
     {
-        if (!$this->account) {
+        if ($forced && !$this->account) {
             try {
                 $this->setUserFromSession();
             } catch (\Exception $e) {
