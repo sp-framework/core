@@ -103,7 +103,6 @@
                         $('#' + sectionId + '-delete').addClass('disabled');
                     }
                 }
-                        // $('#' + sectionId + '-filters option:selected').data()['filter_type'] === 1    //User
 
                 toggleFilterButtons(sectionId);
 
@@ -685,7 +684,6 @@
                 $('body').on('formToDatatableTableRowDelete', function(e) {
                     onFormToDatatableTableUpdate(e);
                 });
-
                 function onFormToDatatableTableUpdate(e) {
                     //Remove numeric from edit data
                     $('#' + sectionId + '-filter-table-data tbody tr').each(function(index, tr) {
@@ -1226,7 +1224,13 @@
                         $('#listing-secondary-buttons').attr('hidden', false);
                         $('#listing-additional-fields').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
-                        $.extend(thisOptions.listOptions.datatable, JSON.parse(response.rows));
+                        if (response.rows) {
+                            if (typeof response.rows === 'string') {
+                                response.rows = JSON.parse(response.rows);
+                            }
+
+                            $.extend(thisOptions.listOptions.datatable, response.rows);
+                        }
 
                         if (response.routeEnv && response.routeEnv.pageParams) {
                             if (response.routeEnv.pageParams.limit) {
@@ -1574,7 +1578,9 @@
                 if (!filterQuery) {
                     filterQuery = query;
                 }
-
+                if (filterQuery.length === 0) {
+                    filterQuery = { };
+                }
                 if (filterQuery['filter']) {
                     filter = true;
                 }
@@ -1586,14 +1592,18 @@
                 postData['page'] = page;
                 postData['limit'] = limit;
 
-                if (filterQuery.filter || filterQuery.order) {
-                    postData['filter'] = filterQuery.filter;
-                    postData['order'] = filterQuery.order;
+                if (filterQuery['filter'] || filterQuery['order']) {
+                    if (filterQuery['filter']) {
+                        postData['filter'] = filterQuery['filter'];
+                    }
+                    if (filterQuery['order']) {
+                        postData['order'] = filterQuery['order'];
+                    }
                 } else {
                     postData['filter'] = filterQuery;
                 }
 
-                if (filterQuery.quick_filter) {
+                if (filterQuery['quick_filter']) {
                     postData['conditions'] = filterQuery['conditions'];
                     postData['quick_filter'] = true;
                     if (postData['filter']) {
