@@ -447,6 +447,19 @@ class AppsComponent extends BaseComponent
         }
     }
 
+    public function saveMiddlewareSettingsAction()
+    {
+        $this->requestIsPost();
+
+        $this->modules->middlewares->saveMiddlewareSettings($this->postData());
+
+        $this->addResponse(
+            $this->modules->middlewares->packagesData->responseMessage,
+            $this->modules->middlewares->packagesData->responseCode,
+            $this->modules->middlewares->packagesData->responseData ?? []
+        );
+    }
+
     public function getFiltersAction()
     {
         $this->requestIsPost();

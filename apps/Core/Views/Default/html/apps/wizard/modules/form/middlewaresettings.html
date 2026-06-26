@@ -1,0 +1,25 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'middleware-settings',
+                'fieldLabel'                     : 'Middleware Settings',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Settings of the middleware. JSON Format',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 15,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>

@@ -310,6 +310,55 @@ class Middlewares extends BasePackage
 		}
 	}
 
+	public function saveMiddlewareSettings($data)
+	{
+		if (!isset($data['id'])) {
+			$this->addResponse('Please provide middleware id', 1);
+
+			return false;
+		}
+
+		if (!isset($data['app_id'])) {
+			$this->addResponse('Please provide app id', 1);
+
+			return false;
+		}
+
+		if (!isset($data['settings'])) {
+			$this->addResponse('Please provide middleware settings', 1);
+
+			return false;
+		}
+
+		$middleware = $this->getById((int) $data['id']);
+
+		if (!isset($middleware['apps'])) {
+			$middleware['apps'] = [];
+		}
+
+		if (is_string($middleware['apps'])) {
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
+		}
+
+		if (is_string($data['settings'])) {
+			$data['settings'] = $this->helper->decode($data['settings'], true);
+		}
+
+		if (!isset($middleware['apps'][$data['app_id']]['settings'])) {
+			$middleware['apps'][$data['app_id']]['settings'] = [];
+		}
+
+		$middleware['apps'][$data['app_id']]['settings'] = array_merge($middleware['apps'][$data['app_id']]['settings'], $data['settings']);
+
+		if ($this->update($middleware)) {
+			$this->addResponse('Middleware Settings updated!');
+
+			return true;
+		}
+
+		$this->addResponse('Error updating middleware settings', 1);
+	}
+
 	protected function checkMiddlewareDependencies($data, &$middlewares, &$middleware)
 	{
 		$dependencyArray = [];
