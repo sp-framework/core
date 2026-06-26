@@ -192,8 +192,7 @@ dataCollectionSection =
             afterInit: function() {
                 var middlewareSettings = { };
                 middlewareSettings = JSON.parse('{{middlewareSettings}}');
-                //eslint-disable-next-line
-                console.log(middlewareSettings);
+
                 if (middlewareSettings.length === 0) {
                     middlewareSettings = { };
                 }
