@@ -7259,10 +7259,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 if (!filterQuery) {
                     filterQuery = query;
                 }
-                if (filterQuery.length === 0) {
-                    filterQuery = { };
-                }
-                if (filterQuery['filter']) {
+
+                if (typeof filterQuery['filter'] !== 'object') {
                     filter = true;
                 }
 
@@ -7273,7 +7271,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 postData['page'] = page;
                 postData['limit'] = limit;
 
-                if (filterQuery['filter'] || filterQuery['order']) {
+                if (filter && (filterQuery['filter'] || filterQuery['order'])) {
                     if (filterQuery['filter']) {
                         postData['filter'] = filterQuery['filter'];
                     }
@@ -7297,6 +7295,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 }
 
                 that._runDatatableAjax(postData, true);
+
+                filter = false;
             }
 
             _proto._drawCallback = function() {

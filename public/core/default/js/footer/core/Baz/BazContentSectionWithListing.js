@@ -1578,10 +1578,8 @@
                 if (!filterQuery) {
                     filterQuery = query;
                 }
-                if (filterQuery.length === 0) {
-                    filterQuery = { };
-                }
-                if (filterQuery['filter']) {
+
+                if (typeof filterQuery['filter'] !== 'object') {
                     filter = true;
                 }
 
@@ -1592,7 +1590,7 @@
                 postData['page'] = page;
                 postData['limit'] = limit;
 
-                if (filterQuery['filter'] || filterQuery['order']) {
+                if (filter && (filterQuery['filter'] || filterQuery['order'])) {
                     if (filterQuery['filter']) {
                         postData['filter'] = filterQuery['filter'];
                     }
@@ -1616,6 +1614,8 @@
                 }
 
                 that._runDatatableAjax(postData, true);
+
+                filter = false;
             }
 
             _proto._drawCallback = function() {
