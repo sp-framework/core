@@ -271,8 +271,6 @@ Class Setup
 						return $this->response->send();
 					}
 				}
-			} else if (isset($this->postData['dev']) && $this->postData['dev'] == 'true') {
-				// $this->progress->unregisterMethods(['downloadCountriesStateAndCities', 'registerCountriesStateAndCities']);
 			}
 
 			if (!$onlyUpdateDb) {
@@ -635,15 +633,6 @@ Class Setup
 						[
 							'method'	=> 'registerCountries',
 							'text'		=> 'Registering geo location: countries...'
-						],
-						[
-							'method'	=> 'downloadCountriesStateAndCities',
-							'text'		=> 'Downloading geo location: selected country\'s states and cities...',
-							'remoteWeb' => true
-						],
-						[
-							'method'	=> 'registerCountriesStateAndCities',
-							'text'		=> 'Registering geo location: selected country\'s states and cities...'
 						],
 						[
 							'method'	=> 'registerTimezones',

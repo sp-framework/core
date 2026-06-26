@@ -4,15 +4,11 @@ namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Geo;
 
 class Timezones
 {
+    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
+
     public function register($db, $ff, $localContent, $helper)
     {
-        $timezonesData =
-            $helper->decode(
-                $localContent->read(
-                    '/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/TimeZones.json'
-                ),
-                true
-            );
+        $timezonesData = $helper->decode($localContent->read($this->sourceDir . 'TimeZones.json'), true);
 
         foreach ($timezonesData as $key => $timezone) {
             $zone =

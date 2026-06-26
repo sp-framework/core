@@ -103,8 +103,6 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Dashboards\
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Email\BasepackagesEmailQueue;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Email\BasepackagesEmailServices;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCities;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv4;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv6;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoHolidays;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoPostcodes;
@@ -297,14 +295,6 @@ class Schema
                 'basepackages_geo_postcodes'                => [
                         'schema'    => new Postcodes,
                         'model'     => new BasepackagesGeoPostcodes,
-                    ],
-                'basepackages_geo_cities_ip2locationv4'     => [
-                        'schema'    => new CitiesIp2LocationV4,
-                        'model'     => new BasepackagesGeoCitiesIp2locationv4,
-                    ],
-                'basepackages_geo_cities_ip2locationv6'     => [
-                        'schema'    => new CitiesIp2LocationV6,
-                        'model'     => new BasepackagesGeoCitiesIp2locationv6,
                     ],
                 'basepackages_geo_timezones'                => [
                         'schema'    => new Timezones,
