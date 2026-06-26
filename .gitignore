@@ -31,6 +31,7 @@ apps/*
 !apps/Core/
 .ff/*
 .sql/*
+system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/*
 system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/*
 !system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json
 !system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/TimeZones.json

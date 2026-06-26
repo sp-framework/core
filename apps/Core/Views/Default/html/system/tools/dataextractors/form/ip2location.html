@@ -1,0 +1,57 @@
+<div class="row">
+    <div class="col">
+        <div class="callout callout-info">
+            <h6>IP2LOCATION IP DATABASE</h6>
+            IP2Location data BIN file is retrieved from <a href="https://www.ip2location.com" class="text-primary" target="_blank">IP2Location Website</a><br>
+            You can download the free (lite) version of the file or the paid version.<br><br>
+            IP2Location also provides an online API REST service via <a href="https://www.ip2location.io" class="text-primary" target="_blank">IP2Location IO Website</a><br><br>
+            IP2Location is used by IpTables middleware to allow/block region (Country & City) based access to a particular app.<br>
+            NOTE: This tool will download the BIN file. To use ip2location.io api, configure the API key in the middleware settings.
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'ip',
+                'fieldLabel'                     : 'Download and extract IP2Locations Data',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Download & Extract from IP2Location',
+                'fieldRequired'                  : false,
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : false,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'token',
+                'fieldLabel'                     : 'IP2Location.com API Token',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Get IP2location api token from ip2location.com',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>

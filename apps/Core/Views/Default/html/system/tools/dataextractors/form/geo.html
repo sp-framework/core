@@ -1,0 +1,64 @@
+<div class="row">
+    <div class="col">
+        <div class="callout callout-info">
+            <h6>GEO LOCATIONS</h6>
+            Geo data is extracted from Github project repository :
+            <a href="https://github.com/dr5hn/countries-states-cities-database" class="text-primary" target="_blank">Countries States Cities Database.</a><br>
+            Select the countries and we will download, extract and insert selected country's cities, states, postcodes into the database.<br><br>
+            <h6>TIME ZONES</h6>
+            Time zone data is extracted from the Wikipedia page :
+            <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones" class="text-primary" target="_blank">List of tz database time zones.</a><br>
+            Extractor will extracts data from the table shown on the Wikipedia page and inserts the information into time zone database.
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'countries',
+                'fieldLabel'                           : 'Select Countries',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select country',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazJstreeSearch'                 : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2Options'              : countries,
+                'fieldDataSelect2Multiple'             : true,
+                'fieldDataSelect2OptionsKey'           : 'iso2',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'timezone',
+                'fieldLabel'                     : 'Download and extract Time zone Data',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Download & Extract Time zone data from Eikipedia',
+                'fieldRequired'                  : false,
+                'fieldCheckboxChecked'           : false,
+                'fieldCheckboxType'              : 'primary',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
