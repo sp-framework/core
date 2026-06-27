@@ -86,20 +86,34 @@ class DataExtractors extends BasePackage
             }
         }
 
-        return $this->downloadData(
+        if (!$download = $this->remoteWebDownload->downloadData(
             'https://github.com/dr5hn/countries-states-cities-database/releases/latest/download/json-countries+states+cities.json.gz',
-            base_path($this->sourceDir . 'Geo/json-countries+states+cities.json.gz')
-        );
+            base_path($this->sourceDir . 'Geo/json-countries+states+cities.json.gz'),
+            $this->method)
+        ) {
+            $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
+
+            return false;
+        }
+
+        return true;
     }
 
     protected function downloadGeoPostcodeData()
     {
         $this->method = 'downloadGeoPostcodeData';
 
-        return $this->downloadData(
+        if (!$download = $this->remoteWebDownload->downloadData(
             'https://github.com/dr5hn/countries-states-cities-database/releases/latest/download/json-postcodes.json.gz',
-            base_path($this->sourceDir . 'Geo/json-postcodes.json.gz')
-        );
+            base_path($this->sourceDir . 'Geo/json-postcodes.json.gz'),
+            $this->method)
+        ) {
+            $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
+
+            return false;
+        }
+
+        return true;
     }
 
     protected function processDownloadedGeoCountriesData($data)
@@ -301,10 +315,17 @@ class DataExtractors extends BasePackage
             }
         }
 
-        return $this->downloadData(
+        if (!$download = $this->remoteWebDownload->downloadData(
             'https://en.wikipedia.org/wiki/List_of_tz_database_time_zones',
-            base_path($this->sourceDir . 'Geo/tz.txt')
-        );
+            base_path($this->sourceDir . 'Geo/tz.txt'),
+            $this->method)
+        ) {
+            $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
+
+            return false;
+        }
+
+        return true;
     }
 
     protected function processTimezoneData()
@@ -386,63 +407,63 @@ class DataExtractors extends BasePackage
         return $this->gmtOffsets[$gmtOffset];
     }
 
-    protected function downloadData($url, $sink)
-    {
-        $download = $this->remoteWebContent->request(
-            'GET',
-            $url,
-            [
-                'progress' => function(
-                    $downloadTotal,
-                    $downloadedBytes,
-                    $uploadTotal,
-                    $uploadedBytes
-                ) {
-                    $counters =
-                            [
-                                'downloadTotal'     => $downloadTotal,
-                                'downloadedBytes'   => $downloadedBytes,
-                                'uploadTotal'       => $uploadTotal,
-                                'uploadedBytes'     => $uploadedBytes
-                            ];
+    // protected function downloadData($url, $sink)
+    // {
+    //     $download = $this->remoteWebContent->request(
+    //         'GET',
+    //         $url,
+    //         [
+    //             'progress' => function(
+    //                 $downloadTotal,
+    //                 $downloadedBytes,
+    //                 $uploadTotal,
+    //                 $uploadedBytes
+    //             ) {
+    //                 $counters =
+    //                         [
+    //                             'downloadTotal'     => $downloadTotal,
+    //                             'downloadedBytes'   => $downloadedBytes,
+    //                             'uploadTotal'       => $uploadTotal,
+    //                             'uploadedBytes'     => $uploadedBytes
+    //                         ];
 
-                    if ($downloadedBytes === 0) {
-                        return;
-                    }
+    //                 if ($downloadedBytes === 0) {
+    //                     return;
+    //                 }
 
-                    //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
-                    //So this way, we only update progress when there is actually an update.
-                    if ($downloadedBytes === $this->trackCounter) {
-                        return;
-                    }
+    //                 //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
+    //                 //So this way, we only update progress when there is actually an update.
+    //                 if ($downloadedBytes === $this->trackCounter) {
+    //                     return;
+    //                 }
 
-                    $this->trackCounter = $downloadedBytes;
+    //                 $this->trackCounter = $downloadedBytes;
 
-                    if ($downloadedBytes === $downloadTotal) {
-                        $this->basepackages->progress->updateProgress($this->method, true, false, null, $counters);
-                    } else {
-                        $this->basepackages->progress->updateProgress($this->method, null, false, null, $counters);
-                    }
-                },
-                'verify'            => false,
-                'connect_timeout'   => 5,
-                'sink'              => $sink,
-                'headers'           => [
-                    'User-Agent'    => 'Mozilla/5.0 (X11; Linux i686; rv:150.0) Gecko/20100101 Firefox/150.0'
-                ]
-            ]
-        );
+    //                 if ($downloadedBytes === $downloadTotal) {
+    //                     $this->basepackages->progress->updateProgress($this->method, true, false, null, $counters);
+    //                 } else {
+    //                     $this->basepackages->progress->updateProgress($this->method, null, false, null, $counters);
+    //                 }
+    //             },
+    //             'verify'            => false,
+    //             'connect_timeout'   => 5,
+    //             'sink'              => $sink,
+    //             'headers'           => [
+    //                 'User-Agent'    => 'Mozilla/5.0 (X11; Linux i686; rv:150.0) Gecko/20100101 Firefox/150.0'
+    //             ]
+    //         ]
+    //     );
 
-        $this->trackCounter = 0;
+    //     $this->trackCounter = 0;
 
-        if ($download->getStatusCode() === 200) {
-            return true;
-        }
+    //     if ($download->getStatusCode() === 200) {
+    //         return true;
+    //     }
 
-        $this->addResponse('Download resulted in : ' . $download->getStatusCode(), 1);
+    //     $this->addResponse('Download resulted in : ' . $download->getStatusCode(), 1);
 
-        return false;
-    }
+    //     return false;
+    // }
 
     protected function processGeoCountriesData()
     {
@@ -791,10 +812,17 @@ class DataExtractors extends BasePackage
             }
         }
 
-        return $this->downloadData(
+        if (!$download = $this->remoteWebDownload->downloadData(
             'https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt',
-            base_path($this->sourceDir . 'Dictionary/words_alpha.txt')
-        );
+            base_path($this->sourceDir . 'Dictionary/words_alpha.txt'),
+            $this->method)
+        ) {
+            $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
+
+            return false;
+        }
+
+        return true;
     }
 
     public function processDictionaryData()
@@ -846,4 +874,38 @@ class DataExtractors extends BasePackage
 
         return true;
     }
+
+    // ip2location
+    public function downloadIp2locationFile($type, $data)
+    {
+        $this->method = 'downloadIp2locationFile';
+
+        if (!is_dir(base_path($this->sourceDir . 'Ip2location'))) {
+            if (!mkdir(base_path($this->sourceDir . 'Ip2location'), 0777, true)) {
+                $this->addResponse('Unable to create Ip2location directory', 1);
+
+                return false;
+            }
+        }
+
+        if ($type === 'bin') {
+            $url = 'https://www.ip2location.com/download/?token=' . $data['token'] . '&file=' . $data['bin_file_code'];
+            $file = $data['bin_file_code'] . 'ZIP';
+        } else if ($type === 'proxy') {
+            $url = 'https://www.ip2location.com/download/?token=' . $data['token'] . '&file=' . $data['proxy_file_code'];
+            $file = $data['proxy_file_code'] . 'ZIP';
+        }
+
+        if (!$download = $this->remoteWebDownload->downloadData(
+                $url,
+                base_path($this->sourceDir . 'Ip2location/' . $file),
+                $this->method)
+        ) {
+            $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
+
+            return false;
+        }
+    }
 }
+
+return true;

@@ -72,14 +72,14 @@ class DataextractorsComponent extends BaseComponent
             }
 
 
-            if (isset($data['ip']) && $data['ip'] == 'true') {
-                // $this->dataExtractors->downloadGeoIpv4Data();
-                // $this->dataExtractors->unzipGeoIpv4Data();
-                // $this->dataExtractors->processGeoIpv4Data();
-                // $this->dataExtractors->downloadGeoIpv6Data();
-                // $this->dataExtractors->unzipGeoIpv6Data();
-                // $this->dataExtractors->processGeoIpv6Data();
-                // $this->dataExtractors->mergeGeoIpData();
+            if (isset($data['bin']) && $data['bin'] == 'true') {
+                $this->dataExtractors->downloadIp2locationFile('bin', $data);
+                $this->dataExtractors->unzipIp2locationFile('bin', $data);
+            }
+
+            if (isset($data['proxy']) && $data['proxy'] == 'true') {
+                $this->dataExtractors->downloadIp2locationFile('proxy', $data);
+                $this->dataExtractors->unzipIp2locationFile('proxy', $data);
             }
 
             $this->addResponse(
@@ -162,38 +162,33 @@ class DataextractorsComponent extends BaseComponent
                 );
             }
         } else if ($data['process'] === 'ip2location') {
-            if (isset($data['ip']) && $data['ip'] == 'true') {
+            if (isset($data['bin']) && $data['bin'] == 'true') {
                 $methods = array_merge($methods,
                     [
                         [
-                            'method'    => 'downloadGeoIpv4Data',
-                            'text'      => 'Download Geo Location IPv4 Data...',
+                            'method'    => 'downloadIp2locationFile',
+                            'text'      => 'Download Ip2Location BIN File...',
                             'remoteWeb' => true
                         ],
                         [
-                            'method'    => 'unzipGeoIpv4Data',
-                            'text'      => 'Unzip Geo Location IPv4 Data...',
-                        ],
+                            'method'    => 'unzipIp2locationFile',
+                            'text'      => 'Unzip Ip2Location BIN File...',
+                        ]
+                    ]
+                );
+            }
+
+            if (isset($data['proxy']) && $data['proxy'] == 'true') {
+                $methods = array_merge($methods,
+                    [
                         [
-                            'method'    => 'processGeoIpv4Data',
-                            'text'      => 'Process Geo Location IPv4 Data. This will take a while...',
-                        ],
-                        [
-                            'method'    => 'downloadGeoIpv6Data',
-                            'text'      => 'Download Geo Location IPv6 Data...',
+                            'method'    => 'downloadIp2locationFile',
+                            'text'      => 'Download Ip2Location Proxy File...',
                             'remoteWeb' => true
                         ],
                         [
-                            'method'    => 'unzipGeoIpv6Data',
-                            'text'      => 'Unzip Geo Location IPv6 Data...',
-                        ],
-                        [
-                            'method'    => 'processGeoIpv6Data',
-                            'text'      => 'Process Geo Location IPv6 Data. This will take a while...',
-                        ],
-                        [
-                            'method'    => 'mergeGeoIpData',
-                            'text'      => 'Merge Geo Location IP Data. This will  take a while...',
+                            'method'    => 'unzipIp2locationFile',
+                            'text'      => 'Unzip Ip2Location Proxy File...',
                         ]
                     ]
                 );

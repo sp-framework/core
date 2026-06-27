@@ -18,11 +18,33 @@
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
-                'fieldId'                        : 'ip',
-                'fieldLabel'                     : 'Download and extract IP2Locations Data',
+                'fieldId'                        : 'bin',
+                'fieldLabel'                     : 'Download and extract IP2Locations BIN File',
                 'fieldType'                      : 'checkbox',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Download & Extract from IP2Location',
+                'fieldHelpTooltipContent'        : 'Download & Extract BIN file from IP2Location',
+                'fieldRequired'                  : false,
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : false,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'proxy',
+                'fieldLabel'                     : 'Download and extract IP2Locations Proxy File',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Download & Extract Proxy file from IP2Location',
                 'fieldRequired'                  : false,
                 'fieldCheckboxType'              : 'primary',
                 'fieldCheckboxChecked'           : false,
@@ -46,11 +68,55 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Get IP2location api token from ip2location.com',
                 'fieldRequired'                  : true,
-                'fieldDisabled'                  : true,
+                'fieldDisabled'                  : false,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : false,
                 'fieldBazPostOnUpdate'           : false,
                 'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'bin_file_code',
+                'fieldLabel'                     : 'BIN File Code',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'BIN File Code. Refer to ip2location.com for more information. We only require ipv4 or ipv6 BIN file.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldValue'                     : 'DB3LITEBINIPV6'
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'proxy_file_code',
+                'fieldLabel'                     : 'Proxy File Code',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Proxy File Code. Refer to ip2location.com for more information. We only require ipv4 or ipv6 Proxy file.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldValue'                     : 'PX3LITEBIN'
             ]
         )}}
     </div>
