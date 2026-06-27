@@ -7262,6 +7262,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                 if (typeof filterQuery['filter'] !== 'object') {
                     filter = true;
+
+                    if (Array.isArray(filterQuery)) {
+                        filterQuery = Object.assign({}, filterQuery);
+
+                        if (typeof filterQuery['filter'] === 'object') {
+                            delete(filterQuery['filter']);
+                        }
+                    }
                 }
 
                 thisOptions['datatable'].rows().clear().draw();
