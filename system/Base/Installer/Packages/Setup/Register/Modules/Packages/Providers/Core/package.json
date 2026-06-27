@@ -60,7 +60,10 @@
 				"mattiasgeniar/php-percentages" : "^1.3",
 				"spatie/server-side-rendering" : "^0.3.2",
 				"xobotyi/rsync" : "^1.0",
-				"mistic100/randomcolor" : "^1.1"
+				"mistic100/randomcolor" : "^1.1",
+				"ip2location/ip2location-php" : "^9.7",
+				"ip2location/ip2location-io-php" : "^1.0",
+				"ip2location/ip2proxy-php" : "^4.1"
 			},
 			"config" : 
 			{

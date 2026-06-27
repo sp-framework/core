@@ -4,7 +4,7 @@ namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Geo;
 
 class Timezones
 {
-    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
+    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/';
 
     public function register($db, $ff, $localContent, $helper)
     {

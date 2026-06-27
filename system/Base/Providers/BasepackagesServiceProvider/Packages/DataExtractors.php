@@ -4,9 +4,9 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Carbon\Carbon;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
-
 use System\Base\BasePackage;
 
 class DataExtractors extends BasePackage
@@ -22,6 +22,16 @@ class DataExtractors extends BasePackage
     protected $zip;
 
     protected $gmtOffsets = [];
+
+    protected $geoCountriesStore;
+
+    protected $geoRegionsStore;
+
+    protected $geoStatesStore;
+
+    protected $geoCitiesStore;
+
+    protected $geoPostcodesStore;
 
     public function init()
     {
@@ -92,8 +102,10 @@ class DataExtractors extends BasePackage
         );
     }
 
-    protected function processGeoCountriesData()
+    protected function processDownloadedGeoCountriesData($data)
     {
+        $this->method = 'downloadGeoPostcodeData';
+
         $this->ungzData('Geo/json-countries+states+cities.json.gz');
         $this->ungzData('Geo/json-postcodes.json.gz');
 
@@ -107,7 +119,7 @@ class DataExtractors extends BasePackage
             if ($this->localContent->fileExists($this->sourceDir . 'Geo/json-postcodes.json')) {
                 $postcodesArr = $this->helper->decode($this->localContent->read($this->sourceDir . 'Geo/json-postcodes.json'), true);
             }
-        } catch (FilesystemException | UnableToReadFile | \throwable $e) {
+        } catch (FilesystemException | UnableToReadFile | UnableToCheckExistence | \throwable $e) {
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -115,10 +127,6 @@ class DataExtractors extends BasePackage
 
         if ($this->sourceFile && is_array($this->sourceFile)) {
             foreach ($this->sourceFile as $country) {
-                if (!in_array($country['iso2'], $this->postData()['countries'])) {
-                    continue;
-                }
-
                 $countryKey = $country['iso2'];
 
                 $states = $country['states'];
@@ -163,6 +171,10 @@ class DataExtractors extends BasePackage
         }
 
         foreach ($countries as $countryKey => &$country) {
+            if (!in_array($country['iso2'], $data['countries'])) {
+                continue;
+            }
+
             if (isset($country['states'])) {
                 foreach ($country['states'] as &$state) {
                     if (isset($postCodes[$country['id'] . '-' . $state['id']])) {
@@ -181,29 +193,71 @@ class DataExtractors extends BasePackage
         return true;
     }
 
-    protected function processGeoDataToDb()
+    protected function processCountryStatesCititesPostcodesData($data)
     {
-        foreach ($this->postData()['countries'] as $countryIso2) {
+        $this->method = 'processCountryStatesCititesPostcodesData';
+
+        $installedCountries = [];
+
+        if ($this->ff) {
+            $this->geoCountriesStore = $this->ff->store('basepackages_geo_countries');
+            $this->geoRegionsStore = $this->ff->store('basepackages_geo_regions');
+            $this->geoStatesStore = $this->ff->store('basepackages_geo_states');
+            $this->geoCitiesStore = $this->ff->store('basepackages_geo_cities');
+            $this->geoPostcodesStore = $this->ff->store('basepackages_geo_postcodes');
+        }
+
+        foreach ($data['countries'] as $countryIso2) {
             try {
                 if ($this->localContent->fileExists($this->sourceDir . 'Geo/' . $countryIso2 . '.json')) {
-                    $countryFile = $this->helper->decode($this->localContent->read($this->sourceDir . 'Geo/' . $countryIso2 . '.json'), true);
+                    $country = $this->helper->decode($this->localContent->read($this->sourceDir . 'Geo/' . $countryIso2 . '.json'), true);
                 }
-            } catch (FilesystemException | UnableToReadFile | \throwable $e) {
+            } catch (FilesystemException | UnableToReadFile | UnableToCheckExistence | \throwable $e) {
                 $this->addResponse($e->getMessage(), 1);
 
                 return false;
             }
+
+            if (isset($country)) {
+                $this->registerStates($country['states'], $country['id']);
+
+                if ($this->ff) {
+                    $dbCountry = $this->geoCountriesStore->findById((int) $country['id']);
+                } else if ($this->db) {
+                    $dbCountry = $this->db->fetchAll(
+                        "SELECT * FROM basepackages_geo_countries WHERE id LIKE :id",
+                        \Phalcon\Db\Enum::FETCH_ASSOC,
+                        [
+                            "id" => $country['id'],
+                        ]
+                    );
+
+                    if (isset($dbCountry[0])) {
+                        $dbCountry = $dbCountry[0];
+                    } else {
+                        $dbCountry = false;
+                    }
+                }
+
+                $dbCountry['installed'] = 1;
+
+                if (isset($data['enabled'])) {
+                    $dbCountry['enabled'] = 1;
+                }
+
+                array_push($installedCountries, $dbCountry['name']);
+
+                if ($this->ff) {
+                    $this->geoCountriesStore->updateOrInsert($dbCountry, false);
+                } else if ($this->db) {
+                    $this->db->insertAsDict('basepackages_geo_countries', $dbCountry);
+                }
+            }
         }
 
-        if (isset($countryFile)) {
-            //
+        $this->addResponse('Installed countries : ' . implode(',', $installedCountries));
 
-            return true;
-        }
-
-        $this->addResponse('Not able to read country file', 1);
-
-        return false;
+        return true;
     }
 
     protected function ungzData($fileName)
@@ -249,7 +303,7 @@ class DataExtractors extends BasePackage
 
         return $this->downloadData(
             'https://en.wikipedia.org/wiki/List_of_tz_database_time_zones',
-            base_path('apps/Core/Packages/Devtools/GeoExtractData/Data/tz.txt')
+            base_path($this->sourceDir . 'Geo/tz.txt')
         );
     }
 
@@ -257,9 +311,15 @@ class DataExtractors extends BasePackage
     {
         $wikiTz = [];
 
-        include('vendor/Simplehtmldom.php');
+        include('DataExtractors/vendor/Simplehtmldom.php');
 
-        $html = str_get_html($this->localContent->read($this->sourceDir . 'tz.txt'));
+        try {
+            $html = str_get_html($this->localContent->read($this->sourceDir . 'Geo/tz.txt'));
+        } catch (FilesystemException | UnableToReadFile | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
 
         $table = $html->find('table.wikitable tbody');
 
@@ -299,9 +359,11 @@ class DataExtractors extends BasePackage
         }
 
         try {
-            $this->localContent->write($this->sourceDir . 'TimeZones.json', $this->helper->encode($wikiTz));
+            $this->localContent->write($this->sourceDir . 'Geo/TimeZones.json', $this->helper->encode($wikiTz));
         } catch (FilesystemException | UnableToWriteFile | \throwable $e) {
-            throw $e;
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
         }
 
         $this->addResponse('Downloaded and extract Tz data');
@@ -381,74 +443,407 @@ class DataExtractors extends BasePackage
 
         return false;
     }
-    //Move this to tools/DataExtractor
-    // public function registerSelectedCountryStatesAndCities($ff, $localContent, $country, $ip2location = null, $helper)
-    //     $countriesStore = $ff->store('basepackages_geo_countries');
-    //     $country = $countriesStore->findOneBy(['iso3', '=', $country]);
 
-    //     $statesStore = $ff->store('basepackages_geo_states');
-    //     $citiesStore = $ff->store('basepackages_geo_cities');
-    //     $postcodesStore = $ff->store('basepackages_geo_postcodes');
+    protected function processGeoCountriesData()
+    {
+        $this->method = 'processGeoCountriesData';
 
-    //     try {
-    //         $countryData = $helper->decode($localContent->read($this->sourceDir . $country['iso2'] . '.json'), true);
+        if ($this->ff) {
+            $this->geoCountriesStore = $this->ff->store('basepackages_geo_countries');
+            $this->geoRegionsStore = $this->ff->store('basepackages_geo_regions');
+        }
 
-    //         foreach ($countryData['states'] as $key => $state) {
-    //             $state['country_id'] = $country['id'];
+        try {
+            if ($this->localContent->fileExists($this->sourceDir . 'Geo/AllCountries.json')) {
+                $countries = $this->helper->decode($this->localContent->read($this->sourceDir . 'Geo/AllCountries.json'), true);
+            }
+        } catch (FilesystemException | UnableToReadFile | UnableToCheckExistence | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
 
-    //             if (isset($state['cities'])) {
-    //                 $cities = $state['cities'];
-    //                 unset($state['cities']);
-    //             }
+            return false;
+        }
 
-    //             if (isset($state['postcodes'])) {
-    //                 $postcodes = $state['postcodes'];
-    //                 unset($state['postcodes']);
-    //             }
+        if (!isset($countries)) {
+            $this->addResponse('All Countries database does not exist', 1);
 
-    //             $statesStore->updateOrInsert($state, false);
+            return false;
+        }
 
-    //             if (isset($cities)) {
-    //                 foreach ($cities as $key => $city) {
-    //                     if (!isset($city['id'])) {
-    //                         continue;
-    //                     }
+        foreach ($countries as $key => $country) {
+            if ($this->ff) {
+                $dbCountry = $this->geoCountriesStore->findById((int) $country['id']);
+            } else if ($this->db) {
+                $dbCountry = $this->db->fetchAll(
+                    "SELECT * FROM basepackages_geo_countries WHERE id LIKE :id",
+                    \Phalcon\Db\Enum::FETCH_ASSOC,
+                    [
+                        "id" => $country['id'],
+                    ]
+                );
 
-    //                     $city['state_id'] = $state['id'];
-    //                     $city['country_id'] = $country['id'];
+                if (isset($dbCountry[0])) {
+                    $dbCountry = $dbCountry[0];
+                } else {
+                    $dbCountry = false;
+                }
+            }
 
-    //                     $citiesStore->updateOrInsert($city, false);
-    //                 }
-    //             }
+            if (!$dbCountry) {
+                $dbCountry =
+                    [
+                        'id'                => $country['id'],
+                        'name'              => $country['name'],
+                        'native'            => $country['native'],
+                        'nationality'       => $country['nationality'],
+                        'capital'           => $country['capital'],
+                        'iso2'              => $country['iso2'],
+                        'iso3'              => $country['iso3'],
+                        'currency'          => $country['currency'],
+                        'currency_name'     => $country['currency_name'],
+                        'currency_symbol'   => $country['currency_symbol'],
+                        'currency_enabled'  => 0,
+                        'region_id'         => $country['region_id'],
+                        'region'            => $country['region'],
+                        'subregion_id'      => $country['subregion_id'],
+                        'subregion'         => $country['subregion'],
+                        'numeric_code'      => $country['numeric_code'],
+                        'phone_code'        => $country['phonecode'],
+                        'tld'               => $country['tld'],
+                        'emoji'             => $country['emoji'],
+                        'emojiU'            => $country['emojiU'],
+                        'latitude'          => (int) $country['latitude'],
+                        'longitude'         => (int) $country['longitude'],
+                        'translations'      => $this->helper->encode($country['translations']),
+                        'installed'         => 0,
+                        'enabled'           => 0
+                    ];
+            } else {
+                $installed = $dbCountry['installed'];
+                $enabled = $dbCountry['enabled'];
+                $currency_enabled = $dbCountry['currency_enabled'];
 
-    //             if (isset($postcodes)) {
-    //                 foreach ($postcodes as $key => $postcode) {
-    //                     if (!isset($postcode['id'])) {
-    //                         continue;
-    //                     }
+                $dbCountry = array_merge($dbCountry, $country);
 
-    //                     $postcode['state_id'] = $state['id'];
-    //                     $postcode['country_id'] = $country['id'];
+                $dbCountry['installed'] = $installed;
+                $dbCountry['enabled'] = $enabled;
+                $dbCountry['currency_enabled'] = $currency_enabled;
+            }
 
-    //                     $postcodesStore->updateOrInsert($postcode, false);
-    //                 }
-    //             }
-    //         }
+            if ($this->ff) {
+                $this->geoCountriesStore->updateOrInsert($dbCountry, false);
+            } else if ($this->db) {
+                $this->db->insertAsDict('basepackages_geo_countries', $dbCountry);
+            }
 
-    //         $localContent->delete($this->sourceDir . $country['iso2'] . '.json');
-    //         $localContent->delete($this->sourceDir . $country['iso2'] . '.zip');
-    //         $countriesStore->count(true);
-    //         $statesStore->count(true);
-    //         $citiesStore->count(true);
-    //         $postcodesStore->count(true);
+            if (strlen($dbCountry['region']) > 0 &&
+                strlen($dbCountry['subregion']) > 0
+            ) {
+                $this->checkRegion($dbCountry);
+            }
+        }
 
-    //         $country['installed'] = 1;
-    //         $country['enabled'] = 1;
-    //         $countriesStore->update($country);
+        if ($this->ff) {
+            $this->geoCountriesStore->reIndexStore()->count(true);
+            $this->geoRegionsStore->reIndexStore()->count(true);
+        }
 
-    //         return true;
-    //     } catch (\Exception $e) {
-    //         return false;
-    //     }
-    // }
+        return true;
+    }
+
+    protected function checkRegion($dbCountry)
+    {
+        $subregion = false;
+
+        if ($this->ff) {
+            $subregion = $this->geoRegionsStore->findById($dbCountry['subregion_id']);
+        } else if ($this->db) {
+            $subregion =
+                $this->db->fetchAll(
+                    "SELECT * FROM basepackages_geo_regions WHERE id LIKE :id",
+                    \Phalcon\Db\Enum::FETCH_ASSOC,
+                    [
+                        "id" => $dbCountry['subregion_id'],
+                    ]
+                );
+
+            if (isset($subregion[0])) {
+                $subregion = $subregion[0];
+            } else {
+                $subregion = false;
+            }
+        }
+
+        if (!$subregion) {
+            $subregion['id'] = $dbCountry['subregion_id'];
+            $subregion['name'] = $dbCountry['subregion'];
+            $subregion['parent_region_id'] = $dbCountry['region_id'];
+        } else {
+            $subregion['name'] = $dbCountry['subregion'];
+        }
+
+        if ($this->ff) {
+            $this->geoRegionsStore->updateOrInsert($subregion, false);
+        } else if ($this->db) {
+            $this->db->insertAsDict('basepackages_geo_regions', $subregion);
+        }
+
+
+        $region = false;
+
+        if ($this->ff) {
+            $region = $this->geoRegionsStore->findById($dbCountry['region_id']);
+        } else if ($this->db) {
+            $region =
+                $this->db->fetchAll(
+                    "SELECT * FROM basepackages_geo_regions WHERE id LIKE :id",
+                    \Phalcon\Db\Enum::FETCH_ASSOC,
+                    [
+                        "id" => $dbCountry['region_id'],
+                    ]
+                );
+
+            if (isset($region[0])) {
+                $region = $region[0];
+            } else {
+                $region = false;
+            }
+        }
+
+        if (!$region) {
+            $region['id'] = $dbCountry['region_id'];
+            $region['name'] = $dbCountry['region'];
+            $region['parent_region_id'] = null;
+        } else {
+            $region['name'] = $dbCountry['region'];
+        }
+
+        if ($this->ff) {
+            $this->geoRegionsStore->updateOrInsert($region, false);
+        } else if ($this->db) {
+            $this->db->insertAsDict('basepackages_geo_regions', $region);
+        }
+    }
+
+    protected function registerStates($statesData, $country_id)
+    {
+        $counter = 1;
+        foreach ($statesData as $key => $state) {
+            $this->basepackages->progress->updateProgress(
+                method: $this->method,
+                counters: ['stepsTotal' => count($statesData), 'stepsCurrent' => $counter],
+                text: 'Registering cities & postcodes for state ' . $state['name'] . '...'
+            );
+
+            $state['country_id'] = $country_id;
+
+            if (isset($state['cities'])) {
+                $cities = $state['cities'];
+                unset($state['cities']);
+            }
+
+            if (isset($state['postcodes'])) {
+                $postcodes = $state['postcodes'];
+                unset($state['postcodes']);
+            }
+
+            $dbState = false;
+
+            if ($this->ff) {
+                $dbState = $this->geoStatesStore->findById($state['id']);
+            } else if ($this->db) {
+                $dbState =
+                    $this->db->fetchAll(
+                        "SELECT * FROM basepackages_geo_states WHERE id LIKE :id",
+                        \Phalcon\Db\Enum::FETCH_ASSOC,
+                        [
+                            "id" => $state['id'],
+                        ]
+                    );
+
+                if (isset($dbState[0])) {
+                    $dbState = $dbState[0];
+                } else {
+                    $dbState = false;
+                }
+            }
+
+            if (!$dbState) {
+                $dbState = $state;
+            } else {
+                $dbState = array_merge($dbState, $state);
+            }
+
+            if ($this->ff) {
+                $this->geoStatesStore->updateOrInsert($dbState, false);
+            } else if ($this->db) {
+                $this->db->insertAsDict('basepackages_geo_states', $dbState);
+            }
+
+            if (isset($cities)) {
+                $this->registerCities($cities, $country_id, $state['id']);
+            }
+
+            if (isset($postcodes)) {
+                $this->registerPostcodes($postcodes, $country_id, $state['id']);
+            }
+
+            $counter++;
+        }
+
+        $this->geoStatesStore->count(true);
+        $this->geoCitiesStore->count(true);
+        $this->geoPostcodesStore->count(true);
+    }
+
+    protected function registerCities($citiesData, $country_id, $state_id)
+    {
+        foreach ($citiesData as $key => $city) {
+            $city['state_id'] = $state_id;
+            $city['country_id'] = $country_id;
+
+            $dbCity = false;
+
+            if ($this->ff) {
+                $dbCity = $this->geoCitiesStore->findById($city['id']);
+            } else if ($this->db) {
+                $dbCity =
+                    $this->db->fetchAll(
+                        "SELECT * FROM basepackages_geo_cities WHERE id LIKE :id",
+                        \Phalcon\Db\Enum::FETCH_ASSOC,
+                        [
+                            "id" => $city['id'],
+                        ]
+                    );
+
+                if (isset($dbCity[0])) {
+                    $dbCity = $dbCity[0];
+                } else {
+                    $dbCity = false;
+                }
+            }
+
+            if (!$dbCity) {
+                $dbCity = $city;
+            } else {
+                $dbCity = array_merge($dbCity, $city);
+            }
+
+            if ($this->ff) {
+                $this->geoCitiesStore->updateOrInsert($dbCity, false);
+            } else if ($this->db) {
+                $this->db->insertAsDict('basepackages_geo_cities', $dbCity);
+            }
+        }
+    }
+
+    protected function registerPostcodes($postcodesData, $country_id, $state_id)
+    {
+        foreach ($postcodesData as $key => $postcode) {
+            $postcode['state_id'] = $state_id;
+            $postcode['country_id'] = $country_id;
+
+            $dbPostcode = false;
+
+            if ($this->ff) {
+                $dbPostcode = $this->geoPostcodesStore->findById($postcode['id']);
+            } else if ($this->db) {
+                $dbPostcode =
+                    $this->db->fetchAll(
+                        "SELECT * FROM basepackages_geo_postcodes WHERE id LIKE :id",
+                        \Phalcon\Db\Enum::FETCH_ASSOC,
+                        [
+                            "id" => $postcode['id'],
+                        ]
+                    );
+
+                if (isset($dbPostcode[0])) {
+                    $dbPostcode = $dbPostcode[0];
+                } else {
+                    $dbPostcode = false;
+                }
+            }
+
+            if (!$dbPostcode) {
+                $dbPostcode = $postcode;
+            } else {
+                $dbPostcode = array_merge($dbPostcode, $postcode);
+            }
+
+            if ($this->ff) {
+                $this->geoPostcodesStore->updateOrInsert($dbPostcode, false);
+            } else if ($this->db) {
+                $this->db->insertAsDict('basepackages_geo_postcodes', $dbPostcode);
+            }
+        }
+    }
+
+    //Dictionary
+    //Download Dictionary data from https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt and store in data folder
+    public function downloadDictionaryData()
+    {
+        $this->method = 'downloadDictionaryData';
+
+        if (!is_dir(base_path($this->sourceDir . 'Dictionary'))) {
+            if (!mkdir(base_path($this->sourceDir . 'Dictionary'), 0777, true)) {
+                $this->addResponse('Unable to create Dictionary directory', 1);
+
+                return false;
+            }
+        }
+
+        return $this->downloadData(
+            'https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt',
+            base_path($this->sourceDir . 'Dictionary/words_alpha.txt')
+        );
+    }
+
+    public function processDictionaryData()
+    {
+        $this->method = 'processDictionaryData';
+
+        try {
+            $words = $this->localContent->readStream($this->sourceDir . 'Dictionary/words_alpha.txt');
+        } catch (FilesystemException | UnableToReadFile | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        $alphas = range('a','z');
+
+        $wordsArr = [];
+
+        while(!feof($words)) {
+            $word = stream_get_line($words, 0, "\n");
+
+            foreach ($alphas as $alpha) {
+                if (str_starts_with($word, $alpha)) {
+                    $stringLength = strlen($word) - 1;
+
+                    if (!isset($wordsArr[$stringLength][$alpha])) {
+                        $wordsArr[$stringLength][$alpha] = [];
+                    }
+                    array_push($wordsArr[$stringLength][$alpha], trim($word));
+                }
+            }
+        }
+
+        foreach ($wordsArr as $length => $chars) {
+            foreach ($chars as $charKey => $charValue) {
+                try {
+                    $this->localContent->write($this->sourceDir . 'Dictionary/' . $length . '/' . $charKey . '.json', $this->helper->encode($chars[$charKey]));
+                } catch (FilesystemException | UnableToWriteFile | \throwable $e) {
+                    $this->addResponse($e->getMessage(), 1);
+
+                    return false;
+                }
+            }
+        }
+
+        fclose($words);
+
+        $this->addResponse('Downloaded and extracted dictionary data');
+
+        return true;
+    }
 }

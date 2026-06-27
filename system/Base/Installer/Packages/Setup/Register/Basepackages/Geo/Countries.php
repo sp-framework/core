@@ -10,11 +10,25 @@ class Countries
 
     public $progress;
 
-    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
+    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/';
+
+    protected $countryStore;
+
+    protected $regionStore;
 
     public function register($db, $ff, $localContent, $helper)
     {
+        if (!is_dir(base_path($this->sourceDir))) {
+            if (!mkdir(base_path($this->sourceDir), 0777, true)) {
+                $this->addResponse('Unable to create Geo directory', 1);
+
+                return false;
+            }
+        }
+
         $countries = $helper->decode($localContent->read($this->sourceDir . 'AllCountries.json'), true);
+        $this->countryStore = $ff->store('basepackages_geo_countries');
+        $this->regionStore = $ff->store('basepackages_geo_regions');
 
         foreach ($countries as $key => $country) {
             $countryToInsert =
@@ -51,9 +65,7 @@ class Countries
             }
 
             if ($ff) {
-                $countryStore = $ff->store('basepackages_geo_countries');
-
-                $countryStore->updateOrInsert($countryToInsert, false);
+                $this->countryStore->updateOrInsert($countryToInsert, false);
             }
 
             if (strlen($country['region']) > 0 &&
@@ -71,9 +83,7 @@ class Countries
         $subregion = false;
 
         if ($ff) {
-            $regionStore = $ff->store('basepackages_geo_regions');
-
-            $subregion = $regionStore->findById($country['subregion_id']);
+            $subregion = $this->regionStore->findById($country['subregion_id']);
         }
 
         if ($db) {
@@ -88,6 +98,8 @@ class Countries
 
             if (isset($subregion[0])) {
                 $subregion = $subregion[0];
+            } else {
+                $subregion = false;
             }
         }
 
@@ -97,7 +109,7 @@ class Countries
             $newSubRegion['parent_region_id'] = $country['region_id'];
 
             if ($ff) {
-                $regionStore->updateOrInsert($newSubRegion, false);
+                $this->regionStore->updateOrInsert($newSubRegion, false);
             }
 
             if ($db) {
@@ -108,7 +120,7 @@ class Countries
         $region = false;
 
         if ($ff) {
-            $region = $regionStore->findById($country['region_id']);
+            $region = $this->regionStore->findById($country['region_id']);
         }
 
         if ($db) {
@@ -123,6 +135,8 @@ class Countries
 
             if (isset($region[0])) {
                 $region = $region[0];
+            } else {
+                $region = false;
             }
         }
 
@@ -132,7 +146,7 @@ class Countries
             $newRegion['parent_region_id'] = null;
 
             if ($ff) {
-                $regionStore->updateOrInsert($newRegion, false);
+                $this->regionStore->updateOrInsert($newRegion, false);
             }
 
             if ($db) {

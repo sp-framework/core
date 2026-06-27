@@ -101,11 +101,8 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-process').click(function(e) {
                     e.preventDefault();
 
-                    //eslint-disable-next-line
-                    console.log(processWhat);
-
-                    // $(this).addClass('disabled');
-                    // $('#{{componentId}}-{{sectionId}}-process').children().attr('hidden', false);
+                    $(this).addClass('disabled');
+                    $('#{{componentId}}-{{sectionId}}-process').children('i').attr('hidden', false);
 
                     var url = $(this).attr('href');
                     var postData = { };
@@ -116,6 +113,8 @@ dataCollectionSection =
                     if (processWhat === 'geo') {
                         postData['countries'] = $('#{{componentId}}-{{sectionId}}-countries').val();
                         postData['timezone'] = $('#{{componentId}}-{{sectionId}}-timezone')[0].checked;
+                        postData['update_countries_regions'] = $('#{{componentId}}-{{sectionId}}-update_countries_regions')[0].checked;
+                        postData['enabled'] = $('#{{componentId}}-{{sectionId}}-enabled')[0].checked;
                     } else if (processWhat === 'ip2location') {
                         postData['ip'] = $('#{{componentId}}-{{sectionId}}-ip')[0].checked;
                         postData['token'] = $('#{{componentId}}-{{sectionId}}-token').val();
@@ -142,7 +141,8 @@ dataCollectionSection =
                         }
 
                         $('#{{componentId}}-{{sectionId}}-process').removeClass('disabled');
-                        $('#{{componentId}}-{{sectionId}}-process').children().attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-process').children('i').attr('hidden', true);
+                        BazProgress.resetProgressCounter();
 
                         if (response.tokenKey && response.token) {
                             $('#security-token').attr('name', response.tokenKey);
@@ -152,6 +152,8 @@ dataCollectionSection =
                 });
             }
         },
+        '{{componentId}}-{{sectionId}}-update_countries_regions'                : { },
+        '{{componentId}}-{{sectionId}}-enable'                                  : { },
         '{{componentId}}-{{sectionId}}-timezone'                                : { },
         '{{componentId}}-{{sectionId}}-ip'                                      : { },
         '{{componentId}}-{{sectionId}}-token'                                   : { },

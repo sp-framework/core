@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
+use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToReadFile;
 use Phalcon\Filter\Validation\Validator\PresenceOf;
 use Phalcon\Filter\Validation\Validator\Url;
@@ -15,6 +16,8 @@ class Murls extends BasePackage
     protected $packageName = 'murls';
 
     public $murls;
+
+    protected $dataDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Dictionary/';
 
     public function init()
     {
@@ -141,24 +144,67 @@ class Murls extends BasePackage
             if (!isset($data['dictionary_words_amount'])) {
                 $data['dictionary_words_amount'] = 1;
             }
+            if ((int) $data['dictionary_words_amount'] === 0) {
+                $data['dictionary_words_amount'] = 1;
+            }
             if (!isset($data['dictionary_word_length'])) {
                 $data['dictionary_word_length'] = 3;
             }
+            if ((int) $data['dictionary_word_length'] === 0) {
+                $data['dictionary_word_length'] = 3;
+            }
+            if ((int) $data['dictionary_word_length'] > 31) {
+                $data['dictionary_word_length'] = 31;
+            }
 
             $wordsArr = [];
-            $charactersArr = range('a','z');
 
-            for ($i=0; $i < $data['dictionary_words_amount']; $i++) {
+            try {
+                if (!$this->localContent->directoryExists($this->dataDir . $data['dictionary_word_length'])) {
+                    $data['dictionary_word_length'] = (int) $data['dictionary_word_length'] - 1;
+                }
+
+                $scanWordLengthDir =
+                    $this->basepackages->utils->scanDir(
+                        $this->dataDir . $data['dictionary_word_length']
+                    );
+            } catch (\throwable | UnableToCheckExistence $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+
+            if (count($scanWordLengthDir['files']) === 0) {
+                $this->addResponse('No keyword files present to generate words. Please extract data.', 1);
+
+                return false;
+            }
+
+            $charactersArr = [];
+
+            array_walk($scanWordLengthDir['files'], function($file, $index) use (&$charactersArr, $data) {
+                $file = str_replace('.json', '', str_replace($this->dataDir . $data['dictionary_word_length'] . '/', '', $file));
+
+                array_push($charactersArr, $file);
+            });
+
+            for ($i = 0; $i < $data['dictionary_words_amount']; $i++) {
                 $randomKey = array_rand($charactersArr);
 
                 try {
-                    $file = $this->localContent->read('system/Base/Providers/BasepackagesServiceProvider/Packages/Murls/Dictionary/' . $data['dictionary_word_length'] . '/' . $charactersArr[$randomKey] . '.json');
-                } catch (\throwable | UnableToReadFile $e) {
+                    $file =
+                        $this->localContent->read(
+                            $this->dataDir .
+                            $data['dictionary_word_length'] . '/' . $charactersArr[$randomKey] . '.json'
+                        );
+                } catch (\throwable | UnableToReadFile | UnableToCheckExistence $e) {
                     if ($e->getCode() === 2) {
                         continue;
                     }
 
-                    throw $e;
+                    $this->addResponse($e->getMessage(), 1);
+
+                    return false;
                 }
 
                 $fileArr = $this->helper->decode($file, true);
