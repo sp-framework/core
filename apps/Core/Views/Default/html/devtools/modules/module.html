@@ -3485,7 +3485,11 @@ dataCollectionSection =
                         dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['version'] = $('#{{componentId}}-{{sectionId}}-dependencies-moduleversion').val();
                         dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['repo'] = $('#{{componentId}}-{{sectionId}}-dependencies-modulerepo').val();
                     } else if (label === 'externals') {
-                        if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                        if (dataCollectionSectionForm['vars']['module_type'] === 'packages' &&
+                            dataCollectionSectionForm['vars']['modules']['core'] &&
+                            dataCollectionSectionForm['vars']['modules']['core'][dataCollectionSectionForm['vars']['moduleId']] &&
+                            dataCollectionSectionForm['vars']['modules']['core'][dataCollectionSectionForm['vars']['moduleId']]['name'] === 'Core'
+                        ) {
                             if (!dataCollectionSectionForm['vars']['moduleDependencies']['composer']) {
                                 dataCollectionSectionForm['vars']['moduleDependencies']['composer'] = { };
                             }
@@ -3554,7 +3558,11 @@ dataCollectionSection =
                     } else if (label === 'apptypes') {
                         dataCollectionSectionForm['vars']['moduleDependencies']['apptype'] = { };
                     } else if (label === 'externals') {
-                        if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                        if (dataCollectionSectionForm['vars']['module_type'] === 'packages' &&
+                            dataCollectionSectionForm['vars']['modules']['core'] &&
+                            dataCollectionSectionForm['vars']['modules']['core'][dataCollectionSectionForm['vars']['moduleId']] &&
+                            dataCollectionSectionForm['vars']['modules']['core'][dataCollectionSectionForm['vars']['moduleId']]['name'] === 'Core'
+                        ) {
                             if (dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]) {
                                 delete dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
                             }
