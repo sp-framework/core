@@ -168,8 +168,8 @@ dataCollectionSection =
                             }
                         },
                         onSelection: feedback => {
-                            $("#{{componentId}}-{{sectionId}}-country_id").val(feedback.selection.value.id);
-                            $("#{{componentId}}-{{sectionId}}-country_id").attr("value", feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-country_id").val(feedback.selection.value.iso2);
+                            $("#{{componentId}}-{{sectionId}}-country_id").attr("value", feedback.selection.value.iso2);
                             $("#{{componentId}}-{{sectionId}}-country_name").val(feedback.selection.value.name);
                             $("#{{componentId}}-{{sectionId}}-country_name").attr("value", feedback.selection.value.name);
                         }
@@ -258,12 +258,12 @@ dataCollectionSection =
                             }
                         },
                         onSelection: feedback => {
-                            $("#{{componentId}}-{{sectionId}}-state_id").val(feedback.selection.value.id);
-                            $("#{{componentId}}-{{sectionId}}-state_id").attr("value", feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-state_id").val(feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-state_id").attr("value", feedback.selection.value.name);
                             $("#{{componentId}}-{{sectionId}}-state_name").val(feedback.selection.value.name);
                             $("#{{componentId}}-{{sectionId}}-state_name").attr("value", feedback.selection.value.name);
-                            $("#{{componentId}}-{{sectionId}}-country_id").val(feedback.selection.value.country_id);
-                            $("#{{componentId}}-{{sectionId}}-country_id").attr("value", feedback.selection.value.country_id);
+                            $("#{{componentId}}-{{sectionId}}-country_id").val(feedback.selection.value.country_iso2);
+                            $("#{{componentId}}-{{sectionId}}-country_id").attr("value", feedback.selection.value.country_iso2);
                             $("#{{componentId}}-{{sectionId}}-country_name").val(feedback.selection.value.country_name);
                             $("#{{componentId}}-{{sectionId}}-country_name").attr("value", feedback.selection.value.country_name);
                         }
@@ -362,16 +362,16 @@ dataCollectionSection =
                             }
                         },
                         onSelection: feedback => {
-                            $("#{{componentId}}-{{sectionId}}-city_id").val(feedback.selection.value.id);
-                            $("#{{componentId}}-{{sectionId}}-city_id").attr("value", feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-city_id").val(feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-city_id").attr("value", feedback.selection.value.name);
                             $("#{{componentId}}-{{sectionId}}-city_name").blur();
                             $("#{{componentId}}-{{sectionId}}-city_name").val(feedback.selection.value.name);
-                            $("#{{componentId}}-{{sectionId}}-state_id").val(feedback.selection.value.state_id);
-                            $("#{{componentId}}-{{sectionId}}-state_id").attr("value", feedback.selection.value.state_id);
+                            $("#{{componentId}}-{{sectionId}}-state_id").val(feedback.selection.value.state_name);
+                            $("#{{componentId}}-{{sectionId}}-state_id").attr("value", feedback.selection.value.state_name);
                             $("#{{componentId}}-{{sectionId}}-state_name").val(feedback.selection.value.state_name);
                             $("#{{componentId}}-{{sectionId}}-state_name").attr("value", feedback.selection.value.state_name);
-                            $("#{{componentId}}-{{sectionId}}-country_id").val(feedback.selection.value.country_id);
-                            $("#{{componentId}}-{{sectionId}}-country_id").attr("value", feedback.selection.value.country_id);
+                            $("#{{componentId}}-{{sectionId}}-country_id").val(feedback.selection.value.country_iso2);
+                            $("#{{componentId}}-{{sectionId}}-country_id").attr("value", feedback.selection.value.country_iso2);
                             $("#{{componentId}}-{{sectionId}}-country_name").val(feedback.selection.value.country_name);
                             $("#{{componentId}}-{{sectionId}}-country_name").attr("value", feedback.selection.value.country_name);
                         }

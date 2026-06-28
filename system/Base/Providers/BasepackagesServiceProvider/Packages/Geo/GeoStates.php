@@ -59,6 +59,7 @@ class GeoStates extends BasePackage
                 if ($this->countries[$stateValue['country_id']]['enabled'] == 1 && $this->countries[$stateValue['country_id']]['installed'] == 1) {
                     $states[$stateKey] = $stateValue;
                     $states[$stateKey]['country_id'] = $this->countries[$stateValue['country_id']]['id'];
+                    $states[$stateKey]['country_iso2'] = $this->countries[$stateValue['country_id']]['iso2'];
                     $states[$stateKey]['country_name'] = $this->countries[$stateValue['country_id']]['name'];
                 }
             }

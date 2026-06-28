@@ -70,6 +70,7 @@ class GeoCities extends BasePackage
                     $cities[$cityKey]['state_id'] = $this->states[$cityValue['state_id']]['id'];
                     $cities[$cityKey]['state_name'] = $this->states[$cityValue['state_id']]['name'];
                     $cities[$cityKey]['country_id'] = $this->countries[$cityValue['country_id']]['id'];
+                    $cities[$cityKey]['country_iso2'] = $this->countries[$cityValue['country_id']]['iso2'];
                     $cities[$cityKey]['country_name'] = $this->countries[$cityValue['country_id']]['name'];
                 }
             }
