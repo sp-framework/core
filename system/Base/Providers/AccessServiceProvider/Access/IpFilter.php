@@ -5,18 +5,21 @@ namespace System\Base\Providers\AccessServiceProvider\Access;
 use Carbon\Carbon;
 use Phalcon\Filter\Validation\Validator\Ip;
 use System\Base\BasePackage;
-use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilter;
+use System\Base\Providers\AccessServiceProvider\Access\IpFilter\Ip2location;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilters;
 use System\Base\Providers\AppsServiceProvider\Exceptions\IpFilterBlockedException;
 
 class IpFilter extends BasePackage
 {
-    protected $modelToUse = ServiceProviderAccessIpFilter::class;
+    protected $modelToUse = ServiceProviderAccessIpFilters::class;
 
     protected $packageName = 'ipfilter';
 
-    protected $packageNameS = 'ipfilter';
+    public $ip;
 
-    public $clientAddress;
+    protected $ipFilterSettings;
+
+    protected $ip2location;
 
     protected $app;
 
@@ -24,7 +27,30 @@ class IpFilter extends BasePackage
     {
         $this->app = $this->apps->getAppInfo();
 
+        $this->ip2location = new Ip2location($this);
+
+        $this->getIpFilterSettings();
+
         return $this;
+    }
+
+    public function getIpFilterSettings()
+    {
+        if (!$this->ipFilterSettings) {
+            $ipfilterMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('IpFilter', $this->app['id']);
+
+            if ($ipfilterMiddleware) {
+                if (isset($ipfilterMiddleware['apps'][$this->app['id']]['settings'])) {
+                    $this->ipFilterSettings = $ipfilterMiddleware['apps'][$this->app['id']]['settings'];
+                } else if (isset($ipfilterMiddleware['settings'])) {//Load default settings
+                    $this->ipFilterSettings = $ipfilterMiddleware['settings'];
+                }
+            }
+        }
+
+        $this->addResponse('Ok', 0, ['ipFilterSettings' => $this->ipFilterSettings]);
+
+        return $this->ipFilterSettings;
     }
 
     public function getFilters(array $data)
@@ -252,31 +278,41 @@ class IpFilter extends BasePackage
         return;
     }
 
-    public function setClientAddress($clientAddress = null)
+    public function setVisitorIp($ip = null)
     {
-        if (!$clientAddress) {
-            $this->clientAddress = $this->request->getClientAddress();
+        if (!$ip) {
+            $this->ip = $this->ip2location->ipTools->getVisitorIp();
         } else {
-            $this->clientAddress = $clientAddress;
+            $this->ip = $ip;
         }
     }
 
-    public function getClientAddress($clientAddress = null)
+    public function getVisitorIp($ip = null)
     {
-        if (!$this->clientAddress) {
-            $this->setClientAddress($clientAddress);
+        if (!$this->ip) {
+            $this->setVisitorIp($ip);
         }
 
-        return $this->clientAddress;
+        return $this->ip;
     }
 
-    public function checkList()
+    public function checkList($ip = null, array $overrideIp2locationLookupSequence = null)
     {
-        $this->getClientAddress();
+        $this->ip = $ip;
 
-        if ($this->clientAddress === "127.0.0.1") {
+        if (!$this->ip) {
+            $this->getVisitorIp();
+        }
+
+        if ($this->ip === "127.0.0.1") {
             return true;
         }
+
+        if (!$this->validateIP()) {
+            return false;
+        }
+        // if ($this->ipFilterSettings['status'])
+        trace([$this->ip, $this->ipFilterSettings]);
 
         $this->apps->setFFRelations(true);
         $this->apps->setFFRelationsConditions(['monitorlist' => ['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]]);
@@ -349,7 +385,7 @@ class IpFilter extends BasePackage
 
         if ($filters && count($filters) > 0) {
             foreach ($filters as $key => $filter) {
-                if (\Symfony\Component\HttpFoundation\IpUtils::checkIp($this->clientAddress, $filter['ip_address'])) {
+                if (\Symfony\Component\HttpFoundation\IpUtils::checkIp($this->ip, $filter['ip_address'])) {
                     if ($this->config->databasetype === 'db') {
                         $filterObj = $this->getFirst('ip_address', $filter['ip_address']);
 
@@ -384,31 +420,76 @@ class IpFilter extends BasePackage
         return true;
     }
 
-    public function validateIp($ip)
+    public function validateIP()
     {
-        $this->validation->init()->add("ip_address", Ip::class,
-            [
-                "message"           => "Incorrect ip address.",
-                "version"           => Ip::VERSION_4 | Ip::VERSION_6,
-                "allowReserved"     => true,
-                "allowPrivate"      => true,
-                "allowEmpty"        => false
-            ]
-        );
-
-        $validated = $this->validation->validate(["ip_address" => $ip])->jsonSerialize();
-
-        if (count($validated) > 0) {
-            $messages = 'Error: ';
-
-            foreach ($validated as $key => $value) {
-                $messages .= $value['message'];
-            }
-
-            return $messages;
-        } else {
-            return true;
+        $ipv6 = false;
+        if ($this->ip2location->ipTools->isIpv6($this->ip)) {
+            $ipv6 = true;
         }
+
+        if (!$ipv6 && !$this->ipFilterSettings['filter_ipv4']) {
+            $this->logger->log->debug('IpFilter blocked connection as filter_ipv4 settings is set to false and ip address is from ipv4 range.');
+
+            return false;
+        }
+
+        if ($ipv6 && !$this->ipFilterSettings['filter_ipv6']) {
+            $this->logger->log->debug('IpFilter blocked connection as filter_ipv6 settings is set to false and ip address is from ipv6 range.');
+
+            return false;
+        }
+
+        if ($ipv6) {
+            if (!filter_var($this->ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                $this->addResponse('Please enter correct ip address', 1);
+
+                return false;
+            }
+        } else {
+            if (!filter_var($this->ip, FILTER_VALIDATE_IP)) {
+                $this->addResponse('Please enter correct ip address', 1);
+
+                return false;
+            }
+        }
+
+        $allow_private_range = true;
+        if (array_key_exists('allow_private_range', $this->ipFilterSettings) &&
+            !is_null($this->ipFilterSettings['allow_private_range']) &&
+            $this->ipFilterSettings['allow_private_range'] === false
+        ) {
+            $allow_private_range = false;
+        }
+
+        if (!$allow_private_range) {
+            if (!filter_var($this->ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
+                $this->logger->log->debug('IpFilter blocked connection as allow_private_range settings is set to false and ip address is from private range.');
+
+                $this->addResponse('IpFilter blocked connection as allow_private_range settings is set to false and ip address is from private range.', 1);
+
+                return false;
+            }
+        }
+
+        $allow_reserved_range = true;
+        if (array_key_exists('allow_reserved_range', $this->ipFilterSettings) &&
+            !is_null($this->ipFilterSettings['allow_reserved_range']) &&
+            $this->ipFilterSettings['allow_reserved_range'] === false
+        ) {
+            $allow_reserved_range = false;
+        }
+
+        if (!$allow_reserved_range) {
+            if (!filter_var($this->ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE)) {
+                $this->logger->log->debug('IpFilter blocked connection as allow_reserved_range settings is set to false and ip address is from reserved range.');
+
+                $this->addResponse('IpFilter blocked connection as allow_reserved_range settings is set to false and ip address is from reserved range.', 1);
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function bumpFilterHitCounter($filterObj = null, $updateHitCount = true, $updateIncorrectAttempts = false, $appRoute = null)
@@ -437,7 +518,7 @@ class IpFilter extends BasePackage
 
         if ($updateIncorrectAttempts) {
             if (!$filterObj) {
-                $filterObj = $this->getFirst('ip_address', $this->clientAddress);
+                $filterObj = $this->getFirst('ip_address', $this->ip);
             }
 
             $filter = [];
@@ -450,7 +531,7 @@ class IpFilter extends BasePackage
                 $newFilter =
                     [
                         'app_id'                => $this->app['id'],
-                        'ip_address'            => $this->clientAddress,
+                        'ip_address'            => $this->ip,
                         'address_type'          => 1,
                         'filter_type'           => 'monitor',
                         'added_by'              => 0,

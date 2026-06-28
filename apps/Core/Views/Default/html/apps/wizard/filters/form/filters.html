@@ -1,0 +1,334 @@
+<div class="row vdivide">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'filter_type',
+                'fieldLabel'                     : 'Filter Type',
+                'fieldType'                      : 'radio',
+                'fieldRadioPlacementType'        : "horizontal",
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select filter type.',
+                'fieldRequired'                  : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioButtons'              :
+                    [
+                        'allow' :
+                            [
+                                'title'                           : 'ALLOW',
+                                'type'                            : 'success',
+                                'dataValue'                       : 'allow'
+                            ],
+                        'block' :
+                            [
+                                'title'                           : 'BLOCK',
+                                'type'                            : 'danger',
+                                'dataValue'                       : 'block'
+                            ],
+                        'monitor' :
+                            [
+                                'title'                           : 'MONITOR',
+                                'type'                            : 'warning',
+                                'dataValue'                       : 'monitor'
+                            ]
+                    ],
+                'fieldRadioChecked'              : 'allow'
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'address_type',
+                'fieldLabel'                     : 'Address Type',
+                'fieldType'                      : 'radio',
+                'fieldRadioPlacementType'        : "horizontal",
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select address type.',
+                'fieldRequired'                  : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioButtons'              :
+                    [
+                        'host' :
+                            [
+                                'title'                           : 'HOST',
+                                'dataValue'                       : 'host'
+                            ],
+                        'network' :
+                            [
+                                'title'                           : 'NETWORK',
+                                'dataValue'                       : 'network'
+                            ],
+                        'ip2location' :
+                            [
+                                'title'                           : 'COUNTRY:STATE:CITY',
+                                'dataValue'                       : 'ip2location'
+                            ]
+                    ],
+                'fieldRadioChecked'              : 'host'
+            ]
+        )}}
+    </div>
+</div>
+<div class="row" id="host_network_address_div">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'host_network_address',
+                'fieldLabel'                            : 'Host/Network Address',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'HOST - Enter IP V4 or IP V6 host address. Example: 10.10.10.10 (ipv4) 2001:0DB8:ABCD:0012:::FFFF:FFFF (ipv6)<br>NETWORK -  Enter network mask/prefix using forward slash. Example: 10.10.10.0/8 for network. 2001:db8:abcd:0012::0/96.',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataInputMaxLength'               : 100,
+                'fieldValue'                            : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row" id="ip2location_address_div" hidden>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'country_id',
+                'fieldLabel'                            : 'Country Id',
+                'fieldHidden'                           : true,
+                'fieldType'                             : 'input',
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldValue'                            : ''
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'country_name',
+                'fieldLabel'                            : 'Search Country',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter country name to search.',
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldRequired'                         : true,
+                'fieldDataInputMinLength'               : 1,
+                'fieldDataInputMaxLength'               : 100,
+                'fieldValue'                            : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'state_id',
+                'fieldLabel'                            : 'State Id',
+                'fieldHidden'                           : true,
+                'fieldType'                             : 'input',
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldValue'                            : ''
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'state_name',
+                'fieldLabel'                            : 'Search State',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter state name to search.',
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldRequired'                         : false,
+                'fieldDataInputMinLength'               : 1,
+                'fieldDataInputMaxLength'               : 100,
+                'fieldValue'                            : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'city_id',
+                'fieldLabel'                            : 'City Id',
+                'fieldHidden'                           : true,
+                'fieldType'                             : 'input',
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldValue'                            : ''
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'city_name',
+                'fieldLabel'                            : 'Search City',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter city name to search.',
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldRequired'                         : false,
+                'fieldDataInputMinLength'               : 1,
+                'fieldDataInputMaxLength'               : 100,
+                'fieldValue'                            : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'ip2location_proxy',
+                'fieldLabel'                     : 'Proxy Connections',
+                'fieldType'                      : 'radio',
+                'fieldRadioPlacementType'        : "horizontal",
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select what to do with someone connecting via proxy based connections (via VPN).',
+                'fieldRequired'                  : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioButtons'              :
+                    [
+                        'allow_proxy' :
+                            [
+                                'title'                           : 'ALLOW',
+                                'dataValue'                       : 'allow_proxy'
+                            ],
+                        'block_proxy' :
+                            [
+                                'title'                           : 'BLOCK',
+                                'dataValue'                       : 'block_proxy'
+                            ],
+                        'ignore' :
+                            [
+                                'title'                           : 'IGNORE',
+                                'dataValue'                       : 'ignore'
+                            ]
+                    ],
+                'fieldRadioChecked'              : 'ignore'
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       : [
+                        'add-filter'       : [
+                            'title'                   : 'Add',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'position'                : 'right'
+                        ],
+                        'update-filter'    : [
+                            'title'                   : 'Update',
+                            'hidden'                  : true,
+                            'disabled'                : true,
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'position'                : 'right'
+                        ],
+                        'cancel-filter'    : [
+                            'title'                   : 'Cancel',
+                            'size'                    : 'xs',
+                            'type'                    : 'secondary',
+                            'icon'                    : 'times',
+                            'position'                : 'right'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'filters',
+                'fieldLabel'                     : 'Filters',
+                'fieldType'                      : 'html',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Current filters applied to the system for this app. Block filters are matched first and then allow filters.',
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {% include 'apps/tables/filters' with
+            [
+                'component'             : component,
+                'componentId'           : componentId,
+                'parent'                : parent,
+                'sectionId'             : sectionId
+            ]
+        %}
+    </div>
+</div>

@@ -4,7 +4,7 @@ namespace System\Base\Providers\AccessServiceProvider\Model;
 
 use System\Base\BaseModel;
 
-class ServiceProviderAccessIpFilter extends BaseModel
+class ServiceProviderAccessIpFiltersDefault extends BaseModel
 {
     public $id;
 
@@ -14,15 +14,7 @@ class ServiceProviderAccessIpFilter extends BaseModel
 
     public $address;
 
-    public $country_code;
-
-    public $region_name;
-
-    public $city_name;
-
-    public $is_proxy;
-
-    public $proxy_type;
+    public $decimal;
 
     public $filter_type;
 

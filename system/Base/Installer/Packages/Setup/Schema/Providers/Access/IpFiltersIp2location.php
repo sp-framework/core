@@ -5,7 +5,7 @@ namespace System\Base\Installer\Packages\Setup\Schema\Providers\Access;
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 
-class IpFilter
+class IpFiltersIp2location
 {
     public function columns()
     {
@@ -22,26 +22,18 @@ class IpFilter
                     ]
                 ),
                 new Column(
-                    'app_id',
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'address_type',//host, network, ip2location
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 20,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
                     'address',//ipv4, ipv6 host or network address
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
                         'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'decimal',//ip address to decimal for quick index search
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
@@ -83,55 +75,11 @@ class IpFilter
                         'notNull' => false,
                     ]
                 ),
-                new Column(
-                    'filter_type',//allow, block, monitor
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 20,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(//Self parent for network
-                    'parent_id',
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'hit_count',
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'incorrect_login_attempts',
-                    [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'updated_by',//0 - Auth_Service, account_id
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'updated_at',//for auto unblock
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => false,
-                    ]
-                )
             ],
             'indexes' => [
                 new Index(
                     'column_UNIQUE',
                     [
-                        'app_id',
                         'address'
                     ],
                     'UNIQUE'
@@ -147,13 +95,12 @@ class IpFilter
             new Index(
                 'column_INDEX',
                 [
-                    'app_id',
-                    'address_type',
                     'address',
-                    'filter_type',
+                    'decimal',
                     'country_code',
                     'region_name',
-                    'city_name'
+                    'city_name',
+                    'is_proxy'
                 ],
                 'INDEX'
             )

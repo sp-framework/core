@@ -59,7 +59,9 @@ use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Queues;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views\Settings;
-use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFilter;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFilters;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersDefault;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersIp2location;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api as SPApi;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AccessTokens;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AuthorizationCodes;
@@ -72,7 +74,9 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Core;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
-use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilter;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilters;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersDefault;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2location;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessTokens;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizationCodes;
@@ -156,9 +160,17 @@ class Schema
                         'schema'    => new Types,
                         'model'     => new ServiceProviderAppsTypes,
                     ],
-                'service_provider_access_ip_filter'         => [
-                        'schema'    => new IpFilter,
-                        'model'     => new ServiceProviderAccessIpFilter,
+                'service_provider_access_ip_filters'        => [
+                        'schema'    => new IpFilters,
+                        'model'     => new ServiceProviderAccessIpFilters,
+                    ],
+                'service_provider_access_ip_filters_default'=> [
+                        'schema'    => new IpFiltersDefault,
+                        'model'     => new ServiceProviderAccessIpFiltersDefault,
+                    ],
+                'service_provider_access_ip_filters_ip2location'=> [
+                        'schema'    => new IpFiltersIp2location,
+                        'model'     => new ServiceProviderAccessIpFiltersIp2location,
                     ],
                 'service_provider_domains'                  => [
                         'schema'    => new Domains,

@@ -148,6 +148,13 @@
                 'buttonType'                    : 'button',
                 'buttons'                       :
                         [
+                            'reset-middleware-settings' : [
+                                'title'                   : 'Reset Settings',
+                                'type'                    : 'danger',
+                                'position'                : 'right',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
+                            ],
                             'save-middleware-settings' : [
                                 'title'                   : 'Save Settings',
                                 'type'                    : 'primary',
@@ -161,7 +168,7 @@
     )}}
 </div>
 <script>
-/* globals Sortable paginatedPNotify */
+/* globals Sortable paginatedPNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -210,33 +217,82 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}-middlewares-settings-modal').on('shown.bs.modal', function() {
                         $('#{{componentId}}-{{sectionId}}-middlewares-settings-modal').off('shown.bs.modal');
 
-                        $('#{{componentId}}-{{sectionId}}-save-middleware-settings').off();
-                        $('#{{componentId}}-{{sectionId}}-save-middleware-settings').click(function(e) {
+                        $('#{{componentId}}-{{sectionId}}-save-middleware-settings,' +
+                          '#{{componentId}}-{{sectionId}}-reset-middleware-settings').off();
+                        $('#{{componentId}}-{{sectionId}}-save-middleware-settings,' +
+                          '#{{componentId}}-{{sectionId}}-reset-middleware-settings').click(function(e) {
                             e.preventDefault();
+
+                            var resetSaveButton = this;
 
                             var postData = { };
                             postData[$('#security-token').attr('name')] = $('#security-token').val();
                             postData['id'] = $(thisButton).data('id')
                             postData['app_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                            postData['settings'] = $('#{{componentId}}-{{sectionId}}-middleware-settings').val();
+                            if ($(resetSaveButton)[0].id === '{{componentId}}-{{sectionId}}-reset-middleware-settings') {
+                                postData['reset'] = true;
+                                postData['settings'] = JSON.stringify([]);
+                            } else {
+                                postData['settings'] = $('#{{componentId}}-{{sectionId}}-middleware-settings').val();
+                            }
 
-                            $.post('{{links.url("apps/saveMiddlewareSettings")}}', postData, function(response) {
-                                if (response.tokenKey && response.token) {
-                                    $('#security-token').attr('name', response.tokenKey);
-                                    $('#security-token').val(response.token);
-                                }
-
-                                if (response.responseCode == 0) {
-                                    $('#{{componentId}}-{{sectionId}}-middlewares-settings-modal').modal('hide');
-
-                                    paginatedPNotify('success', {'text': response.responseMessage});
-                                } else {
-                                    paginatedPNotify('error', {'text': response.responseMessage});
-                                }
-                            }, 'json');
+                            if (postData['reset'] === true) {
+                                Swal.fire({
+                                    title                       : '<span class="text-danger"> Reset middleware settings?</span>',
+                                    icon                        : 'question',
+                                    background                  : 'rgba(0,0,0,.8)',
+                                    backdrop                    : 'rgba(0,0,0,.6)',
+                                    buttonsStyling              : false,
+                                    confirmButtonText           : 'Reset',
+                                    customClass                 : {
+                                        'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                                    },
+                                    showCancelButton            : true,
+                                    keydownListenerCapture      : true,
+                                    allowOutsideClick           : true,
+                                    allowEscapeKey              : true,
+                                    didOpen                     : function() {
+                                        window.dataCollection.env.sounds.swalSound.play();
+                                    }
+                                }).then((result) => {
+                                    if (result.value) {
+                                        updateSettings(postData, thisButton, resetSaveButton, middlewareSettings);
+                                    } else {
+                                        return true;
+                                    }
+                                });
+                            } else {
+                                updateSettings(postData, thisButton, resetSaveButton,middlewareSettings);
+                            }
                         });
                     });
                 });
+
+                function updateSettings(postData, thisButton, resetSaveButton, middlewareSettings) {
+                    $.post('{{links.url("apps/saveMiddlewareSettings")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.settings) {
+                                middlewareSettings[$(thisButton).data('id')] = response.responseData.settings;
+                            }
+
+                            if ($(resetSaveButton)[0].id === '{{componentId}}-{{sectionId}}-reset-middleware-settings') {
+                                $('#{{componentId}}-{{sectionId}}-middleware-settings').val(JSON.stringify(middlewareSettings[$(thisButton).data('id')], null, 4));
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-middlewares-settings-modal').modal('hide');
+                            }
+
+                            paginatedPNotify('success', {'text': response.responseMessage});
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+                    }, 'json');
+                }
             }
         },
         '{{componentId}}-{{sectionId}}-middlewares'                     : {

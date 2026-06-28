@@ -25,6 +25,9 @@
 	},
 	"settings" : 
 	{
+		"monitor" : true,
+		"default_filter" : "block",
+		"auto_unblock_ip_minutes" : 0,
 		"filter_ipv4" : true,
 		"filter_ipv6" : true,
 		"allow_private_range" : true,
@@ -37,6 +40,7 @@
 		"ip2location_io_api_key":null,
 		"ip2location_io_api_language":null,
 		"ip2location_primary_lookup_method" : "BIN",
+		"log_filters" : false,
 		"debug_filters" : false
 	}
 }

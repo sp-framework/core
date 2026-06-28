@@ -1,165 +1,37 @@
 <div class="row">
     <div class="col">
-        {{adminltetags.useTag('fields',
+        {{adminltetags.useTag('tabs',
             [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'ip_filter_default_action',
-                'fieldLabel'                     : 'Ip Filter default action',
-                'fieldType'                      : 'radio',
-                'fieldRadioPlacementType'        : "horizontal",
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Select default action if there are no rules configured. Default is set to allow everyone to access the app. Use Allow all option if you want to block IP and then allow everyone else. Use Block all option if you want to allow IP and then block everyone else.',
-                'fieldRequired'                  : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazScan'                   : true,
-                'fieldRadioButtons'              :
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'tabsId'                        : 'filters',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsData'                      :
                     [
-                        'allow' :
-                            [
-                                'title'                           : 'Allow All',
-                                'type'                            : 'success',
-                                'dataValue'                       : 'allow'
-                            ],
-                        'block' :
-                            [
-                                'title'                           : 'Block All',
-                                'type'                            : 'danger',
-                                'dataValue'                       : 'block'
-                            ]
-                    ],
-                'fieldRadioChecked'              : appIpFilterDefaultAction
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'auto_unblock_ip_minutes',
-                'fieldLabel'                            : 'Auto Unblock IP after X minutes',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Auto unblock up after x amount of minutes.',
-                'fieldInputTypeTextFilter'              : 'positiveInt',
-                'fieldRequired'                         : false,
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldDataInputMaxLength'               : 6,
-                'fieldValue'                            : appAutoUnblockIpMinutes
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'incorrect_login_attempt_block_ip',
-                'fieldLabel'                            : 'Incorrect Login Attempt Block IP',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Block IP after # of incorrect login attempts. 0 is for not blocking. Note: Authentication middleware should be enabled for this to work.',
-                'fieldInputTypeTextFilter'              : 'positiveInt',
-                'fieldRequired'                         : false,
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldDataInputMaxLength'               : 2,
-                'fieldValue'                            : appIncorrectLoginAttemptBlockIp
-            ]
-        )}}
-    </div>
-</div>
-<hr>
-<div class="row">
-    <div class="col" id="ip-filters-add">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'ip_address',
-                'fieldLabel'                            : 'New Filter',
-                'fieldPlaceholder'                      : 'IP Address',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Enter IP V4 or IP V6 address. Adding network mask/prefix is allowed using forward slash. Example: 10.10.10.0/8 for network and 10.10.10.10 for IP host filter rule. 2001:db8:abcd:0012::0/96 for network and 2001:0DB8:ABCD:0012:::FFFF:FFFF for IP host filter rule.',
-                'fieldRequired'                         : false,
-                'fieldDisabled'                         : true,
-                'fieldGroupPreAddonDropdown'            : true,
-                'fieldGroupPreAddonDropdownButtonTitle' : 'SELECT FILTER TYPE',
-                'fieldGroupPreAddonDropdownButtonListTitle':
-                    [
-                        'allow' : 'Allow',
-                        'block' : 'Block'
-                    ]
-                ,
-                'fieldGroupPostAddonButtons'            :
-                    [
-                        'add'        : [
-                            'title'                   : 'Add',
-                            'type'                    : 'primary',
-                            'noMargin'                : true,
-                            'disabled'                : true,
-                            'buttonAdditionalClass'   : 'rounded-0 text-white',
-                            'position'                : 'right',
-                            'icon'                    : 'cog fa-spin',
-                            'iconHidden'              : true
+                        'filters'   :
+                        [
+                            'tabTitle'          : 'Filters',
+                            'tabInclude'        : 'apps/wizard/filters/form/filters'
+                        ],
+                        'filtersdefault'   :
+                        [
+                            'tabTitle'          : 'Default Filters',
+                            'tabInclude'        : 'apps/wizard/filters/form/filtersdefault'
+                        ],
+                        'test'   :
+                        [
+                            'tabTitle'          : 'Test',
+                            'tabInclude'        : 'apps/wizard/filters/form/test'
                         ]
-                    ],
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldDataInputMaxLength'               : 100,
-                'fieldValue'                            : ''
+                    ]
             ]
         )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'filters',
-                'fieldLabel'                     : 'Filters',
-                'fieldType'                      : 'html',
-                'fieldAdditionalClass'           : 'mb-0',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Current filters applied to the system for this app. Block filters are matched first and then allow filters.',
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazScan'                   : true
-            ]
-        )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        {% include 'apps/tables/filters' with
-            [
-                'component'             : component,
-                'componentId'           : componentId,
-                'parent'                : parent,
-                'sectionId'             : sectionId
-            ]
-        %}
     </div>
 </div>
 <script>
-/* globals paginatedPNotify Swal dataCollection */
+/* globals paginatedPNotify Swal dataCollection autoComplete */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -187,10 +59,330 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                              : { },
-        '{{componentId}}-{{sectionId}}-ip_filter_default_action'        : { },
-        '{{componentId}}-{{sectionId}}-auto_unblock_ip_minutes'         : { },
-        '{{componentId}}-{{sectionId}}-incorrect_login_attempt_block_ip': { },
-        '{{componentId}}-{{sectionId}}-ip_address'                      : { },
+        '{{componentId}}-{{sectionId}}-filter_type'                     : { },
+        '{{componentId}}-{{sectionId}}-address_type'                    : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-address_type').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') === 'host' ||
+                        $(this).find('input[type=radio]:checked').data('value') === 'network'
+                    ) {
+                        $('#host_network_address_div').attr('hidden', false);
+                        $('#ip2location_address_div').attr('hidden', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') === 'ip2location') {
+                        $('#host_network_address_div').attr('hidden', true);
+                        $('#ip2location_address_div').attr('hidden', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-host_network_address'            : { },
+        '{{componentId}}-{{sectionId}}-ip2location_address'             : { },
+        '{{componentId}}-{{sectionId}}-country_id'                      : { },
+        '{{componentId}}-{{sectionId}}-country_name'                    : {
+            afterInit: function() {
+                dataCollectionSectionForm["autoCompleteCountries"] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = "{{links.url('system/geo/countries/searchCountry')}}";
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-country_name").value);
+                                formdata.append($("#security-token").attr("name"), $("#security-token").val());
+
+                                var requestOptions = {
+                                    method: "POST",
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $("#security-token").attr("name", response.tokenKey);
+                                    $("#security-token").val(response.token);
+                                }
+
+                                if (response.responseData.countries) {
+                                    return response.responseData.countries;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["name"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-country_name",
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-country_name_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-country_name",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match;
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-country_name_list")) {
+                                $("#{{componentId}}-{{sectionId}}-country_name_list").empty().append(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-country_name").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-country_name_list" class="autoComplete_results"></div>'
+                                );
+                                document.querySelector("#{{componentId}}-{{sectionId}}-country_name_list").appendChild(result);
+                            }
+                        },
+                        onSelection: feedback => {
+                            $("#{{componentId}}-{{sectionId}}-country_id").val(feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-country_id").attr("value", feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-country_name").val(feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-country_name").attr("value", feedback.selection.value.name);
+                        }
+                });
+
+                $("#{{componentId}}-{{sectionId}}-country_name").focusout(function() {
+                    $("#{{componentId}}-{{sectionId}}-country_name_list").children("li").remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-state_id'                        : { },
+        '{{componentId}}-{{sectionId}}-state_name'                      : {
+            afterInit: function() {
+                dataCollectionSectionForm["autoCompleteStates"] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = "{{links.url('system/geo/states/searchState')}}";
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-state_name").value);
+                                formdata.append($("#security-token").attr("name"), $("#security-token").val());
+
+                                var requestOptions = {
+                                    method: "POST",
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $("#security-token").attr("name", response.tokenKey);
+                                    $("#security-token").val(response.token);
+                                }
+
+                                if (response.responseData.states) {
+                                    return response.responseData.states;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["name"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-state_name",
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-state_name_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-state_name",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + " <span>(Country: " + data.value.country_name + ")</span>";
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-state_name_list")) {
+                                $("#{{componentId}}-{{sectionId}}-state_name_list").empty().append(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-state_name").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-state_name_list" class="autoComplete_results"></div>'
+                                );
+                                document.querySelector("#{{componentId}}-{{sectionId}}-state_name_list").appendChild(result);
+                            }
+                        },
+                        onSelection: feedback => {
+                            $("#{{componentId}}-{{sectionId}}-state_id").val(feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-state_id").attr("value", feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-state_name").val(feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-state_name").attr("value", feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-country_id").val(feedback.selection.value.country_id);
+                            $("#{{componentId}}-{{sectionId}}-country_id").attr("value", feedback.selection.value.country_id);
+                            $("#{{componentId}}-{{sectionId}}-country_name").val(feedback.selection.value.country_name);
+                            $("#{{componentId}}-{{sectionId}}-country_name").attr("value", feedback.selection.value.country_name);
+                        }
+                });
+                // On delete
+                $("#{{componentId}}-{{sectionId}}-state_name").on("input propertychange", function() {
+                    $("#{{componentId}}-{{sectionId}}-state_id").val(0);
+                    $("#{{componentId}}-{{sectionId}}-state_id").attr("value", 0);
+                    $("#{{componentId}}-{{sectionId}}-country_id").val(0);
+                    $("#{{componentId}}-{{sectionId}}-country_id").attr("value", 0);
+                    $("#{{componentId}}-{{sectionId}}-country_name").val("");
+                    $("#{{componentId}}-{{sectionId}}-country_name").attr("value", "");
+                });
+
+                $("#{{componentId}}-{{sectionId}}-state_name").focusout(function() {
+                    $("#{{componentId}}-{{sectionId}}-state_name_list").children("li").remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-city_id'                         : { },
+        '{{componentId}}-{{sectionId}}-city_name'                       : {
+            afterInit: function() {
+                dataCollectionSectionForm["autoCompleteCities"] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = "{{links.url('system/geo/cities/searchCity')}}";
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-city_name").value);
+                                formdata.append($("#security-token").attr("name"), $("#security-token").val());
+
+                                var requestOptions = {
+                                    method: "POST",
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $("#security-token").attr("name", response.tokenKey);
+                                    $("#security-token").val(response.token);
+                                }
+
+                                if (response.responseData.cities) {
+                                    return response.responseData.cities;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["name"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-city_name",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-city_name_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-city_name",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + " <span>(State: " + data.value.state_name + ", Country: " + data.value.country_name + ")</span>";
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-city_name_list")) {
+                                $("#{{componentId}}-{{sectionId}}-city_name_list").empty().append(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-city_name").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-city_name_list" class="autoComplete_results"></div>'
+                                );
+                                document.querySelector("#{{componentId}}-{{sectionId}}-city_name_list").appendChild(result);
+                            }
+                        },
+                        onSelection: feedback => {
+                            $("#{{componentId}}-{{sectionId}}-city_id").val(feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-city_id").attr("value", feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-city_name").blur();
+                            $("#{{componentId}}-{{sectionId}}-city_name").val(feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-state_id").val(feedback.selection.value.state_id);
+                            $("#{{componentId}}-{{sectionId}}-state_id").attr("value", feedback.selection.value.state_id);
+                            $("#{{componentId}}-{{sectionId}}-state_name").val(feedback.selection.value.state_name);
+                            $("#{{componentId}}-{{sectionId}}-state_name").attr("value", feedback.selection.value.state_name);
+                            $("#{{componentId}}-{{sectionId}}-country_id").val(feedback.selection.value.country_id);
+                            $("#{{componentId}}-{{sectionId}}-country_id").attr("value", feedback.selection.value.country_id);
+                            $("#{{componentId}}-{{sectionId}}-country_name").val(feedback.selection.value.country_name);
+                            $("#{{componentId}}-{{sectionId}}-country_name").attr("value", feedback.selection.value.country_name);
+                        }
+                });
+                // On delete
+                $("#{{componentId}}-{{sectionId}}-city_name").on("input propertychange", function() {
+                    $("#{{componentId}}-{{sectionId}}-city_id").val(0);
+                    $("#{{componentId}}-{{sectionId}}-city_id").attr("value", 0);
+                    $("#{{componentId}}-{{sectionId}}-post_code").val("");
+                    $("#{{componentId}}-{{sectionId}}-state_id").val(0);
+                    $("#{{componentId}}-{{sectionId}}-state_id").attr("value", 0);
+                    $("#{{componentId}}-{{sectionId}}-state_name").val("");
+                    $("#{{componentId}}-{{sectionId}}-state_name").attr("value", "");
+                    $("#{{componentId}}-{{sectionId}}-country_id").val(0);
+                    $("#{{componentId}}-{{sectionId}}-country_id").attr("value", 0);
+                    $("#{{componentId}}-{{sectionId}}-country_name").val("");
+                    $("#{{componentId}}-{{sectionId}}-country_name").attr("value", "");
+                });
+
+                $("#{{componentId}}-{{sectionId}}-city_name").focusout(function() {
+                    $("#{{componentId}}-{{sectionId}}-city_name_list").children("li").remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-ip2location_proxy'               : { },
         '{{componentId}}-{{sectionId}}-filters'                         : {
             afterInit: function() {
                 $("#ip-filters-add a").click(function(e) {
