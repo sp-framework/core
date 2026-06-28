@@ -806,13 +806,13 @@ Class Setup
 		if (!$precheckFail) {
 			$this->view->countries =
 				$this->helper->decode(
-					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'),
+					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/AllCountries.json'),
 					true
 				);
 
 			$this->view->timezones =
 				$this->helper->decode(
-					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/TimeZones.json'),
+					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/TimeZones.json'),
 					true
 				);
 

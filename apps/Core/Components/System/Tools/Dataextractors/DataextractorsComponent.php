@@ -18,6 +18,8 @@ class DataextractorsComponent extends BaseComponent
     public function viewAction()
     {
         $this->view->countries = $this->basepackages->geoCountries->getAll()->geoCountries;
+
+        $this->view->ip2locationInfo = $this->dataExtractors->getIp2locationInfo();
     }
 
     public function processAction($data = null)
@@ -65,21 +67,26 @@ class DataextractorsComponent extends BaseComponent
                     $this->dataExtractors->processTimezoneData();
                 }
             } else if ($data['process'] === 'ip2location') {
-                //
+                if (isset($data['bin']) && $data['bin'] == 'true') {
+                    $this->dataExtractors->downloadIp2locationBinFile($data);
+                    $this->dataExtractors->unzipIp2locationBinFile($data);
+                    $this->dataExtractors->moveIp2locationBinFile($data);
+                }
+
+                if (isset($data['proxy']) && $data['proxy'] == 'true') {
+                    $this->dataExtractors->downloadIp2locationProxyFile($data);
+                    $this->dataExtractors->unzipIp2locationProxyFile($data);
+                    $this->dataExtractors->moveIp2locationProxyFile($data);
+                }
+
+                if ((isset($data['bin']) && $data['bin'] == 'true') ||
+                    (isset($data['proxy']) && $data['proxy'] == 'true')
+                ) {
+                    $this->dataExtractors->updateIp2locationInfo($data);
+                }
             } else if ($data['process'] === 'dictionary') {
                 $this->dataExtractors->downloadDictionaryData();
                 $this->dataExtractors->processDictionaryData();
-            }
-
-
-            if (isset($data['bin']) && $data['bin'] == 'true') {
-                $this->dataExtractors->downloadIp2locationFile('bin', $data);
-                $this->dataExtractors->unzipIp2locationFile('bin', $data);
-            }
-
-            if (isset($data['proxy']) && $data['proxy'] == 'true') {
-                $this->dataExtractors->downloadIp2locationFile('proxy', $data);
-                $this->dataExtractors->unzipIp2locationFile('proxy', $data);
             }
 
             $this->addResponse(
@@ -166,13 +173,17 @@ class DataextractorsComponent extends BaseComponent
                 $methods = array_merge($methods,
                     [
                         [
-                            'method'    => 'downloadIp2locationFile',
+                            'method'    => 'downloadIp2locationBinFile',
                             'text'      => 'Download Ip2Location BIN File...',
                             'remoteWeb' => true
                         ],
                         [
-                            'method'    => 'unzipIp2locationFile',
+                            'method'    => 'unzipIp2locationBinFile',
                             'text'      => 'Unzip Ip2Location BIN File...',
+                        ],
+                        [
+                            'method'    => 'moveIp2locationBinFile',
+                            'text'      => 'Moving Ip2Location BIN File...',
                         ]
                     ]
                 );
@@ -182,13 +193,30 @@ class DataextractorsComponent extends BaseComponent
                 $methods = array_merge($methods,
                     [
                         [
-                            'method'    => 'downloadIp2locationFile',
+                            'method'    => 'downloadIp2locationProxyFile',
                             'text'      => 'Download Ip2Location Proxy File...',
                             'remoteWeb' => true
                         ],
                         [
-                            'method'    => 'unzipIp2locationFile',
+                            'method'    => 'unzipIp2locationProxyFile',
                             'text'      => 'Unzip Ip2Location Proxy File...',
+                        ],
+                        [
+                            'method'    => 'moveIp2locationProxyFile',
+                            'text'      => 'Moving Ip2Location Proxy File...',
+                        ]
+                    ]
+                );
+            }
+
+            if ((isset($data['bin']) && $data['bin'] == 'true') ||
+                (isset($data['proxy']) && $data['proxy'] == 'true')
+            ) {
+                $methods = array_merge($methods,
+                    [
+                        [
+                            'method'    => 'updateIp2locationInfo',
+                            'text'      => 'Updating Ip2location Information File...',
                         ]
                     ]
                 );

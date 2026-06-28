@@ -10,6 +10,98 @@
         </div>
     </div>
 </div>
+{% set downloaded_on = '-' %}
+{% set bin_file_name = '-' %}
+{% set bin_file_version = '-' %}
+{% set proxy_file_name = '-' %}
+{% set proxy_file_version = '-' %}
+{% if ip2locationInfo is defined %}
+    {% if ip2locationInfo['downloaded_on'] is defined %}
+        {% set downloaded_on = ip2locationInfo['downloaded_on'] %}
+    {% endif %}
+    {% if ip2locationInfo['bin_file_name'] is defined %}
+        {% set bin_file_name = ip2locationInfo['bin_file_name'] %}
+    {% endif %}
+    {% if ip2locationInfo['bin_file_version'] is defined %}
+        {% set bin_file_version = ip2locationInfo['bin_file_version'] %}
+    {% endif %}
+    {% if ip2locationInfo['proxy_file_name'] is defined %}
+        {% set proxy_file_name = ip2locationInfo['proxy_file_name'] %}
+    {% endif %}
+    {% if ip2locationInfo['proxy_file_version'] is defined %}
+        {% set proxy_file_version = ip2locationInfo['proxy_file_version'] %}
+    {% endif %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'ip2location_info',
+                'fieldLabel'                    : false,
+                'fieldType'                     : 'counters',
+                'fieldCountersPlacementType'    : 'horizontal',
+                'fieldCounters'                 :
+                    [
+                        'downloaded_on'        :
+                            [
+                                'id'        : 'downloaded_on',
+                                'title'     : 'Downloaded On',
+                                'type'      : 'primary',
+                                'value'     : downloaded_on
+                            ]
+                    ]
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'ip2location_info',
+                'fieldLabel'                    : false,
+                'fieldType'                     : 'counters',
+                'fieldCountersPlacementType'    : 'horizontal',
+                'fieldCounters'                 :
+                    [
+                        'bin_file_name'        :
+                            [
+                                'id'        : 'bin_file_name',
+                                'title'     : 'BIN File Name',
+                                'type'      : 'info',
+                                'value'     : bin_file_name
+                            ],
+                        'bin_file_version'        :
+                            [
+                                'id'        : 'bin_file_version',
+                                'title'     : 'BIN File Version',
+                                'type'      : 'info',
+                                'value'     : bin_file_version
+                            ],
+                        'proxy_file_name'        :
+                            [
+                                'id'        : 'proxy_file_name',
+                                'title'     : 'Proxy File Name',
+                                'type'      : 'info',
+                                'value'     : proxy_file_name
+                            ],
+                        'proxy_file_version'        :
+                            [
+                                'id'        : 'proxy_file_version',
+                                'title'     : 'Proxy File Version',
+                                'type'      : 'info',
+                                'value'     : proxy_file_version
+                            ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<hr>
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',

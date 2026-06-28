@@ -158,6 +158,29 @@ dataCollectionSection =
                             paginatedPNotify('success', {
                                 'title' : response.responseMessage
                             });
+
+                            if (response.responseData && response.responseData.ip2locationInfo) {
+                                if (response.responseData.ip2locationInfo.downloaded_on) {
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-downloaded_on').data('value', response.responseData.ip2locationInfo.downloaded_on);
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-downloaded_on span').html(response.responseData.ip2locationInfo.downloaded_on);
+                                }
+                                if (response.responseData.ip2locationInfo.bin_file_name) {
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-bin_file_name').data('value', response.responseData.ip2locationInfo.bin_file_name);
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-bin_file_name span').html(response.responseData.ip2locationInfo.bin_file_name);
+                                }
+                                if (response.responseData.ip2locationInfo.bin_file_version) {
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-bin_file_version').data('value', response.responseData.ip2locationInfo.bin_file_version);
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-bin_file_version span').html(response.responseData.ip2locationInfo.bin_file_version);
+                                }
+                                if (response.responseData.ip2locationInfo.proxy_file_name) {
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-proxy_file_name').data('value', response.responseData.ip2locationInfo.proxy_file_name);
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-proxy_file_name span').html(response.responseData.ip2locationInfo.proxy_file_name);
+                                }
+                                if (response.responseData.ip2locationInfo.proxy_file_version) {
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-proxy_file_version').data('value', response.responseData.ip2locationInfo.proxy_file_version);
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-proxy_file_version span').html(response.responseData.ip2locationInfo.proxy_file_version);
+                                }
+                            }
                         } else {
                             paginatedPNotify('error', {
                                 'title' : response.responseMessage
