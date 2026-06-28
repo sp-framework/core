@@ -29,7 +29,15 @@ class IpFilter
                     ]
                 ),
                 new Column(
-                    'ip_address',
+                    'address_type',//host, network, ip2location
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'address',//ipv4, ipv6 host or network address
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
@@ -37,38 +45,78 @@ class IpFilter
                     ]
                 ),
                 new Column(
-                    'address_type',//1 - Host, 2 - Network
+                    'country_code',//ip2location country code - AU
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => true,
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 10,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'filter_type',//1 - Allow, 2 - Block, 3 - Monitor (for failed login attempts)
+                    'region_name',//ip2location region name - Victoria
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => true,
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'added_by',//0 - Auth_Service, account_id
+                    'city_name',//ip2location city name - Melbourne
                     [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'hit_count',//Hit count on filter_type 1 or 2
+                    'is_proxy',//ip2location proxy
+                    [
+                        'type'    => Column::TYPE_BOOLEAN,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'proxy_type',//ip2location proxy type
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'filter_type',//allow, block, monitor
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(//Self parent for network
+                    'parent_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
                         'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'incorrect_attempts',//for filter_type 3
+                    'hit_count',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'incorrect_login_attempts',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
                         'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'updated_by',//0 - Auth_Service, account_id
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(
@@ -84,11 +132,31 @@ class IpFilter
                     'column_UNIQUE',
                     [
                         'app_id',
-                        'ip_address'
+                        'address'
                     ],
                     'UNIQUE'
                 )
             ]
+        ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'app_id',
+                    'address_type',
+                    'address',
+                    'filter_type',
+                    'country_code',
+                    'region_name',
+                    'city_name'
+                ],
+                'INDEX'
+            )
         ];
     }
 }

@@ -10,17 +10,29 @@ class ServiceProviderAccessIpFilter extends BaseModel
 
     public $app_id;
 
-    public $ip_address;
+    public $address_type;
 
-    public $address_type;//1 - Host, 2 - Network
+    public $address;
 
-    public $filter_type;//1 - Allow, 2 - Block, 3 - Monitor (for failed login attempts)
+    public $country_code;
 
-    public $added_by;//0 - Auth_Service, account_id
+    public $region_name;
 
-    public $hit_count;//Hit count on filter_type 1 or 2
+    public $city_name;
 
-    public $incorrect_attempts;//for filter_type 3
+    public $is_proxy;
 
-    public $updated_at;//for auto unblock
+    public $proxy_type;
+
+    public $filter_type;
+
+    public $parent_id;
+
+    public $hit_count;
+
+    public $incorrect_login_attempts;
+
+    public $updated_by;
+
+    public $updated_at;
 }
