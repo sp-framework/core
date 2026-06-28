@@ -48,11 +48,9 @@ class DataextractorsComponent extends BaseComponent
 
         try {
             if ($data['process'] === 'geo') {
-                if (isset($data['countries'])) {
-                    $this->dataExtractors->downloadGeoCountriesData();
-                    $this->dataExtractors->downloadGeoPostcodeData();
-                    $this->dataExtractors->processDownloadedGeoCountriesData($data);
-                }
+                $this->dataExtractors->downloadGeoCountriesData();
+                $this->dataExtractors->downloadGeoPostcodeData();
+                $this->dataExtractors->processDownloadedGeoCountriesData($data);
 
                 if (isset($data['update_countries_regions']) && $data['update_countries_regions'] == 'true') {
                     $this->dataExtractors->processGeoCountriesData($data);
@@ -109,26 +107,24 @@ class DataextractorsComponent extends BaseComponent
         $methods = [];
 
         if ($data['process'] === 'geo') {
-            if (isset($data['countries'])) {
-                $methods = array_merge($methods,
+            $methods = array_merge($methods,
+                [
                     [
-                        [
-                            'method'    => 'downloadGeoCountriesData',
-                            'text'      => 'Download Geo Location Countries Data...',
-                            'remoteWeb' => true
-                        ],
-                        [
-                            'method'    => 'downloadGeoPostcodeData',
-                            'text'      => 'Download Geo Location Postcode Data...',
-                            'remoteWeb' => true
-                        ],
-                        [
-                            'method'    => 'processDownloadedGeoCountriesData',
-                            'text'      => 'Process Downloaded Geo Location Countries & Postcode Data...'
-                        ]
+                        'method'    => 'downloadGeoCountriesData',
+                        'text'      => 'Download Geo Location Countries Data...',
+                        'remoteWeb' => true
+                    ],
+                    [
+                        'method'    => 'downloadGeoPostcodeData',
+                        'text'      => 'Download Geo Location Postcode Data...',
+                        'remoteWeb' => true
+                    ],
+                    [
+                        'method'    => 'processDownloadedGeoCountriesData',
+                        'text'      => 'Process Downloaded Geo Location Countries & Postcode Data...'
                     ]
-                );
-            }
+                ]
+            );
 
             if (isset($data['update_countries_regions']) && $data['update_countries_regions'] == 'true') {
                 $methods = array_merge($methods,

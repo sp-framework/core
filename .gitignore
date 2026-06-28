@@ -34,6 +34,7 @@ apps/*
 system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/*
 !system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/vendor
 !system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo
+system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/*
 !system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/AllCountries.json
 !system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/TimeZones.json
 .api/

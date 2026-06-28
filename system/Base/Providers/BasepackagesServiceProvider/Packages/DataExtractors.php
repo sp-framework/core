@@ -15,10 +15,6 @@ class DataExtractors extends BasePackage
 {
     protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/';
 
-    protected $sourceFile;
-
-    protected $trackCounter = 0;
-
     public $method;
 
     protected $zip;
@@ -129,7 +125,7 @@ class DataExtractors extends BasePackage
 
         try {
             if ($this->localContent->fileExists($this->sourceDir . 'Geo/json-countries+states+cities.json')) {
-                $this->sourceFile = $this->helper->decode($this->localContent->read($this->sourceDir . 'Geo/json-countries+states+cities.json'), true);
+                $countriesArr = $this->helper->decode($this->localContent->read($this->sourceDir . 'Geo/json-countries+states+cities.json'), true);
             }
 
             if ($this->localContent->fileExists($this->sourceDir . 'Geo/json-postcodes.json')) {
@@ -141,8 +137,8 @@ class DataExtractors extends BasePackage
             return false;
         }
 
-        if ($this->sourceFile && is_array($this->sourceFile)) {
-            foreach ($this->sourceFile as $country) {
+        if ($countriesArr && is_array($countriesArr)) {
+            foreach ($countriesArr as $country) {
                 $countryKey = $country['iso2'];
 
                 $states = $country['states'];
@@ -151,63 +147,76 @@ class DataExtractors extends BasePackage
 
                 $countries[$countryKey] = $country;
 
-                if ($states && is_array($states) && count($states) > 0) {
-                    foreach ($states as $state) {
-                        $cities = $state['cities'];
+                if (isset($data['countries']) && count($data['countries']) > 0) {
+                    if ($states && is_array($states) && count($states) > 0) {
+                        foreach ($states as $state) {
+                            $cities = $state['cities'];
 
-                        unset($state['cities']);
+                            unset($state['cities']);
 
-                        $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']] = $state;
+                            $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']] = $state;
 
-                        foreach ($cities as $city) {
-                            $cityName = str_replace(' ', '' , strtolower($city['name']));
+                            foreach ($cities as $city) {
+                                $cityName = str_replace(' ', '' , strtolower($city['name']));
 
-                            $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']]['cities'][$cityName] = $city;
+                                $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']]['cities'][$cityName] = $city;
+                            }
                         }
-                    }
 
-                    $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']]['postcodes'] = [];
+                        $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']]['postcodes'] = [];
+                    }
                 }
             }
         }
 
-        $postCodes = [];
+        if (isset($data['countries']) && count($data['countries']) > 0) {
+            $postCodes = [];
 
-        if ($postcodesArr && is_array($postcodesArr)) {
-            foreach ($postcodesArr as $postcode) {
-                if (!isset($postCodes[$postcode['country_id'] . '-' . $postcode['state_id']])) {
-                    $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']] = [];
+            if ($postcodesArr && is_array($postcodesArr)) {
+                foreach ($postcodesArr as $postcode) {
+                    if (!isset($postCodes[$postcode['country_id'] . '-' . $postcode['state_id']])) {
+                        $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']] = [];
+                    }
+
+                    $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['id'] = $postcode['id'];
+                    $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['code'] = $postcode['code'];
+                    $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['name'] = $postcode['locality_name'];
+                    $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['city_id'] = $postcode['city_id'];
+                }
+            }
+
+            foreach ($countries as $countryKey => &$country) {
+                if (!in_array($country['iso2'], $data['countries'])) {
+                    continue;
                 }
 
-                $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['id'] = $postcode['id'];
-                $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['code'] = $postcode['code'];
-                $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['name'] = $postcode['locality_name'];
-                $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['city_id'] = $postcode['city_id'];
+                if (isset($country['states'])) {
+                    foreach ($country['states'] as &$state) {
+                        if (isset($postCodes[$country['id'] . '-' . $state['id']])) {
+                            $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']]['postcodes'] = $postCodes[$country['id'] . '-' . $state['id']];
+                        }
+                    }
+                }
+
+                try {
+                    $this->localContent->write($this->sourceDir . 'Geo/' . $countryKey . '.json', $this->helper->encode($country));
+                } catch (FilesystemException | UnableToWriteFile | \throwable $e) {
+                    $this->addResponse($e->getMessage(), 1);
+
+                    return false;
+                }
+
+                unset($country['states']);
             }
         }
 
         foreach ($countries as $countryKey => &$country) {
-            if (!in_array($country['iso2'], $data['countries'])) {
-                continue;
-            }
-
             if (isset($country['states'])) {
-                foreach ($country['states'] as &$state) {
-                    if (isset($postCodes[$country['id'] . '-' . $state['id']])) {
-                        $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']]['postcodes'] = $postCodes[$country['id'] . '-' . $state['id']];
-                    }
-                }
+                unset($country['states']);
             }
-
-            try {
-                $this->localContent->write($this->sourceDir . 'Geo/' . $countryKey . '.json', $this->helper->encode($country));
-            } catch (FilesystemException | UnableToWriteFile | \throwable $e) {
-                $this->addResponse($e->getMessage(), 1);
-
-                return false;
+            if (isset($country['timezones'])) {
+                unset($country['timezones']);
             }
-
-            unset($country['states']);
         }
 
         try {
