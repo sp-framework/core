@@ -421,64 +421,6 @@ class DataExtractors extends BasePackage
         return $this->gmtOffsets[$gmtOffset];
     }
 
-    // protected function downloadData($url, $sink)
-    // {
-    //     $download = $this->remoteWebContent->request(
-    //         'GET',
-    //         $url,
-    //         [
-    //             'progress' => function(
-    //                 $downloadTotal,
-    //                 $downloadedBytes,
-    //                 $uploadTotal,
-    //                 $uploadedBytes
-    //             ) {
-    //                 $counters =
-    //                         [
-    //                             'downloadTotal'     => $downloadTotal,
-    //                             'downloadedBytes'   => $downloadedBytes,
-    //                             'uploadTotal'       => $uploadTotal,
-    //                             'uploadedBytes'     => $uploadedBytes
-    //                         ];
-
-    //                 if ($downloadedBytes === 0) {
-    //                     return;
-    //                 }
-
-    //                 //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
-    //                 //So this way, we only update progress when there is actually an update.
-    //                 if ($downloadedBytes === $this->trackCounter) {
-    //                     return;
-    //                 }
-
-    //                 $this->trackCounter = $downloadedBytes;
-
-    //                 if ($downloadedBytes === $downloadTotal) {
-    //                     $this->basepackages->progress->updateProgress($this->method, true, false, null, $counters);
-    //                 } else {
-    //                     $this->basepackages->progress->updateProgress($this->method, null, false, null, $counters);
-    //                 }
-    //             },
-    //             'verify'            => false,
-    //             'connect_timeout'   => 5,
-    //             'sink'              => $sink,
-    //             'headers'           => [
-    //                 'User-Agent'    => 'Mozilla/5.0 (X11; Linux i686; rv:150.0) Gecko/20100101 Firefox/150.0'
-    //             ]
-    //         ]
-    //     );
-
-    //     $this->trackCounter = 0;
-
-    //     if ($download->getStatusCode() === 200) {
-    //         return true;
-    //     }
-
-    //     $this->addResponse('Download resulted in : ' . $download->getStatusCode(), 1);
-
-    //     return false;
-    // }
-
     protected function processGeoCountriesData()
     {
         $this->method = 'processGeoCountriesData';
