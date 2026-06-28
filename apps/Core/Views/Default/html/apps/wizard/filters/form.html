@@ -68,9 +68,23 @@ dataCollectionSection =
                     ) {
                         $('#host_network_address_div').attr('hidden', false);
                         $('#ip2location_address_div').attr('hidden', true);
+                        $("#{{componentId}}-{{sectionId}}-city_id").val(0);
+                        $("#{{componentId}}-{{sectionId}}-city_id").attr("value", 0);
+                        $("#{{componentId}}-{{sectionId}}-city_name").val("");
+                        $("#{{componentId}}-{{sectionId}}-city_name").attr("value", "");
+                        $("#{{componentId}}-{{sectionId}}-state_id").val(0);
+                        $("#{{componentId}}-{{sectionId}}-state_id").attr("value", 0);
+                        $("#{{componentId}}-{{sectionId}}-state_name").val("");
+                        $("#{{componentId}}-{{sectionId}}-state_name").attr("value", "");
+                        $("#{{componentId}}-{{sectionId}}-country_id").val(0);
+                        $("#{{componentId}}-{{sectionId}}-country_id").attr("value", 0);
+                        $("#{{componentId}}-{{sectionId}}-country_name").val("");
+                        $("#{{componentId}}-{{sectionId}}-country_name").attr("value", "");
                     } else if ($(this).find('input[type=radio]:checked').data('value') === 'ip2location') {
                         $('#host_network_address_div').attr('hidden', true);
                         $('#ip2location_address_div').attr('hidden', false);
+                        $("#{{componentId}}-{{sectionId}}-host_network_address").val("");
+                        $("#{{componentId}}-{{sectionId}}-host_network_address").attr("value", "");
                     }
                 });
             }
@@ -366,7 +380,6 @@ dataCollectionSection =
                 $("#{{componentId}}-{{sectionId}}-city_name").on("input propertychange", function() {
                     $("#{{componentId}}-{{sectionId}}-city_id").val(0);
                     $("#{{componentId}}-{{sectionId}}-city_id").attr("value", 0);
-                    $("#{{componentId}}-{{sectionId}}-post_code").val("");
                     $("#{{componentId}}-{{sectionId}}-state_id").val(0);
                     $("#{{componentId}}-{{sectionId}}-state_id").attr("value", 0);
                     $("#{{componentId}}-{{sectionId}}-state_name").val("");
