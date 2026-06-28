@@ -32,9 +32,10 @@ apps/*
 .ff/*
 .sql/*
 system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/*
-system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/*
-!system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json
-!system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/TimeZones.json
+!system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/vendor
+!system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo
+!system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/AllCountries.json
+!system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/TimeZones.json
 .api/
 phpstan.neon
 psalm.xml
