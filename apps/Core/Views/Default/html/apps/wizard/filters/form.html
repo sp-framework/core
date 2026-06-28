@@ -398,64 +398,78 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-ip2location_proxy'               : { },
         '{{componentId}}-{{sectionId}}-filters'                         : {
             afterInit: function() {
-                $("#ip-filters-add a").click(function(e) {
+                $("#{{componentId}}-{{sectionId}}-add-filter,#{{componentId}}-{{sectionId}}-update-filter,#{{componentId}}-{{sectionId}}-cancel-filter").click(function(e) {
                     e.preventDefault();
 
-                    $("#{{componentId}}-{{sectionId}}-ip_address").attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button span').text($(this).text().toUpperCase());
-                });
+                    if ($(this)[0].id === '#{{componentId}}-{{sectionId}}-add-filter' ||
+                        $(this)[0].id === '#{{componentId}}-{{sectionId}}-update-filter'
+                    ) {
+                        //
+                    } else if ($(this)[0].id === '#{{componentId}}-{{sectionId}}-cancel-filter') {
 
-                $("#{{componentId}}-{{sectionId}}-ip_address").keyup(function() {
-                    if ($("#{{componentId}}-{{sectionId}}-ip_address").val() === '') {
-                        $("#{{componentId}}-{{sectionId}}-add").attr('disabled', true);
-                    } else {
-                        $("#{{componentId}}-{{sectionId}}-add").attr('disabled', false);
+                        return;
                     }
-                });
 
-                $("#{{componentId}}-{{sectionId}}-add").click(function(e) {
-                    e.preventDefault();
-
-                    $(this).attr('disabled', true);
-                    $("#{{componentId}}-{{sectionId}}-ip_address").attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button').attr("disabled", true);
-                    $("#{{componentId}}-{{sectionId}}-add").children("i").attr('hidden', false);
+                    // $(this).attr('disabled', true);
+                    // $(this).children('i').attr('hidden', false);
 
                     var url = "{{links.url('apps/addFilter')}}";
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
-                    postData['ip_address'] = $("#{{componentId}}-{{sectionId}}-ip_address").val();
-                    postData['filter_type'] = $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button span').text().toLowerCase();
+                    postData['filter_type'] = $('#{{componentId}}-{{sectionId}}-filter_type').find('input[type=radio]:checked').data('value').toLowerCase();
+                    postData['address_type'] = $('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value').toLowerCase();
 
-                    $.post(url, postData, function(response) {
-                        $("#{{componentId}}-{{sectionId}}-add").children("i").attr('hidden', true);
-                        $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button').attr("disabled", false);
+                    if ($('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'host' ||
+                        $('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'network'
+                    ) {
+                        postData['address'] = $('#{{componentId}}-{{sectionId}}-host_network_address').val();
+                    } else if ($('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'ip2location') {
+                        postData['address'] = $('#{{componentId}}-{{sectionId}}-country_id').val();
 
-                        if (response.responseCode != 0) {
-                            paginatedPNotify('error', {
-                                title   : response.responseMessage
-                            });
-
-                            if (response.responseCode === 3) {
-                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].search(postData['ip_address']).draw();
-                            }
-
-                            $("#{{componentId}}-{{sectionId}}-ip_address").attr('disabled', false);
-                            $("#{{componentId}}-{{sectionId}}-add").attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button').attr("disabled", false);
+                        if (postData['address'] === '' || postData['address'] === '0') {
+                            paginatedPNotify('error', {title   : 'Country cannot be empty'});
 
                             return;
                         }
 
-                        paginatedPNotify('success', {
-                            title   : 'Filter added.'
-                        });
+                        if ($('#{{componentId}}-{{sectionId}}-state_id').val() !== '' &&
+                            $('#{{componentId}}-{{sectionId}}-state_id').val() != '0'
+                        ) {
+                            postData['address'] += ':' + $('#{{componentId}}-{{sectionId}}-state_id').val().toUpperCase();
+                        }
+                        if ($('#{{componentId}}-{{sectionId}}-city_id').val() !== '' &&
+                            $('#{{componentId}}-{{sectionId}}-city_id').val() != '0'
+                        ) {
+                            postData['address'] += ':' + $('#{{componentId}}-{{sectionId}}-city_id').val().toUpperCase();
+                        }
+                        if ($('#{{componentId}}-{{sectionId}}-ip2location_proxy').find('input[type=radio]:checked').data('value') === 'allow_proxy' ||
+                            $('#{{componentId}}-{{sectionId}}-ip2location_proxy').find('input[type=radio]:checked').data('value') === 'block_proxy'
+                        ) {
+                            if ($('#{{componentId}}-{{sectionId}}-ip2location_proxy').find('input[type=radio]:checked').data('value').toLowerCase() === 'allow_proxy') {
+                                postData['ip2location_proxy'] = 'allow';
+                            } else if ($('#{{componentId}}-{{sectionId}}-ip2location_proxy').find('input[type=radio]:checked').data('value').toLowerCase() === 'block_proxy') {
+                                postData['ip2location_proxy'] = 'block';
+                            }
+                        }
+                    }
+
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode != 0) {
+                            paginatedPNotify('error', {title   : response.responseMessage});
+
+                            if (response.responseCode === 3) {
+                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].search(postData['address']).draw();
+                            }
+
+                            $("#{{componentId}}-{{sectionId}}-add-filter").attr('disabled', false);
+
+                            return;
+                        }
+
+                        paginatedPNotify('success', {title   : 'Filter added.'});
 
                         dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-
-                        $("#{{componentId}}-{{sectionId}}-ip_address").val('');
-                        $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button span').text('SELECT FILTER TYPE');
                     }, "json");
                 });
 
@@ -472,93 +486,92 @@ dataCollectionSection =
                     if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-filters-table')) {
                         dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'] =
                         $('#{{componentId}}-{{sectionId}}-filters-table').DataTable({
-                                "responsive": true,
-                                "columns": [
-                                    { data : 'id', visible: false,},
-                                    { data : 'ip_address'},
-                                    { data : 'address_type'},
-                                    { data : 'filter_type'},
-                                    { data : 'added_by'},
-                                    { data : 'hit_count'},
-                                    { data : 'incorrect_attempts'},
-                                    { data : 'actions', orderable: false },
-                                ],
-                                "rowId" : 'id',
-                                "dom": dom,
-                                "buttons": [
-                                    {
-                                        text: function() {
-                                            return '<i class="fas fa-sync-alt fa-fw"></i>'
-                                        },
-                                        className: 'btn-sm',
-                                        action: function ( e, dt, node, config ) {
-                                            dt.ajax.reload();
-                                        }
+                            "responsive": true,
+                            "columns": [
+                                { data : 'id', visible: false,},
+                                { data : 'ip_address'},
+                                { data : 'address_type'},
+                                { data : 'filter_type'},
+                                { data : 'added_by'},
+                                { data : 'hit_count'},
+                                { data : 'incorrect_attempts'},
+                                { data : 'actions', orderable: false },
+                            ],
+                            "rowId" : 'id',
+                            "dom": dom,
+                            "buttons": [
+                                {
+                                    text: function() {
+                                        return '<i class="fas fa-sync-alt fa-fw"></i>'
+                                    },
+                                    className: 'btn-sm',
+                                    action: function ( e, dt, node, config ) {
+                                        dt.ajax.reload();
                                     }
-                                ],
-                                "ajax": {
-                                    "url" : "{{links.url('apps/getFilters')}}",
-                                    "type": "POST",
-                                    "data": postData,
-                                    "dataSrc" : function (json) {
-                                        var return_data = new Array();
+                                }
+                            ],
+                            "ajax": {
+                                "url" : "{{links.url('apps/getFilters')}}",
+                                "type": "POST",
+                                "data": postData,
+                                "dataSrc" : function (json) {
+                                    var return_data = new Array();
 
-                                        for(var i=0;i< json.data.length; i++) {
-                                            if (json.data[i]['incorrect_attempts'] === null) {
-                                                json.data[i]['incorrect_attempts'] = "-";
-                                            }
+                                    for(var i=0;i< json.data.length; i++) {
+                                        if (json.data[i]['incorrect_attempts'] === null) {
+                                            json.data[i]['incorrect_attempts'] = "-";
+                                        }
 
-                                            if (json.data[i]['hits'] === null) {
-                                                json.data[i]['hits'] = "-";
-                                            }
+                                        if (json.data[i]['hits'] === null) {
+                                            json.data[i]['hits'] = "-";
+                                        }
 
-                                            if (json.data[i]['address_type'] === 'host') {
-                                                json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">Host</span>';
-                                            } else if (json.data[i]['address_type'] === 'network') {
-                                                json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">Network</span>';
-                                            }
+                                        if (json.data[i]['address_type'] === 'host') {
+                                            json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">Host</span>';
+                                        } else if (json.data[i]['address_type'] === 'network') {
+                                            json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">Network</span>';
+                                        }
 
-                                            json.data[i]['actions'] = '';
+                                        json.data[i]['actions'] = '';
 
-                                            if (json.data[i]['filter_type'] === 'monitor' && json.data[i]['added_by'] === 'System') {
+                                        if (json.data[i]['filter_type'] === 'monitor' && json.data[i]['added_by'] === 'System') {
+                                            json.data[i]['actions'] +=
+                                                '<a href="#" class="text-danger block-filter ml-1" ' +
+                                                'data-toggle="tooltip" data-placement="left" title="Block IP"' +
+                                                'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-times-circle"></i></a>';
+                                        } else {
+                                            if (json.data[i]['filter_type'] === 'allow') {
                                                 json.data[i]['actions'] +=
                                                     '<a href="#" class="text-danger block-filter ml-1" ' +
                                                     'data-toggle="tooltip" data-placement="left" title="Block IP"' +
                                                     'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-times-circle"></i></a>';
-                                            } else {
-                                                if (json.data[i]['filter_type'] === 'allow') {
-                                                    json.data[i]['actions'] +=
-                                                        '<a href="#" class="text-danger block-filter ml-1" ' +
-                                                        'data-toggle="tooltip" data-placement="left" title="Block IP"' +
-                                                        'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-times-circle"></i></a>';
-                                                } else if (json.data[i]['filter_type'] === 'block') {
-                                                    json.data[i]['actions'] +=
-                                                        '<a href="#" class="text-success allow-filter ml-1" ' +
-                                                        'data-toggle="tooltip" data-placement="left" title="Allow IP"' +
-                                                        'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-check-circle"></i></a>';
-                                                }
-                                            }
-
-                                            json.data[i]['actions'] += '<a href="#" class="text-danger remove-filter" ' +
-                                                'data-toggle="tooltip" data-placement="left" title="Remove Filter"' +
-                                                'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-trash"></i></a>';
-
-                                            if (json.data[i]['filter_type'] === 'allow') {
-                                                json.data[i]['filter_type'] = '<span class="badge badge-success text-uppercase">Allow</span>';
                                             } else if (json.data[i]['filter_type'] === 'block') {
-                                                json.data[i]['filter_type'] = '<span class="badge badge-danger text-uppercase">Block</span>';
-                                            } else if (json.data[i]['filter_type'] === 'monitor') {
-                                                json.data[i]['filter_type'] = '<span class="badge badge-warning text-uppercase">Monitor</span>';
+                                                json.data[i]['actions'] +=
+                                                    '<a href="#" class="text-success allow-filter ml-1" ' +
+                                                    'data-toggle="tooltip" data-placement="left" title="Allow IP"' +
+                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-check-circle"></i></a>';
                                             }
-
-                                            return_data.push(json.data[i]);
                                         }
 
-                                        return return_data;
+                                        json.data[i]['actions'] += '<a href="#" class="text-danger remove-filter" ' +
+                                            'data-toggle="tooltip" data-placement="left" title="Remove Filter"' +
+                                            'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-trash"></i></a>';
+
+                                        if (json.data[i]['filter_type'] === 'allow') {
+                                            json.data[i]['filter_type'] = '<span class="badge badge-success text-uppercase">Allow</span>';
+                                        } else if (json.data[i]['filter_type'] === 'block') {
+                                            json.data[i]['filter_type'] = '<span class="badge badge-danger text-uppercase">Block</span>';
+                                        } else if (json.data[i]['filter_type'] === 'monitor') {
+                                            json.data[i]['filter_type'] = '<span class="badge badge-warning text-uppercase">Monitor</span>';
+                                        }
+
+                                        return_data.push(json.data[i]);
                                     }
+
+                                    return return_data;
                                 }
                             }
-                        );
+                        });
 
                         dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].on( 'draw', function () {
                             dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].columns.adjust().responsive.recalc();

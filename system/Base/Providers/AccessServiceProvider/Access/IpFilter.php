@@ -84,71 +84,185 @@ class IpFilter extends BasePackage
         return $filters;
     }
 
-    public function addFilter(array $data)
+    public function getFilterByAddress($address, $getChildren = false, $defaultStore = false)
     {
-        if (!isset($data['filter_type']) || !isset($data['ip_address'])) {
-            $this->addResponse('Please provide correct address and filter type', 1);
-
-            return false;
+        if ($defaultStore) {
+            $filter = $this->firewallFiltersDefaultStore->findBy(['address', '=', $address]);
+            $getChildren = false;
+        } else {
+            $filter = $this->firewallFiltersStore->findBy(['address', '=', $address]);
         }
 
-        if ($data['filter_type'] !== 'allow' &&
-            $data['filter_type'] !== 'block' &&
-            $data['filter_type'] !== 'monitor'
+        if (isset($filter[0])) {
+            if ($filter[0]['address_type'] !== 'host' &&
+                $getChildren
+            ) {
+                $filters = $this->firewallFiltersStore->findBy(['parent_id', '=', $filter[0]['id']]);
+
+                if ($filters && count($filters) > 0) {
+                    $filter[0]['ips'] = $filters;
+                }
+            }
+
+            $this->addResponse('Ok', 0, ['filter' => $filter[0]]);
+
+            return $filter[0];
+        }
+
+        $this->addResponse('No filter found for the given address ' . $address, 1);
+
+        return false;
+    }
+
+    public function addFilter(array $data, $defaultStore = null)
+    {
+        if (!isset($data['filter_type']) ||
+            (isset($data['filter_type']) &&
+             ($data['filter_type'] !== 'allow' &&
+              $data['filter_type'] !== 'block' &&
+              $data['filter_type'] !== 'monitor')
+            )
         ) {
             $this->addResponse('Please provide correct filter type', 1);
 
             return false;
         }
 
-        $address = explode('/', $data['ip_address']);
-
-        if (count($address) === 2 || count($address) === 1) {
-            //validate address
-            $validateIP = $this->validateIp($address[0]);
-
-            if ($validateIP !== true) {
-                $this->addResponse($validateIP, 1);
-
-                return;
-            }
-
-            if (count($address) === 2) {
-                $data['address_type'] = 2;
-            } else if (count($address) === 1) {
-                $data['address_type'] = 1;
-            }
-        } else {
-            $this->addResponse('Please enter correct address', 1);
+        if (!isset($data['address_type']) ||
+            (isset($data['address_type']) &&
+             ($data['address_type'] !== 'host' &&
+              $data['address_type'] !== 'network' &&
+              $data['address_type'] !== 'ip2location')
+            )
+        ) {
+            $this->addResponse('Please provide correct address type', 1);
 
             return false;
         }
 
-        if ($data['filter_type'] === 'allow') {
-            $data['filter_type'] = 1;
-        } else if ($data['filter_type'] === 'block') {
-            $data['filter_type'] = 2;
-        } else if ($data['filter_type'] === 'monitor') {
-            $data['filter_type'] = 3;
-        }
-        if (!isset($data['added_by'])) {
-            $data['added_by'] = $this->access->auth->account()['id'];
-        }
-        $data['updated_at'] = time();
+        if (!isset($data['address'])) {
+            $this->addResponse('Please provide correct address', 1);
 
-        try {
-            $this->add($data);
+            return false;
+        }
 
-            $this->addResponse('Filter Added.');
-        } catch (\Exception $e) {
-            if (strpos($e->getMessage(), 'UNIQUE') !== false) {
-                $this->addResponse('Duplicate Entry!', 3);
+        trace([$data]);
+        if ($filterexists = $this->getFilterByAddress($data['address'])) {
+            $this->addResponse('Filter with address ' . $data['address'] . ' already exists. Please see filter with ID: ' . $filterexists['id'], 1);
+
+            return false;
+        }
+        if ($data['address_type'] === 'host' || $data['address_type'] === 'network') {
+            if ($data['address_type'] === 'network' &&
+                !str_contains($data['address'], '/')
+            ) {
+                $this->firewall->addResponse('Please type correct network address. Format is CIDR - network address/network mask', 1);
 
                 return false;
             }
 
-            throw $e;
+            if ($data['address_type'] === 'host' &&
+                str_contains($data['address'], '/')
+            ) {
+                $this->firewall->addResponse('Please type correct host address.', 1);
+
+                return false;
+            }
+
+            if ($data['address_type'] === 'network') {
+                if (str_contains($data['address'], ':')) {
+                    $range = $this->firewall->ip2location->ipTools->cidrToIpv6($data['address']);
+                } else {
+                    $range = $this->firewall->ip2location->ipTools->cidrToIpv4($data['address']);
+                }
+
+                if (!isset($range['ip_start']) && !isset($range['ip_end'])) {
+                    $this->firewall->addResponse('Please type correct network address. Format is CIDR - network address/network mask', 1);
+
+                    return false;
+                }
+            }
+
+            $address = explode('/', $data['address'])[0];
+
+            if (!$this->firewall->validateIP($address)) {
+                $this->firewall->addResponse('Please provide correct address', 1);
+
+                return false;
+            }
+        } else if ($data['address_type'] === 'ip2location') {
+            if ((!$this->firewall->config['ip2location_api_key'] ||
+                 $this->firewall->config['ip2location_api_key'] === '') &&
+                (!$this->firewall->config['ip2location_io_api_key'] ||
+                 $this->firewall->config['ip2location_io_api_key'] === '')
+            ) {
+                $this->firewall->addResponse('Please set ip2location API key to add address type ip2location', 1);
+
+                return false;
+            }
         }
+
+        if (!isset($data['ip2location_proxy']) ||
+            (isset($data['ip2location_proxy']) &&
+             ($data['ip2location_proxy'] !== 'allow' &&
+              $data['ip2location_proxy'] !== 'block')
+            )
+        ) {
+            if ($data['address_type'] === 'ip2location') {
+                $data['ip2location_proxy'] = 'allow';//Default is to allow proxy connections
+            } else {
+                $data['ip2location_proxy'] = '-';//Default is to allow proxy connections
+            }
+        }
+
+        if (!isset($data['updated_by'])) {
+            $data['updated_by'] = 0;
+        }
+        if (!isset($data['updated_at'])) {
+            $data['updated_at'] = time();
+        }
+
+        if (!isset($data['parent_id'])) {
+            $data['parent_id'] = null;
+        }
+
+        if (!isset($data['hit_count'])) {
+            $data['hit_count'] = 0;
+        }
+
+        if ($defaultStore) {
+            $newFilter = $this->firewall->firewallFiltersDefaultStore->insert($data);
+
+            if ($newFilter) {
+                if ($newFilter['address_type'] === 'host') {
+                    $this->firewall->indexes->addToIndex($newFilter, true);
+                }
+            }
+        } else {
+            if ($data['address_type'] === 'host') {
+                $inDefaultFilter = $this->getFilterByAddress($data['address'], $data['destination'], false, true);
+
+                if ($inDefaultFilter) {
+                    $this->removeFilter($inDefaultFilter['id'], true);
+                }
+            }
+
+            $newFilter = $this->firewall->firewallFiltersStore->insert($data);
+
+            if ($newFilter) {
+                if ($newFilter['address_type'] === 'host') {
+                    $this->firewall->indexes->addToIndex($newFilter);
+                }
+            }
+        }
+
+        if ($data['address_type'] !== 'host') {
+            $this->firewall->indexes->reindexFilters(true, true);//We have to clear index for new network/ips to be indexed again.
+        }
+
+        $this->firewall->systemLogger->info('FILTER_ADD', $newFilter);
+
+        return $newFilter;
     }
 
     public function updateFilter(array $data)
