@@ -62,6 +62,9 @@ use System\Base\Installer\Packages\Setup\Schema\Modules\Views\Settings;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFilters;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersDefault;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersIp2location;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersIp2locationCities;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersIp2locationCountries;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersIp2locationStates;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api as SPApi;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AccessTokens;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AuthorizationCodes;
@@ -77,6 +80,9 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
 use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilters;
 use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersDefault;
 use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2location;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2locationCities;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2locationCountries;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2locationStates;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessTokens;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizationCodes;
@@ -171,6 +177,18 @@ class Schema
                 'service_provider_access_ip_filters_ip2location'=> [
                         'schema'    => new IpFiltersIp2location,
                         'model'     => new ServiceProviderAccessIpFiltersIp2location,
+                    ],
+                'service_provider_access_ip_filters_ip2location_countries'=> [
+                        'schema'    => new IpFiltersIp2locationCountries,
+                        'model'     => new ServiceProviderAccessIpFiltersIp2locationCountries,
+                    ],
+                'service_provider_access_ip_filters_ip2location_states'=> [
+                        'schema'    => new IpFiltersIp2locationStates,
+                        'model'     => new ServiceProviderAccessIpFiltersIp2locationStates,
+                    ],
+                'service_provider_access_ip_filters_ip2location_cities'=> [
+                        'schema'    => new IpFiltersIp2locationCities,
+                        'model'     => new ServiceProviderAccessIpFiltersIp2locationCities,
                     ],
                 'service_provider_domains'                  => [
                         'schema'    => new Domains,
