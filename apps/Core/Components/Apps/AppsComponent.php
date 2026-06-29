@@ -468,30 +468,27 @@ class AppsComponent extends BaseComponent
 
         foreach ($filters as $key => &$filter) {
             unset ($filter['app_id']);
-            if ($filter['address_type'] == '1') {
-                $filter['address_type'] = 'host';
-            } else if ($filter['address_type'] == '2') {
-                $filter['address_type'] = 'network';
-            }
+            unset ($filter['decimal']);
+            unset ($filter['ip2location_proxy']);
+            unset ($filter['parent_id']);
+            unset ($filter['ip_hits']);
 
-            if ($filter['filter_type'] == '1') {
-                $filter['filter_type'] = "allow";
-            } else if ($filter['filter_type'] == '2') {
-                $filter['filter_type'] = "block";
-            } else if ($filter['filter_type'] == '3') {
-                $filter['filter_type'] = "monitor";
-            }
-
-            if ($filter['added_by'] == '0') {
-                $filter['added_by'] = "System";
+            if ($filter['updated_by'] == '0') {
+                $filter['updated_by'] = "System";
             } else {
-                $user = $this->basepackages->accounts->getAccountById($filter['added_by']);
+                $user = $this->basepackages->accounts->getAccountById($filter['updated_by']);
 
-                if ($user && isset($user['profile']['full_name'])) {
-                    $filter['added_by'] = $user['profile']['full_name'];
+                if ($user && isset($user['contact']['full_name'])) {
+                    $filter['updated_by'] = $user['contact']['full_name'];
                 } else {
-                    $filter['added_by'] = "System";
+                    $filter['updated_by'] = "System";
                 }
+            }
+
+            try {
+                $filter['updated_at'] = (\Carbon\Carbon::parse($filter['updated_at']))->toDateTimeString();
+            } catch (\throwable $e) {
+                $filter['updated_at'] = '-';
             }
 
             $filter['actions'] = '';
