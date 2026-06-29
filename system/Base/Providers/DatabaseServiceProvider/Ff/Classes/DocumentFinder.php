@@ -164,7 +164,9 @@ class DocumentFinder
                                                 $match = false;
 
                                                 foreach ($conditionsCount[$conditionArrConditions[0][0]] as $conditionsCountIndex => $conditionsCountKey) {
-                                                    if (ConditionsHandler::verifyCondition($conditionArr[$conditionsCountKey][1], $foundValue[$conditionArrConditions[0][0]], $conditionArr[$conditionsCountKey][2])
+                                                    if (ConditionsHandler::verifyCondition($conditionArr[$conditionsCountKey][1],
+                                                                                           $foundValue[$conditionArrConditions[0][0]],
+                                                                                           $conditionArr[$conditionsCountKey][2])
                                                     ) {
                                                         if (strtolower($conditionArr[1]) === 'or') {
                                                             $match = true;
@@ -190,7 +192,10 @@ class DocumentFinder
                                                     unset($found[$foundKey]);
                                                 }
                                             } else {
-                                                if (ConditionsHandler::verifyCondition($conditionArrConditions[1], $foundValue[$conditionArrConditions[0]], $conditionArrConditions[2])) {
+                                                if (ConditionsHandler::verifyCondition($conditionArrConditions[1],
+                                                                                       $foundValue[$conditionArrConditions[0]],
+                                                                                       $conditionArrConditions[2])
+                                                ) {
                                                     continue;
                                                 }
 
@@ -202,12 +207,43 @@ class DocumentFinder
                             }
                         } else {
                             $this->processIndexes($conditionArr[0], $found, $skip, $limit);
+
+                            if ($found > 0) {
+                                foreach ($found as $foundKey => $foundValue) {
+                                    if (isset($foundValue[$conditionArr[0][0]])) {
+                                        if (ConditionsHandler::verifyCondition($conditionArr[0][1],
+                                                                               $foundValue[$conditionArr[0][0]],
+                                                                               $conditionArr[0][2])
+                                        ) {
+                                            continue;
+                                        }
+
+                                        unset($found[$foundKey]);
+                                    }
+                                }
+                            }
                         }
                     } else {
                         $this->processIndexes($conditionArr, $found, $skip, $limit);
+
+                        if ($found > 0) {
+                            foreach ($found as $foundKey => $foundValue) {
+                                if (isset($foundValue[$conditionArr[0]])) {
+                                    if (ConditionsHandler::verifyCondition($conditionArr[1],
+                                                                           $foundValue[$conditionArr[0]],
+                                                                           $conditionArr[2])
+                                    ) {
+                                        continue;
+                                    }
+
+                                    unset($found[$foundKey]);
+                                }
+                            }
+                        }
                     }
                 }
             }
+
             if (count($found) > 0) {
                 if (!$this->store->criteriaCount) {
                     $this->store->criteriaCount = count($found);
@@ -388,7 +424,7 @@ class DocumentFinder
 
                         if ($keywordIsDate) {
                             $indexChars = $conditionArr[2] = $keyword = $keywordIsDate->getTimestamp();
-                            // trace([$conditionArr]);
+
                             $found = array_replace($found, $this->searchIndexes($conditionArr, $indexChars, $keyword, $skip, $limit));
 
                             return $found ?? [];
