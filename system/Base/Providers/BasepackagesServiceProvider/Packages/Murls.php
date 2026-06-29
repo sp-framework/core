@@ -17,7 +17,7 @@ class Murls extends BasePackage
 
     public $murls;
 
-    protected $dataDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Dictionary/';
+    protected $dataDir = 'var/dataextractors/dictionary/';
 
     public function init()
     {

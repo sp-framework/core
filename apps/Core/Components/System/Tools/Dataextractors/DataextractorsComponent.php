@@ -17,6 +17,16 @@ class DataextractorsComponent extends BaseComponent
 
     public function viewAction()
     {
+        $geoCountries = $this->basepackages->geoCountries->getAll()->geoCountries;
+
+        $ip2locationCountries = $this->access->ipFilter->ip2location->getAllCountries();
+
+        if ($ip2locationCountries && count($ip2locationCountries) > 0) {
+            $this->view->ip2locationCountries = $ip2locationCountries;
+        } else {
+            $this->view->ip2locationCountries = $geoCountries;
+        }
+
         $this->view->countries = $this->basepackages->geoCountries->getAll()->geoCountries;
 
         $this->view->ip2locationInfo = $this->dataExtractors->getIp2locationInfo();
@@ -65,6 +75,13 @@ class DataextractorsComponent extends BaseComponent
                     $this->dataExtractors->processTimezoneData();
                 }
             } else if ($data['process'] === 'ip2location') {
+                if (isset($data['csv']) && $data['csv'] == 'true') {
+                    $this->dataExtractors->downloadIp2locationCsvFile($data);
+                    $this->dataExtractors->unzipIp2locationCsvFile($data);
+                    $this->dataExtractors->moveIp2locationCsvFile($data);
+                    $this->dataExtractors->extractGeoDataFromIp2locationCsvFile($data);
+                }
+
                 if (isset($data['bin']) && $data['bin'] == 'true') {
                     $this->dataExtractors->downloadIp2locationBinFile($data);
                     $this->dataExtractors->unzipIp2locationBinFile($data);
@@ -77,7 +94,8 @@ class DataextractorsComponent extends BaseComponent
                     $this->dataExtractors->moveIp2locationProxyFile($data);
                 }
 
-                if ((isset($data['bin']) && $data['bin'] == 'true') ||
+                if ((isset($data['csv']) && $data['csv'] == 'true') ||
+                    (isset($data['bin']) && $data['bin'] == 'true') ||
                     (isset($data['proxy']) && $data['proxy'] == 'true')
                 ) {
                     $this->dataExtractors->updateIp2locationInfo($data);
@@ -165,6 +183,31 @@ class DataextractorsComponent extends BaseComponent
                 );
             }
         } else if ($data['process'] === 'ip2location') {
+            if (isset($data['csv']) && $data['csv'] == 'true') {
+                $methods = array_merge($methods,
+                    [
+                        [
+                            'method'    => 'downloadIp2locationCsvFile',
+                            'text'      => 'Download Ip2Location CSV File...',
+                            'remoteWeb' => true
+                        ],
+                        [
+                            'method'    => 'unzipIp2locationCsvFile',
+                            'text'      => 'Unzip Ip2Location CSV File...',
+                        ],
+                        [
+                            'method'    => 'moveIp2locationCsvFile',
+                            'text'      => 'Moving Ip2Location CSV File...',
+                        ],
+                        [
+                            'method'    => 'extractGeoDataFromIp2locationCsvFile',
+                            'text'      => 'Extracting Geo Data From Ip2Location CSV File...',
+                            'steps'     => true
+                        ]
+                    ]
+                );
+            }
+
             if (isset($data['bin']) && $data['bin'] == 'true') {
                 $methods = array_merge($methods,
                     [
@@ -205,7 +248,8 @@ class DataextractorsComponent extends BaseComponent
                 );
             }
 
-            if ((isset($data['bin']) && $data['bin'] == 'true') ||
+            if ((isset($data['csv']) && $data['csv'] == 'true') ||
+                (isset($data['bin']) && $data['bin'] == 'true') ||
                 (isset($data['proxy']) && $data['proxy'] == 'true')
             ) {
                 $methods = array_merge($methods,

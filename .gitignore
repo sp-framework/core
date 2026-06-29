@@ -37,6 +37,9 @@ system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/*
 system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/*
 !system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/AllCountries.json
 !system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/TimeZones.json
+!system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Ip2location
+system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Ip2location/*
+!system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Ip2location/AllCountries.json
 .api/
 phpstan.neon
 psalm.xml

@@ -3,16 +3,20 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Carbon\Carbon;
+use League\Csv\Reader;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use League\MimeTypeDetection\FinfoMimeTypeDetector;
 use System\Base\BasePackage;
 
 class DataExtractors extends BasePackage
 {
+    protected $varDir = 'var/dataextractors/';
+
     protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/';
 
     public $method;
@@ -84,9 +88,34 @@ class DataExtractors extends BasePackage
             }
         }
 
+        if (!is_dir(base_path($this->varDir . 'geo'))) {
+            if (!mkdir(base_path($this->varDir . 'geo'), 0777, true)) {
+                $this->addResponse('Unable to create var/dataextractors/geo directory', 1);
+
+                return false;
+            }
+        }
+
+        try {
+            //File is already downloaded
+            if ($this->localContent->fileExists($this->varDir . 'geo/json-countries+states+cities.json.gz')) {
+                $remoteSize = (int) getRemoteFilesize('https://github.com/dr5hn/countries-states-cities-database/releases/latest/download/json-countries+states+cities.json.gz');
+
+                $localSize = $this->localContent->fileSize($this->varDir . 'geo/json-countries+states+cities.json.gz');
+
+                if ($remoteSize === $localSize) {
+                    return true;
+                }
+            }
+        } catch (FilesystemException | UnableToCheckExistence | UnableToRetrieveMetadata | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
         if (!$download = $this->remoteWebDownload->downloadData(
             'https://github.com/dr5hn/countries-states-cities-database/releases/latest/download/json-countries+states+cities.json.gz',
-            base_path($this->sourceDir . 'Geo/json-countries+states+cities.json.gz'),
+            base_path($this->varDir . 'geo/json-countries+states+cities.json.gz'),
             $this->method)
         ) {
             $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
@@ -101,9 +130,26 @@ class DataExtractors extends BasePackage
     {
         $this->method = 'downloadGeoPostcodeData';
 
+        try {
+            //File is already downloaded
+            if ($this->localContent->fileExists($this->varDir . 'geo/json-postcodes.json.gz')) {
+                $remoteSize = (int) getRemoteFilesize('https://github.com/dr5hn/countries-states-cities-database/releases/latest/download/json-postcodes.json.gz');
+
+                $localSize = $this->localContent->fileSize($this->varDir . 'geo/json-postcodes.json.gz');
+
+                if ($remoteSize === $localSize) {
+                    return true;
+                }
+            }
+        } catch (FilesystemException | UnableToCheckExistence | UnableToRetrieveMetadata | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
         if (!$download = $this->remoteWebDownload->downloadData(
             'https://github.com/dr5hn/countries-states-cities-database/releases/latest/download/json-postcodes.json.gz',
-            base_path($this->sourceDir . 'Geo/json-postcodes.json.gz'),
+            base_path($this->varDir . 'geo/json-postcodes.json.gz'),
             $this->method)
         ) {
             $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
@@ -118,18 +164,18 @@ class DataExtractors extends BasePackage
     {
         $this->method = 'downloadGeoPostcodeData';
 
-        $this->ungzData('Geo/json-countries+states+cities.json.gz');
-        $this->ungzData('Geo/json-postcodes.json.gz');
+        $this->ungzData('geo/json-countries+states+cities.json.gz');
+        $this->ungzData('geo/json-postcodes.json.gz');
 
         $countries = [];
 
         try {
-            if ($this->localContent->fileExists($this->sourceDir . 'Geo/json-countries+states+cities.json')) {
-                $countriesArr = $this->helper->decode($this->localContent->read($this->sourceDir . 'Geo/json-countries+states+cities.json'), true);
+            if ($this->localContent->fileExists($this->varDir . 'geo/json-countries+states+cities.json')) {
+                $countriesArr = $this->helper->decode($this->localContent->read($this->varDir . 'geo/json-countries+states+cities.json'), true);
             }
 
-            if ($this->localContent->fileExists($this->sourceDir . 'Geo/json-postcodes.json')) {
-                $postcodesArr = $this->helper->decode($this->localContent->read($this->sourceDir . 'Geo/json-postcodes.json'), true);
+            if ($this->localContent->fileExists($this->varDir . 'geo/json-postcodes.json')) {
+                $postcodesArr = $this->helper->decode($this->localContent->read($this->varDir . 'geo/json-postcodes.json'), true);
             }
         } catch (FilesystemException | UnableToReadFile | UnableToCheckExistence | \throwable $e) {
             $this->addResponse($e->getMessage(), 1);
@@ -199,7 +245,7 @@ class DataExtractors extends BasePackage
                 }
 
                 try {
-                    $this->localContent->write($this->sourceDir . 'Geo/' . $countryKey . '.json', $this->helper->encode($country));
+                    $this->localContent->write($this->varDir . 'geo/' . $countryKey . '.json', $this->helper->encode($country));
                 } catch (FilesystemException | UnableToWriteFile | \throwable $e) {
                     $this->addResponse($e->getMessage(), 1);
 
@@ -246,8 +292,8 @@ class DataExtractors extends BasePackage
 
         foreach ($data['countries'] as $countryIso2) {
             try {
-                if ($this->localContent->fileExists($this->sourceDir . 'Geo/' . $countryIso2 . '.json')) {
-                    $country = $this->helper->decode($this->localContent->read($this->sourceDir . 'Geo/' . $countryIso2 . '.json'), true);
+                if ($this->localContent->fileExists($this->varDir . 'geo/' . $countryIso2 . '.json')) {
+                    $country = $this->helper->decode($this->localContent->read($this->varDir . 'geo/' . $countryIso2 . '.json'), true);
                 }
             } catch (FilesystemException | UnableToReadFile | UnableToCheckExistence | \throwable $e) {
                 $this->addResponse($e->getMessage(), 1);
@@ -304,9 +350,9 @@ class DataExtractors extends BasePackage
             $outFileName = str_replace('.gz', '', $fileName);
 
             // Open the gzipped file in read-binary mode
-            $gzFile = gzopen(base_path($this->sourceDir . $fileName), 'rb');
+            $gzFile = gzopen(base_path($this->varDir . $fileName), 'rb');
             // Open/Create the output file in write-binary mode
-            $outFile = fopen(base_path($this->sourceDir . $outFileName), 'wb');
+            $outFile = fopen(base_path($this->varDir . $outFileName), 'wb');
 
             // Read and write until the end of the compressed file
             while (!gzeof($gzFile)) {
@@ -338,9 +384,17 @@ class DataExtractors extends BasePackage
             }
         }
 
+        if (!is_dir(base_path($this->varDir . 'geo'))) {
+            if (!mkdir(base_path($this->varDir . 'geo'), 0777, true)) {
+                $this->addResponse('Unable to create var/dataextractors/geo directory', 1);
+
+                return false;
+            }
+        }
+
         if (!$download = $this->remoteWebDownload->downloadData(
             'https://en.wikipedia.org/wiki/List_of_tz_database_time_zones',
-            base_path($this->sourceDir . 'Geo/tz.txt'),
+            base_path($this->varDir . 'geo/tz.txt'),
             $this->method)
         ) {
             $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
@@ -358,7 +412,7 @@ class DataExtractors extends BasePackage
         include('DataExtractors/vendor/Simplehtmldom.php');
 
         try {
-            $html = str_get_html($this->localContent->read($this->sourceDir . 'Geo/tz.txt'));
+            $html = str_get_html($this->localContent->read($this->varDir . 'geo/tz.txt'));
         } catch (FilesystemException | UnableToReadFile | \throwable $e) {
             $this->addResponse($e->getMessage(), 1);
 
@@ -769,9 +823,9 @@ class DataExtractors extends BasePackage
     {
         $this->method = 'downloadDictionaryData';
 
-        if (!is_dir(base_path($this->sourceDir . 'Dictionary'))) {
-            if (!mkdir(base_path($this->sourceDir . 'Dictionary'), 0777, true)) {
-                $this->addResponse('Unable to create Dictionary directory', 1);
+        if (!is_dir(base_path($this->varDir . 'dictionary'))) {
+            if (!mkdir(base_path($this->varDir . 'dictionary'), 0777, true)) {
+                $this->addResponse('Unable to create var/dataextractors/dictionary directory', 1);
 
                 return false;
             }
@@ -779,7 +833,7 @@ class DataExtractors extends BasePackage
 
         if (!$download = $this->remoteWebDownload->downloadData(
             'https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt',
-            base_path($this->sourceDir . 'Dictionary/words_alpha.txt'),
+            base_path($this->varDir . 'dictionary/words_alpha.txt'),
             $this->method)
         ) {
             $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
@@ -795,7 +849,7 @@ class DataExtractors extends BasePackage
         $this->method = 'processDictionaryData';
 
         try {
-            $words = $this->localContent->readStream($this->sourceDir . 'Dictionary/words_alpha.txt');
+            $words = $this->localContent->readStream($this->varDir . 'dictionary/words_alpha.txt');
         } catch (FilesystemException | UnableToReadFile | \throwable $e) {
             $this->addResponse($e->getMessage(), 1);
 
@@ -824,7 +878,7 @@ class DataExtractors extends BasePackage
         foreach ($wordsArr as $length => $chars) {
             foreach ($chars as $charKey => $charValue) {
                 try {
-                    $this->localContent->write($this->sourceDir . 'Dictionary/' . $length . '/' . $charKey . '.json', $this->helper->encode($chars[$charKey]));
+                    $this->localContent->write($this->varDir . 'dictionary/' . $length . '/' . $charKey . '.json', $this->helper->encode($chars[$charKey]));
                 } catch (FilesystemException | UnableToWriteFile | \throwable $e) {
                     $this->addResponse($e->getMessage(), 1);
 
@@ -841,10 +895,9 @@ class DataExtractors extends BasePackage
     }
 
     // ip2location
-    protected function downloadIp2locationBinFile($data)
+    protected function downloadIp2locationCsvFile($data)
     {
-        $this->method = 'downloadIp2locationBinFile';
-
+        $this->method = 'downloadIp2locationCsvFile';
         if (!is_dir(base_path($this->sourceDir . 'Ip2location'))) {
             if (!mkdir(base_path($this->sourceDir . 'Ip2location'), 0777, true)) {
                 $this->addResponse('Unable to create Ip2location directory', 1);
@@ -853,9 +906,43 @@ class DataExtractors extends BasePackage
             }
         }
 
+        if (!is_dir(base_path($this->varDir . 'ip2location'))) {
+            if (!mkdir(base_path($this->varDir . 'ip2location'), 0777, true)) {
+                $this->addResponse('Unable to create var/dataextractors/ip2location directory', 1);
+
+                return false;
+            }
+        }
+
+        try {
+            //File is already downloaded
+            if ($this->localContent->fileExists($this->varDir . 'ip2location/' . $data['csv_file_code'] . '.ZIP')) {
+                $detector = new FinfoMimeTypeDetector();
+                $mimeType = $detector->detectMimeTypeFromFile(base_path($this->varDir . 'ip2location/' . $data['csv_file_code'] . '.ZIP'));
+
+                if ($mimeType === 'text/plain' &&
+                    $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['csv_file_code'] . '.CSV')
+                ) {
+                    return true;//Downloaded file is a plain text file with probably error content received from ip2location site.
+                } else {
+                    $remoteSize = (int) getRemoteFilesize('https://www.ip2location.com/download/?token=' . $data['token'] . '&file=' . $data['csv_file_code']);
+
+                    $localSize = $this->localContent->fileSize($this->varDir . 'ip2location/' . $data['csv_file_code'] . '.ZIP');
+
+                    if ($remoteSize === $localSize) {
+                        return true;
+                    }
+                }
+            }
+        } catch (FilesystemException | UnableToCheckExistence | UnableToRetrieveMetadata | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
         if (!$download = $this->remoteWebDownload->downloadData(
-                'https://www.ip2location.com/download/?token=' . $data['token'] . '&file=' . $data['bin_file_code'],
-                base_path($this->sourceDir . 'Ip2location/' . $data['bin_file_code'] . '.ZIP'),
+                'https://www.ip2location.com/download/?token=' . $data['token'] . '&file=' . $data['csv_file_code'],
+                base_path($this->varDir . 'ip2location/' . $data['csv_file_code'] . '.ZIP'),
                 $this->method)
         ) {
             $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
@@ -866,41 +953,25 @@ class DataExtractors extends BasePackage
         return true;
     }
 
-    protected function downloadIp2locationProxyFile($data)
+    protected function unzipIp2locationCsvFile($data)
     {
-        $this->method = 'downloadIp2locationProxyFile';
+        $this->method = 'unzipIp2locationCsvFile';
 
-        if (!is_dir(base_path($this->sourceDir . 'Ip2location'))) {
-            if (!mkdir(base_path($this->sourceDir . 'Ip2location'), 0777, true)) {
-                $this->addResponse('Unable to create Ip2location directory', 1);
+        $detector = new FinfoMimeTypeDetector();
+        $mimeType = $detector->detectMimeTypeFromFile(base_path($this->varDir . 'ip2location/' . $data['csv_file_code'] . '.ZIP'));
 
-                return false;
-            }
-        }
-
-        if (!$download = $this->remoteWebDownload->downloadData(
-                'https://www.ip2location.com/download/?token=' . $data['token'] . '&file=' . $data['proxy_file_code'],
-                base_path($this->sourceDir . 'Ip2location/' . $data['proxy_file_code'] . '.ZIP'),
-                $this->method)
+        if ($mimeType === 'text/plain' &&
+            $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['csv_file_code'] . '.CSV')
         ) {
-            $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
+            return true;//Downloaded file is a plain text file with probably error content received from ip2location site.
+        } else {
+            if ($this->zip->open(base_path($this->varDir . 'ip2location/' . $data['csv_file_code'] . '.ZIP')) === true) {
+                $this->zip->extractTo(base_path($this->varDir . 'ip2location/'));
 
-            return false;
-        }
+                $this->zip->close();
 
-        return true;
-    }
-
-    protected function unzipIp2locationBinFile($data)
-    {
-        $this->method = 'unzipIp2locationBinFile';
-
-        if ($this->zip->open(base_path($this->sourceDir . 'Ip2location/' . $data['bin_file_code'] . '.ZIP')) === true) {
-            $this->zip->extractTo(base_path($this->sourceDir . 'Ip2location/'));
-
-            $this->zip->close();
-
-            return true;
+                return true;
+            }
         }
 
         $this->addResponse('Unable to unzip BIN file', 1);
@@ -908,28 +979,11 @@ class DataExtractors extends BasePackage
         return false;
     }
 
-    protected function unzipIp2locationProxyFile($data)
+    protected function moveIp2locationCsvFile($data)
     {
-        $this->method = 'unzipIp2locationProxyFile';
+        $this->method = 'moveIp2locationCsvFile';
 
-        if ($this->zip->open(base_path($this->sourceDir . 'Ip2location/' . $data['proxy_file_code'] . '.ZIP')) === true) {
-            $this->zip->extractTo(base_path($this->sourceDir . 'Ip2location/'));
-
-            $this->zip->close();
-
-            return true;
-        }
-
-        $this->addResponse('Unable to unzip Proxy file', 1);
-
-        return false;
-    }
-
-    protected function moveIp2locationBinFile($data)
-    {
-        $this->method = 'moveIp2locationBinFile';
-
-        $folderContents = $this->basepackages->utils->scanDir($this->sourceDir . 'Ip2location/');
+        $folderContents = $this->basepackages->utils->scanDir($this->varDir . 'ip2location/');
 
         if (count($folderContents['files']) === 0) {
             $this->addResponse('Data was not extracted correctly, re-run download', 1);
@@ -942,16 +996,20 @@ class DataExtractors extends BasePackage
             $renamedFile = false;
 
             foreach ($folderContents['files'] as $file) {
-                if (str_contains($file, '.BIN') && str_contains($file, 'DB3')) {
-                    $binFile = $data['bin_file_code'] . '.BIN';
+                if (str_contains($file, '.CSV') && str_contains($file, 'DB3')) {
+                    $csvFile = $data['csv_file_code'] . '.CSV';
                 } else {
                     continue;
                 }
 
-                try {
-                    $this->localContent->move($file, $this->sourceDir . 'Ip2location/' . $binFile);
+                if ($file === $this->varDir . 'ip2location/' . $csvFile) {
+                    $renamedFile = true;
 
-                    $this->localContent->delete($file);
+                    break;
+                }
+
+                try {
+                    $this->localContent->move($file, $this->varDir . 'ip2location/' . $csvFile);
 
                     $renamedFile = true;
                 } catch (\throwable | FilesystemException | UnableToMoveFile | UnableToDeleteFile $e) {
@@ -975,11 +1033,393 @@ class DataExtractors extends BasePackage
         return true;
     }
 
+    protected function extractGeoDataFromIp2locationCsvFile($data)
+    {
+        $this->method = 'extractGeoDataFromIp2locationCsvFile';
+
+        $folderContents = $this->basepackages->utils->scanDir($this->varDir . 'ip2location/');
+
+        if (count($folderContents['files']) === 0) {
+            $this->addResponse('Data was not extracted correctly, re-run download', 1);
+
+            return false;
+        }
+
+        if (!isset($data['ip2location_countries']) ||
+            (isset($data['ip2location_countries']) && count($data['ip2location_countries']) === 0)
+        ) {
+            $this->addResponse('Please provide list of countries to extract ip2location Geo data from.', 1);
+
+            return false;
+        }
+
+        $countries = [];
+        $states = [];
+        $cities = [];
+
+        if ($this->ff) {
+            $ip2locationGeoCountriesStore = $this->ff->store('service_provider_access_ip_filters_ip2location_countries');
+            $ip2locationGeoStatesStore = $this->ff->store('service_provider_access_ip_filters_ip2location_states');
+            $ip2locationGeoCitiesStore = $this->ff->store('service_provider_access_ip_filters_ip2location_cities');
+        }
+
+        $dbCountries = $this->access->ipFilter->ip2location->getAllCountries();
+
+        if ($dbCountries && count($dbCountries) > 0) {
+            foreach ($dbCountries as $dbCountry) {
+                $countries[$dbCountry['iso2']] = $dbCountry;
+            }
+        }
+
+        try {
+            $reader = Reader::from(fopen(base_path($this->varDir . 'ip2location/' . $data['csv_file_code'] . '.CSV'), 'r+'));
+
+            $records = $reader->getRecords();
+
+            foreach ($records as $offset => $record) {
+                if ($record[2] === '-' || $record[3] === '-' || $record[4] === '-' || $record[5] === '-') {
+                    continue;
+                }
+
+                if (!isset($countries[$record[2]])) {
+                    if ($this->ff) {
+                        $newCountry = $ip2locationGeoCountriesStore->insert(['name' => $record[3], 'iso2' => $record[2]]);
+                    } else if ($this->db) {
+                        $newCountry = $this->db->insertAsDict('service_provider_access_ip_filters_ip2location_countries', $dbCountry);
+                    }
+
+                    if (isset($newCountry)) {
+                        $countries[$newCountry['iso2']] = $newCountry;
+                    }
+                }
+
+                if (!in_array($record[2], $data['ip2location_countries'])) {
+                    continue;
+                }
+
+                if (!isset($states[$record[4]])) {//Add new State
+                    $dbState = false;
+
+                    if ($this->ff) {
+                        $dbState = $ip2locationGeoStatesStore->findBy(['name', '=', $record[4]]);
+                    } else if ($this->db) {
+                        $dbState =
+                            $this->db->fetchAll(
+                                "SELECT * FROM service_provider_access_ip_filters_ip2location_states WHERE name = :name",
+                                \Phalcon\Db\Enum::FETCH_ASSOC,
+                                [
+                                    "name" => $record[4]
+                                ]
+                            );
+                    }
+
+                    if (isset($dbState[0])) {
+                        $dbState = $dbState[0];
+                    } else {
+                        $dbState = false;
+                    }
+
+                    if (!$dbState) {
+                        if ($this->ff) {
+                            $newState = $ip2locationGeoStatesStore->insert(['name' => $record[4], 'country_id' => $countries[$record[2]]['id']]);
+                        } else if ($this->db) {
+                            $newState =
+                                $this->db->insertAsDict(
+                                    'service_provider_access_ip_filters_ip2location_states',
+                                    ['name' => $record[4], 'country_id' => $countries[$record[2]]['id']]
+                                );
+                        }
+
+                        if (isset($newState)) {
+                            $states[$newState['name']] = $newState;
+                        }
+                    } else {
+                        $states[$dbState['name']] = $dbState;
+                    }
+                }
+
+                if (!isset($cities[$record[5]])) {//Add new City
+                    $dbCity = false;
+
+                    if ($this->ff) {
+                        $dbCity = $ip2locationGeoCitiesStore->findBy(['name', '=', $record[5]]);
+                    } else if ($this->db) {
+                        $dbCity =
+                            $this->db->fetchAll(
+                                "SELECT * FROM service_provider_access_ip_filters_ip2location_cities WHERE name = :name",
+                                \Phalcon\Db\Enum::FETCH_ASSOC,
+                                [
+                                    "name" => $record[5]
+                                ]
+                            );
+                    }
+
+                    if (isset($dbCity[0])) {
+                        $dbCity = $dbCity[0];
+                    } else {
+                        $dbCity = false;
+                    }
+
+                    if (!$dbCity) {
+                        if ($this->ff) {
+                            $newCity = $ip2locationGeoCitiesStore->insert(
+                                ['name' => $record[5], 'state_id' => $states[$record[4]]['id'], 'country_id' => $countries[$record[2]]['id']]
+                            );
+                        } else if ($this->db) {
+                            $newCity =
+                                $this->db->insertAsDict(
+                                    'service_provider_access_ip_filters_ip2location_cities',
+                                    ['name' => $record[5], 'state_id' => $states[$record[4]]['id'], 'country_id' => $countries[$record[2]]['id']]
+                                );
+                        }
+
+                        if (isset($newCity)) {
+                            $cities[$newCity['name']] = $newCity;
+                        }
+                    } else {
+                        $cities[$dbCity['name']] = $dbCity;
+                    }
+                }
+            }
+
+            $this->localContent->write($this->sourceDir . 'Ip2location/AllCountries.json', $this->helper->encode($countries));
+        } catch (\throwable | UnableToWriteFile | FilesystemException $e) {
+            trace([$e]);
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function downloadIp2locationBinFile($data)
+    {
+        $this->method = 'downloadIp2locationBinFile';
+
+        if (!is_dir(base_path($this->sourceDir . 'Ip2location'))) {
+            if (!mkdir(base_path($this->sourceDir . 'Ip2location'), 0777, true)) {
+                $this->addResponse('Unable to create Ip2location directory', 1);
+
+                return false;
+            }
+        }
+
+        if (!is_dir(base_path($this->varDir . 'ip2location'))) {
+            if (!mkdir(base_path($this->varDir . 'ip2location'), 0777, true)) {
+                $this->addResponse('Unable to create var/dataextractors/ip2location directory', 1);
+
+                return false;
+            }
+        }
+
+        try {
+            //File is already downloaded
+            if ($this->localContent->fileExists($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.ZIP')) {
+                $detector = new FinfoMimeTypeDetector();
+                $mimeType = $detector->detectMimeTypeFromFile(base_path($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.ZIP'));
+
+                if ($mimeType === 'text/plain' &&
+                    $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.CSV')
+                ) {
+                    return true;//Downloaded file is a plain text file with probably error content received from ip2location site.
+                } else {
+                    $remoteSize = (int) getRemoteFilesize('https://www.ip2location.com/download/?token=' . $data['token'] . '&file=' . $data['bin_file_code']);
+
+                    $localSize = $this->localContent->fileSize($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.ZIP');
+
+                    if ($remoteSize === $localSize) {
+                        return true;
+                    }
+                }
+            }
+        } catch (FilesystemException | UnableToCheckExistence | UnableToRetrieveMetadata | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        if (!$download = $this->remoteWebDownload->downloadData(
+                'https://www.ip2location.com/download/?token=' . $data['token'] . '&file=' . $data['bin_file_code'],
+                base_path($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.ZIP'),
+                $this->method)
+        ) {
+            $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function unzipIp2locationBinFile($data)
+    {
+        $this->method = 'unzipIp2locationBinFile';
+
+        $detector = new FinfoMimeTypeDetector();
+        $mimeType = $detector->detectMimeTypeFromFile(base_path($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.ZIP'));
+
+        if ($mimeType === 'text/plain' &&
+            $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.CSV')
+        ) {
+            return true;//Downloaded file is a plain text file with probably error content received from ip2location site.
+        } else {
+            if ($this->zip->open(base_path($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.ZIP')) === true) {
+                $this->zip->extractTo(base_path($this->varDir . 'ip2location/'));
+
+                $this->zip->close();
+
+                return true;
+            }
+        }
+
+        $this->addResponse('Unable to unzip BIN file', 1);
+
+        return false;
+    }
+
+    protected function moveIp2locationBinFile($data)
+    {
+        $this->method = 'moveIp2locationBinFile';
+
+        $folderContents = $this->basepackages->utils->scanDir($this->varDir . 'ip2location/');
+
+        if (count($folderContents['files']) === 0) {
+            $this->addResponse('Data was not extracted correctly, re-run download', 1);
+
+            return false;
+        }
+
+        //Rename file to the bin file code name.
+        try {
+            $renamedFile = false;
+
+            foreach ($folderContents['files'] as $file) {
+                if (str_contains($file, '.BIN') && str_contains($file, 'DB3')) {
+                    $binFile = $data['bin_file_code'] . '.BIN';
+                } else {
+                    continue;
+                }
+
+                if ($file === $this->varDir . 'ip2location/' . $binFile) {
+                    $renamedFile = true;
+
+                    break;
+                }
+
+                try {
+                    $this->localContent->move($file, $this->varDir . 'ip2location/' . $binFile);
+
+                    $renamedFile = true;
+                } catch (\throwable | FilesystemException | UnableToMoveFile | UnableToDeleteFile $e) {
+                    $this->addResponse($e->getMessage(), 1);
+
+                    return false;
+                }
+
+                break;
+            }
+
+            if (!$renamedFile) {
+                throw new \Exception('Data was not extracted correctly, re-run download');
+            }
+        } catch (\throwable | UnableToMoveFile | FilesystemException $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function downloadIp2locationProxyFile($data)
+    {
+        $this->method = 'downloadIp2locationProxyFile';
+
+        if (!is_dir(base_path($this->varDir . 'ip2location'))) {
+            if (!mkdir(base_path($this->varDir . 'ip2location'), 0777, true)) {
+                $this->addResponse('Unable to create Ip2location directory', 1);
+
+                return false;
+            }
+        }
+
+        if (!is_dir(base_path($this->varDir . 'ip2location'))) {
+            if (!mkdir(base_path($this->varDir . 'ip2location'), 0777, true)) {
+                $this->addResponse('Unable to create var/dataextractors/ip2location directory', 1);
+
+                return false;
+            }
+        }
+
+        try {
+            //File is already downloaded
+            if ($this->localContent->fileExists($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP')) {
+                $detector = new FinfoMimeTypeDetector();
+                $mimeType = $detector->detectMimeTypeFromFile(base_path($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP'));
+
+                if ($mimeType === 'text/plain' &&
+                    $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.CSV')
+                ) {
+                    return true;//Downloaded file is a plain text file with probably error content received from ip2location site.
+                } else {
+                    $remoteSize = (int) getRemoteFilesize('https://www.ip2location.com/download/?token=' . $data['token'] . '&file=' . $data['proxy_file_code']);
+
+                    $localSize = $this->localContent->fileSize($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP');
+
+                    if ($remoteSize === $localSize) {
+                        return true;
+                    }
+                }
+            }
+        } catch (FilesystemException | UnableToCheckExistence | UnableToRetrieveMetadata | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        if (!$download = $this->remoteWebDownload->downloadData(
+                'https://www.ip2location.com/download/?token=' . $data['token'] . '&file=' . $data['proxy_file_code'],
+                base_path($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP'),
+                $this->method)
+        ) {
+            $this->addResponse('Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(), 1);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function unzipIp2locationProxyFile($data)
+    {
+        $this->method = 'unzipIp2locationProxyFile';
+
+        $detector = new FinfoMimeTypeDetector();
+        $mimeType = $detector->detectMimeTypeFromFile(base_path($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP'));
+
+        if ($mimeType === 'text/plain' &&
+            $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.CSV')
+        ) {
+            if ($this->zip->open(base_path($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP')) === true) {
+                $this->zip->extractTo(base_path($this->varDir . 'ip2location/'));
+
+                $this->zip->close();
+
+                return true;
+            }
+        }
+
+        $this->addResponse('Unable to unzip Proxy file', 1);
+
+        return false;
+    }
+
     protected function moveIp2locationProxyFile($data)
     {
         $this->method = 'moveIp2locationProxyFile';
 
-        $folderContents = $this->basepackages->utils->scanDir($this->sourceDir . 'Ip2location/');
+        $folderContents = $this->basepackages->utils->scanDir($this->varDir . 'ip2location/');
 
         if (count($folderContents['files']) === 0) {
             $this->addResponse('Data was not extracted correctly, re-run download', 1);
@@ -998,10 +1438,14 @@ class DataExtractors extends BasePackage
                     continue;
                 }
 
-                try {
-                    $this->localContent->move($file, $this->sourceDir . 'Ip2location/' . $proxyFile);
+                if ($file === $this->varDir . 'ip2location/' . $proxyFile) {
+                    $renamedFile = true;
 
-                    $this->localContent->delete($file);
+                    break;
+                }
+
+                try {
+                    $this->localContent->move($file, $this->varDir . 'ip2location/' . $proxyFile);
 
                     $renamedFile = true;
                 } catch (\throwable | FilesystemException | UnableToMoveFile | UnableToDeleteFile $e) {
@@ -1030,24 +1474,54 @@ class DataExtractors extends BasePackage
         $this->method = 'updateIp2locationInfo';
 
         $ip2locationinfo = [];
-        $ip2locationinfo['downloaded_on'] = (\Carbon\Carbon::now())->toDateTimeString();
+        try {
+            if ($this->localContent->fileExists($this->varDir . 'ip2location/info.json')) {
+                $ip2locationinfo = $this->helper->decode($this->localContent->read($this->varDir . 'ip2location/info.json'), true);
+            }
+        } catch (FilesystemException | UnableToWriteFile | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        $downloadedOn = (\Carbon\Carbon::now())->toDateTimeString();
+
+        if (isset($data['csv']) && $data['csv'] == 'true') {
+            $ip2locationinfo['csv_downloaded_on'] = $downloadedOn;
+
+            $ip2locationinfo['csv_file_name'] = $data['csv_file_code'] . '.CSV';
+
+            if (!isset($ip2locationinfo['csv_imported_countries'])) {
+                $ip2locationinfo['csv_imported_countries'] = $data['ip2location_countries'];
+            } else {
+                foreach ($data['ip2location_countries'] as $country) {
+                    if (!in_array($country, $ip2locationinfo['csv_imported_countries'])) {
+                        array_push($ip2locationinfo['csv_imported_countries'], $country);
+                    }
+                }
+            }
+        }
 
         if (isset($data['bin']) && $data['bin'] == 'true') {
+            $ip2locationinfo['bin_downloaded_on'] = $downloadedOn;
+
             try {
                 $ip2locationinfo['bin_file_name'] = $data['bin_file_code'] . '.BIN';
                 $ip2locationBin =
                     new \IP2Location\Database(
-                        base_path($this->sourceDir . 'Ip2location/' . $data['bin_file_code'] . '.BIN'),
+                        base_path($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.BIN'),
                         constant('\IP2Location\Database::FILE_IO')
                     );
 
                 $ip2locationinfo['bin_file_version'] = $ip2locationBin->getDatabaseVersion();
             } catch (\throwable $e) {
                 $detector = new FinfoMimeTypeDetector();
-                $mimeType = $detector->detectMimeTypeFromFile(base_path($this->sourceDir . 'Ip2location/' . $data['bin_file_code'] . '.ZIP'));
+                $mimeType = $detector->detectMimeTypeFromFile(base_path($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.ZIP'));
 
-                if ($mimeType === 'text/plain') {
-                    $this->addResponse(strtolower($this->localContent->read($this->sourceDir . 'Ip2location/' . $data['bin_file_code'] . '.ZIP')), 1);
+                if ($mimeType === 'text/plain' &&
+                    $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.BIN')
+                ) {
+                    $this->addResponse(strtolower($this->localContent->read($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.ZIP')), 1);
                 } else {
                     $this->addResponse('Unable to read BIN file, re-run download', 1);
                 }
@@ -1055,22 +1529,27 @@ class DataExtractors extends BasePackage
                 return false;
             }
         }
+
         if (isset($data['proxy']) && $data['proxy'] == 'true') {
+            $ip2locationinfo['proxy_downloaded_on'] = $downloadedOn;
+
             try {
                 $ip2locationinfo['proxy_file_name'] = $data['proxy_file_code'] . '.BIN';
                 $ip2locationProxy =
                     new \IP2Location\Database(
-                        base_path($this->sourceDir . 'Ip2location/' . $data['proxy_file_code'] . '.BIN'),
+                        base_path($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.BIN'),
                         constant('\IP2Location\Database::FILE_IO')
                     );
 
                 $ip2locationinfo['proxy_file_version'] = $ip2locationProxy->getDatabaseVersion();
             } catch (\throwable $e) {
                 $detector = new FinfoMimeTypeDetector();
-                $mimeType = $detector->detectMimeTypeFromFile(base_path($this->sourceDir . 'Ip2location/' . $data['proxy_file_code'] . '.ZIP'));
+                $mimeType = $detector->detectMimeTypeFromFile(base_path($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP'));
 
-                if ($mimeType === 'text/plain') {
-                    $this->addResponse(strtolower($this->localContent->read($this->sourceDir . 'Ip2location/' . $data['proxy_file_code'] . '.ZIP')), 1);
+                if ($mimeType === 'text/plain' &&
+                    $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.BIN')
+                ) {
+                    $this->addResponse(strtolower($this->localContent->read($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP')), 1);
                 } else {
                     $this->addResponse('Unable to read BIN file, re-run download', 1);
                 }
@@ -1080,7 +1559,7 @@ class DataExtractors extends BasePackage
         }
 
         try {
-            $this->localContent->write($this->sourceDir . 'Ip2location/info.json', $this->helper->encode($ip2locationinfo));
+            $this->localContent->write($this->varDir . 'ip2location/info.json', $this->helper->encode($ip2locationinfo));
         } catch (FilesystemException | UnableToWriteFile | \throwable $e) {
             $this->addResponse($e->getMessage(), 1);
 
@@ -1095,8 +1574,8 @@ class DataExtractors extends BasePackage
     public function getIp2locationInfo()
     {
         try {
-            if ($this->localContent->fileExists($this->sourceDir . 'Ip2location/info.json')) {
-                return $this->helper->decode($this->localContent->read($this->sourceDir . 'Ip2location/info.json'), true);
+            if ($this->localContent->fileExists($this->varDir . 'ip2location/info.json')) {
+                return $this->helper->decode($this->localContent->read($this->varDir . 'ip2location/info.json'), true);
             }
         } catch (FilesystemException | UnableToCheckExistence | UnableToReadFile | \throwable $e) {
             $this->addResponse($e->getMessage(), 1);
