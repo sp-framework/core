@@ -7,6 +7,7 @@ use Phalcon\Filter\Validation\Validator\Ip;
 use System\Base\BasePackage;
 use System\Base\Providers\AccessServiceProvider\Access\IpFilter\Ip2location;
 use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilters;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersDefault;
 use System\Base\Providers\AppsServiceProvider\Exceptions\IpFilterBlockedException;
 
 class IpFilter extends BasePackage
@@ -19,7 +20,7 @@ class IpFilter extends BasePackage
 
     protected $ipFilterSettings;
 
-    protected $ip2location;
+    public $ip2location;
 
     protected $app;
 
@@ -53,63 +54,413 @@ class IpFilter extends BasePackage
         return $this->ipFilterSettings;
     }
 
-    public function getFilters(array $data)
+    public function getFilters($data)
     {
-        $filters = [];
-
-        if (!isset($data['app_id'])) {
-            return $this->helper->encode([]);//blank array
+        if (isset($data['app_id'])) {
+            $this->app = $this->apps->apps[$data['app_id']];
         }
 
-        if ($this->config->databasetype === 'db') {
-            $app = $this->apps->getFirst('id', (int) $data['app_id']);
+        $defaultStore = false;
 
-            $filtersObj = $app->getIpFilters();
+        if (isset($data['defaultStore']) && $data['defaultStore'] == 'true') {
+            $defaultStore = true;
 
-            if ($filtersObj && $filtersObj->count() > 0) {
-                $filters = $filtersObj->toArray();
-            }
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFiltersDefault::class);
+
+            $filters = $this->getAll();
         } else {
-            $this->apps->setFFRelations(true);
+            $filters = [];
 
-            $this->apps->setFFRelationsConditions(['monitorlist' => ['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]]);
+            $hosts = $this->getFilterByType('host');
+            if ($hosts && count($hosts) > 0) {
+                $filters = array_merge($filters, $hosts);
+            }
 
-            $app = $this->apps->getFirst('id', (int) $data['app_id']);
+            $networks = $this->getFilterByType('network');
+            if ($networks && count($networks) > 0) {
+                $filters = array_merge($filters, $networks ?? []);
+            }
 
-            if ($app->data['ipFilters'] && count($app->data['ipFilters']) > 0) {
-                $filters = $app->data['ipFilters'];
+            $ip2locationArr = $this->getFilterByType('ip2location');
+
+            if ($ip2locationArr && count($ip2locationArr) > 0) {
+                $ip2locationSortArr = [];
+
+                foreach ($ip2locationArr as $ip2location) {
+                    $ip2locationAddressArr = explode(':', $ip2location['address']);
+                    if (count($ip2locationAddressArr) === 3) {
+                        if (!isset($ip2locationSortArr[0])) {
+                            $ip2locationSortArr[0] = [];
+                        }
+                        array_push($ip2locationSortArr[0], $ip2location);
+                    } else if (count($ip2locationAddressArr) === 2) {
+                        if (!isset($ip2locationSortArr[1])) {
+                            $ip2locationSortArr[1] = [];
+                        }
+                        array_push($ip2locationSortArr[1], $ip2location);
+                    } else if (count($ip2locationAddressArr) === 1) {
+                        if (!isset($ip2locationSortArr[2])) {
+                            $ip2locationSortArr[2] = [];
+                        }
+                        array_push($ip2locationSortArr[2], $ip2location);
+                    }
+                }
+
+                if (count($ip2locationSortArr) > 0) {
+                    ksort($ip2locationSortArr);
+
+                    foreach (array_keys($ip2locationSortArr) as $ip2locationSortKey) {
+                        $filters = array_merge($filters, $ip2locationSortArr[$ip2locationSortKey]);
+                    }
+                }
             }
         }
 
-        return $filters;
+        if (count($filters) > 0) {
+            if (!$defaultStore) {
+                foreach ($filters as &$filter) {
+                    if ($filter['address_type'] === 'host') {
+                        $filter['ip_hits'] = '-';
+                        continue;
+                    }
+
+                    if ($this->config->databasetype === 'db') {
+                        $conditions =
+                            [
+                                'conditions'    => 'parent_id = :parent_id:',
+                                'bind'          =>
+                                    [
+                                        'parent_id'   => $filter['id'],
+                                    ]
+                            ];
+                    } else {
+                        $conditions =
+                            [
+                                'conditions'    => [
+                                    ['parent_id', '=', $filter['id']]
+                                ]
+                            ];
+                    }
+
+                    $childs = $this->getByParams($conditions);
+
+                    $filter['ip_hits'] = 0;
+
+                    if ($childs) {
+                        $childs = count($childs);
+
+                        if ($childs > 0) {
+                            $filter['ip_hits'] = $childs;
+                        }
+                    }
+                }
+            }
+
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+            $this->addResponse('Ok', 0, ['filters' => $filters]);
+
+            return $filters;
+        } else if (count($filters) === 0) {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+            $this->addResponse('No Filters!', 0, ['filters' => $filters]);
+
+            return $filters;
+        }
+
+        $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+        $this->addResponse('Error retrieving filters', 1);
+
+        return false;
+    }
+
+    public function getFilterById($id, $getChildren = false, $defaultStore = false)
+    {
+        if ($defaultStore) {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFiltersDefault::class);
+
+            $filter = $this->getById($id);
+        } else {
+            $filter = $this->getById($id);
+        }
+
+        if ($filter) {
+            if ($filter['address_type'] !== 'host' &&
+                $getChildren
+            ) {
+                if ($this->config->databasetype === 'db') {
+                    $conditions =
+                        [
+                            'conditions'    => 'parent_id = :parent_id:',
+                            'bind'          =>
+                                [
+                                    'parent_id'   => $filter['id'],
+                                ]
+                        ];
+                } else {
+                    $conditions =
+                        [
+                            'conditions'    => [
+                                ['parent_id', '=', $filter['id']]
+                            ]
+                        ];
+                }
+
+                $filters = $this->getByParams($conditions);
+
+                if ($filters && count($filters) > 0) {
+                    $filter['ips'] = $filters;
+                }
+            }
+
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+            $this->addResponse('Ok', 0, ['default_filter' => $defaultStore, 'filter' => $filter]);
+
+            return $filter;
+        }
+
+        $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+        $this->addResponse('No filter found for the given id ' . $id, 1);
+
+        return false;
     }
 
     public function getFilterByAddress($address, $getChildren = false, $defaultStore = false)
     {
-        if ($defaultStore) {
-            $filter = $this->firewallFiltersDefaultStore->findBy(['address', '=', $address]);
-            $getChildren = false;
+        if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'conditions'    => 'app_id = :app_id: AND address = :address:',
+                    'bind'          =>
+                        [
+                            'app_id'    => $this->app['id'],
+                            'address'   => $address,
+                        ]
+                ];
         } else {
-            $filter = $this->firewallFiltersStore->findBy(['address', '=', $address]);
+            $conditions =
+                [
+                    'conditions'    => [
+                        ['app_id', '=', $this->app['id']],
+                        ['address', '=', $address]
+                    ]
+                ];
         }
+
+        if ($defaultStore) {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFiltersDefault::class);
+
+            $getChildren = false;
+        }
+
+        $filter = $this->getByParams($conditions);
 
         if (isset($filter[0])) {
             if ($filter[0]['address_type'] !== 'host' &&
                 $getChildren
             ) {
-                $filters = $this->firewallFiltersStore->findBy(['parent_id', '=', $filter[0]['id']]);
+                if ($this->config->databasetype === 'db') {
+                    $conditions =
+                        [
+                            'conditions'    => 'app_id = :app_id: AND parent_id = :parent_id:',
+                            'bind'          =>
+                                [
+                                    'app_id'      => $this->app['id'],
+                                    'parent_id'   => $filter[0]['id'],
+                                ]
+                        ];
+                } else {
+                    $conditions =
+                        [
+                            'conditions'    => [
+                                ['app_id', '=', $this->app['id']],
+                                ['parent_id', '=', $filter[0]['id']]
+                            ]
+                        ];
+                }
+
+                $filters = $this->getByParams($conditions);
 
                 if ($filters && count($filters) > 0) {
                     $filter[0]['ips'] = $filters;
                 }
             }
 
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
             $this->addResponse('Ok', 0, ['filter' => $filter[0]]);
 
             return $filter[0];
         }
 
+        $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
         $this->addResponse('No filter found for the given address ' . $address, 1);
+
+        return false;
+    }
+
+    public function getFilterByDecimal($decimal, $getChildren = false, $defaultStore = false)
+    {
+        if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'conditions'    => 'app_id = :app_id: AND decimal = :decimal:',
+                    'bind'          =>
+                        [
+                            'app_id'   => $this->app['id'],
+                            'decimal'   => $decimal,
+                        ]
+                ];
+        } else {
+            $conditions =
+                [
+                    'conditions'    => [
+                        ['app_id', '=', $this->app['id']],
+                        ['decimal', '=', $decimal]
+                    ]
+                ];
+        }
+
+        if ($defaultStore) {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFiltersDefault::class);
+
+            $getChildren = false;
+        }
+
+        $filter = $this->getByParams($conditions);
+
+        if (isset($filter[0])) {
+            if ($filter[0]['address_type'] !== 'host' &&
+                $getChildren
+            ) {
+                if ($this->config->databasetype === 'db') {
+                    $conditions =
+                        [
+                            'conditions'    => 'app_id = :app_id: AND parent_id = :parent_id:',
+                            'bind'          =>
+                                [
+                                    'app_id'   => $this->app['id'],
+                                    'parent_id'   => $filter[0]['id'],
+                                ]
+                        ];
+                } else {
+                    $conditions =
+                        [
+                            'conditions'    => [
+                                ['app_id', '=', $this->app['id']],
+                                ['parent_id', '=', $filter[0]['id']]
+                            ]
+                        ];
+                }
+
+                $filters = $this->getByParams($conditions);
+
+                if ($filters && count($filters) > 0) {
+                    $filter[0]['ips'] = $filters;
+                }
+            }
+
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+            $this->addResponse('Ok', 0, ['filter' => $filter[0]]);
+
+            return $filter[0];
+        }
+
+        $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+        $this->addResponse('No filter found for the given decimal ' . $decimal, 1);
+
+        return false;
+    }
+
+    public function getFilterByType($type, $defaultStore = false, $children = false)
+    {
+        if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'conditions'    => 'app_id = :app_id: AND address_type = :address_type:',
+                    'bind'          =>
+                        [
+                            'app_id'   => $this->app['id'],
+                            'address_type'   => $type,
+                        ]
+                ];
+
+            if (!$children) {
+                $conditions['conditions'] = 'app_id = :app_id: AND address_type = :address_type: AND parent_id = :parent_id:';
+                $conditions['bind']['parent_id'] = NULL;
+                $conditions['order'] = 'filter_type desc';
+            }
+        } else {
+            $conditions =
+                [
+                    'conditions'    => [
+                        ['app_id', '=', $this->app['id']],
+                        ['address_type', '=', $type]
+                    ],
+                    'order'         => 'filter_type desc'
+                ];
+
+            if (!$children) {
+                array_push($conditions['conditions'], ['parent_id', '=', null]);
+            }
+        }
+
+        if ($defaultStore) {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFiltersDefault::class);
+        }
+        $filters = $this->getByParams($conditions);
+
+        if ($filters) {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+            $this->addResponse('Ok', 0, ['filters' => $filters]);
+
+            return $filters;
+        }
+
+        $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+        $this->addResponse('No filters found for the given type ' . $type, 1);
+
+        return false;
+    }
+
+    public function getFilterByParentId($id)
+    {
+        if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'conditions'    => 'parent_id = :parent_id:',
+                    'bind'          =>
+                        [
+                            'parent_id'   => $id,
+                        ]
+                ];
+        } else {
+            $conditions =
+                [
+                    'conditions'    => [
+                        ['parent_id', '=', $id]
+                    ]
+                ];
+        }
+
+        $filters = $this->getByParams($conditions);
+
+        if ($filters) {
+            $this->addResponse('Ok', 0, ['filters' => $filters]);
+
+            return $filters;
+        }
+
+        $this->addResponse('No filters found for the given parent ' . $id, 1);
 
         return false;
     }
@@ -146,17 +497,17 @@ class IpFilter extends BasePackage
             return false;
         }
 
-        trace([$data]);
         if ($filterexists = $this->getFilterByAddress($data['address'])) {
             $this->addResponse('Filter with address ' . $data['address'] . ' already exists. Please see filter with ID: ' . $filterexists['id'], 1);
 
             return false;
         }
+
         if ($data['address_type'] === 'host' || $data['address_type'] === 'network') {
             if ($data['address_type'] === 'network' &&
                 !str_contains($data['address'], '/')
             ) {
-                $this->firewall->addResponse('Please type correct network address. Format is CIDR - network address/network mask', 1);
+                $this->addResponse('Please type correct network address. Format is CIDR - network address/network mask', 1);
 
                 return false;
             }
@@ -164,39 +515,43 @@ class IpFilter extends BasePackage
             if ($data['address_type'] === 'host' &&
                 str_contains($data['address'], '/')
             ) {
-                $this->firewall->addResponse('Please type correct host address.', 1);
+                $this->addResponse('Please type correct host address.', 1);
 
                 return false;
             }
 
             if ($data['address_type'] === 'network') {
                 if (str_contains($data['address'], ':')) {
-                    $range = $this->firewall->ip2location->ipTools->cidrToIpv6($data['address']);
+                    $range = $this->ip2location->ipTools->cidrToIpv6($data['address']);
                 } else {
-                    $range = $this->firewall->ip2location->ipTools->cidrToIpv4($data['address']);
+                    $range = $this->ip2location->ipTools->cidrToIpv4($data['address']);
                 }
 
                 if (!isset($range['ip_start']) && !isset($range['ip_end'])) {
-                    $this->firewall->addResponse('Please type correct network address. Format is CIDR - network address/network mask', 1);
+                    $this->addResponse('Please type correct network address. Format is CIDR - network address/network mask', 1);
 
                     return false;
                 }
             }
 
-            $address = explode('/', $data['address'])[0];
+            $this->ip = explode('/', $data['address'])[0];
 
-            if (!$this->firewall->validateIP($address)) {
-                $this->firewall->addResponse('Please provide correct address', 1);
-
+            if (!$this->validateIP($this->ip)) {
                 return false;
             }
+
+            if ($this->ip2location->ipTools->isIpv4($this->ip)) {
+                $data['decimal'] = (int) $this->ip2location->ipTools->ipv4ToDecimal($this->ip);
+            } else if ($this->ip2location->ipTools->isIpv6($this->ip)) {
+                $data['decimal'] = (int) $this->ip2location->ipTools->ipv6ToDecimal($this->ip);
+            }
         } else if ($data['address_type'] === 'ip2location') {
-            if ((!$this->firewall->config['ip2location_api_key'] ||
-                 $this->firewall->config['ip2location_api_key'] === '') &&
-                (!$this->firewall->config['ip2location_io_api_key'] ||
-                 $this->firewall->config['ip2location_io_api_key'] === '')
+            if ((!$this->config['ip2location_api_key'] ||
+                 $this->config['ip2location_api_key'] === '') &&
+                (!$this->config['ip2location_io_api_key'] ||
+                 $this->config['ip2location_io_api_key'] === '')
             ) {
-                $this->firewall->addResponse('Please set ip2location API key to add address type ip2location', 1);
+                $this->addResponse('Please set ip2location API key to get check address via Country, State & City', 1);
 
                 return false;
             }
@@ -231,38 +586,34 @@ class IpFilter extends BasePackage
         }
 
         if ($defaultStore) {
-            $newFilter = $this->firewall->firewallFiltersDefaultStore->insert($data);
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFiltersDefault::class);
 
-            if ($newFilter) {
-                if ($newFilter['address_type'] === 'host') {
-                    $this->firewall->indexes->addToIndex($newFilter, true);
-                }
-            }
+            $newFilter = $this->add($data);
         } else {
             if ($data['address_type'] === 'host') {
-                $inDefaultFilter = $this->getFilterByAddress($data['address'], $data['destination'], false, true);
+                $inDefaultFilter = $this->getFilterByDecimal($data['decimal'], false, true);
 
                 if ($inDefaultFilter) {
-                    $this->removeFilter($inDefaultFilter['id'], true);
+                    $this->removeFilter((int) $inDefaultFilter['id'], true);
                 }
             }
 
-            $newFilter = $this->firewall->firewallFiltersStore->insert($data);
-
-            if ($newFilter) {
-                if ($newFilter['address_type'] === 'host') {
-                    $this->firewall->indexes->addToIndex($newFilter);
-                }
-            }
+            $newFilter = $this->add($data);
         }
 
-        if ($data['address_type'] !== 'host') {
-            $this->firewall->indexes->reindexFilters(true, true);//We have to clear index for new network/ips to be indexed again.
+        if ($newFilter) {
+            $newFilter = $this->packagesData->last;
+
+            $this->logger->log->info('FILTER_ADD', $newFilter);
+
+            $this->addResponse('Filter added');
+
+            return $newFilter;
         }
 
-        $this->firewall->systemLogger->info('FILTER_ADD', $newFilter);
+        $this->addResponse('Not able to add filter', 1);
 
-        return $newFilter;
+        return false;
     }
 
     public function updateFilter(array $data)
@@ -270,27 +621,41 @@ class IpFilter extends BasePackage
         //
     }
 
-    public function removeFilter(array $data)
+    public function removeFilter(array $data, $defaultStore = false)
     {
-        if (!isset($data['id'])) {
-            $this->addResponse('Please provide correct filter ID', 1);
+        if (!$filter = $this->getFilterById((int) $data['id'], false, $defaultStore)) {
+            $this->addResponse('Filter with ID ' . $id . ' does not exists', 1);
 
             return false;
         }
 
-        $filter = $this->getById($data['id']);
+        if (!$defaultStore) {
+            $childFilters = $this->getFilterByParentId((int) $filter['id']);
 
-        if ($filter['ip_address'] === $this->getClientAddress()) {
-            $this->addResponse('Cannot remove your own IP!', 1);
-
-            return false;
+            if ($childFilters && count($childFilters) > 0) {//Remove all childs
+                foreach ($childFilters as $$childFilter) {
+                    $this->remove((int) $childFilter['id']);
+                }
+            }
         }
 
-        if ($this->remove($filter['id'])) {
-            $this->addResponse('Filter removed.');
-        } else {
-            $this->addResponse('Error removing filter.', 1);
+        if ($defaultStore) {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFiltersDefault::class);
         }
+
+        $deleteFilter = $this->remove((int) $filter['id']);
+
+        if ($deleteFilter) {
+            $deleteFilter = $this->packagesData->last;
+
+            $this->logger->log->info('FILTER_DELETE', $deleteFilter);
+
+            return $deleteFilter;
+        }
+
+        $this->addResponse('Unable to remove filter', 1);
+
+        return false;
     }
 
     public function allowFilter(array $data)
@@ -467,7 +832,7 @@ class IpFilter extends BasePackage
                 if ($this->config->databasetype === 'db') {
                     $this->bumpFilterHitCounter($filterObj);
                 } else {
-                    $filterStore->findById($filter['id']);
+                    $filterStore->getById($filter['id']);
 
                     $this->bumpFilterHitCounter($filterStore);
                 }
@@ -544,11 +909,15 @@ class IpFilter extends BasePackage
         if (!$ipv6 && !$this->ipFilterSettings['filter_ipv4']) {
             $this->logger->log->debug('IpFilter blocked connection as filter_ipv4 settings is set to false and ip address is from ipv4 range.');
 
+            $this->addResponse('Please enter correct ip address', 1);
+
             return false;
         }
 
         if ($ipv6 && !$this->ipFilterSettings['filter_ipv6']) {
             $this->logger->log->debug('IpFilter blocked connection as filter_ipv6 settings is set to false and ip address is from ipv6 range.');
+
+            $this->addResponse('Please enter correct ip address', 1);
 
             return false;
         }

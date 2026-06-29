@@ -489,12 +489,13 @@ dataCollectionSection =
                             "responsive": true,
                             "columns": [
                                 { data : 'id', visible: false,},
-                                { data : 'ip_address'},
+                                { data : 'address'},
                                 { data : 'address_type'},
                                 { data : 'filter_type'},
-                                { data : 'added_by'},
+                                { data : 'updated_by'},
+                                { data : 'updated_at'},
                                 { data : 'hit_count'},
-                                { data : 'incorrect_attempts'},
+                                { data : 'incorrect_login_attempts'},
                                 { data : 'actions', orderable: false },
                             ],
                             "rowId" : 'id',
@@ -518,8 +519,8 @@ dataCollectionSection =
                                     var return_data = new Array();
 
                                     for(var i=0;i< json.data.length; i++) {
-                                        if (json.data[i]['incorrect_attempts'] === null) {
-                                            json.data[i]['incorrect_attempts'] = "-";
+                                        if (json.data[i]['incorrect_login_attempts'] === null) {
+                                            json.data[i]['incorrect_login_attempts'] = "-";
                                         }
 
                                         if (json.data[i]['hits'] === null) {
@@ -534,7 +535,7 @@ dataCollectionSection =
 
                                         json.data[i]['actions'] = '';
 
-                                        if (json.data[i]['filter_type'] === 'monitor' && json.data[i]['added_by'] === 'System') {
+                                        if (json.data[i]['filter_type'] === 'monitor' && json.data[i]['updated_by'] === 'System') {
                                             json.data[i]['actions'] +=
                                                 '<a href="#" class="text-danger block-filter ml-1" ' +
                                                 'data-toggle="tooltip" data-placement="left" title="Block IP"' +

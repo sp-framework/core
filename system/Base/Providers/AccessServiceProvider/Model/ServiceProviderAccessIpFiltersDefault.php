@@ -14,6 +14,8 @@ class ServiceProviderAccessIpFiltersDefault extends BaseModel
 
     public $address;
 
+    public $ip2location_proxy;
+
     public $decimal;
 
     public $filter_type;

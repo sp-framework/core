@@ -45,6 +45,14 @@ class IpFilters
                     ]
                 ),
                 new Column(
+                    'ip2location_proxy',//allow, block, -
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
                     'decimal',//ip address to decimal for quick index search
                     [
                         'type'    => Column::TYPE_INTEGER,
@@ -118,6 +126,7 @@ class IpFilters
                     'app_id',
                     'address_type',
                     'address',
+                    'ip2location_proxy',
                     'decimal',
                     'filter_type'
                 ],

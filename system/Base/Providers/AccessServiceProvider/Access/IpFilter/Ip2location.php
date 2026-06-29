@@ -6,6 +6,10 @@ use IP2LocationIO\Configuration;
 use IP2LocationIO\IPGeolocation;
 use IP2Location\Database;
 use IP2Location\IpTools;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
+use League\Flysystem\UnableToReadFile;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2locationCountries;
 
 class Ip2location
 {
@@ -15,7 +19,9 @@ class Ip2location
 
     public $ipFilterFiltersIp2locationStore;
 
-    protected $dataPath = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Ip2location';
+    protected $dataPath = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Ip2location/';
+
+    protected $varPath = 'var/dataextractors/ip2location/';
 
     protected $ipFilter;
 
@@ -45,7 +51,7 @@ class Ip2location
         try {
             $ip2locationBin =
                 new \IP2Location\Database(
-                    $this->dataPath . '/' . $this->ipFilterSettings['ip2location_bin_file_code'] . '.BIN',
+                    $this->varPath . $this->ipFilterSettings['ip2location_bin_file_code'] . '.BIN',
                     constant('\IP2Location\Database::' . $this->ipFilterSettings['ip2location_bin_access_mode'])
                 );
         } catch (\throwable $e) {
@@ -92,7 +98,7 @@ class Ip2location
         try {
             $ip2locationProxyBin =
                 new \IP2Proxy\Database(
-                    $this->dataPath . '/' . $this->ipFilterSettings['ip2location_proxy_bin_file_code'] . '.BIN',
+                    $this->varPath . $this->ipFilterSettings['ip2location_proxy_bin_file_code'] . '.BIN',
                     constant('\IP2Proxy\Database::' . $this->ipFilterSettings['ip2location_proxy_bin_access_mode'])
                 );
 
@@ -213,5 +219,48 @@ class Ip2location
         }
 
         return true;
+    }
+
+    public function getAllCountries()
+    {
+        $countriesModel = new ServiceProviderAccessIpFiltersIp2locationCountries;
+
+        $ff = null;
+        $db = null;
+
+        try {
+            $ff = $countriesModel->getDi()->getShared('ff');
+            $db = $countriesModel->getDi()->getShared('db');
+        } catch (\throwable $e) {
+            //Do nothing
+        }
+
+        $countries = [];
+
+        if ($ff) {
+            $ip2locationCountriesStore = $ff->store('service_provider_access_ip_filters_ip2location_countries');
+
+            $countries = $ip2locationCountriesStore->findAll();
+        } else if ($db) {
+            $countries =
+                $db->fetchAll(
+                    "SELECT * FROM service_provider_access_ip_filters_ip2location_countries",
+                    \Phalcon\Db\Enum::FETCH_ASSOC
+                );
+        }
+
+        if (count($countries) === 0) {
+            $localContent = $countriesModel->getDi()->getShared('localContent');
+
+            try {
+                if ($localContent->fileExists($this->dataPath . 'AllCountries.json')) {
+                    $countries = json_decode($localContent->read($this->dataPath . 'AllCountries.json'), true);
+                }
+            } catch (FilesystemException | UnableToCheckExistence | UnableToReadFile | \throwable $e) {
+                $countries = [];//We ignore and get countries list via Geo Counties
+            }
+        }
+
+        return $countries;
     }
 }
