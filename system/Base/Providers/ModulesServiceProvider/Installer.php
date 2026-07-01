@@ -23,8 +23,6 @@ class Installer extends BasePackage
 {
     protected $queue;
 
-    public static $trackCounter = 0;
-
     public $method;
 
     protected $apiClient;
@@ -981,14 +979,24 @@ class Installer extends BasePackage
             $this->method = $args['progressMethod'];
 
             if (isset($this->modulesToInstallOrUpdate['repo_details']['latestRelease']['zipball_url'])) {
-                return $this->downloadData(
+                if (!$download = $this->remoteWebDownload->setVerify(false)->setConnectTimeout(60)->downloadData(
                     $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['zipball_url'],
                     base_path($this->downloadLocation .
                               $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
                               $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
                               $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
-                              $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip')
-                );
+                              $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip'),
+                    $this->method
+                    )
+                ) {
+                    return $this->queueHasErrors(
+                        'Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(),
+                        $preCheckQueueLogs,
+                        true
+                    );
+                }
+
+                return true;
             }
         }
     }
@@ -2314,63 +2322,63 @@ class Installer extends BasePackage
         return true;
     }
 
-    protected function downloadData($url, $sink)
-    {
-        $download = $this->remoteWebContent->request(
-            'GET',
-            $url,
-            $this->getHttpOptions($sink)
-        );
+    // protected function downloadData($url, $sink)
+    // {
+    //     $download = $this->remoteWebContent->request(
+    //         'GET',
+    //         $url,
+    //         $this->getHttpOptions($sink)
+    //     );
 
-        if ($download->getStatusCode() === 200) {
-            return true;
-        }
+    //     if ($download->getStatusCode() === 200) {
+    //         return true;
+    //     }
 
-        return false;
-    }
+    //     return false;
+    // }
 
-    protected function getHttpOptions($sink)//Public because remoteWebContent needs to access it
-    {
-        self::$trackCounter = 0;
+    // protected function getHttpOptions($sink)//Public because remoteWebContent needs to access it
+    // {
+    //     self::$trackCounter = 0;
 
-        return [
-            'progress' => function(
-                $downloadTotal,
-                $downloadedBytes,
-                $uploadTotal,
-                $uploadedBytes
-            ) {
-                $counters =
-                        [
-                            'downloadTotal'     => $downloadTotal,
-                            'downloadedBytes'   => $downloadedBytes,
-                            'uploadTotal'       => $uploadTotal,
-                            'uploadedBytes'     => $uploadedBytes
-                        ];
+    //     return [
+    //         'progress' => function(
+    //             $downloadTotal,
+    //             $downloadedBytes,
+    //             $uploadTotal,
+    //             $uploadedBytes
+    //         ) {
+    //             $counters =
+    //                     [
+    //                         'downloadTotal'     => $downloadTotal,
+    //                         'downloadedBytes'   => $downloadedBytes,
+    //                         'uploadTotal'       => $uploadTotal,
+    //                         'uploadedBytes'     => $uploadedBytes
+    //                     ];
 
-                if ($downloadedBytes === 0) {
-                    return;
-                }
+    //             if ($downloadedBytes === 0) {
+    //                 return;
+    //             }
 
-                //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
-                //So this way, we only update progress when there is actually an update.
-                if ($downloadedBytes === \System\Base\Providers\ModulesServiceProvider\Installer::$trackCounter) {
-                    return;
-                }
+    //             //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
+    //             //So this way, we only update progress when there is actually an update.
+    //             if ($downloadedBytes === \System\Base\Providers\ModulesServiceProvider\Installer::$trackCounter) {
+    //                 return;
+    //             }
 
-                \System\Base\Providers\ModulesServiceProvider\Installer::$trackCounter = $downloadedBytes;
+    //             \System\Base\Providers\ModulesServiceProvider\Installer::$trackCounter = $downloadedBytes;
 
-                $downloadComplete = null;
-                if ($downloadedBytes === $downloadTotal) {
-                    $downloadComplete = true;
-                }
-                $this->basepackages->progress->updateProgress($this->method, $downloadComplete, false, null, $counters);
-            },
-            'verify'            => false,
-            'connect_timeout'   => 60,
-            'sink'              => $sink
-        ];
-    }
+    //             $downloadComplete = null;
+    //             if ($downloadedBytes === $downloadTotal) {
+    //                 $downloadComplete = true;
+    //             }
+    //             $this->basepackages->progress->updateProgress($this->method, $downloadComplete, false, null, $counters);
+    //         },
+    //         'verify'            => false,
+    //         'connect_timeout'   => 60,
+    //         'sink'              => $sink
+    //     ];
+    // }
 
     protected function getComposerJsonFile()
     {
