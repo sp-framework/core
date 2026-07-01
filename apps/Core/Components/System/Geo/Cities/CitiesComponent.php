@@ -141,12 +141,14 @@ class CitiesComponent extends BaseComponent
                 return;
             }
 
-            $this->basepackages->geoCities->searchCities($searchQuery);
+            $cities = $this->basepackages->geoCities->searchCities($searchQuery);
+
+            $cities = msort($cities, 'id');
 
             $this->addResponse(
                 $this->basepackages->geoCities->packagesData->responseMessage,
                 $this->basepackages->geoCities->packagesData->responseCode,
-                $this->basepackages->geoCities->packagesData->responseData ?? []
+                ['cities' => $cities] ?? []
             );
         } else {
             $this->addResponse('Search Query Missing', 1);
