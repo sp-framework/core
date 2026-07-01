@@ -492,8 +492,6 @@ class Accounts extends BasePackage
 
         if ($validation === true) {
             if ($this->addAccount($data)) {
-                $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
-
                 $this->packagesData->redirectUrl = $this->links->url('auth');
             }
 

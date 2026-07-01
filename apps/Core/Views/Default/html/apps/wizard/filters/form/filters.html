@@ -107,39 +107,26 @@
     <div class="col">
         {{adminltetags.useTag('fields',
             [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'country_id',
-                'fieldLabel'                            : 'Country Id',
-                'fieldHidden'                           : true,
-                'fieldType'                             : 'input',
-                'fieldBazScan'                          : true,
-                'fieldBazPostOnCreate'                  : false,
-                'fieldBazPostOnUpdate'                  : false,
-                'fieldValue'                            : ''
-            ]
-        )}}
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'country_name',
-                'fieldLabel'                            : 'Search Country',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Enter country name to search.',
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnCreate'                  : false,
-                'fieldBazPostOnUpdate'                  : false,
-                'fieldRequired'                         : true,
-                'fieldDataInputMinLength'               : 1,
-                'fieldDataInputMaxLength'               : 100,
-                'fieldValue'                            : ''
+                'component'                                     : component,
+                'componentName'                                 : componentName,
+                'componentId'                                   : componentId,
+                'sectionId'                                     : sectionId,
+                'fieldId'                                       : 'country_id',
+                'fieldLabel'                                    : 'Select Country',
+                'fieldType'                                     : 'select2',
+                'fieldHelp'                                     : true,
+                'fieldHelpTooltipContent'                       : 'Select country',
+                'fieldRequired'                                 : true,
+                'fieldBazScan'                                  : true,
+                'fieldBazJstreeSearch'                          : true,
+                'fieldBazPostOnCreate'                          : true,
+                'fieldBazPostOnUpdate'                          : true,
+                'fieldDataSelect2Options'                       : ip2locationCountries,
+                'fieldDataSelect2AddDataAttrFromData'           : ['iso2'],
+                'fieldDataSelect2OptionsKey'                    : 'id',
+                'fieldDataSelect2OptionsValue'                  : 'name:iso2|name',
+                'fieldDataSelect2OptionsArray'                  : true,
+                'fieldDataSelect2OptionsSelected'               : ''
             ]
         )}}
     </div>
@@ -176,6 +163,7 @@
                 'fieldBazPostOnCreate'                  : false,
                 'fieldBazPostOnUpdate'                  : false,
                 'fieldRequired'                         : false,
+                'fieldDisabled'                         : true,
                 'fieldDataInputMinLength'               : 1,
                 'fieldDataInputMaxLength'               : 100,
                 'fieldValue'                            : ''
@@ -215,6 +203,7 @@
                 'fieldBazPostOnCreate'                  : false,
                 'fieldBazPostOnUpdate'                  : false,
                 'fieldRequired'                         : false,
+                'fieldDisabled'                         : true,
                 'fieldDataInputMinLength'               : 1,
                 'fieldDataInputMaxLength'               : 100,
                 'fieldValue'                            : ''
@@ -261,6 +250,11 @@
         )}}
     </div>
 </div>
+<div class="row mb-2" id="ip2location-error" hidden>
+    <div class="col">
+        <small class="text-danger">Note: <span class="country_name"></span> geo data is not imported into the system. Use DataExtractor tool to import ip2location country data to select state and city. You can still filter traffic using Country. But, if you want granularity of state and city, you have to import <span class="country_name"></span> geo data into the system.</small>
+    </div>
+</div>
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('buttons',
@@ -273,16 +267,6 @@
                 'buttons'                       : [
                         'add-filter'       : [
                             'title'                   : 'Add',
-                            'size'                    : 'xs',
-                            'type'                    : 'primary',
-                            'icon'                    : 'cog fa-spin',
-                            'iconHidden'              : true,
-                            'position'                : 'right'
-                        ],
-                        'update-filter'    : [
-                            'title'                   : 'Update',
-                            'hidden'                  : true,
-                            'disabled'                : true,
                             'size'                    : 'xs',
                             'type'                    : 'primary',
                             'icon'                    : 'cog fa-spin',

@@ -1,0 +1,44 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'ip',
+                'fieldLabel'                            : 'Host Address',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'HOST - Enter IP V4 or IP V6 host address. Example: 10.10.10.10 (ipv4) 2001:0DB8:ABCD:0012:::FFFF:FFFF (ipv6)',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataInputMaxLength'               : 100,
+                'fieldValue'                            : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       : [
+                        'checkip'       : [
+                            'title'                   : 'Check IP',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

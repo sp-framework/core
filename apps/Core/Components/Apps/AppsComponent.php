@@ -199,6 +199,8 @@ class AppsComponent extends BaseComponent
 
                 //Middlewares
                 $middlewaresArr = $this->modules->middlewares->getMiddlewaresForAppType($app['app_type'], $app['id'], true);
+                $ip2locationCountries = [];
+                $ip2locationInfo = [];
                 foreach ($middlewaresArr as $key => &$middlewareValue) {
                     if ($middlewareValue['apps']) {
                         if (is_string($middlewareValue['apps'])) {
@@ -221,7 +223,16 @@ class AppsComponent extends BaseComponent
                         }
                     }
                     $middlewares[$key] = $middlewareValue;
+
+                    if ($middlewareValue['name'] === 'IpFilter') {
+                        if (isset($middlewareValue['apps'][$app['id']]) && $middlewareValue['apps'][$app['id']]['enabled']) {
+                            $ip2locationCountries = $this->access->ipFilter->ip2location->getAllCountries();
+                            $ip2locationInfo = $this->access->ipFilter->ip2location->getIp2locationInfo();
+                        }
+                    }
                 }
+                $this->view->ip2locationCountries = $ip2locationCountries;
+                $this->view->ip2locationInfo = $ip2locationInfo;
 
                 //Views
                 $viewsArr = $this->modules->views->getViewsForAppType($app['app_type'], false, true);
@@ -464,14 +475,13 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $filters = $this->access->ipFilter->getFilters($this->postData());
+        $filters = $this->access->ipFilter->filters->getFilters($this->postData());
 
         foreach ($filters as $key => &$filter) {
             unset ($filter['app_id']);
             unset ($filter['decimal']);
             unset ($filter['ip2location_proxy']);
             unset ($filter['parent_id']);
-            unset ($filter['ip_hits']);
 
             if ($filter['updated_by'] == '0') {
                 $filter['updated_by'] = "System";
@@ -501,11 +511,11 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->addFilter($this->postData());
+        $this->access->ipFilter->filters->addFilter($this->postData());
 
         $this->addResponse(
-            $this->access->ipFilter->packagesData->responseMessage,
-            $this->access->ipFilter->packagesData->responseCode
+            $this->access->ipFilter->filters->packagesData->responseMessage,
+            $this->access->ipFilter->filters->packagesData->responseCode
         );
     }
 
@@ -513,11 +523,11 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->removeFilter($this->postData());
+        $this->access->ipFilter->filters->removeFilter($this->postData());
 
         $this->addResponse(
-            $this->access->ipFilter->packagesData->responseMessage,
-            $this->access->ipFilter->packagesData->responseCode
+            $this->access->ipFilter->filters->packagesData->responseMessage,
+            $this->access->ipFilter->filters->packagesData->responseCode
         );
     }
 
@@ -525,11 +535,11 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->allowFilter($this->postData());
+        $this->access->ipFilter->filters->allowFilter($this->postData());
 
         $this->addResponse(
-            $this->access->ipFilter->packagesData->responseMessage,
-            $this->access->ipFilter->packagesData->responseCode
+            $this->access->ipFilter->filters->packagesData->responseMessage,
+            $this->access->ipFilter->filters->packagesData->responseCode
         );
     }
 
@@ -537,11 +547,11 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->blockFilter($this->postData());
+        $this->access->ipFilter->filters->blockFilter($this->postData());
 
         $this->addResponse(
-            $this->access->ipFilter->packagesData->responseMessage,
-            $this->access->ipFilter->packagesData->responseCode
+            $this->access->ipFilter->filters->packagesData->responseMessage,
+            $this->access->ipFilter->filters->packagesData->responseCode
         );
     }
 
@@ -549,11 +559,24 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->resetAppFilters($this->postData());
+        $this->access->ipFilter->filters->resetAppFilters($this->postData());
+
+        $this->addResponse(
+            $this->access->ipFilter->filters->packagesData->responseMessage,
+            $this->access->ipFilter->filters->packagesData->responseCode
+        );
+    }
+
+    public function checkIpAction()
+    {
+        $this->requestIsPost();
+
+        $this->access->ipFilter->checkIp($this->postData()['ip']);
 
         $this->addResponse(
             $this->access->ipFilter->packagesData->responseMessage,
-            $this->access->ipFilter->packagesData->responseCode
+            $this->access->ipFilter->packagesData->responseCode,
+            $this->access->ipFilter->packagesData->responseData ?? []
         );
     }
 
@@ -592,6 +615,83 @@ class AppsComponent extends BaseComponent
             return $views;
         } else {
             $this->addResponse('No Views Installed', 1);
+        }
+    }
+
+    public function searchCountryAction()
+    {
+        $this->requestIsPost();
+
+        if (isset($this->postData()['search'])) {
+            $searchQuery = $this->postData()['search'];
+
+            if (strlen($searchQuery) < 3) {
+                return;
+            }
+
+            $countries = $this->access->ipFilter->ip2location->searchCountries($searchQuery);
+
+            $countries = msort($countries, 'id');
+
+            $this->addResponse(
+                $this->access->ipFilter->packagesData->responseMessage,
+                $this->access->ipFilter->packagesData->responseCode,
+                ['countries' => $countries] ?? []
+            );
+        } else {
+            $this->addResponse('Search Query Missing', 1);
+        }
+    }
+
+    public function searchStateAction()
+    {
+        $this->requestIsPost();
+
+        if (isset($this->postData()['country_id']) && isset($this->postData()['search'])) {
+            $countryId = $this->postData()['country_id'];
+            $searchQuery = $this->postData()['search'];
+
+            if (strlen($searchQuery) < 3) {
+                return;
+            }
+
+            $states = $this->access->ipFilter->ip2location->searchStates($countryId, $searchQuery);
+
+            $states = msort($states, 'id');
+
+            $this->addResponse(
+                $this->access->ipFilter->packagesData->responseMessage,
+                $this->access->ipFilter->packagesData->responseCode,
+                ['states' => $states] ?? []
+            );
+        } else {
+            $this->addResponse('Search Query Missing', 1);
+        }
+    }
+
+    public function searchCityAction()
+    {
+        $this->requestIsPost();
+
+        if (isset($this->postData()['country_id']) && isset($this->postData()['search'])) {
+            $countryId = $this->postData()['country_id'];
+            $searchQuery = $this->postData()['search'];
+
+            if (strlen($searchQuery) < 3) {
+                return;
+            }
+
+            $cities = $this->access->ipFilter->ip2location->searchCities($countryId, $searchQuery);
+
+            $cities = msort($cities, 'id');
+
+            $this->addResponse(
+                $this->access->ipFilter->packagesData->responseMessage,
+                $this->access->ipFilter->packagesData->responseCode,
+                ['cities' => $cities] ?? []
+            );
+        } else {
+            $this->addResponse('Search Query Missing', 1);
         }
     }
 }

@@ -66,7 +66,7 @@ class Auth extends BasePackage
         }
 
         if (!$this->checkAccount($data)) {//Set $this->account here
-            $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
+            $this->access->ipFilter->filters->bumpFilterHitCounter(true);
 
             return false;
         }

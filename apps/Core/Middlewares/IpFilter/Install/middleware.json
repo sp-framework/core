@@ -25,14 +25,14 @@
 	},
 	"settings" : 
 	{
-		"monitor" : true,
+		"status" : "monitor",
 		"default_filter" : "block",
-		"auto_unblock_ip_minutes" : 0,
+		"auto_unblock_ip_minutes" : 60,
+		"incorrect_login_attempt_block_ip" : 10,
 		"filter_ipv4" : true,
 		"filter_ipv6" : true,
 		"allow_private_range" : true,
 		"allow_reserved_range" : true,
-		"ip2location_api_key":null,
 		"ip2location_bin_file_code" : "DB3LITEBINIPV6",
 		"ip2location_bin_access_mode" : "FILE_IO",
 		"ip2location_proxy_bin_file_code" : "PX3LITEBIN",

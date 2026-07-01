@@ -10,7 +10,7 @@ class IpFilter extends BaseMiddleware
     {
         return true;
         try {
-            if ($this->access->ipFilter->checkList()) {
+            if ($this->access->ipFilter->checkIp()) {
                 return true;
             }
         } catch (\throwable $e) {

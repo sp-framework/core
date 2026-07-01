@@ -41,12 +41,6 @@ class ServiceProviderApps extends BaseModel
 
     public $acceptable_usernames;
 
-    public $incorrect_login_attempt_block_ip;
-
-    public $auto_unblock_ip_minutes;
-
-    public $ip_filter_default_action;
-
     public $menu_structure;
 
     public $use_app_db;

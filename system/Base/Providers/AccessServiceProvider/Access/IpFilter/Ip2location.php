@@ -9,10 +9,15 @@ use IP2Location\IpTools;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToReadFile;
+use System\Base\Providers\AccessServiceProvider\Access\IpFilter\PackagesData;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2locationCities;
 use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2locationCountries;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2locationStates;
 
 class Ip2location
 {
+    public $packagesData;
+
     public $ipTools;
 
     public $ipGeoLocation;
@@ -29,6 +34,8 @@ class Ip2location
 
     public function __construct($ipFilter)
     {
+        $this->packagesData = new PackagesData;
+
         $this->ipFilter = $ipFilter;
 
         $this->ipFilterSettings = $this->ipFilter->getIpFilterSettings();
@@ -51,22 +58,23 @@ class Ip2location
         try {
             $ip2locationBin =
                 new \IP2Location\Database(
-                    $this->varPath . $this->ipFilterSettings['ip2location_bin_file_code'] . '.BIN',
+                    base_path($this->varPath . $this->ipFilterSettings['ip2location_bin_file_code'] . '.BIN'),
                     constant('\IP2Location\Database::' . $this->ipFilterSettings['ip2location_bin_access_mode'])
                 );
         } catch (\throwable $e) {
+            trace([$e]);
             //Log here
             if (str_contains($e->getMessage(), 'exist')) {
-                $this->ipFilter->addResponse('Bin file does not exist, please download bin file first to check in bin file.', 1);
+                $this->addResponse('Bin file does not exist, please download bin file first to check in bin file.', 1);
             } else {
-                $this->ipFilter->addResponse($e->getMessage(), 1);
+                $this->addResponse($e->getMessage(), 1);
             }
 
             return false;
         }
 
         $ipDetailsArr = $ip2locationBin->lookup($ip, \IP2Location\Database::ALL);
-
+        trace([$ipDetailsArr]);
         if ($ipDetailsArr) {
             $ipDetails['address'] = $ip;
             $ipDetails['country_code'] = $ipDetailsArr['countryCode'];
@@ -79,12 +87,12 @@ class Ip2location
                 $ipDetails = array_merge($ipDetails, $ipProxyDetails);
             }
 
-            $this->ipFilter->addResponse('Details for IP: ' . $ip . ' retrieved successfully using BIN file.', 0, ['ip_details' => $ipDetails]);
+            $this->addResponse('Details for IP: ' . $ip . ' retrieved successfully using BIN file.', 0, ['ip_details' => $ipDetails]);
 
             return $ipDetails;
         }
 
-        $this->ipFilter->addResponse('Details for IP: ' . $ip . ' not available in the BIN file. Please search API.', 2);
+        $this->addResponse('Details for IP: ' . $ip . ' not available in the BIN file. Please search API.', 2);
 
         return false;
     }
@@ -98,7 +106,7 @@ class Ip2location
         try {
             $ip2locationProxyBin =
                 new \IP2Proxy\Database(
-                    $this->varPath . $this->ipFilterSettings['ip2location_proxy_bin_file_code'] . '.BIN',
+                    base_path($this->varPath . $this->ipFilterSettings['ip2location_proxy_bin_file_code'] . '.BIN'),
                     constant('\IP2Proxy\Database::' . $this->ipFilterSettings['ip2location_proxy_bin_access_mode'])
                 );
 
@@ -106,9 +114,9 @@ class Ip2location
         } catch (\throwable $e) {
             //Log here
             if (str_contains($e->getMessage(), 'exist')) {
-                $this->ipFilter->addResponse('Bin file does not exist, please download bin file first to check in bin file.', 1);
+                $this->addResponse('Bin file does not exist, please download bin file first to check in bin file.', 1);
             } else {
-                $this->ipFilter->addResponse($e->getMessage(), 1);
+                $this->addResponse($e->getMessage(), 1);
             }
 
             return false;
@@ -119,12 +127,12 @@ class Ip2location
             $ipDetails['is_proxy'] = $ipDetailsArr['isProxy'];
             $ipDetails['proxy_type'] = $ipDetailsArr['proxyType'];
 
-            $this->ipFilter->addResponse('Details for IP: ' . $ip . ' retrieved successfully using Proxy BIN file.', 0, ['ip_details' => $ipDetails]);
+            $this->addResponse('Details for IP: ' . $ip . ' retrieved successfully using Proxy BIN file.', 0, ['ip_details' => $ipDetails]);
 
             return $ipDetails;
         }
 
-        $this->ipFilter->addResponse('Details for IP: ' . $ip . ' not available in the Proxy BIN file. Please search API.', 2);
+        $this->addResponse('Details for IP: ' . $ip . ' not available in the Proxy BIN file. Please search API.', 2);
 
         return false;
     }
@@ -135,24 +143,34 @@ class Ip2location
             return false;
         }
 
-        $index = $this->ipFilter->indexes->searchIndexes($ip, true);
+        $ff = null;
+        $db = null;
 
-        if ($index) {
-            $ipFilterFiltersIp2locationStoreEntry = $this->ipFilterFiltersIp2locationStore->findById((int) $index);
-
-            if ($ipFilterFiltersIp2locationStoreEntry) {
-                $this->ipFilter->addResponse('Details for IP: ' . $ip . ' retrieved successfully using indexes.', 0, ['ip_details' => $ipFilterFiltersIp2locationStoreEntry]);
-
-                return $ipFilterFiltersIp2locationStoreEntry;
-            }
+        try {
+            $ff = $this->ipFilter->getDi()->getShared('ff');
+            $db = $this->ipFilter->getDi()->getShared('db');
+            $logger = $this->ipFilter->getDi()->getShared('logger');
+        } catch (\throwable $e) {
+            throw $e;
         }
 
-        $ipFilterFiltersIp2locationStoreEntry = $this->ipFilterFiltersIp2locationStore->findBy(['address', '=', $ip]);
+        if ($ff) {
+            $ip2locationStore = $ff->store('service_provider_access_ip_filters_ip2location');
 
+            $ipFilterFiltersIp2locationStoreEntry = $ip2locationStore->findBy(['address', '=', $ip]);
+        } else if ($db) {
+            $ipFilterFiltersIp2locationStoreEntry =
+                $db->fetchAll(
+                    "SELECT * FROM service_provider_access_ip_filters_ip2location WHERE address = :address",
+                    \Phalcon\Db\Enum::FETCH_ASSOC,
+                    [
+                        'address'  => $ip
+                    ]
+                );
+        }
+        // trace([$ipFilterFiltersIp2locationStoreEntry]);
         if ($ipFilterFiltersIp2locationStoreEntry && isset($ipFilterFiltersIp2locationStoreEntry[0])) {
-            $this->ipFilter->addResponse('Details for IP: ' . $ip . ' retrieved successfully using ip2location local database.', 0, ['ip_details' => $ipFilterFiltersIp2locationStoreEntry[0]]);
-
-            $this->ipFilter->indexes->addToIndex($ipFilterFiltersIp2locationStoreEntry[0], false, true);//Add to index
+            $this->addResponse('Details for IP: ' . $ip . ' retrieved successfully using ip2location local database.', 0, ['ip_details' => $ipFilterFiltersIp2locationStoreEntry[0]]);
 
             return $ipFilterFiltersIp2locationStoreEntry[0];
         }
@@ -165,6 +183,11 @@ class Ip2location
                     $apiCallResponse = json_decode(json_encode($apiCallResponse), true);
 
                     $ipDetails['address'] = $apiCallResponse['ip'];
+                    if ($this->ipTools->isIpv4($ip)) {
+                        $ipDetails['decimal'] = (int) $this->ipTools->ipv4ToDecimal($ip);
+                    } else if ($this->ipTools->isIpv6($ip)) {
+                        $ipDetails['decimal'] = (int) $this->ipTools->ipv6ToDecimal($ip);
+                    }
                     $ipDetails['country_code'] = $apiCallResponse['country_code'];
                     $ipDetails['region_name'] = $apiCallResponse['region_name'];
                     $ipDetails['city_name'] = $apiCallResponse['city_name'];
@@ -174,29 +197,39 @@ class Ip2location
                         $ipDetails['proxy_type'] = $apiCallResponse['proxy']['proxy_type'];
                     }
 
-                    $ipDetails = $this->ipFilterFiltersIp2locationStore->insert($ipDetails);
+                    if ($ff) {
+                        $ipDetails = $ip2locationStore->insert($ipDetails);
+                    } else if ($db) {
+                        $ipDetails = $db->insertAsDict('service_provider_access_ip_filters_ip2location', $ipDetails);
+                    }
 
-                    $this->ipFilter->indexes->addToIndex($ipDetails, false, true);//Add to index
-
-                    $this->ipFilter->addResponse('Details for IP: ' . $ip . ' retrieved successfully using API.', 0, ['ip_details' => $ipDetails]);
+                    $this->addResponse('Details for IP: ' . $ip . ' retrieved successfully using API.', 0, ['ip_details' => $ipDetails]);
 
                     return $apiCallResponse;
                 }
             } catch (\throwable $e) {
+                trace([$e]);
                 //Log here
-                $this->ipFilter->systemLogger->error('ERROR_IP2LOCATION', [$e->getMessage()]);
-                $this->ipFilter->addResponse($e->getMessage(), 1);
+                if ($this->ipFilterSettings['debug_filters'] === true) {
+                    $logger->logIpFilters->error(json_encode(['status' => 'ERROR_IP2LOCATION', 'error' => $e->getMessage()]));
+                }
+
+                $this->addResponse($e->getMessage(), 1);
             }
         } else {
-            $this->ipFilter->addResponse('Lookup is using io API and io API keys are not set!', 1);
+            if ($this->ipFilterSettings['debug_filters'] === true) {
+                $logger->logIpFilters->error(json_encode(['status' => 'ERROR_IP2LOCATION', 'error' => $e->getMessage()]));
+            }
+
+            $this->addResponse('Lookup is using io API and io API keys are not set!', 1);
         }
 
         return false;
     }
 
-    protected function checkIPIsPublic($ip)
+    public function checkIPIsPublic($ip)
     {
-        if ($this->ipFilter->validateIP($ip)) {
+        if ($this->ipFilter->filters->validateIP($ip)) {
             $ipv6 = false;
 
             if (str_contains($ip, ':')) {
@@ -210,7 +243,7 @@ class Ip2location
             );
 
             if (!$isPublic) {
-                $this->ipFilter->addResponse('IP Address : ' . $ip . ' is from a private range of IP addresses!', 2);
+                $this->addResponse('IP Address : ' . $ip . ' is from a private range of IP addresses!', 2);
 
                 return false;
             }
@@ -223,16 +256,14 @@ class Ip2location
 
     public function getAllCountries()
     {
-        $countriesModel = new ServiceProviderAccessIpFiltersIp2locationCountries;
-
         $ff = null;
         $db = null;
 
         try {
-            $ff = $countriesModel->getDi()->getShared('ff');
-            $db = $countriesModel->getDi()->getShared('db');
+            $ff = $this->ipFilter->getDi()->getShared('ff');
+            $db = $this->ipFilter->getDi()->getShared('db');
         } catch (\throwable $e) {
-            //Do nothing
+            throw $e;
         }
 
         $countries = [];
@@ -250,7 +281,7 @@ class Ip2location
         }
 
         if (count($countries) === 0) {
-            $localContent = $countriesModel->getDi()->getShared('localContent');
+            $localContent = $this->ipFilter->getDi()->getShared('localContent');
 
             try {
                 if ($localContent->fileExists($this->dataPath . 'AllCountries.json')) {
@@ -262,5 +293,227 @@ class Ip2location
         }
 
         return $countries;
+    }
+
+    public function getIp2locationInfo()
+    {
+        try {
+            $localContent = $this->ipFilter->getDi()->getShared('localContent');
+
+            if ($localContent->fileExists($this->varPath . 'info.json')) {
+                return json_decode($localContent->read($this->varPath . 'info.json'), true);
+            }
+        } catch (FilesystemException | UnableToCheckExistence | UnableToReadFile | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+        }
+
+        return false;
+    }
+
+    public function searchCountries(string $countryQueryString)
+    {
+        $ff = null;
+        $db = null;
+
+        try {
+            $ff = $this->ipFilter->getDi()->getShared('ff');
+            $db = $this->ipFilter->getDi()->getShared('db');
+        } catch (\throwable $e) {
+            throw $e;
+        }
+
+        $countries = [];
+
+        if ($ff) {
+            $ip2locationCountriesStore = $ff->store('service_provider_access_ip_filters_ip2location_countries');
+
+            $countries = $ip2locationCountriesStore->findBy(['name', 'like', '%' . $countryQueryString . '%']);
+        } else if ($db) {
+            $countries =
+                $db->fetchAll(
+                    "SELECT * FROM service_provider_access_ip_filters_ip2location_countries WHERE name LIKE :name",
+                    \Phalcon\Db\Enum::FETCH_ASSOC,
+                    [
+                        'name'  => $countryQueryString
+                    ]
+                );
+        }
+
+        $this->addResponse('Ok', 0, ['countries' => $countries]);
+
+        return $countries;
+    }
+
+    public function searchStates($countryId, string $stateQueryString)
+    {
+        $ff = null;
+        $db = null;
+
+        try {
+            $ff = $this->ipFilter->getDi()->getShared('ff');
+            $db = $this->ipFilter->getDi()->getShared('db');
+        } catch (\throwable $e) {
+            throw $e;
+        }
+
+        $countries = [];
+        $states = [];
+
+        if ($ff) {
+            $ip2locationStatesStore = $ff->store('service_provider_access_ip_filters_ip2location_states');
+
+            $searchStates = $ip2locationStatesStore->findBy([['country_id', '=', (int) $countryId],['name', 'like', '%' . $stateQueryString . '%']]);
+        } else if ($db) {
+            $searchStates =
+                $db->fetchAll(
+                    "SELECT * FROM service_provider_access_ip_filters_ip2location_states WHERE name LIKE :name",
+                    \Phalcon\Db\Enum::FETCH_ASSOC,
+                    [
+                        'name'  => $stateQueryString
+                    ]
+                );
+        }
+
+        if (isset($searchStates) && count($searchStates) > 0) {
+            foreach ($searchStates as $stateKey => $stateValue) {
+                if (!isset($countries[$stateValue['country_id']])) {
+                    if ($ff) {
+                        $ip2locationCountriesStore = $ff->store('service_provider_access_ip_filters_ip2location_countries');
+
+                        $searchCountry = $ip2locationCountriesStore->findBy(['id', '=', $stateValue['country_id']]);
+                    } else if ($db) {
+                        $searchCountry =
+                            $db->fetchAll(
+                                "SELECT * FROM service_provider_access_ip_filters_ip2location_countries WHERE id = :id",
+                                \Phalcon\Db\Enum::FETCH_ASSOC,
+                                [
+                                    'id'  => $stateValue['country_id']
+                                ]
+                            );
+                    }
+
+                    if (isset($searchCountry[0])) {
+                        $countries[$stateValue['country_id']] = $searchCountry[0];
+                    } else {
+                        continue;
+                    }
+                }
+
+                $states[$stateKey] = $stateValue;
+                $states[$stateKey]['country_id'] = $countries[$stateValue['country_id']]['id'];
+                $states[$stateKey]['country_iso2'] = $countries[$stateValue['country_id']]['iso2'];
+                $states[$stateKey]['country_name'] = $countries[$stateValue['country_id']]['name'];
+            }
+        }
+
+        $this->addResponse('Ok', 0, ['states' => $states]);
+
+        return $states;
+    }
+
+    public function searchCities($countryId, string $cityQueryString)
+    {
+        $ff = null;
+        $db = null;
+
+        try {
+            $ff = $this->ipFilter->getDi()->getShared('ff');
+            $db = $this->ipFilter->getDi()->getShared('db');
+        } catch (\throwable $e) {
+            throw $e;
+        }
+
+        $countries = [];
+        $states = [];
+        $cities = [];
+
+        if ($ff) {
+            $ip2locationCitiesStore = $ff->store('service_provider_access_ip_filters_ip2location_cities');
+
+            $searchCities = $ip2locationCitiesStore->findBy([['country_id', '=', (int) $countryId],['name', 'like', '%' . $cityQueryString . '%']]);
+        } else if ($db) {
+            $searchCities =
+                $db->fetchAll(
+                    "SELECT * FROM service_provider_access_ip_filters_ip2location_cities WHERE name LIKE :name",
+                    \Phalcon\Db\Enum::FETCH_ASSOC,
+                    [
+                        'name'  => $cityQueryString
+                    ]
+                );
+        }
+
+        if (isset($searchCities) && count($searchCities) > 0) {
+            foreach ($searchCities as $cityKey => $cityValue) {
+                if (!isset($countries[$cityValue['country_id']])) {
+                    if ($ff) {
+                        $ip2locationCountriesStore = $ff->store('service_provider_access_ip_filters_ip2location_countries');
+
+                        $searchCountry = $ip2locationCountriesStore->findBy(['id', '=', $cityValue['country_id']]);
+                    } else if ($db) {
+                        $searchCountry =
+                            $db->fetchAll(
+                                "SELECT * FROM service_provider_access_ip_filters_ip2location_countries WHERE id = :id",
+                                \Phalcon\Db\Enum::FETCH_ASSOC,
+                                [
+                                    'id'  => $cityValue['country_id']
+                                ]
+                            );
+                    }
+
+                    if (isset($searchCountry[0])) {
+                        $countries[$cityValue['country_id']] = $searchCountry[0];
+                    } else {
+                        continue;
+                    }
+                }
+
+                if (!isset($states[$cityValue['state_id']])) {
+                    if ($ff) {
+                        $ip2locationStatesStore = $ff->store('service_provider_access_ip_filters_ip2location_states');
+
+                        $searchState = $ip2locationStatesStore->findBy(['id', '=', $cityValue['state_id']]);
+                    } else if ($db) {
+                        $searchState =
+                            $db->fetchAll(
+                                "SELECT * FROM service_provider_access_ip_filters_ip2location_states WHERE id = :id",
+                                \Phalcon\Db\Enum::FETCH_ASSOC,
+                                [
+                                    'id'  => $cityValue['state_id']
+                                ]
+                            );
+                    }
+
+                    if (isset($searchState[0])) {
+                        $states[$cityValue['state_id']] = $searchState[0];
+                    } else {
+                        continue;
+                    }
+                }
+
+                $cities[$cityKey] = $cityValue;
+                $cities[$cityKey]['state_id'] = $states[$cityValue['state_id']]['id'];
+                $cities[$cityKey]['state_name'] = $states[$cityValue['state_id']]['name'];
+                $cities[$cityKey]['country_id'] = $countries[$cityValue['country_id']]['id'];
+                $cities[$cityKey]['country_iso2'] = $countries[$cityValue['country_id']]['iso2'];
+                $cities[$cityKey]['country_name'] = $countries[$cityValue['country_id']]['name'];
+            }
+        }
+
+        $this->addResponse('Ok', 0, ['cities' => $cities]);
+
+        return $cities;
+    }
+
+    protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null)
+    {
+        $this->packagesData->responseMessage = $responseMessage;
+
+        $this->packagesData->responseCode = $responseCode;
+
+        if ($responseData !== null && is_array($responseData)) {
+            $this->packagesData->responseData = $responseData;
+        } else {
+            $this->packagesData->responseData = [];
+        }
     }
 }
