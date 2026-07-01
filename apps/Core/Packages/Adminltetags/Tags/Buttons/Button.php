@@ -269,7 +269,7 @@ class Button
                 '<a target="_blank" href="' . $this->buttonParams['url'] . '" ';
         } else {
             $this->content .=
-                '<button ';
+                '<button type="button" ';
         }
 
         $this->content .=
