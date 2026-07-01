@@ -1570,17 +1570,4 @@ class DataExtractors extends BasePackage
 
         return true;
     }
-
-    public function getIp2locationInfo()
-    {
-        try {
-            if ($this->localContent->fileExists($this->varDir . 'ip2location/info.json')) {
-                return $this->helper->decode($this->localContent->read($this->varDir . 'ip2location/info.json'), true);
-            }
-        } catch (FilesystemException | UnableToCheckExistence | UnableToReadFile | \throwable $e) {
-            $this->addResponse($e->getMessage(), 1);
-        }
-
-        return false;
-    }
 }

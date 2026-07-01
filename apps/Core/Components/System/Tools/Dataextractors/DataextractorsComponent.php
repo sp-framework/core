@@ -29,7 +29,7 @@ class DataextractorsComponent extends BaseComponent
 
         $this->view->countries = $this->basepackages->geoCountries->getAll()->geoCountries;
 
-        $this->view->ip2locationInfo = $this->dataExtractors->getIp2locationInfo();
+        $this->view->ip2locationInfo = $this->access->ipFilter->ip2location->getIp2locationInfo();
     }
 
     public function processAction($data = null)
