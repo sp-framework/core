@@ -17,6 +17,8 @@ class Logger
 
     public $logExceptions;
 
+    public $logIpFilters;
+
     public $logEmail;
 
     protected $logsConfig;
@@ -69,8 +71,7 @@ class Logger
 
         $streamAdapter = new Stream($savePath . 'exceptions.log');
         $streamAdapter->setFormatter($this->customFormatter);
-
-        if ($this->logsConfig->exceptions) {
+        if ($this->logsConfig->exceptions) {//Exceptions
             $this->logExceptions = new PhalconLogger(
                 'messages',
                 ['exceptions'        => $streamAdapter]
@@ -80,6 +81,15 @@ class Logger
 
             $this->logExceptions->getAdapter('exceptions')->begin();
         }
+
+        //IpFilters
+        $streamAdapter = new Stream($savePath . 'ipfilters.log');
+        $streamAdapter->setFormatter($this->customFormatter);
+        $this->logIpFilters = new PhalconLogger(
+            'messages',
+            ['ipfilters'        => $streamAdapter]
+        );
+        $this->logIpFilters->getAdapter('ipfilters')->begin();
 
         if ($this->logsConfig->enabled) {
             if (PHP_SAPI === 'cli') {
@@ -103,9 +113,7 @@ class Logger
                     );
 
                     $this->log->getAdapter('logs')->begin();
-
                 } else if ($this->logsConfig->service === 'dbLogs') {
-
                     $dbAdapter = new DbAdapter($this->oneDbEntry, $this->helper);
                     $dbAdapter->setFormatter($this->customFormatter);
 
@@ -165,6 +173,10 @@ class Logger
                     $this->logExceptions->getAdapter('exceptions')->commit();
                 }
             }
+        }
+
+        if ($this->logIpFilters->getAdapter('ipfilters')->inTransaction()) {
+            $this->logIpFilters->getAdapter('ipfilters')->commit();
         }
 
         if ($this->logsConfig->enabled) {
