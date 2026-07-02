@@ -834,6 +834,141 @@ dataCollectionSection =
                     postData["ip"] = $("#{{componentId}}-{{sectionId}}-ip").val();
 
                     $.post(url, postData, function(response) {
+                        $('#filter-store').html('-');
+                        $('#filter-id').html('-');
+                        $('#filter-parent-id').html('-');
+                        $('#filter-address-type').html('-');
+                        $('#filter-address').html('-');
+                        $('#filter-type').html('-');
+                        $('#filter-ip2location-proxy').html('-');
+                        $('#filter-hit-count').html('-');
+                        $('#filter-incorrect-login-attempts').html('-');
+                        $('#parent-address-type').html('-');
+                        $('#parent-address').html('-');
+                        $('#parent-type').html('-');
+                        $('#parent-ip2location-proxy').html('-');
+                        $('#parent-hit-count').html('-');
+                        $('#parent-incorrect-login-attempts').html('-');
+                        $('#profiling').html('');
+
+                        if (response.responseData && response.responseData.filter && typeof response.responseData.filter === 'object') {
+                            if (response.responseData.profiling && response.responseData.profiling[1]) {
+                                $('#profiling').html('IP checked via ' + response.responseData.profiling[1]['reference'] + '. It took ' + response.responseData.profiling[1]['difference'] + ' ms');
+                            }
+
+                            if (response.responseData.default_filter !== 'undefined') {
+                                var store = '';
+                                if (response.responseData.default_filter === true) {
+                                    store += 'DEFAULT';
+                                } else {
+                                    store += 'MAIN';
+                                }
+
+                                if (response.responseData.cached) {
+                                    store += ' | CACHED';
+                                } else {
+                                    store += ' | NOT CACHED';
+                                }
+
+                                $('#filter-store').html(store);
+                            } else {
+                                $('#filter-store').html('-');
+                            }
+                            if (response.responseData.filter.id) {
+                                $('#filter-id').html(response.responseData.filter.id);
+                            } else {
+                                $('#filter-id').html('-');
+                            }
+                            if (response.responseData.filter.parent_id) {
+                                $('#filter-parent-id').html(response.responseData.filter.parent_id);
+                            } else {
+                                $('#filter-parent-id').html('-');
+                            }
+                            if (response.responseData.filter.address_type) {
+                                $('#filter-address-type').html(
+                                    '<span class="badge badge-primary text-uppercase">' + response.responseData.filter.address_type + '</span>'
+                                );
+                            } else {
+                                $('#filter-address-type').html('-');
+                            }
+                            if (response.responseData.filter.address) {
+                                $('#filter-address').html(response.responseData.filter.address);
+                            } else {
+                                $('#filter-address').html('-');
+                            }
+                            if (response.responseData.filter.filter_type) {
+                                if (response.responseData.filter.filter_type === 'allow') {
+                                    response.responseData.filter.filter_type = '<span class="badge badge-success text-uppercase">Allow</span>';
+                                } else if (response.responseData.filter.filter_type === 'block') {
+                                    response.responseData.filter.filter_type = '<span class="badge badge-danger text-uppercase">Block</span>';
+                                } else if (response.responseData.filter.filter_type === 'monitor') {
+                                    response.responseData.filter.filter_type = '<span class="badge badge-warning text-uppercase">Monitor</span>';
+                                }
+
+                                $('#filter-type').html(response.responseData.filter.filter_type);
+                            } else {
+                                $('#filter-type').html('-');
+                            }
+                            if (response.responseData.filter.ip2location_proxy) {
+                                $('#filter-ip2location-proxy').html(response.responseData.filter.ip2location_proxy);
+                            } else {
+                                $('#filter-ip2location-proxy').html('-');
+                            }
+                            if (response.responseData.filter.hit_count) {
+                                $('#filter-hit-count').html(response.responseData.filter.hit_count);
+                            } else {
+                                $('#filter-hit-count').html('0');
+                            }
+                            if (response.responseData.filter.incorrect_login_attempts) {
+                                $('#filter-incorrect-login-attempts').html(response.responseData.filter.incorrect_login_attempts);
+                            } else {
+                                $('#filter-incorrect-login-attempts').html('0');
+                            }
+
+                            if (response.responseData.filter.parent_filter) {
+                                if (response.responseData.filter.parent_filter.address_type) {
+                                    $('#parent-address-type').html(
+                                        '<span class="badge badge-primary text-uppercase">' + response.responseData.filter.parent_filter.address_type + '</span>'
+                                    );
+                                } else {
+                                    $('#parent-address-type').html('-');
+                                }
+                                if (response.responseData.filter.parent_filter.address) {
+                                    $('#parent-address').html(response.responseData.filter.parent_filter.address);
+                                } else {
+                                    $('#parent-address').html('-');
+                                }
+                                if (response.responseData.filter.parent_filter.filter_type) {
+                                    if (response.responseData.filter.parent_filter.filter_type === 'allow') {
+                                        response.responseData.filter.parent_filter.filter_type = '<span class="badge badge-success text-uppercase">Allow</span>';
+                                    } else if (response.responseData.filter.parent_filter.filter_type === 'block') {
+                                        response.responseData.filter.parent_filter.filter_type = '<span class="badge badge-danger text-uppercase">Block</span>';
+                                    } else if (response.responseData.filter.parent_filter.filter_type === 'monitor') {
+                                        response.responseData.filter.parent_filter.filter_type = '<span class="badge badge-warning text-uppercase">Monitor</span>';
+                                    }
+
+                                    $('#parent-type').html(response.responseData.filter.parent_filter.filter_type);
+                                } else {
+                                    $('#parent-type').html('-');
+                                }
+                                if (response.responseData.filter.parent_filter.ip2location_proxy) {
+                                    $('#parent-ip2location-proxy').html(response.responseData.filter.parent_filter.ip2location_proxy);
+                                } else {
+                                    $('#parent-ip2location-proxy').html('-');
+                                }
+                                if (response.responseData.filter.parent_filter.hit_count) {
+                                    $('#parent-hit-count').html(response.responseData.filter.parent_filter.hit_count);
+                                } else {
+                                    $('#parent-hit-count').html('0');
+                                }
+                                if (response.responseData.filter.parent_filter.incorrect_login_attempts) {
+                                    $('#parent-incorrect-login-attempts').html(response.responseData.filter.parent_filter.incorrect_login_attempts);
+                                } else {
+                                    $('#parent-incorrect-login-attempts').html('0');
+                                }
+                            }
+                        }
+
                         dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
 
                         if (response.responseCode != 0) {

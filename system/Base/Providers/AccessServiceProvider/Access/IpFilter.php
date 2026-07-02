@@ -122,17 +122,19 @@ class IpFilter extends BasePackage
         }
 
         //First Check - We check HOST entries
-        $profiling = [];
-        $this->basepackages->utils->setMicroTimer('hostCheckIpFilter', true, true);
+        if (!$cached) {
+            $profiling = [];
+            $this->basepackages->utils->setMicroTimer('hostCheckIpFilter', true, true);
+        }
 
         $filter = $this->filters->getFilterByAddressAndType($this->ip, 'host');
 
         if ($filter) {//We find the address in address_type host
             $hostCheckIpFilter = $this->filters->checkIPFilter($filter, $this->ip);
 
-            $this->basepackages->utils->setMicroTimer('hostCheckIpFilter', true);
-
             if (count($profiling) === 0) {
+                $this->basepackages->utils->setMicroTimer('hostCheckIpFilter', true);
+
                 $profiling = $this->basepackages->utils->getMicroTimer();
             }
 
@@ -140,6 +142,7 @@ class IpFilter extends BasePackage
 
             if (count($responseData) > 0) {
                 $responseData['profiling'] = $profiling;
+                $responseData['cached'] = $cached;
             }
 
             $this->addResponse(
@@ -162,8 +165,10 @@ class IpFilter extends BasePackage
         }
 
         //Second Check - We check NETWORK entries
-        $profiling = [];
-        $this->basepackages->utils->setMicroTimer('networkCheckIpFilter', true, true);
+        if (!$cached) {
+            $profiling = [];
+            $this->basepackages->utils->setMicroTimer('networkCheckIpFilter', true, true);
+        }
 
         $filters = $this->filters->getFilterByType('network');
 
@@ -172,9 +177,9 @@ class IpFilter extends BasePackage
                 if (IpUtils::checkIp($this->ip, $filter['address'])) {
                     $networkCheckIpFilter = $this->filters->checkIPFilter($filter, $ip);
 
-                    $this->basepackages->utils->setMicroTimer('networkCheckIpFilter', true);
-
                     if (count($profiling) === 0) {
+                        $this->basepackages->utils->setMicroTimer('networkCheckIpFilter', true);
+
                         $profiling = $this->basepackages->utils->getMicroTimer();
                     }
 
@@ -194,6 +199,7 @@ class IpFilter extends BasePackage
                         }
 
                         $responseData['profiling'] = $profiling;
+                        $responseData['cached'] = $cached;
                     }
 
                     $this->addResponse(
@@ -209,7 +215,10 @@ class IpFilter extends BasePackage
 
         //Third Check - We check ip2location as per the primary set first and then secondary if we did not find the entry
         if ($this->ip2location->checkIPIsPublic($this->ip)) {
-            $this->basepackages->utils->setMicroTimer('ip2locationCheckIpFilter', true, true);
+            if (!$cached) {
+                $profiling = [];
+                $this->basepackages->utils->setMicroTimer('ip2locationCheckIpFilter', true, true);
+            }
 
             $filters = $this->filters->getFilterByType('ip2location');
 
@@ -283,12 +292,29 @@ class IpFilter extends BasePackage
 
                                 $ip2locationCheckIpFilter = $this->filters->checkIPFilter($filter, $ip);
 
-                                $this->basepackages->utils->setMicroTimer('ip2locationCheckIpFilter', true);
+                                if (count($profiling) === 0) {
+                                    $this->basepackages->utils->setMicroTimer('ip2locationCheckIpFilter', true);
+
+                                    $profiling = $this->basepackages->utils->getMicroTimer();
+                                }
 
                                 $responseData = $this->filters->packagesData->responseData ?? [];
 
                                 if (count($responseData) > 0) {
-                                    $responseData['profiling'] = $this->basepackages->utils->getMicroTimer();
+                                    if (isset($responseData['filter'])) {
+                                        if ($this->opCache) {
+                                            $opCacheFilters[$this->ip] = false;
+
+                                            if ($responseData['filter']['filter_type'] === 'allow') {
+                                                $opCacheFilters[$this->ip] = true;
+                                            }
+
+                                            $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+                                        }
+                                    }
+
+                                    $responseData['profiling'] = $profiling;
+                                    $responseData['cached'] = $cached;
                                 }
 
                                 $this->addResponse(
@@ -306,8 +332,10 @@ class IpFilter extends BasePackage
         }
 
         //Forth - We check DEFAULT entries in default store
-        $profiling = [];
-        $this->basepackages->utils->setMicroTimer('defaultCheckIpFilter', true, true);
+        if (!$cached) {
+            $profiling = [];
+            $this->basepackages->utils->setMicroTimer('defaultCheckIpFilter', true, true);
+        }
 
         $filter = $this->filters->getFilterByAddressAndType($this->ip, 'host', true);
 
@@ -330,20 +358,32 @@ class IpFilter extends BasePackage
             $filter = $this->filters->addFilter($newFilter, true);
         }
 
-        $this->basepackages->utils->setMicroTimer('defaultCheckIpFilter', true);
-
         if (count($profiling) === 0) {
+            $this->basepackages->utils->setMicroTimer('defaultCheckIpFilter', true);
+
             $profiling = $this->basepackages->utils->getMicroTimer();
         }
 
         $responseData = [];
-
-        if (count($responseData) > 0) {
-            $responseData['profiling'] = $profiling;
-        }
-
         $responseData['default_filter'] = true;
         $responseData['filter'] = $filter;
+
+        if (count($responseData) > 0) {
+            if (isset($responseData['filter'])) {
+                if ($this->opCache) {
+                    $opCacheFilters[$this->ip] = false;
+
+                    if ($responseData['filter']['filter_type'] === 'allow') {
+                        $opCacheFilters[$this->ip] = true;
+                    }
+
+                    $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+                }
+            }
+
+            $responseData['profiling'] = $profiling;
+            $responseData['cached'] = $cached;
+        }
 
         if ($this->ipFilterSettings['default_filter'] === 'allow') {
             $this->addResponse('Allowed', 0, $responseData);
