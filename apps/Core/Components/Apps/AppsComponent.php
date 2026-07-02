@@ -480,7 +480,6 @@ class AppsComponent extends BaseComponent
         foreach ($filters as $key => &$filter) {
             unset ($filter['app_id']);
             unset ($filter['decimal']);
-            unset ($filter['ip2location_proxy']);
             unset ($filter['parent_id']);
 
             if ($filter['updated_by'] == '0') {
@@ -543,6 +542,18 @@ class AppsComponent extends BaseComponent
         );
     }
 
+    public function resetFilterHitCountAction()
+    {
+        $this->requestIsPost();
+
+        $this->access->ipFilter->filters->resetFilterHitCount($this->postData());
+
+        $this->addResponse(
+            $this->access->ipFilter->filters->packagesData->responseMessage,
+            $this->access->ipFilter->filters->packagesData->responseCode
+        );
+    }
+
     public function blockFilterAction()
     {
         $this->requestIsPost();
@@ -571,7 +582,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->checkIp($this->postData()['ip']);
+        $this->access->ipFilter->checkIp($this->postData()['ip'], null, true);
 
         $this->addResponse(
             $this->access->ipFilter->packagesData->responseMessage,

@@ -38,9 +38,13 @@
 		"ip2location_proxy_bin_file_code" : "PX3LITEBIN",
 		"ip2location_proxy_bin_access_mode" : "FILE_IO",
 		"ip2location_io_api_key":null,
-		"ip2location_io_api_language":null,
+		"ip2location_io_api_language" : "en",
 		"ip2location_primary_lookup_method" : "BIN",
 		"log_filters" : false,
-		"debug_filters" : false
+		"debug_filters" : false,
+		"response_type" : "code",
+		"response_code" : 404,
+		"response_url" : "",
+		"response_route" : ""
 	}
 }

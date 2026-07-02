@@ -95,7 +95,8 @@ class Auth extends BasePackage
             return false;
         }
 
-        $this->access->ipFilter->removeFromMonitoring();
+        $filter = null;
+        $this->access->ipFilter->filters->bumpFilterHitCounter(false, null, $filter, false, true);
 
         $security = $this->getAccountSecurityObject();
 
@@ -253,6 +254,16 @@ class Auth extends BasePackage
 
     protected function clearAccountSessionId()
     {
+        if (!$this->account) {
+            try {
+                $this->setUserFromSession();
+            } catch (\Exception $e) {
+                $this->sessionTools->clearSession($this->session->getId());
+
+                return;
+            }
+        }
+
         $sessionModel = new BasepackagesUsersAccountsSessions;
         $sessionStore = $this->ff->store($sessionModel->getSource());
 

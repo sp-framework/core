@@ -77,7 +77,7 @@ class IpFilter extends BasePackage
         return $this->ip;
     }
 
-    public function checkIp($ip = null, array $overrideIp2locationLookupSequence = null)
+    public function checkIp($ip = null, array $overrideIp2locationLookupSequence = null, $checkViaApp = false)
     {
         $this->ip = $ip;
 
@@ -87,6 +87,28 @@ class IpFilter extends BasePackage
 
         if ($this->ip === "127.0.0.1") {
             return true;
+        }
+
+        //Zero Check - We check OpCache
+        $profiling = [];
+        $this->basepackages->utils->setMicroTimer('cacheCheckIpFilter', true, true);
+
+        $opCacheFilters = [];
+        $cached = false;
+        if ($this->opCache && $this->opCache->checkCache($this->app['route'], 'filters')) {
+            $opCacheFilters = $this->opCache->getCache($this->app['route'], 'filters');
+
+            if (isset($opCacheFilters[$this->ip])) {
+                $this->basepackages->utils->setMicroTimer('cacheCheckIpFilter', true);
+
+                $profiling = $this->basepackages->utils->getMicroTimer();
+
+                if ($checkViaApp) {
+                    $cached = true;
+                } else {
+                    return $opCacheFilters[$this->ip];
+                }
+            }
         }
 
         if (!$this->filters->validateIP($this->ip)) {
@@ -99,7 +121,8 @@ class IpFilter extends BasePackage
             return false;
         }
 
-        //Zero Check - We check HOST entries
+        //First Check - We check HOST entries
+        $profiling = [];
         $this->basepackages->utils->setMicroTimer('hostCheckIpFilter', true, true);
 
         $filter = $this->filters->getFilterByAddressAndType($this->ip, 'host');
@@ -109,10 +132,14 @@ class IpFilter extends BasePackage
 
             $this->basepackages->utils->setMicroTimer('hostCheckIpFilter', true);
 
+            if (count($profiling) === 0) {
+                $profiling = $this->basepackages->utils->getMicroTimer();
+            }
+
             $responseData = $this->filters->packagesData->responseData ?? [];
 
             if (count($responseData) > 0) {
-                $responseData['profiling'] = $this->basepackages->utils->getMicroTimer();
+                $responseData['profiling'] = $profiling;
             }
 
             $this->addResponse(
@@ -121,10 +148,21 @@ class IpFilter extends BasePackage
                 $responseData
             );
 
+            if ($this->opCache) {
+                $opCacheFilters[$this->ip] = false;
+
+                if ($filter['filter_type'] === 'allow') {
+                    $opCacheFilters[$this->ip] = true;
+                }
+
+                $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+            }
+
             return $hostCheckIpFilter;
         }
 
-        //First Check - We check NETWORK entries
+        //Second Check - We check NETWORK entries
+        $profiling = [];
         $this->basepackages->utils->setMicroTimer('networkCheckIpFilter', true, true);
 
         $filters = $this->filters->getFilterByType('network');
@@ -136,10 +174,26 @@ class IpFilter extends BasePackage
 
                     $this->basepackages->utils->setMicroTimer('networkCheckIpFilter', true);
 
+                    if (count($profiling) === 0) {
+                        $profiling = $this->basepackages->utils->getMicroTimer();
+                    }
+
                     $responseData = $this->filters->packagesData->responseData ?? [];
 
                     if (count($responseData) > 0) {
-                        $responseData['profiling'] = $this->basepackages->utils->getMicroTimer();
+                        if (isset($responseData['filter'])) {
+                            if ($this->opCache) {
+                                $opCacheFilters[$this->ip] = false;
+
+                                if ($responseData['filter']['filter_type'] === 'allow') {
+                                    $opCacheFilters[$this->ip] = true;
+                                }
+
+                                $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+                            }
+                        }
+
+                        $responseData['profiling'] = $profiling;
                     }
 
                     $this->addResponse(
@@ -251,10 +305,10 @@ class IpFilter extends BasePackage
             }
         }
 
-        //Forth - We check DEFAULT entries
+        //Forth - We check DEFAULT entries in default store
+        $profiling = [];
         $this->basepackages->utils->setMicroTimer('defaultCheckIpFilter', true, true);
 
-        //We check host entry in the default store
         $filter = $this->filters->getFilterByAddressAndType($this->ip, 'host', true);
 
         if ($filter) {//We find the address in default store and bump its counter
@@ -278,8 +332,21 @@ class IpFilter extends BasePackage
 
         $this->basepackages->utils->setMicroTimer('defaultCheckIpFilter', true);
 
+        if (count($profiling) === 0) {
+            $profiling = $this->basepackages->utils->getMicroTimer();
+        }
+
+        $responseData = [];
+
+        if (count($responseData) > 0) {
+            $responseData['profiling'] = $profiling;
+        }
+
+        $responseData['default_filter'] = true;
+        $responseData['filter'] = $filter;
+
         if ($this->ipFilterSettings['default_filter'] === 'allow') {
-            $this->addResponse('Allowed', 0, ['default_filter' => true, 'filter' => $filter]);
+            $this->addResponse('Allowed', 0, $responseData);
 
             if ($this->ipFilterSettings['log_filters'] === true) {
                 $this->logger->logIpFilters->info($this->helper->encode(['action' => 'ALLOWED', 'ip' => $this->ip, 'filters_store'=> 'default', 'filter_id' => $filter['id']]));
@@ -288,7 +355,7 @@ class IpFilter extends BasePackage
             return true;
         } else if ($this->ipFilterSettings['default_filter'] === 'block') {
             if ($this->ipFilterSettings['status'] === 'monitor') {
-                $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, ['default_filter' => true, 'filter' => $filter]);
+                $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, $responseData);
 
                 return true;
             }
@@ -297,7 +364,7 @@ class IpFilter extends BasePackage
                 $this->logger->logIpFilters->info($this->helper->encode(['action' => 'BLOCKED', 'ip' => $this->ip, 'filters_store'=> 'default', 'filter_id' => $filter['id']]));
             }
 
-            $this->addResponse('Blocked', 1, ['default_filter' => true, 'filter' => $filter]);
+            $this->addResponse('Blocked', 1, $responseData);
 
             return false;
         }
