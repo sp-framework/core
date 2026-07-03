@@ -69,7 +69,7 @@
                                     'size'                    : 'xs',
                                     'type'                    : 'danger',
                                     'disabled'                : true,
-                                    'buttonAdditionalClass'   : 'mt-2',
+                                    'buttonAdditionalClass'   : 'mt-1',
                                     'icon'                    : 'cog fa-spin',
                                     'position'                : 'right',
                                     'iconHidden'              : true
@@ -79,7 +79,7 @@
                                     'size'                    : 'xs',
                                     'type'                    : 'warning',
                                     'disabled'                : true,
-                                    'buttonAdditionalClass'   : 'mt-2',
+                                    'buttonAdditionalClass'   : 'mt-1',
                                     'icon'                    : 'cog fa-spin',
                                     'position'                : 'right',
                                     'iconHidden'              : true
@@ -89,7 +89,7 @@
                                     'size'                    : 'xs',
                                     'type'                    : 'info',
                                     'disabled'                : true,
-                                    'buttonAdditionalClass'   : 'mt-2',
+                                    'buttonAdditionalClass'   : 'mt-1',
                                     'icon'                    : 'cog fa-spin',
                                     'position'                : 'right',
                                     'iconHidden'              : true
@@ -143,6 +143,7 @@
         </div>
     </div>
 </div>
+<hr>
 <div class="row">
     <div class="col">
         <div class="row">
@@ -163,7 +164,17 @@
                                     'size'                    : 'xs',
                                     'type'                    : 'danger',
                                     'disabled'                : true,
-                                    'buttonAdditionalClass'   : 'mt-2',
+                                    'buttonAdditionalClass'   : 'mt-1',
+                                    'icon'                    : 'cog fa-spin',
+                                    'position'                : 'right',
+                                    'iconHidden'              : true
+                                ],
+                                'remove-checked-parent-children'       : [
+                                    'title'                   : 'Remove Child Filters',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'warning',
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'mt-1',
                                     'icon'                    : 'cog fa-spin',
                                     'position'                : 'right',
                                     'iconHidden'              : true
@@ -173,7 +184,7 @@
                                     'size'                    : 'xs',
                                     'type'                    : 'info',
                                     'disabled'                : true,
-                                    'buttonAdditionalClass'   : 'mt-2',
+                                    'buttonAdditionalClass'   : 'mt-1',
                                     'icon'                    : 'cog fa-spin',
                                     'position'                : 'right',
                                     'iconHidden'              : true
@@ -209,6 +220,12 @@
             <div class="col">
                 <label class="text-uppercase">Incorrect Login Attempts: </label>
                 <span id="parent-incorrect-login-attempts">-</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label class="text-uppercase">Ip Hits: </label>
+                <span id="parent-ip-hits">-</span>
             </div>
         </div>
     </div>

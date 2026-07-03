@@ -528,19 +528,15 @@ class Filters extends BasePackage
 
         $filters = $this->getByParams($conditions);
 
+        $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+        $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
         if ($filters) {
-            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
-
-            $this->ffStore = $this->ff->store($this->ffStoreToUse);
-
             $this->addResponse('Ok', 0, ['filters' => $filters]);
 
             return $filters;
         }
-
-        $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
-
-        $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
         $this->addResponse('No filters found for the given type ' . $type, 1);
 
@@ -771,8 +767,6 @@ class Filters extends BasePackage
             ) {
                 if ($data['address_type'] === 'ip2location') {
                     $data['ip2location_proxy'] = 'allow';//Default is to allow proxy connections
-                } else {
-                    $data['ip2location_proxy'] = '-';//Default is to allow proxy connections
                 }
             }
 
@@ -964,7 +958,7 @@ class Filters extends BasePackage
 
         $filter = $this->getFirst('id', $data['id'], false, true, null, [], true);
 
-        if ($filter['address'] === $this->getVisitorIp()) {
+        if ($filter['address'] === $this->access->ipFilter->getVisitorIp()) {
             $this->addResponse('Cannot block your own IP!', 1);
 
             return false;
@@ -1041,7 +1035,13 @@ class Filters extends BasePackage
         }
 
         if (isset($filter['parent_id'])) {
-            $parentFilter = $this->getFilterById($filter['parent_id']);
+            $parentFilter = $this->getFilterById($filter['parent_id'], true);
+
+            if (isset($parentFilter['ips']) && count($parentFilter['ips']) > 0) {
+                $parentFilter['ip_hits'] = count($parentFilter['ips']);
+
+                unset($parentFilter['ips']);
+            }
         }
 
         $this->bumpFilterHitCounter(false, null, $filter, $defaultStore);

@@ -218,7 +218,7 @@
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
                 'fieldId'                        : 'ip2location_proxy',
-                'fieldLabel'                     : 'Proxy Connections',
+                'fieldLabel'                     : 'Proxy (VPN)',
                 'fieldType'                      : 'radio',
                 'fieldRadioPlacementType'        : "horizontal",
                 'fieldHelp'                      : true,
@@ -232,20 +232,17 @@
                         'allow_proxy' :
                             [
                                 'title'                           : 'ALLOW',
+                                'type'                            : 'success',
                                 'dataValue'                       : 'allow_proxy'
                             ],
                         'block_proxy' :
                             [
                                 'title'                           : 'BLOCK',
+                                'type'                            : 'danger',
                                 'dataValue'                       : 'block_proxy'
-                            ],
-                        'ignore' :
-                            [
-                                'title'                           : 'IGNORE',
-                                'dataValue'                       : 'ignore'
                             ]
                     ],
-                'fieldRadioChecked'              : 'ignore'
+                'fieldRadioChecked'              : 'allow_proxy'
             ]
         )}}
     </div>

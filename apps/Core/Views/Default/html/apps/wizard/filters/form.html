@@ -55,6 +55,183 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['funcs'] = { };
 
+dataCollectionSectionForm['funcs']['resetForm'] = function() {
+    if ($('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'host' ||
+        $('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'network'
+    ) {
+        $('#{{componentId}}-{{sectionId}}-host_network_address').val('');
+    } else if ($('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'ip2location') {
+        $('#{{componentId}}-{{sectionId}}-country_id').val(0).trigger('change');
+        $('#{{componentId}}-{{sectionId}}-state_id').val('');
+        $('#{{componentId}}-{{sectionId}}-state_name').val('');
+        $('#{{componentId}}-{{sectionId}}-city_id').val('');
+        $('#{{componentId}}-{{sectionId}}-city_name').val('');
+
+        $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', true);
+    }
+
+    $('#allow').prop('checked', true);
+    $('#host').prop('checked', true);
+    $('#allow_proxy').prop('checked', true);
+    $('#host_network_address_div').attr('hidden', false);
+    $('#ip2location_address_div').attr('hidden', true);
+    $('#ip2location-error').attr('hidden', true);
+}
+
+dataCollectionSectionForm['funcs']['removeFilter'] = function(childs = false, thisButton) {
+    var url = "{{links.url('apps/removeFilter')}}";
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData["id"] = $(thisButton).data('id');
+    var color = 'danger';
+    var text = 'Remove Filter?';
+    if (childs) {
+        text = 'Remove Child Filters?'
+        postData["remove_child_filters"] = true;
+        color = 'warning';
+    }
+
+    Swal.fire({
+        title                       : '<span class="text-' + color + '">' + text + '</span>',
+        icon                        : 'question',
+        background                  : 'rgba(0,0,0,.8)',
+        backdrop                    : 'rgba(0,0,0,.6)',
+        buttonsStyling              : false,
+        confirmButtonText           : 'Remove',
+        customClass                 : {
+            'confirmButton'             : 'btn btn-' + color + ' btn-sm text-uppercase',
+            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+        },
+        showCancelButton            : true,
+        keydownListenerCapture      : true,
+        allowOutsideClick           : true,
+        allowEscapeKey              : true,
+        didOpen                     : function() {
+            dataCollection.env.sounds.swalSound.play();
+        }
+    }).then((result) => {
+        if (result.value) {
+            $.post(url, postData, function(response) {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+
+                if (response.responseCode != 0) {
+                    paginatedPNotify('error', {
+                        title   : response.responseMessage
+                    });
+
+                    return;
+                }
+
+                paginatedPNotify('success', {
+                    title   : response.responseMessage
+                });
+            }, "json");
+        }
+    });
+}
+
+dataCollectionSectionForm['funcs']['allowBlock'] = function(task, thisButton) {
+    var text;
+    var responseText;
+    var color;
+
+    if (task === 'allow') {
+        text = 'Allow';
+        responseText = 'Allowed';
+        color = 'success';
+    } else if (task === 'block') {
+        text = 'Block';
+        responseText = 'Blocked';
+        color = 'danger';
+    }
+
+    Swal.fire({
+        title                       : '<span class="text-' + color + '">' + text + ' IP?</span>',
+        icon                        : 'question',
+        background                  : 'rgba(0,0,0,.8)',
+        backdrop                    : 'rgba(0,0,0,.6)',
+        buttonsStyling              : false,
+        confirmButtonText           : text,
+        customClass                 : {
+            'confirmButton'             : 'btn btn-' + color + ' btn-sm text-uppercase',
+            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+        },
+        showCancelButton            : true,
+        keydownListenerCapture      : true,
+        allowOutsideClick           : true,
+        allowEscapeKey              : true,
+        didOpen                     : function() {
+            dataCollection.env.sounds.swalSound.play();
+        }
+    }).then((result) => {
+        if (result.value) {
+            var url = "{{links.url('apps/" + text + "Filter')}}";
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData["id"] = $(thisButton).data('id');
+
+            $.post(url, postData, function(response) {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+
+                if (response.responseCode != 0) {
+                    paginatedPNotify('error', {
+                        title   : response.responseMessage
+                    });
+
+                    return;
+                }
+
+                paginatedPNotify('success', {title   : 'IP ' + responseText + '.'});
+            }, "json");
+        }
+    });
+}
+
+dataCollectionSectionForm['funcs']['resetHitCount'] = function(thisButton) {
+    Swal.fire({
+        title                       : '<span class="text-info"> Reset Hit Count to "0"?</span>',
+        icon                        : 'question',
+        background                  : 'rgba(0,0,0,.8)',
+        backdrop                    : 'rgba(0,0,0,.6)',
+        buttonsStyling              : false,
+        confirmButtonText           : 'Reset',
+        customClass                 : {
+            'confirmButton'             : 'btn btn-info btn-sm text-uppercase',
+            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+        },
+        showCancelButton            : true,
+        keydownListenerCapture      : true,
+        allowOutsideClick           : true,
+        allowEscapeKey              : true,
+        didOpen                     : function() {
+            dataCollection.env.sounds.swalSound.play();
+        }
+    }).then((result) => {
+        if (result.value) {
+            var url = "{{links.url('apps/resetFilterHitCount')}}";
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData["id"] = $(thisButton).data('id');
+
+            $.post(url, postData, function(response) {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+
+                if (response.responseCode != 0) {
+                    paginatedPNotify('error', {
+                        title   : response.responseMessage
+                    });
+
+                    return;
+                }
+
+                paginatedPNotify('success', {
+                    title   : 'Counter reset to 0.'
+                });
+            }, "json");
+        }
+    });
+}
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                              : { },
@@ -337,20 +514,7 @@ dataCollectionSection =
                     e.preventDefault();
 
                     if ($(this)[0].id === '{{componentId}}-{{sectionId}}-cancel-filter') {
-                        if ($('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'host' ||
-                            $('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'network'
-                        ) {
-                            $('#{{componentId}}-{{sectionId}}-host_network_address').val('');
-                        } else if ($('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'ip2location') {
-                            $('#{{componentId}}-{{sectionId}}-country_id').val(0).trigger('change');
-                            $('#{{componentId}}-{{sectionId}}-state_id').val('');
-                            $('#{{componentId}}-{{sectionId}}-state_name').val('');
-                            $('#{{componentId}}-{{sectionId}}-city_id').val('');
-                            $('#{{componentId}}-{{sectionId}}-city_name').val('');
-
-                            $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', true);
-                        }
+                        dataCollectionSectionForm['funcs']['resetForm']();
 
                         return;
                     }
@@ -416,6 +580,8 @@ dataCollectionSection =
                         }
 
                         paginatedPNotify('success', {title   : 'Filter added.'});
+
+                        dataCollectionSectionForm['funcs']['resetForm']();
                     }, "json");
                 });
 
@@ -523,6 +689,18 @@ dataCollectionSection =
                                                 'data-toggle="tooltip" data-placement="left" title="Remove Filter"' +
                                                 'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-trash"></i></a>';
 
+                                            if (json.data[i]['ip2location_proxy'] === '<span class="badge badge-success text-uppercase">Allow</span>') {
+                                                json.data[i]['actions'] += ' | ';
+                                                json.data[i]['actions'] += '<a href="#" class="text-danger block-proxy" ' +
+                                                    'data-toggle="tooltip" data-placement="left" title="Block Proxy"' +
+                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-lock"></i></a>';
+                                            } else if (json.data[i]['ip2location_proxy'] === '<span class="badge badge-danger text-uppercase">Block</span>') {
+                                                json.data[i]['actions'] += ' | ';
+                                                json.data[i]['actions'] += '<a href="#" class="text-success allow-proxy" ' +
+                                                    'data-toggle="tooltip" data-placement="left" title="Allow Proxy"' +
+                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-lock"></i></a>';
+                                            }
+
                                             if (json.data[i]['hit_count'] && json.data[i]['hit_count'] > 0) {
                                                 json.data[i]['actions'] += '<a href="#" class="text-info reset-hit-count" ' +
                                                     'data-toggle="tooltip" data-placement="left" title="Reset Hit Count"' +
@@ -562,207 +740,40 @@ dataCollectionSection =
                             $('.remove-filter,.remove-child-filters').click(function(e) {
                                 e.preventDefault();
 
-                                var url = "{{links.url('apps/removeFilter')}}";
-                                var postData = { };
-                                postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                postData["id"] = $(this).data('id');
-                                var color = 'danger';
-                                var text = 'Remove Filter?';
+                                var childs = false;
                                 if ($($(e)[0].currentTarget).hasClass('remove-child-filters')) {
-                                    text = 'Remove Child Filters?'
-                                    postData["remove_child_filters"] = true;
-                                    color = 'warning';
+                                    childs = true;
                                 }
 
-                                Swal.fire({
-                                    title                       : '<span class="text-' + color + '">' + text + '</span>',
-                                    icon                        : 'question',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    buttonsStyling              : false,
-                                    confirmButtonText           : 'Remove',
-                                    customClass                 : {
-                                        'confirmButton'             : 'btn btn-' + color + ' btn-sm text-uppercase',
-                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-                                    },
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : true,
-                                    allowEscapeKey              : true,
-                                    didOpen                     : function() {
-                                        dataCollection.env.sounds.swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        $.post(url, postData, function(response) {
-                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-
-                                            if (response.responseCode != 0) {
-                                                paginatedPNotify('error', {
-                                                    title   : response.responseMessage
-                                                });
-
-                                                return;
-                                            }
-
-                                            paginatedPNotify('success', {
-                                                title   : response.responseMessage
-                                            });
-                                        }, "json");
-                                    }
-                                });
+                                dataCollectionSectionForm['funcs']['removeFilter'](childs, this);
                             });
 
                             $('.allow-filter').click(function(e) {
                                 e.preventDefault();
 
-                                Swal.fire({
-                                    title                       : '<span class="text-success"> Allow IP?</span>',
-                                    icon                        : 'question',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    buttonsStyling              : false,
-                                    confirmButtonText           : 'Allow',
-                                    customClass                 : {
-                                        'confirmButton'             : 'btn btn-success btn-sm text-uppercase',
-                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-                                    },
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : true,
-                                    allowEscapeKey              : true,
-                                    didOpen                     : function() {
-                                        dataCollection.env.sounds.swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        var url = "{{links.url('apps/allowFilter')}}";
-                                        var postData = { };
-                                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                        postData["id"] = $(this).data('id');
-
-                                        $.post(url, postData, function(response) {
-                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-
-                                            if (response.responseCode != 0) {
-                                                paginatedPNotify('error', {
-                                                    title   : response.responseMessage
-                                                });
-
-                                                return;
-                                            }
-
-                                            paginatedPNotify('success', {
-                                                title   : 'IP Allowed.'
-                                            });
-                                        }, "json");
-                                    }
-                                });
+                                dataCollectionSectionForm['funcs']['allowBlock']('allow', this);
                             });
 
                             $('.block-filter').click(function(e) {
                                 e.preventDefault();
 
-                                Swal.fire({
-                                    title                       : '<span class="text-danger"> Block IP?</span>',
-                                    icon                        : 'question',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    buttonsStyling              : false,
-                                    confirmButtonText           : 'Block',
-                                    customClass                 : {
-                                        'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
-                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-                                    },
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : true,
-                                    allowEscapeKey              : true,
-                                    didOpen                     : function() {
-                                        dataCollection.env.sounds.swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        var url = "{{links.url('apps/blockFilter')}}";
-                                        var postData = { };
-                                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                        postData["id"] = $(this).data('id');
-
-                                        $.post(url, postData, function(response) {
-                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-
-                                            if (response.responseCode != 0) {
-                                                paginatedPNotify('error', {
-                                                    title   : response.responseMessage
-                                                });
-
-                                                return;
-                                            }
-
-                                            paginatedPNotify('success', {
-                                                title   : 'IP Blocked.'
-                                            });
-                                        }, "json");
-                                    }
-                                });
+                                dataCollectionSectionForm['funcs']['allowBlock']('block', this);
                             });
 
                             $('.reset-hit-count').click(function(e) {
                                 e.preventDefault();
 
-                                Swal.fire({
-                                    title                       : '<span class="text-info"> Reset Hit Count to "0"?</span>',
-                                    icon                        : 'question',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    buttonsStyling              : false,
-                                    confirmButtonText           : 'Reset',
-                                    customClass                 : {
-                                        'confirmButton'             : 'btn btn-info btn-sm text-uppercase',
-                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-                                    },
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : true,
-                                    allowEscapeKey              : true,
-                                    didOpen                     : function() {
-                                        dataCollection.env.sounds.swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        var url = "{{links.url('apps/resetFilterHitCount')}}";
-                                        var postData = { };
-                                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                        postData["id"] = $(this).data('id');
-
-                                        $.post(url, postData, function(response) {
-                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-
-                                            if (response.responseCode != 0) {
-                                                paginatedPNotify('error', {
-                                                    title   : response.responseMessage
-                                                });
-
-                                                return;
-                                            }
-
-                                            paginatedPNotify('success', {
-                                                title   : 'Counter reset to 0.'
-                                            });
-                                        }, "json");
-                                    }
-                                });
+                                dataCollectionSectionForm['funcs']['resetHitCount'](this);
                             });
 
                             $('.view-child-filters').click(function(e) {
                                 e.preventDefault();
 
-                                $('#{{componentId}}-{{sectionId}}-filters').siblings('label')[0].innerHTML = 'FILTERS (' + $(this).parents('td').siblings('td')[0].innerHTML + ')';
-
+                                $('#{{componentId}}-{{sectionId}}-filters').siblings('label')[0].innerHTML =
+                                    'FILTERS (' + $(this).parents('td').siblings('td')[0].innerHTML + ')';
                                 dataCollectionSectionForm['vars']['filterPostData']['parent_filter_id'] = $(this).parents('tr')[0].id;
-
-                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].settings()[0].ajax.data = dataCollectionSectionForm['vars']['filterPostData'];
-
+                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].settings()[0].ajax.data =
+                                    dataCollectionSectionForm['vars']['filterPostData'];
                                 dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
                             });
                         });
@@ -828,6 +839,8 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-cancelcheckip').click(function(e) {
                     e.preventDefault();
 
+                    $('#{{componentId}}-{{sectionId}}-ip').val('');
+
                     reset();
                 });
 
@@ -847,11 +860,12 @@ dataCollectionSection =
                     $('#parent-ip2location-proxy').html('-');
                     $('#parent-hit-count').html('-');
                     $('#parent-incorrect-login-attempts').html('-');
+                    $('#parent-ip-hits').html('-');
                     $('#profiling').html('');
 
                     $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
                       '#{{componentId}}-{{sectionId}}-reset-checked-filter-counters,#{{componentId}}-{{sectionId}}-remove-checked-parent,' +
-                      '#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').attr('disabled', true);
+                      '#{{componentId}}-{{sectionId}}-remove-checked-parent-children,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').attr('disabled', true);
                 }
 
                 $('#{{componentId}}-{{sectionId}}-checkip').off();
@@ -880,9 +894,11 @@ dataCollectionSection =
                                 }
 
                                 if (response.responseData.cached) {
-                                    store += ' | CACHED';
+                                    $('#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache').attr('disabled', false);
+
+                                    store += ' | <span class="badge badge-success">CACHED</span>';
                                 } else {
-                                    store += ' | NOT CACHED';
+                                    store += ' | <span class="badge badge-warning">NOT CACHED</span>';
                                 }
 
                                 $('#filter-store').html(store);
@@ -941,8 +957,7 @@ dataCollectionSection =
                                 $('#filter-incorrect-login-attempts').html('0');
                             }
 
-                            $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
-                              '#{{componentId}}-{{sectionId}}-remove-checked-parent').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-remove-checked-filter').attr('disabled', false);
 
                             if (response.responseData.filter.parent_filter) {
                                 if (response.responseData.filter.parent_filter.address_type) {
@@ -971,7 +986,16 @@ dataCollectionSection =
                                     $('#parent-type').html('-');
                                 }
                                 if (response.responseData.filter.parent_filter.ip2location_proxy) {
+                                    if (response.responseData.filter.parent_filter.ip2location_proxy === 'allow') {
+                                        response.responseData.filter.parent_filter.ip2location_proxy = '<span class="badge badge-success text-uppercase">Allow</span>';
+                                    } else if (response.responseData.filter.parent_filter.ip2location_proxy === 'block') {
+                                        response.responseData.filter.parent_filter.ip2location_proxy = '<span class="badge badge-danger text-uppercase">Block</span>';
+                                    } else {
+                                        response.responseData.filter.parent_filter.ip2location_proxy = '-';
+                                    }
+
                                     $('#parent-ip2location-proxy').html(response.responseData.filter.parent_filter.ip2location_proxy);
+
                                 } else {
                                     $('#parent-ip2location-proxy').html('-');
                                 }
@@ -986,20 +1010,28 @@ dataCollectionSection =
                                 } else {
                                     $('#parent-incorrect-login-attempts').html('0');
                                 }
-                                $('#{{componentId}}-{{sectionId}}-remove-checked-parent,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').attr('disabled', false);
+                                if (response.responseData.filter.parent_filter.ip_hits) {
+                                    $('#parent-ip-hits').html(response.responseData.filter.parent_filter.ip_hits);
+                                    $('#{{componentId}}-{{sectionId}}-remove-checked-parent-children').attr('disabled', false);
+                                } else {
+                                    $('#parent-ip-hits').html('0');
+                                }
+                                $('#{{componentId}}-{{sectionId}}-remove-checked-parent').attr('disabled', false);
                             }
                         }
 
                         dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-
-                        if (response.responseCode != 0) {
-                            paginatedPNotify('error', {title   : response.responseMessage});
-
-                            return;
-                        }
-
-                        paginatedPNotify('success', {title   : response.responseMessage});
                     }, "json");
+                });
+
+                $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
+                  '#{{componentId}}-{{sectionId}}-reset-checked-filter-counters,#{{componentId}}-{{sectionId}}-remove-checked-parent,' +
+                  '#{{componentId}}-{{sectionId}}-remove-checked-parent-children,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').off();
+                $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
+                  '#{{componentId}}-{{sectionId}}-reset-checked-filter-counters,#{{componentId}}-{{sectionId}}-remove-checked-parent,' +
+                  '#{{componentId}}-{{sectionId}}-remove-checked-parent-children,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').click(function(e) {
+                    //eslint-disable-next-line
+                    console.log($(this)[0].id);
                 });
             }
         }

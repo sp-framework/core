@@ -205,7 +205,7 @@ class IpFilter extends BasePackage
                     $this->addResponse(
                         $this->filters->packagesData->responseMessage,
                         $this->filters->packagesData->responseCode,
-                        $this->filters->packagesData->responseData ?? []
+                        $responseData
                     );
 
                     return $networkCheckIpFilter;
