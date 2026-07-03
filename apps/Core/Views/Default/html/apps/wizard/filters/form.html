@@ -824,9 +824,41 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-ip'                              : {
             afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-cancelcheckip').off();
+                $('#{{componentId}}-{{sectionId}}-cancelcheckip').click(function(e) {
+                    e.preventDefault();
+
+                    reset();
+                });
+
+                function reset() {
+                    $('#filter-store').html('-');
+                    $('#filter-id').html('-');
+                    $('#filter-parent-id').html('-');
+                    $('#filter-address-type').html('-');
+                    $('#filter-address').html('-');
+                    $('#filter-type').html('-');
+                    $('#filter-ip2location-proxy').html('-');
+                    $('#filter-hit-count').html('-');
+                    $('#filter-incorrect-login-attempts').html('-');
+                    $('#parent-address-type').html('-');
+                    $('#parent-address').html('-');
+                    $('#parent-type').html('-');
+                    $('#parent-ip2location-proxy').html('-');
+                    $('#parent-hit-count').html('-');
+                    $('#parent-incorrect-login-attempts').html('-');
+                    $('#profiling').html('');
+
+                    $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
+                      '#{{componentId}}-{{sectionId}}-reset-checked-filter-counters,#{{componentId}}-{{sectionId}}-remove-checked-parent,' +
+                      '#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').attr('disabled', true);
+                }
+
                 $('#{{componentId}}-{{sectionId}}-checkip').off();
                 $('#{{componentId}}-{{sectionId}}-checkip').click(function(e) {
                     e.preventDefault();
+
+                    reset();
 
                     var url = "{{links.url('apps/checkIp')}}";
                     var postData = { };
@@ -834,26 +866,9 @@ dataCollectionSection =
                     postData["ip"] = $("#{{componentId}}-{{sectionId}}-ip").val();
 
                     $.post(url, postData, function(response) {
-                        $('#filter-store').html('-');
-                        $('#filter-id').html('-');
-                        $('#filter-parent-id').html('-');
-                        $('#filter-address-type').html('-');
-                        $('#filter-address').html('-');
-                        $('#filter-type').html('-');
-                        $('#filter-ip2location-proxy').html('-');
-                        $('#filter-hit-count').html('-');
-                        $('#filter-incorrect-login-attempts').html('-');
-                        $('#parent-address-type').html('-');
-                        $('#parent-address').html('-');
-                        $('#parent-type').html('-');
-                        $('#parent-ip2location-proxy').html('-');
-                        $('#parent-hit-count').html('-');
-                        $('#parent-incorrect-login-attempts').html('-');
-                        $('#profiling').html('');
-
                         if (response.responseData && response.responseData.filter && typeof response.responseData.filter === 'object') {
                             if (response.responseData.profiling && response.responseData.profiling[1]) {
-                                $('#profiling').html('IP checked via ' + response.responseData.profiling[1]['reference'] + '. It took ' + response.responseData.profiling[1]['difference'] + ' ms');
+                                $('#profiling').html('IP found in ' + response.responseData.profiling[1]['reference'] + '. Query took ' + response.responseData.profiling[1]['difference'] + ' ms');
                             }
 
                             if (response.responseData.default_filter !== 'undefined') {
@@ -916,6 +931,7 @@ dataCollectionSection =
                             }
                             if (response.responseData.filter.hit_count) {
                                 $('#filter-hit-count').html(response.responseData.filter.hit_count);
+                                $('#{{componentId}}-{{sectionId}}-reset-checked-filter-counters').attr('disabled', false);
                             } else {
                                 $('#filter-hit-count').html('0');
                             }
@@ -924,6 +940,9 @@ dataCollectionSection =
                             } else {
                                 $('#filter-incorrect-login-attempts').html('0');
                             }
+
+                            $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
+                              '#{{componentId}}-{{sectionId}}-remove-checked-parent').attr('disabled', false);
 
                             if (response.responseData.filter.parent_filter) {
                                 if (response.responseData.filter.parent_filter.address_type) {
@@ -958,6 +977,7 @@ dataCollectionSection =
                                 }
                                 if (response.responseData.filter.parent_filter.hit_count) {
                                     $('#parent-hit-count').html(response.responseData.filter.parent_filter.hit_count);
+                                    $('#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').attr('disabled', false);
                                 } else {
                                     $('#parent-hit-count').html('0');
                                 }
@@ -966,6 +986,7 @@ dataCollectionSection =
                                 } else {
                                     $('#parent-incorrect-login-attempts').html('0');
                                 }
+                                $('#{{componentId}}-{{sectionId}}-remove-checked-parent,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').attr('disabled', false);
                             }
                         }
 

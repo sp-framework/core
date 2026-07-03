@@ -91,7 +91,7 @@ class IpFilter extends BasePackage
 
         //Zero Check - We check OpCache
         $profiling = [];
-        $this->basepackages->utils->setMicroTimer('cacheCheckIpFilter', true, true);
+        $this->basepackages->utils->setMicroTimer('Cached Filters', true, true);
 
         $opCacheFilters = [];
         $cached = false;
@@ -99,7 +99,7 @@ class IpFilter extends BasePackage
             $opCacheFilters = $this->opCache->getCache($this->app['route'], 'filters');
 
             if (isset($opCacheFilters[$this->ip])) {
-                $this->basepackages->utils->setMicroTimer('cacheCheckIpFilter', true);
+                $this->basepackages->utils->setMicroTimer('Cached Filters', true);
 
                 $profiling = $this->basepackages->utils->getMicroTimer();
 
@@ -124,7 +124,7 @@ class IpFilter extends BasePackage
         //First Check - We check HOST entries
         if (!$cached) {
             $profiling = [];
-            $this->basepackages->utils->setMicroTimer('hostCheckIpFilter', true, true);
+            $this->basepackages->utils->setMicroTimer('Host Filters', true, true);
         }
 
         $filter = $this->filters->getFilterByAddressAndType($this->ip, 'host');
@@ -133,7 +133,7 @@ class IpFilter extends BasePackage
             $hostCheckIpFilter = $this->filters->checkIPFilter($filter, $this->ip);
 
             if (count($profiling) === 0) {
-                $this->basepackages->utils->setMicroTimer('hostCheckIpFilter', true);
+                $this->basepackages->utils->setMicroTimer('Host Filters', true);
 
                 $profiling = $this->basepackages->utils->getMicroTimer();
             }
@@ -167,7 +167,7 @@ class IpFilter extends BasePackage
         //Second Check - We check NETWORK entries
         if (!$cached) {
             $profiling = [];
-            $this->basepackages->utils->setMicroTimer('networkCheckIpFilter', true, true);
+            $this->basepackages->utils->setMicroTimer('Network Filters', true, true);
         }
 
         $filters = $this->filters->getFilterByType('network');
@@ -178,7 +178,7 @@ class IpFilter extends BasePackage
                     $networkCheckIpFilter = $this->filters->checkIPFilter($filter, $ip);
 
                     if (count($profiling) === 0) {
-                        $this->basepackages->utils->setMicroTimer('networkCheckIpFilter', true);
+                        $this->basepackages->utils->setMicroTimer('Network Filters', true);
 
                         $profiling = $this->basepackages->utils->getMicroTimer();
                     }
@@ -217,7 +217,7 @@ class IpFilter extends BasePackage
         if ($this->ip2location->checkIPIsPublic($this->ip)) {
             if (!$cached) {
                 $profiling = [];
-                $this->basepackages->utils->setMicroTimer('ip2locationCheckIpFilter', true, true);
+                $this->basepackages->utils->setMicroTimer('Ip2location Filters', true, true);
             }
 
             $filters = $this->filters->getFilterByType('ip2location');
@@ -293,7 +293,7 @@ class IpFilter extends BasePackage
                                 $ip2locationCheckIpFilter = $this->filters->checkIPFilter($filter, $ip);
 
                                 if (count($profiling) === 0) {
-                                    $this->basepackages->utils->setMicroTimer('ip2locationCheckIpFilter', true);
+                                    $this->basepackages->utils->setMicroTimer('Ip2location Filters', true);
 
                                     $profiling = $this->basepackages->utils->getMicroTimer();
                                 }
@@ -334,7 +334,7 @@ class IpFilter extends BasePackage
         //Forth - We check DEFAULT entries in default store
         if (!$cached) {
             $profiling = [];
-            $this->basepackages->utils->setMicroTimer('defaultCheckIpFilter', true, true);
+            $this->basepackages->utils->setMicroTimer('Default Filters', true, true);
         }
 
         $filter = $this->filters->getFilterByAddressAndType($this->ip, 'host', true);
@@ -359,7 +359,7 @@ class IpFilter extends BasePackage
         }
 
         if (count($profiling) === 0) {
-            $this->basepackages->utils->setMicroTimer('defaultCheckIpFilter', true);
+            $this->basepackages->utils->setMicroTimer('Default Filters', true);
 
             $profiling = $this->basepackages->utils->getMicroTimer();
         }
