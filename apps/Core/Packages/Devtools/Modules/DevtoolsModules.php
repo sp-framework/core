@@ -262,9 +262,12 @@ class DevtoolsModules extends BasePackage
                         $this->reCalculateFilesHash($this->modules->{$data['module_type']}->packagesData->last);
                     }
 
-                    if ($data['module_type'] === 'components' && strtolower($data['app_type']) === 'core') {
+                    if ($data['module_type'] === 'components') {
+                        $module = $this->modules->{$data['module_type']}->packagesData->last;
                         $this->addUpdateComponentMenu($module);
+                        $module = $this->modules->{$data['module_type']}->packagesData->last;
                         $this->addUpdateComponentWidgets($module);
+                        $module = $this->modules->{$data['module_type']}->packagesData->last;
                         $this->addUpdateComponentFilters($module);
                     }
 
@@ -2372,10 +2375,6 @@ $file .= '
 
     protected function addUpdateComponentMenu($data)
     {
-        if (strtolower($data['app_type']) !== 'core') {
-            return true;
-        }
-
         $module = $this->modules->{$data['module_type']}->packagesData->last;
 
         if ($data['menu_id'] != '' && $data['menu_id'] != '0') {
@@ -2411,7 +2410,11 @@ $file .= '
 
                 return;
             } else {
-                $menu = $this->basepackages->menus->addMenu($data, $module);
+                $menu = $this->basepackages->menus->getMenusByComponentIdForAppType((int) $data['id'], $data['app_type']);
+
+                if (!$menu) {
+                    $menu = $this->basepackages->menus->addMenu($data, $module);
+                }
 
                 if ($menu) {
                     $module = $this->modules->{$data['module_type']}->packagesData->last;
@@ -2426,10 +2429,6 @@ $file .= '
 
     protected function addUpdateComponentWidgets($data)
     {
-        if (strtolower($data['app_type']) !== 'core') {
-            return true;
-        }
-
         if (isset($data['widgets'])) {
             if (!is_array($data['widgets']) && $data['widgets'] !== '') {
                 $data['widgets'] = $this->helper->decode($data['widgets'], true);
@@ -2515,10 +2514,6 @@ $file .= '
 
     protected function addUpdateComponentFilters($data)
     {
-        if (strtolower($data['app_type']) !== 'core') {
-            return true;
-        }
-
         if (isset($data['filters'])) {
             if (!is_array($data['filters']) && $data['filters'] !== '') {
                 $data['filters'] = $this->helper->decode($data['filters'], true);
