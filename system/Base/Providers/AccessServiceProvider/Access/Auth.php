@@ -66,7 +66,13 @@ class Auth extends BasePackage
         }
 
         if (!$this->checkAccount($data)) {//Set $this->account here
-            $this->access->ipFilter->filters->bumpFilterHitCounter(true);
+            $isAllowed = $this->access->ipFilter->filters->bumpFilterHitCounter(true);
+
+            if (is_object($isAllowed))  {
+                $this->response->send();
+
+                exit;
+            }
 
             return false;
         }
@@ -996,9 +1002,9 @@ class Auth extends BasePackage
 
     public function getAccountSecurityObject()
     {
-        if ($this->config->databasetype === 'db') {
-            $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
+        $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
 
+        if ($this->config->databasetype === 'db') {
             return $accountsObj->getSecurity();
         } else {
             if (isset($this->account()['security'])) {

@@ -12,11 +12,13 @@ class Filters extends BasePackage
 
     public $filters;
 
+    public $ip2location;
+
     protected $ip;
 
     protected $ipFilterSettings;
 
-    public $ip2location;
+    protected $opCacheFilters = [];
 
     public function init()
     {
@@ -886,6 +888,8 @@ class Filters extends BasePackage
             $this->ffStore = $this->ff->store($this->ffStoreToUse);
         }
 
+        $filter['updated_at'] = time();
+
         if (isset($data['resetHitCount']) && $data['resetHitCount'] == 'true') {
             $filter['hit_count'] = 0;
 
@@ -898,10 +902,7 @@ class Filters extends BasePackage
             return;
         }
 
-        $opCacheFilters = [];
-        if ($this->opCache && $this->opCache->checkCache($this->app['route'], 'filters')) {
-            $opCacheFilters = $this->opCache->getCache($this->app['route'], 'filters');
-        }
+        $this->getCachedFilters();
 
         if ($filter['address_type'] === 'ip2location') {
             if (isset($data['proxy'])) {
@@ -924,6 +925,7 @@ class Filters extends BasePackage
         if (isset($data['filter_type'])) {
             if ($data['filter_type'] === 'allow') {
                 $filter['filter_type'] = 'allow';
+                $filter['incorrect_login_attempts'] = 0;
             } else if ($data['filter_type'] === 'block')  {
                 $filter['filter_type'] = 'block';
             }
@@ -935,15 +937,15 @@ class Filters extends BasePackage
             }
 
             if ($filter['address_type'] === 'host' &&
-                array_key_exists($filter['address'], $opCacheFilters)
+                array_key_exists($filter['address'], $this->opCacheFilters)
             ) {
-                $opCacheFilters[$filter['address']] = false;
+                $this->opCacheFilters[$filter['address']] = false;
 
                 if ($data['filter_type'] === 'allow') {
-                    $opCacheFilters[$filter['address']] = true;
+                    $this->opCacheFilters[$filter['address']] = true;
                 }
 
-                $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+                $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
 
                 return;
             } else {
@@ -991,19 +993,17 @@ class Filters extends BasePackage
             }
         }
 
-        if (isset($data['remove_from_cache'])) {
-            if ($this->opCache && $this->opCache->checkCache($this->app['route'], 'filters')) {
-                $opCacheFilters = $this->opCache->getCache($this->app['route'], 'filters');
-            }
+        $this->getCachedFilters();
 
-            if (array_key_exists($filter['address'], $opCacheFilters)) {
-                unset($opCacheFilters[$filter['address']]);
+        if (isset($data['remove_from_cache'])) {
+            if (array_key_exists($filter['address'], $this->opCacheFilters)) {
+                unset($this->opCacheFilters[$filter['address']]);
 
                 $resetCache = true;
             }
 
             if ($resetCache) {
-                $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+                $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
             }
 
             $this->addResponse('Removed filter from cache');
@@ -1011,18 +1011,14 @@ class Filters extends BasePackage
             return;
         }
 
-        $opCacheFilters = [];
         $resetCache = false;
-        if ($this->opCache && $this->opCache->checkCache($this->app['route'], 'filters')) {
-            $opCacheFilters = $this->opCache->getCache($this->app['route'], 'filters');
-        }
 
         if (!$defaultStore) {
             if ($getChildren && isset($filter['ips']) && $filter['ips'] > 0) {
                 foreach ($filter['ips'] as $childFilter) {
                     if ($this->remove((int) $childFilter['id'])) {
-                        if (array_key_exists($childFilter['address'], $opCacheFilters)) {
-                            unset($opCacheFilters[$childFilter['address']]);
+                        if (array_key_exists($childFilter['address'], $this->opCacheFilters)) {
+                            unset($this->opCacheFilters[$childFilter['address']]);
 
                             $resetCache = true;
                         }
@@ -1037,7 +1033,7 @@ class Filters extends BasePackage
 
         if ($getChildren && !$removeParent) {
             if ($resetCache) {
-                $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+                $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
             }
 
             $this->addResponse('All child filters removed', 0);
@@ -1055,14 +1051,14 @@ class Filters extends BasePackage
 
         if ($deleteFilter) {
             //Remove from OPCache
-            if (array_key_exists($filter['address'], $opCacheFilters)) {
-                unset($opCacheFilters[$filter['address']]);
+            if (array_key_exists($filter['address'], $this->opCacheFilters)) {
+                unset($this->opCacheFilters[$filter['address']]);
 
                 $resetCache = true;
             }
 
             if ($resetCache) {
-                $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+                $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
             }
 
             if ($this->ipFilterSettings['log_filters'] === true) {
@@ -1083,7 +1079,6 @@ class Filters extends BasePackage
 
     public function checkIPFilter($filter, $ip = false, $defaultStore = false)
     {
-        // trace([$filter, $ip]);
         if ($ip) {//Check if IP is in default store and remove it
             $inDefaultFilter = $this->getFilterByAddress($ip, false, true);
 
@@ -1130,27 +1125,32 @@ class Filters extends BasePackage
 
         $this->bumpFilterHitCounter(false, null, $filter, $defaultStore);
 
-        if ($filter['filter_type'] === 'allow' ||
-            $filter['filter_type'] === 'monitor'
+        if ($filter['filter_type'] === 'block' &&
+            (int) $this->ipFilterSettings['incorrect_login_attempt_block_ip'] !== 0 &&
+            (int) $this->ipFilterSettings['incorrect_login_auto_unblock_ip_minutes'] > 0 &&
+            $filter['incorrect_login_attempts'] >= (int) $this->ipFilterSettings['incorrect_login_attempt_block_ip']
         ) {
-            $status = 'Allowed';
-            $code = 0;
+            $blockedAt = \Carbon\Carbon::parse($filter['updated_at']);
 
-            if ($filter['filter_type'] === 'monitor') {
-                //AutoUnblock - only host ip can be auto unblocked.
-                if ((int) $this->ipFilterSettings['auto_unblock_ip_minutes'] > 0) {
-                    $blockedAt = Carbon::parse($filter['updated_at']);
+            if (time() > $blockedAt->addMinutes((int) $this->ipFilterSettings['incorrect_login_auto_unblock_ip_minutes'])->timestamp) {
+                $filter['updated_at'] = time();
+                $filter['filter_type'] = 'allow';
+                $filter['incorrect_login_attempts'] = 0;
 
-                    if (time() > $blockedAt->addMinutes((int) $this->ipFilterSettings['auto_unblock_ip_minutes'])->timestamp) {
-                        $this->removeFromMonitoring($filter);
-                    } else {
-                        $status = 'Monitoring';
-                        $code = 2;
-                    }
-                } else {
-                    $status = 'Monitoring';
-                    $code = 2;
+                $this->getCachedFilters();
+
+                //Remove from OPCache
+                if (array_key_exists($filter['address'], $this->opCacheFilters)) {
+                    $this->opCacheFilters[$filter['address']] = true;
+
+                    $resetCache = true;
                 }
+
+                if ($resetCache) {
+                    $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
+                }
+
+                $this->updateFilter($filter);
             }
 
             if (isset($parentFilter)) {
@@ -1160,10 +1160,12 @@ class Filters extends BasePackage
             }
 
             if ($this->ipFilterSettings['debug_filters'] === true) {
-                $this->logger->logIpFilters->debug($this->helper->encode(['status' => $status, 'ip' => $ip, 'filters_store'=> 'main', 'filter_id' => $filter['id']]));
+                $this->logger->logIpFilters->debug(
+                    $this->helper->encode(['status' => 'Allowed due to auto unblock timer reached.', 'ip' => $ip, 'filters_store'=> 'main', 'filter_id' => $filter['id']])
+                );
             }
 
-            $this->addResponse($status, $code, ['default_filter' => $defaultStore, 'filter' => $filter]);
+            $this->addResponse('Allowed due to auto unblock timer reached', 0, ['default_filter' => $defaultStore, 'filter' => $filter]);
 
             return true;
         }
@@ -1312,6 +1314,18 @@ class Filters extends BasePackage
                 $filter['incorrect_login_attempts'] >= (int) $this->ipFilterSettings['incorrect_login_attempt_block_ip']
             ) {
                 $filter['filter_type'] = 'block';
+
+                $this->getCachedFilters();
+
+                if (array_key_exists($filter['address'], $this->opCacheFilters)) {
+                    $this->opCacheFilters[$filter['address']] = false;
+
+                    $resetCache = true;
+                }
+
+                if ($resetCache) {
+                    $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
+                }
             } else {
                 $filter['filter_type'] = 'monitor';
             }
@@ -1331,7 +1345,15 @@ class Filters extends BasePackage
             $this->ffStore = $this->ff->store($this->ffStoreToUse);
         }
 
+        $filter['updated_at'] = time();
+
         if ($this->update($filter)) {
+            if ($updateIncorrectAttempts) {
+                if ($filter['filter_type'] === 'block') {
+                    return $this->access->ipFilter->processMiddlewareResponse();
+                }
+            }
+
             return true;
         }
 
@@ -1487,5 +1509,13 @@ class Filters extends BasePackage
         }
 
         return true;
+    }
+
+    protected function getCachedFilters()
+    {
+        $this->opCacheFilters = [];
+        if ($this->opCache && $this->opCache->checkCache($this->app['route'], 'filters')) {
+            $this->opCacheFilters = $this->opCache->getCache($this->app['route'], 'filters');
+        }
     }
 }

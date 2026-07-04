@@ -821,7 +821,7 @@ dataCollectionSection =
 
                                             json.data[i]['actions'] = '';
 
-                                            if (json.data[i]['filter_type'] === 'monitor' && json.data[i]['updated_by'] == '0') {
+                                            if (json.data[i]['filter_type'] === 'monitor') {
                                                 json.data[i]['actions'] +=
                                                     '<a href="#" class="text-danger block-filter ml-1" ' +
                                                     'data-toggle="tooltip" data-placement="left" title="Block IP"' +

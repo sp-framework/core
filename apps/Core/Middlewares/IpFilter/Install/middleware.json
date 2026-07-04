@@ -27,8 +27,8 @@
 	{
 		"status" : "monitor",
 		"default_filter" : "block",
-		"auto_unblock_ip_minutes" : 60,
 		"incorrect_login_attempt_block_ip" : 10,
+		"incorrect_login_auto_unblock_ip_minutes" : 60,
 		"filter_ipv4" : true,
 		"filter_ipv6" : true,
 		"allow_private_range" : true,

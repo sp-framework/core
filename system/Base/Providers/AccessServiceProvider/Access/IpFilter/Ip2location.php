@@ -62,7 +62,6 @@ class Ip2location
                     constant('\IP2Location\Database::' . $this->ipFilterSettings['ip2location_bin_access_mode'])
                 );
         } catch (\throwable $e) {
-            trace([$e]);
             //Log here
             if (str_contains($e->getMessage(), 'exist')) {
                 $this->addResponse('Bin file does not exist, please download bin file first to check in bin file.', 1);
@@ -74,7 +73,7 @@ class Ip2location
         }
 
         $ipDetailsArr = $ip2locationBin->lookup($ip, \IP2Location\Database::ALL);
-        trace([$ipDetailsArr]);
+
         if ($ipDetailsArr) {
             $ipDetails['address'] = $ip;
             $ipDetails['country_code'] = $ipDetailsArr['countryCode'];

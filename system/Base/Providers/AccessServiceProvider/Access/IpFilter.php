@@ -154,7 +154,9 @@ class IpFilter extends BasePackage
             if ($this->opCache) {
                 $opCacheFilters[$this->ip] = false;
 
-                if ($filter['filter_type'] === 'allow') {
+                if ($filter['filter_type'] === 'allow' ||
+                    $filter['filter_type'] === 'monitor'
+                ) {
                     $opCacheFilters[$this->ip] = true;
                 }
 
@@ -165,7 +167,9 @@ class IpFilter extends BasePackage
                 return $hostCheckIpFilter;
             }
 
-            if ($filter['filter_type'] === 'allow') {
+            if ($filter['filter_type'] === 'allow' ||
+                $filter['filter_type'] === 'monitor'
+            ) {
                 return true;
             }
 
@@ -198,7 +202,9 @@ class IpFilter extends BasePackage
                             if ($this->opCache) {
                                 $opCacheFilters[$this->ip] = false;
 
-                                if ($responseData['filter']['filter_type'] === 'allow') {
+                                if ($responseData['filter']['filter_type'] === 'allow' ||
+                                    $responseData['filter']['filter_type'] === 'monitor'
+                                ) {
                                     $opCacheFilters[$this->ip] = true;
                                 }
 
@@ -222,7 +228,9 @@ class IpFilter extends BasePackage
 
                     if (count($responseData) > 0) {
                         if (isset($responseData['filter'])) {
-                            if ($responseData['filter']['filter_type'] === 'allow') {
+                            if ($responseData['filter']['filter_type'] === 'allow' ||
+                                $responseData['filter']['filter_type'] === 'monitor'
+                            ) {
                                 return true;
                             }
 
@@ -259,7 +267,6 @@ class IpFilter extends BasePackage
 
                 if (count($ip2locationFilters) > 0) {
                     $ip2locationLookupOptions = ['API', 'BIN'];
-                    $overrideIp2locationLookupSequence = ['API', 'BIN'];//remove this!
 
                     if ($overrideIp2locationLookupSequence && count($overrideIp2locationLookupSequence) === 2) {
                         $ip2locationLookupOptions = $overrideIp2locationLookupSequence;
@@ -325,7 +332,9 @@ class IpFilter extends BasePackage
                                         if ($this->opCache) {
                                             $opCacheFilters[$this->ip] = false;
 
-                                            if ($responseData['filter']['filter_type'] === 'allow') {
+                                            if ($responseData['filter']['filter_type'] === 'allow' ||
+                                                $responseData['filter']['filter_type'] === 'monitor'
+                                            ) {
                                                 $opCacheFilters[$this->ip] = true;
                                             }
 
@@ -349,7 +358,9 @@ class IpFilter extends BasePackage
 
                                 if (count($responseData) > 0) {
                                     if (isset($responseData['filter'])) {
-                                        if ($responseData['filter']['filter_type'] === 'allow') {
+                                        if ($responseData['filter']['filter_type'] === 'allow' ||
+                                            $responseData['filter']['filter_type'] === 'monitor'
+                                        ) {
                                             return true;
                                         }
 
@@ -405,7 +416,9 @@ class IpFilter extends BasePackage
                 if ($this->opCache) {
                     $opCacheFilters[$this->ip] = false;
 
-                    if ($responseData['filter']['filter_type'] === 'allow') {
+                    if ($responseData['filter']['filter_type'] === 'allow' ||
+                        $responseData['filter']['filter_type'] === 'monitor'
+                    ) {
                         $opCacheFilters[$this->ip] = true;
                     }
 
@@ -442,5 +455,46 @@ class IpFilter extends BasePackage
         }
 
         return true;
+    }
+
+    public function processMiddlewareResponse()
+    {
+        $responseType = 'code';
+
+        if (isset($this->ipFilterSettings['response_type'])) {
+            $responseType = $this->ipFilterSettings['response_type'];
+        }
+
+        $this->logger->commit();
+
+        if ($responseType === 'code') {
+            $this->response->setStatusCode($this->ipFilterSettings['response_type'] ?? 404);
+        } else if ($responseType === 'url') {
+            $url = '/';
+
+            if (isset($this->ipFilterSettings['response_url']) && $this->ipFilterSettings['response_url'] !== '') {
+                $url = $this->ipFilterSettings['response_url'];
+            }
+
+            $this->response->setHeader('response_url', $url);
+
+            return $this->response->redirect($url);
+        } else if ($responseType === 'route') {
+            if (isset($this->ipFilterSettings['response_route']) && $this->ipFilterSettings['response_route'] !== '') {
+                $routeUrl = $this->helper->last(explode('/', $this->request->getURI()));
+
+                if ($routeUrl === $this->ipFilterSettings['response_route']) {
+                    return true;
+                }
+
+                $this->response->setHeader('response_url', $routeUrl);
+
+                return $this->response->redirect($this->links->url($this->ipFilterSettings['response_route']));
+            }
+        }
+
+        $this->response->send();
+
+        exit;
     }
 }
