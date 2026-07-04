@@ -161,7 +161,15 @@ class IpFilter extends BasePackage
                 $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
             }
 
-            return $hostCheckIpFilter;
+            if ($checkViaApp) {
+                return $hostCheckIpFilter;
+            }
+
+            if ($filter['filter_type'] === 'allow') {
+                return true;
+            }
+
+            return false;
         }
 
         //Second Check - We check NETWORK entries
@@ -208,7 +216,19 @@ class IpFilter extends BasePackage
                         $responseData
                     );
 
-                    return $networkCheckIpFilter;
+                    if ($checkViaApp) {
+                        return $networkCheckIpFilter;
+                    }
+
+                    if (count($responseData) > 0) {
+                        if (isset($responseData['filter'])) {
+                            if ($responseData['filter']['filter_type'] === 'allow') {
+                                return true;
+                            }
+
+                            return false;
+                        }
+                    }
                 }
             }
         }
@@ -323,7 +343,19 @@ class IpFilter extends BasePackage
                                     $responseData
                                 );
 
-                                return $ip2locationCheckIpFilter;
+                                if ($checkViaApp) {
+                                    return $ip2locationCheckIpFilter;
+                                }
+
+                                if (count($responseData) > 0) {
+                                    if (isset($responseData['filter'])) {
+                                        if ($responseData['filter']['filter_type'] === 'allow') {
+                                            return true;
+                                        }
+
+                                        return false;
+                                    }
+                                }
                             }
                         }
                     }

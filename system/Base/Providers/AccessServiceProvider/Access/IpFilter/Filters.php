@@ -898,6 +898,11 @@ class Filters extends BasePackage
             return;
         }
 
+        $opCacheFilters = [];
+        if ($this->opCache && $this->opCache->checkCache($this->app['route'], 'filters')) {
+            $opCacheFilters = $this->opCache->getCache($this->app['route'], 'filters');
+        }
+
         if ($filter['address_type'] === 'ip2location') {
             if (isset($data['proxy'])) {
                 if ($data['proxy'] === 'allow') {
@@ -929,7 +934,21 @@ class Filters extends BasePackage
                 $this->addResponse('Unable to change filter type for filter', 1);
             }
 
-            return;
+            if ($filter['address_type'] === 'host' &&
+                array_key_exists($filter['address'], $opCacheFilters)
+            ) {
+                $opCacheFilters[$filter['address']] = false;
+
+                if ($data['filter_type'] === 'allow') {
+                    $opCacheFilters[$filter['address']] = true;
+                }
+
+                $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+
+                return;
+            } else {
+                return;
+            }
         }
 
         $this->addResponse('Nothing to update', 1);
