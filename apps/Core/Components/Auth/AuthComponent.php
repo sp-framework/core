@@ -8,6 +8,12 @@ class AuthComponent extends BaseComponent
 {
     public function viewAction()
     {
+        if (isset($this->getData()['blocked']) && $this->getData()['blocked'] === 'true') {
+            echo 'Blocked!';
+
+            return false;
+        }
+
         $this->view->setLayout('auth');
 
         $this->view->canRegister = false;

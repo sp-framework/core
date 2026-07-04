@@ -476,18 +476,24 @@ class IpFilter extends BasePackage
                 $url = $this->ipFilterSettings['response_url'];
             }
 
-            $this->response->setHeader('response_url', $url);
-
             return $this->response->redirect($url);
         } else if ($responseType === 'route') {
             if (isset($this->ipFilterSettings['response_route']) && $this->ipFilterSettings['response_route'] !== '') {
-                $routeUrl = $this->helper->last(explode('/', $this->request->getURI()));
+                if (str_contains($this->request->getURI(), '/q/')) {
+                    $routeUrl = $this->helper->last(explode('/', $this->request->getURI()));
 
-                if ($routeUrl === $this->ipFilterSettings['response_route']) {
-                    return true;
+                    $responseRoute = $this->helper->last(explode('/', $this->ipFilterSettings['response_route']));
+
+                    if ($routeUrl === $responseRoute) {
+                        return true;
+                    }
+                } else {
+                    $routeUrl = $this->helper->last(explode('/', $this->request->getURI()));
+
+                    if ($routeUrl === $this->ipFilterSettings['response_route']) {
+                        return true;
+                    }
                 }
-
-                $this->response->setHeader('response_url', $routeUrl);
 
                 return $this->response->redirect($this->links->url($this->ipFilterSettings['response_route']));
             }
