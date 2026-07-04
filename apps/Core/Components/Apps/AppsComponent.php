@@ -477,30 +477,32 @@ class AppsComponent extends BaseComponent
 
         $filters = $this->access->ipFilter->filters->getFilters($this->postData());
 
-        foreach ($filters as $key => &$filter) {
-            unset ($filter['app_id']);
-            unset ($filter['decimal']);
-            unset ($filter['parent_id']);
+        if ($filters && count($filters) > 0) {
+            foreach ($filters as $key => &$filter) {
+                unset ($filter['app_id']);
+                unset ($filter['decimal']);
+                unset ($filter['parent_id']);
 
-            if ($filter['updated_by'] == '0') {
-                $filter['updated_by'] = "System";
-            } else {
-                $user = $this->basepackages->accounts->getAccountById($filter['updated_by']);
-
-                if ($user && isset($user['contact']['full_name'])) {
-                    $filter['updated_by'] = $user['contact']['full_name'];
-                } else {
+                if ($filter['updated_by'] == '0') {
                     $filter['updated_by'] = "System";
+                } else {
+                    $user = $this->basepackages->accounts->getAccountById($filter['updated_by']);
+
+                    if ($user && isset($user['contact']['full_name'])) {
+                        $filter['updated_by'] = $user['contact']['full_name'];
+                    } else {
+                        $filter['updated_by'] = "System";
+                    }
                 }
-            }
 
-            try {
-                $filter['updated_at'] = (\Carbon\Carbon::parse($filter['updated_at']))->toDateTimeString();
-            } catch (\throwable $e) {
-                $filter['updated_at'] = '-';
-            }
+                try {
+                    $filter['updated_at'] = (\Carbon\Carbon::parse($filter['updated_at']))->toDateTimeString();
+                } catch (\throwable $e) {
+                    $filter['updated_at'] = '-';
+                }
 
-            $filter['actions'] = '';
+                $filter['actions'] = '';
+            }
         }
 
         $this->view->data = $filters;
@@ -514,7 +516,21 @@ class AppsComponent extends BaseComponent
 
         $this->addResponse(
             $this->access->ipFilter->filters->packagesData->responseMessage,
-            $this->access->ipFilter->filters->packagesData->responseCode
+            $this->access->ipFilter->filters->packagesData->responseCode,
+            $this->access->ipFilter->filters->packagesData->responseData ?? []
+        );
+    }
+
+    public function updateFilterAction()
+    {
+        $this->requestIsPost();
+
+        $this->access->ipFilter->filters->updateFilter($this->postData());
+
+        $this->addResponse(
+            $this->access->ipFilter->filters->packagesData->responseMessage,
+            $this->access->ipFilter->filters->packagesData->responseCode,
+            $this->access->ipFilter->filters->packagesData->responseData ?? []
         );
     }
 
@@ -523,42 +539,6 @@ class AppsComponent extends BaseComponent
         $this->requestIsPost();
 
         $this->access->ipFilter->filters->removeFilter($this->postData());
-
-        $this->addResponse(
-            $this->access->ipFilter->filters->packagesData->responseMessage,
-            $this->access->ipFilter->filters->packagesData->responseCode
-        );
-    }
-
-    public function allowFilterAction()
-    {
-        $this->requestIsPost();
-
-        $this->access->ipFilter->filters->allowFilter($this->postData());
-
-        $this->addResponse(
-            $this->access->ipFilter->filters->packagesData->responseMessage,
-            $this->access->ipFilter->filters->packagesData->responseCode
-        );
-    }
-
-    public function resetFilterHitCountAction()
-    {
-        $this->requestIsPost();
-
-        $this->access->ipFilter->filters->resetFilterHitCount($this->postData());
-
-        $this->addResponse(
-            $this->access->ipFilter->filters->packagesData->responseMessage,
-            $this->access->ipFilter->filters->packagesData->responseCode
-        );
-    }
-
-    public function blockFilterAction()
-    {
-        $this->requestIsPost();
-
-        $this->access->ipFilter->filters->blockFilter($this->postData());
 
         $this->addResponse(
             $this->access->ipFilter->filters->packagesData->responseMessage,

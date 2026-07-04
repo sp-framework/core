@@ -79,21 +79,111 @@ dataCollectionSectionForm['funcs']['resetForm'] = function() {
     $('#ip2location-error').attr('hidden', true);
 }
 
+dataCollectionSectionForm['funcs']['resetCheckIp'] = function(resetInput = true) {
+    if (resetInput) {
+        $('#{{componentId}}-{{sectionId}}-ip').val('');
+    }
+    $('#filter-store').html('-');
+    $('#filter-id').html('-');
+    $('#filter-parent-id').html('-');
+    $('#filter-address-type').html('-');
+    $('#filter-address').html('-');
+    $('#filter-type').html('-');
+    $('#filter-ip2location-proxy').html('-');
+    $('#filter-hit-count').html('-');
+    $('#filter-incorrect-login-attempts').html('-');
+    $('#parent-address-type').html('-');
+    $('#parent-address').html('-');
+    $('#parent-type').html('-');
+    $('#parent-ip2location-proxy').html('-');
+    $('#parent-hit-count').html('-');
+    $('#parent-incorrect-login-attempts').html('-');
+    $('#parent-ip-hits').html('-');
+    $('#profiling').html('');
+
+    $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
+      '#{{componentId}}-{{sectionId}}-reset-checked-filter-counters,#{{componentId}}-{{sectionId}}-remove-checked-parent,' +
+      '#{{componentId}}-{{sectionId}}-remove-checked-parent-children,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').attr('disabled', true);
+}
+
 dataCollectionSectionForm['funcs']['removeFilter'] = function(childs = false, thisButton) {
     var url = "{{links.url('apps/removeFilter')}}";
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
     postData["id"] = $(thisButton).data('id');
+
     var color = 'danger';
-    var text = 'Remove Filter?';
+    var text;
+    var address;
+    if ($(thisButton).parents('td').length > 0) {
+        address = $(thisButton).parents('td').siblings('td')[0].innerHTML;
+    }
+
+    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache') {
+        if (dataCollectionSectionForm['checkedFilter']['filter'] && dataCollectionSectionForm['checkedFilter']['filter']['id']) {
+            postData["remove_from_cache"] = true;
+            color = 'warning';
+            address = dataCollectionSectionForm['checkedFilter']['filter']['address'];
+            postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['id'];
+            if (dataCollectionSectionForm['checkedFilter']['default_filter']) {
+                postData['defaultStore'] = true;
+            }
+        } else {
+            return false;
+        }
+    } else if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent-children') {
+        if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+            dataCollectionSectionForm['checkedFilter']['filter']['parent_filter'] &&
+            dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id']
+        ) {
+            postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id'];
+            address = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['address'];
+        } else {
+            return false;
+        }
+    } else if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter' ||
+               $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent'
+    ) {
+        if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter') {
+            if (dataCollectionSectionForm['checkedFilter']['default_filter']) {
+                postData['defaultStore'] = true;
+            }
+
+            if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                dataCollectionSectionForm['checkedFilter']['filter']['id']
+            ) {
+                postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['id'];
+                address = dataCollectionSectionForm['checkedFilter']['filter']['address'];
+            } else {
+                return false;
+            }
+        } else if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent') {
+            if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                dataCollectionSectionForm['checkedFilter']['filter']['parent_filter'] &&
+                dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id']
+            ) {
+                postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id'];
+                address = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['address'];
+            } else {
+                return false;
+            }
+        }
+    }
+
     if (childs) {
-        text = 'Remove Child Filters?'
+        text = 'Remove Child Filters for ' + address;
         postData["remove_child_filters"] = true;
         color = 'warning';
+    } else {
+        if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache') {
+            text = 'Remove filter from cache for ' + address;
+        } else {
+            text = 'Remove Filter ' + address;
+        }
     }
 
     Swal.fire({
-        title                       : '<span class="text-' + color + '">' + text + '</span>',
+        title                       : '<span class="text-' + color + '">' + text + '?</span>',
         icon                        : 'question',
         background                  : 'rgba(0,0,0,.8)',
         backdrop                    : 'rgba(0,0,0,.6)',
@@ -126,33 +216,86 @@ dataCollectionSectionForm['funcs']['removeFilter'] = function(childs = false, th
                 paginatedPNotify('success', {
                     title   : response.responseMessage
                 });
+
+                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache' ||
+                    $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent-children' ||
+                    $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter' ||
+                    $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent'
+                ) {
+                    dataCollectionSectionForm['funcs']['resetCheckIp'](false);
+                }
             }, "json");
         }
     });
 }
 
-dataCollectionSectionForm['funcs']['allowBlock'] = function(task, thisButton) {
+dataCollectionSectionForm['funcs']['updateFilter'] = function(task, thisButton) {
     var text;
+    var buttonText;
     var responseText;
     var color;
+    var address;
+    if ($(thisButton).parents('td').length > 0) {
+        address = $(thisButton).parents('td').siblings('td')[0].innerHTML;
+    }
 
     if (task === 'allow') {
-        text = 'Allow';
-        responseText = 'Allowed';
+        text = 'Allow ' + address;
+        buttonText = 'Allow';
+        responseText = address + ' Allowed.';
         color = 'success';
     } else if (task === 'block') {
-        text = 'Block';
-        responseText = 'Blocked';
+        text = 'Block ' + address;
+        buttonText = 'Block';
+        responseText = address + ' Blocked.';
         color = 'danger';
+    } else if (task === 'allow-proxy') {
+        text = 'Allow Proxy for ' + address;
+        buttonText = 'Allow';
+        responseText = 'Proxy Allowed for ' + address;
+        color = 'success';
+    } else if (task === 'block-proxy') {
+        text = 'Block Proxy for ' + address;
+        buttonText = 'Block';
+        responseText = 'Proxy Blocked for ' + address;
+        color = 'danger';
+    } else if (task === 'resetHitCount') {
+        if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters' ||
+            $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters'
+        ) {
+            if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters') {
+                if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                    dataCollectionSectionForm['checkedFilter']['filter']['address']
+                ) {
+                    address = dataCollectionSectionForm['checkedFilter']['filter']['address'];
+                } else {
+                    return false;
+                }
+            } else if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters') {
+                if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                    dataCollectionSectionForm['checkedFilter']['filter']['parent_filter'] &&
+                    dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['address']
+                ) {
+                    address = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['address'];
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        text = 'Reset hit counts for ' + address;
+        buttonText = 'Reset';
+        responseText = 'Counter reset for ' + address;
+        color = 'info';
     }
 
     Swal.fire({
-        title                       : '<span class="text-' + color + '">' + text + ' IP?</span>',
+        title                       : '<span class="text-' + color + '">' + text + '?</span>',
         icon                        : 'question',
         background                  : 'rgba(0,0,0,.8)',
         backdrop                    : 'rgba(0,0,0,.6)',
         buttonsStyling              : false,
-        confirmButtonText           : text,
+        confirmButtonText           : buttonText,
         customClass                 : {
             'confirmButton'             : 'btn btn-' + color + ' btn-sm text-uppercase',
             'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
@@ -166,10 +309,57 @@ dataCollectionSectionForm['funcs']['allowBlock'] = function(task, thisButton) {
         }
     }).then((result) => {
         if (result.value) {
-            var url = "{{links.url('apps/" + text + "Filter')}}";
+            var url = "{{links.url('apps/updateFilter')}}";
             var postData = { };
             postData[$('#security-token').attr('name')] = $('#security-token').val();
             postData["id"] = $(thisButton).data('id');
+
+            if (task === 'allow-proxy' ||
+                task === 'block-proxy'
+            ) {
+                postData["proxy"] = false;
+
+                if (task === 'allow-proxy') {
+                    postData["proxy"] = 'allow';
+                } else if (task === 'block-proxy') {
+                    postData["proxy"] = 'block';
+                }
+            }
+
+            if (task === 'resetHitCount') {
+                postData['resetHitCount'] = true;
+
+                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters' ||
+                    $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters'
+                ) {
+                    if (dataCollectionSectionForm['checkedFilter']['default_filter']) {
+                        postData['defaultStore'] = true;
+                    }
+
+                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters') {
+                        if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                            dataCollectionSectionForm['checkedFilter']['filter']['id']
+                        ) {
+                            postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['id'];
+                        }
+                    } else if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters') {
+                        if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                            dataCollectionSectionForm['checkedFilter']['filter']['parent_filter'] &&
+                            dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id']
+                        ) {
+                            postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id'];
+                        }
+                    }
+                }
+            }
+
+            if (task === 'allow' || task === 'block') {
+                if (task === 'allow') {
+                    postData["filter_type"] = 'allow';
+                } else if (task === 'block') {
+                    postData["filter_type"] = 'block';
+                }
+            }
 
             $.post(url, postData, function(response) {
                 dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
@@ -182,56 +372,21 @@ dataCollectionSectionForm['funcs']['allowBlock'] = function(task, thisButton) {
                     return;
                 }
 
-                paginatedPNotify('success', {title   : 'IP ' + responseText + '.'});
-            }, "json");
-        }
-    });
-}
+                paginatedPNotify('success', {title   : responseText});
 
-dataCollectionSectionForm['funcs']['resetHitCount'] = function(thisButton) {
-    Swal.fire({
-        title                       : '<span class="text-info"> Reset Hit Count to "0"?</span>',
-        icon                        : 'question',
-        background                  : 'rgba(0,0,0,.8)',
-        backdrop                    : 'rgba(0,0,0,.6)',
-        buttonsStyling              : false,
-        confirmButtonText           : 'Reset',
-        customClass                 : {
-            'confirmButton'             : 'btn btn-info btn-sm text-uppercase',
-            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-        },
-        showCancelButton            : true,
-        keydownListenerCapture      : true,
-        allowOutsideClick           : true,
-        allowEscapeKey              : true,
-        didOpen                     : function() {
-            dataCollection.env.sounds.swalSound.play();
-        }
-    }).then((result) => {
-        if (result.value) {
-            var url = "{{links.url('apps/resetFilterHitCount')}}";
-            var postData = { };
-            postData[$('#security-token').attr('name')] = $('#security-token').val();
-            postData["id"] = $(thisButton).data('id');
-
-            $.post(url, postData, function(response) {
-                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-
-                if (response.responseCode != 0) {
-                    paginatedPNotify('error', {
-                        title   : response.responseMessage
-                    });
-
-                    return;
+                if (task === 'resetHitCount') {
+                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters' ||
+                        $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters'
+                    ) {
+                        dataCollectionSectionForm['funcs']['resetCheckIp'](false);
+                    }
                 }
 
-                paginatedPNotify('success', {
-                    title   : 'Counter reset to 0.'
-                });
             }, "json");
         }
     });
 }
+
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                              : { },
@@ -600,7 +755,7 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-filters-table').DataTable({
                                 "responsive": true,
                                 "columns": [
-                                    { data : 'id', visible: false},
+                                    { data : 'id'},
                                     { data : 'address'},
                                     { data : 'address_type'},
                                     { data : 'filter_type'},
@@ -751,19 +906,31 @@ dataCollectionSection =
                             $('.allow-filter').click(function(e) {
                                 e.preventDefault();
 
-                                dataCollectionSectionForm['funcs']['allowBlock']('allow', this);
+                                dataCollectionSectionForm['funcs']['updateFilter']('allow', this);
                             });
 
                             $('.block-filter').click(function(e) {
                                 e.preventDefault();
 
-                                dataCollectionSectionForm['funcs']['allowBlock']('block', this);
+                                dataCollectionSectionForm['funcs']['updateFilter']('block', this);
+                            });
+
+                            $('.allow-proxy').click(function(e) {
+                                e.preventDefault();
+
+                                dataCollectionSectionForm['funcs']['updateFilter']('allow-proxy', this);
+                            });
+
+                            $('.block-proxy').click(function(e) {
+                                e.preventDefault();
+
+                                dataCollectionSectionForm['funcs']['updateFilter']('block-proxy', this);
                             });
 
                             $('.reset-hit-count').click(function(e) {
                                 e.preventDefault();
 
-                                dataCollectionSectionForm['funcs']['resetHitCount'](this);
+                                dataCollectionSectionForm['funcs']['updateFilter']('resetHitCount', this);
                             });
 
                             $('.view-child-filters').click(function(e) {
@@ -839,40 +1006,14 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-cancelcheckip').click(function(e) {
                     e.preventDefault();
 
-                    $('#{{componentId}}-{{sectionId}}-ip').val('');
-
-                    reset();
+                    dataCollectionSectionForm['funcs']['resetCheckIp']();
                 });
-
-                function reset() {
-                    $('#filter-store').html('-');
-                    $('#filter-id').html('-');
-                    $('#filter-parent-id').html('-');
-                    $('#filter-address-type').html('-');
-                    $('#filter-address').html('-');
-                    $('#filter-type').html('-');
-                    $('#filter-ip2location-proxy').html('-');
-                    $('#filter-hit-count').html('-');
-                    $('#filter-incorrect-login-attempts').html('-');
-                    $('#parent-address-type').html('-');
-                    $('#parent-address').html('-');
-                    $('#parent-type').html('-');
-                    $('#parent-ip2location-proxy').html('-');
-                    $('#parent-hit-count').html('-');
-                    $('#parent-incorrect-login-attempts').html('-');
-                    $('#parent-ip-hits').html('-');
-                    $('#profiling').html('');
-
-                    $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
-                      '#{{componentId}}-{{sectionId}}-reset-checked-filter-counters,#{{componentId}}-{{sectionId}}-remove-checked-parent,' +
-                      '#{{componentId}}-{{sectionId}}-remove-checked-parent-children,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').attr('disabled', true);
-                }
 
                 $('#{{componentId}}-{{sectionId}}-checkip').off();
                 $('#{{componentId}}-{{sectionId}}-checkip').click(function(e) {
                     e.preventDefault();
 
-                    reset();
+                    dataCollectionSectionForm['funcs']['resetCheckIp'](false);
 
                     var url = "{{links.url('apps/checkIp')}}";
                     var postData = { };
@@ -881,6 +1022,8 @@ dataCollectionSection =
 
                     $.post(url, postData, function(response) {
                         if (response.responseData && response.responseData.filter && typeof response.responseData.filter === 'object') {
+                            dataCollectionSectionForm['checkedFilter'] = response.responseData;
+
                             if (response.responseData.profiling && response.responseData.profiling[1]) {
                                 $('#profiling').html('IP found in ' + response.responseData.profiling[1]['reference'] + '. Query took ' + response.responseData.profiling[1]['difference'] + ' ms');
                             }
@@ -1030,8 +1173,18 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
                   '#{{componentId}}-{{sectionId}}-reset-checked-filter-counters,#{{componentId}}-{{sectionId}}-remove-checked-parent,' +
                   '#{{componentId}}-{{sectionId}}-remove-checked-parent-children,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').click(function(e) {
-                    //eslint-disable-next-line
-                    console.log($(this)[0].id);
+                    if ($(this)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache' ||
+                        $(this)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter' ||
+                        $(this)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent'
+                    ) {
+                        dataCollectionSectionForm['funcs']['removeFilter'](false, this);
+                    } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent-children') {
+                        dataCollectionSectionForm['funcs']['removeFilter'](true, this);
+                    } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters' ||
+                               $(this)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters'
+                    ) {
+                        dataCollectionSectionForm['funcs']['updateFilter']('resetHitCount', this);
+                    }
                 });
             }
         }

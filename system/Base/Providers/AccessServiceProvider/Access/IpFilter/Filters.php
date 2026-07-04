@@ -10,6 +10,8 @@ class Filters extends BasePackage
 {
     protected $modelToUse = ServiceProviderAccessIpFilters::class;
 
+    public $filters;
+
     protected $ip;
 
     protected $ipFilterSettings;
@@ -43,7 +45,7 @@ class Filters extends BasePackage
 
             $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-            $filters = $this->getAll();
+            $filters = $this->getAll()->filters;
         } else {
             $filters = [];
 
@@ -129,7 +131,7 @@ class Filters extends BasePackage
             }
         }
 
-        if (count($filters) > 0) {
+        if ($filters && count($filters) > 0) {
             if (!$defaultStore) {
                 foreach ($filters as &$filter) {
                     if ($filter['address_type'] === 'host') {
@@ -808,7 +810,29 @@ class Filters extends BasePackage
                 $inDefaultFilter = $this->getFilterByDecimal($data['decimal'], false, true);
 
                 if ($inDefaultFilter) {
-                    $this->removeFilter(['id' => (int) $inDefaultFilter['id']], true);
+                    $this->removeFilter($inDefaultFilter, true);
+                }
+            } else if ($data['address_type'] === 'network' && isset($range)) {
+                if (isset($range['ip_start']) && isset($range['ip_end'])) {
+                    if (str_contains($data['address'], ':')) {
+                        $ipStartDecimal = (int) $this->ip2location->ipTools->ipv6ToDecimal($range['ip_start']);
+                        $ipEndDecimal = (int) $this->ip2location->ipTools->ipv6ToDecimal($range['ip_end']);
+                    } else {
+                        $ipStartDecimal = (int) $this->ip2location->ipTools->ipv4ToDecimal($range['ip_start']);
+                        $ipEndDecimal = (int) $this->ip2location->ipTools->ipv4ToDecimal($range['ip_end']);
+                    }
+
+                    $defaultStoreFilters = $this->getFilters(['defaultStore' => 'true']);
+
+                    if ($defaultStoreFilters && count($defaultStoreFilters) > 0) {
+                        foreach ($defaultStoreFilters as $defaultStoreFilter) {
+                            if ($defaultStoreFilter['decimal'] >= $ipStartDecimal &&
+                                $defaultStoreFilter['decimal'] <= $ipEndDecimal
+                            ) {
+                                $this->removeFilter($defaultStoreFilter, true);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -822,12 +846,93 @@ class Filters extends BasePackage
                 $this->logger->logIpFilters->info($this->helper->encode(['action' => 'FILTER_ADD', 'filter' => $newFilter]));
             }
 
-            $this->addResponse('Filter added');
+            $this->addResponse('Filter added', 0, ['filter' => $newFilter]);
 
             return $newFilter;
         }
 
         $this->addResponse('Not able to add filter', 1);
+
+        return false;
+    }
+
+    public function updateFilter(array $data, $defaultStore = false)
+    {
+        if (!isset($data['id'])) {
+            $this->addResponse('Please provide correct filter ID', 1);
+
+            return false;
+        }
+
+        if (isset($data['defaultStore']) && $data['defaultStore'] == 'true') {
+            $defaultStore = true;
+        }
+
+        $filter = $this->getFilterById((int) $data['id'], false, $defaultStore);
+
+        if (!$filter) {
+            $this->addResponse('Filter with ID not found', 1);
+
+            return false;
+        }
+
+        if ($defaultStore) {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFiltersDefault::class);
+
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+        } else {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+        }
+
+        if (isset($data['resetHitCount']) && $data['resetHitCount'] == 'true') {
+            $filter['hit_count'] = 0;
+
+            if ($this->update($filter)) {
+                $this->addResponse('Filter counter reset to 0.', 0);
+            } else {
+                $this->addResponse('Unable to reset filter hit count', 1);
+            }
+
+            return;
+        }
+
+        if ($filter['address_type'] === 'ip2location') {
+            if (isset($data['proxy'])) {
+                if ($data['proxy'] === 'allow') {
+                    $filter['ip2location_proxy'] = 'allow';
+                } else if ($data['proxy'] === 'block')  {
+                    $filter['ip2location_proxy'] = 'block';
+                }
+
+                if ($this->update($filter)) {
+                    $this->addResponse('Filter proxy marked as ' . $filter['ip2location_proxy'], 0);
+                } else {
+                    $this->addResponse('Unable to change proxy for filter', 1);
+                }
+
+                return;
+            }
+        }
+
+        if (isset($data['filter_type'])) {
+            if ($data['filter_type'] === 'allow') {
+                $filter['filter_type'] = 'allow';
+            } else if ($data['filter_type'] === 'block')  {
+                $filter['filter_type'] = 'block';
+            }
+
+            if ($this->update($filter)) {
+                $this->addResponse('Filter marked as ' . $filter['filter_type'], 0);
+            } else {
+                $this->addResponse('Unable to change filter type for filter', 1);
+            }
+
+            return;
+        }
+
+        $this->addResponse('Nothing to update', 1);
 
         return false;
     }
@@ -841,8 +946,12 @@ class Filters extends BasePackage
             $getChildren = true;
         }
 
+        if (isset($data['defaultStore']) && $data['defaultStore'] == 'true') {
+            $defaultStore = true;
+        }
+
         if (!$filter = $this->getFilterById((int) $data['id'], $getChildren, $defaultStore)) {
-            $this->addResponse('Filter with ID ' . $id . ' does not exists', 1);
+            $this->addResponse('Filter with ID ' . $data['id'] . ' does not exists', 1);
 
             return false;
         }
@@ -850,13 +959,37 @@ class Filters extends BasePackage
         if ($filter['address_type'] !== 'host') {
             $getChildren = true;
 
-            $removeParent = true;
+            if (isset($data['remove_child_filters']) && $data['remove_child_filters'] == 'true') {
+                $removeParent = false;
+            } else {
+                $removeParent = true;
+            }
 
             if (!$filter = $this->getFilterById((int) $data['id'], $getChildren, $defaultStore)) {
                 $this->addResponse('Filter with ID ' . $id . ' does not exists', 1);
 
                 return false;
             }
+        }
+
+        if (isset($data['remove_from_cache'])) {
+            if ($this->opCache && $this->opCache->checkCache($this->app['route'], 'filters')) {
+                $opCacheFilters = $this->opCache->getCache($this->app['route'], 'filters');
+            }
+
+            if (array_key_exists($filter['address'], $opCacheFilters)) {
+                unset($opCacheFilters[$filter['address']]);
+
+                $resetCache = true;
+            }
+
+            if ($resetCache) {
+                $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+            }
+
+            $this->addResponse('Removed filter from cache');
+
+            return;
         }
 
         $opCacheFilters = [];
@@ -869,7 +1002,7 @@ class Filters extends BasePackage
             if ($getChildren && isset($filter['ips']) && $filter['ips'] > 0) {
                 foreach ($filter['ips'] as $childFilter) {
                     if ($this->remove((int) $childFilter['id'])) {
-                        if (isset($opCacheFilters[$childFilter['address']])) {
+                        if (array_key_exists($childFilter['address'], $opCacheFilters)) {
                             unset($opCacheFilters[$childFilter['address']]);
 
                             $resetCache = true;
@@ -903,7 +1036,7 @@ class Filters extends BasePackage
 
         if ($deleteFilter) {
             //Remove from OPCache
-            if (isset($opCacheFilters[$filter['address']])) {
+            if (array_key_exists($filter['address'], $opCacheFilters)) {
                 unset($opCacheFilters[$filter['address']]);
 
                 $resetCache = true;
@@ -917,83 +1050,16 @@ class Filters extends BasePackage
                 $this->logger->logIpFilters->info($this->helper->encode(['action' => 'FILTER_DELETE', 'filter' => $filter]));
             }
 
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
             return $deleteFilter;
         }
 
         $this->addResponse('Unable to remove filter', 1);
 
         return false;
-    }
-
-    public function allowFilter(array $data)
-    {
-        if (!isset($data['id'])) {
-            $this->addResponse('Please provide correct filter ID', 1);
-
-            return false;
-        }
-
-        $filter = $this->getFirst('id', $data['id'], false, true, null, [], true);
-
-        $filter['filter_type'] = 'allow';
-        $filter['updated_by'] = $this->access->auth->account()['id'];
-        $filter['updated_at'] = time();
-        $filter['incorrect_login_attempts'] = null;
-        $filter['hit_count'] = 0;
-
-        if ($this->update($filter)) {
-            $this->addResponse('Filter moved to allow.', 0);
-        } else {
-            $this->addResponse('Error allowing filter.', 1);
-        }
-    }
-
-    public function blockFilter(array $data)
-    {
-        if (!isset($data['id'])) {
-            $this->addResponse('Please provide correct filter ID', 1);
-
-            return false;
-        }
-
-        $filter = $this->getFirst('id', $data['id'], false, true, null, [], true);
-
-        if ($filter['address'] === $this->access->ipFilter->getVisitorIp()) {
-            $this->addResponse('Cannot block your own IP!', 1);
-
-            return false;
-        }
-
-        $filter['filter_type'] = 'block';
-        $filter['updated_by'] = $this->access->auth->account()['id'];
-        $filter['updated_at'] = time();
-        $filter['incorrect_login_attempts'] = null;
-        $filter['hit_count'] = 0;
-
-        if ($this->update($filter)) {
-            $this->addResponse('Filter moved to block.', 0);
-        } else {
-            $this->addResponse('Error blocking filter.', 1);
-        }
-    }
-
-    public function resetFilterHitCount($data)
-    {
-        if (!isset($data['id'])) {
-            $this->addResponse('Please provide correct filter ID', 1);
-
-            return false;
-        }
-
-        $filter = $this->getFirst('id', $data['id'], false, true, null, [], true);
-
-        $filter['hit_count'] = 0;
-
-        if ($this->update($filter)) {
-            $this->addResponse('Filter moved to allow.', 0);
-        } else {
-            $this->addResponse('Error allowing filter.', 1);
-        }
     }
 
     public function checkIPFilter($filter, $ip = false, $defaultStore = false)
@@ -1003,7 +1069,7 @@ class Filters extends BasePackage
             $inDefaultFilter = $this->getFilterByAddress($ip, false, true);
 
             if ($inDefaultFilter) {
-                $this->removeFilter(['id' => $inDefaultFilter['id']], true);
+                $this->removeFilter($inDefaultFilter, true);
             }
 
             if ($filter['address_type'] === 'host') {
@@ -1015,7 +1081,6 @@ class Filters extends BasePackage
             $parentFilter = $filter;
 
             $newFilter = $filter;
-
 
             $newFilter['address_type'] = 'host';
             $newFilter['address'] = $ip;
