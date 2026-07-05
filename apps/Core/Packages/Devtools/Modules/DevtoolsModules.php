@@ -426,7 +426,7 @@ class DevtoolsModules extends BasePackage
             if (count($moduleList) > 0) {
                 foreach ($moduleList as $moduleId) {
                     if ($data['task'] === 'remove') {
-                        $this->removeModule(['id' => (int) $moduleId, 'module_type' => $module_type, 'remove_files' => 'true']);
+                        $removed = $this->removeModule(['id' => (int) $moduleId, 'module_type' => $module_type, 'remove_files' => 'true']);
 
                         continue;
                     }
@@ -495,6 +495,10 @@ class DevtoolsModules extends BasePackage
                         }
                     }
                 }
+            }
+
+            if ($data['task'] === 'remove' && !$removed) {
+                return;
             }
         }
 
@@ -601,6 +605,10 @@ class DevtoolsModules extends BasePackage
                 $module = $this->modules->{$data['module_type']}->getById($data['id']);
             } else {
                 $module = $this->apps->types->getById($data['id']);
+            }
+
+            if ($module['name'] === 'Core') {
+                throw new \Exception('Cannot remove Core!');
             }
 
             if ($data['module_type'] !== 'bundles') {
