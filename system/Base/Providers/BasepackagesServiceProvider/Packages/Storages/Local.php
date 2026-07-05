@@ -865,6 +865,29 @@ class Local extends BasePackage
         }
     }
 
+    public function updatePackageInfo($uuid, $packageRowId, $packageClass = null)
+    {
+        $file = $this->getFileInfo($uuid);
+
+        if ($file && count($file) === 1) {
+            if ($packageClass) {
+                $file[0]['package_class'] = $packageClass;
+            }
+
+            $file[0]['package_row_id'] = (int) $packageRowId;
+
+            if ($this->update($file[0])) {
+                $this->addResponse('Updated file package information');
+
+                return true;
+            }
+        }
+
+        $this->addResponse('Unable to update package information');
+
+        return false;
+    }
+
     protected function flipOrphanStatus($uuid, $status, $orgFileName = null, $like = false)
     {
         if ($status === 0) {

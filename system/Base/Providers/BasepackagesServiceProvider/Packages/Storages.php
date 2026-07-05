@@ -343,4 +343,9 @@ class Storages extends BasePackage
     {
         return $this->initStorage()->changeOrphanStatus($newUUID, $oldUUID, $array, $status, $orgFileName, $like);
     }
+
+    public function updatePackageInfo($uuid, $packageRowId, $packageClass = null)
+    {
+        return $this->initStorage()->updatePackageInfo($uuid, $packageRowId, $packageClass);
+    }
 }
