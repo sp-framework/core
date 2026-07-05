@@ -410,10 +410,10 @@ class DevtoolsModules extends BasePackage
         }
 
         foreach ($data['bulk_actions'] as $module_type => $moduleList) {
-            if ($data['task'] !== 'updatedependencies' && $module_type === 'bundles') {
+            if ($data['task'] !== 'updatedependencies' && $data['task'] !== 'remove' && $module_type === 'bundles') {
                 continue;
             }
-            if ($data['task'] === 'updatedependencies' && $module_type === 'apptypes') {
+            if ($data['task'] === 'updatedependencies' && $data['task'] !== 'remove' && $module_type === 'apptypes') {
                 continue;
             }
             if ($data['task'] === 'truncate' && $module_type !== 'packages') {
