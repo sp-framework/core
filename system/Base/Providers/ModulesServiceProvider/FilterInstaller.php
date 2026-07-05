@@ -33,7 +33,7 @@ class FilterInstaller extends BasePackage
                 $componentClassArr = array_slice(explode('\\', get_class($componentClass)), 1, -2);
                 $componentClass = 'Apps\\' . implode('\\', $componentClassArr) . '\\' . $this->helper->last($componentClassArr) . 'Component';
 
-                $component = $this->modules->components->getComponentByClass($componentClass);
+                $component = $this->modules->components->init(true)->getComponentByClass($componentClass);
 
                 if ($component) {
                     if (isset($installComponentJsonFile['filters'])) {
@@ -138,6 +138,10 @@ class FilterInstaller extends BasePackage
             throw $e;
         }
 
+        if ($this->opCache) {
+            $this->opCache->removeCache('components', 'core');
+        }
+
         return true;
     }
 
@@ -147,7 +151,7 @@ class FilterInstaller extends BasePackage
         $componentClassArr = array_slice(explode('\\', get_class($componentClass)), 1, -2);
         $componentClass = 'Apps\\' . implode('\\', $componentClassArr) . '\\' . $this->helper->last($componentClassArr) . 'Component';
 
-        $component = $this->modules->components->getComponentByClass($componentClass);
+        $component = $this->modules->components->init(true)->getComponentByClass($componentClass);
 
         if ($component) {
             $componentFilters = $this->basepackages->filters->getFiltersForComponent((int) $component['id']);

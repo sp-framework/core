@@ -30,10 +30,10 @@ class MenuInstaller extends BasePackage
                         throw new \Exception($e->getMessage() . '. Problem reading component.json at location ' . $adminComponent);
                     }
 
-                    $component = $this->modules->components->getComponentByClass($jsonFile['class']);
+                    $component = $this->modules->components->init(true)->getComponentByClass($jsonFile['class']);
 
                     if ($component) {
-                        $menu = $this->basepackages->menus->getMenusByComponentIdForAppType($component['id'], $component['app_type']);
+                        $menu = $this->basepackages->menus->init(true)->getMenusByComponentIdForAppType($component['id'], $component['app_type']);
 
                         if ($menu) {
                             $menu['component_id'] = $component['id'];
@@ -70,10 +70,10 @@ class MenuInstaller extends BasePackage
                     $componentClassArr = array_slice(explode('\\', get_class($componentClass)), 1, -2);
                     $componentClass = 'Apps\\' . implode('\\', $componentClassArr) . '\\' . $this->helper->last($componentClassArr) . 'Component';
 
-                    $component = $this->modules->components->getComponentByClass($componentClass);
+                    $component = $this->modules->components->init(true)->getComponentByClass($componentClass);
 
                     if ($component) {
-                        $menu = $this->basepackages->menus->getMenusByRouteForAppType($installComponentJsonFile['route'], $installComponentJsonFile['app_type']);
+                        $menu = $this->basepackages->menus->init(true)->getMenusByRouteForAppType($installComponentJsonFile['route'], $installComponentJsonFile['app_type']);
 
                         if ($menu) {
                             $menu['component_id'] = $component['id'];
@@ -84,6 +84,9 @@ class MenuInstaller extends BasePackage
                                 $component['menu'] = false;
                                 $component['menu_id'] = null;
                             } else {
+                                $component['menu'] = $installComponentJsonFile['menu'];
+                                $component['menu_id'] = $menu['id'];
+
                                 $this->basepackages->menus->updateMenu($menu['id'], $installComponentJsonFile, $component);
                             }
                         } else {
@@ -118,7 +121,7 @@ class MenuInstaller extends BasePackage
             $componentClass = 'Apps\\' . implode('\\', $componentClassArr) . '\\' . $this->helper->last($componentClassArr) . 'Component';
         }
 
-        $component = $this->modules->components->getComponentByClass($componentClass);
+        $component = $this->modules->components->init(true)->getComponentByClass($componentClass);
 
         if ($component && $component['menu_id']) {
             if ($this->opCache) {
