@@ -1382,7 +1382,13 @@ class Installer extends BasePackage
                         }
                     }
                 } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
-                    return true;
+                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                    return $this->queueHasErrors(
+                        $e->getMessage(),
+                        $resultQueueLogs,
+                        false
+                    );
                 }
             } catch (\throwable $e) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
