@@ -422,6 +422,12 @@ class DevtoolsModules extends BasePackage
 
             if (count($moduleList) > 0) {
                 foreach ($moduleList as $moduleId) {
+                    if ($data['task'] === 'remove') {
+                        $this->removeModule(['id' => (int) $moduleId, 'module_type' => $module_type, 'remove_files' => 'true']);
+
+                        continue;
+                    }
+
                     $moduleToUpdate = null;
 
                     if ($module_type === 'apptypes') {
