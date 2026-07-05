@@ -509,8 +509,14 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                                     ) {
                                         var moduleLogs = document.querySelectorAll("[data-id='" + taskModule + "']");
 
-                                        if (moduleLogs.length === 1) {
-                                            $(moduleLogs).parents('tr').addClass('bg-danger');
+                                        if (moduleLogs.length > 0) {
+                                            $(moduleLogs).each(function(index, moduleLog) {
+                                                if ($(moduleLog).data('moduletype') &&
+                                                    $(moduleLog).data('moduletype') === moduleType
+                                                ) {
+                                                    $(moduleLog).parents('tr').addClass('bg-danger');
+                                                }
+                                            });
                                         }
                                     }
                                 }
