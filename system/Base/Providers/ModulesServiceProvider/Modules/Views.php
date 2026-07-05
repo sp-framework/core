@@ -241,20 +241,26 @@ class Views extends BasePackage
             if ($this->app &&
                 isset($this->domain['apps'][$this->app['id']]['view'])
             ) {
-                $viewsName = $this->getViewById($this->domain['apps'][$this->app['id']]['view'])['name'];
-                //Get views settings
-                $viewsSettings = $this->modules->viewsSettings->getViewsSettingsByViewIdDomainIdAndAppId(
-                    $this->domain['apps'][$this->app['id']]['view'],
-                    $this->domain['id'],
-                    $this->app['id']
-                );
+                $view = $this->getViewById($this->domain['apps'][$this->app['id']]['view']);
 
-                if ($viewsSettings) {
-                    if (is_string($viewsSettings['settings'])) {
-                        $this->viewSettings = $this->helper->decode($viewsSettings['settings'], true);
-                    } else {
-                        $this->viewSettings = $viewsSettings['settings'];
+                if ($view && isset($view['name'])) {
+                    $viewsName = $view['name'];
+                    //Get views settings
+                    $viewsSettings = $this->modules->viewsSettings->getViewsSettingsByViewIdDomainIdAndAppId(
+                        $this->domain['apps'][$this->app['id']]['view'],
+                        $this->domain['id'],
+                        $this->app['id']
+                    );
+
+                    if ($viewsSettings) {
+                        if (is_string($viewsSettings['settings'])) {
+                            $this->viewSettings = $this->helper->decode($viewsSettings['settings'], true);
+                        } else {
+                            $this->viewSettings = $viewsSettings['settings'];
+                        }
                     }
+                } else {
+                    $viewsName = 'Default';
                 }
             } else {
                 $viewsName =  'Default';
@@ -524,6 +530,10 @@ class Views extends BasePackage
     {
         $viewsModulesVersion = [0,0,0];
 
+        if (!$this->view) {
+            return $viewsModulesVersion;
+        }
+
         $baseViewVersion = $this->view['version'];
         $baseViewVersion = explode('.', $baseViewVersion);
         foreach ($baseViewVersion as $key => $version) {
@@ -565,7 +575,8 @@ class Views extends BasePackage
             if ($this->app['app_type'] === 'core') {
                 $this->assetsVersion = $this->core->getVersion();
             } else {
-                if ($this->view['view_modules_version'] &&
+                if ($this->view &&
+                    $this->view['view_modules_version'] &&
                     $this->view['view_modules_version'] !== '0.0.0'
                 ) {
                     $this->assetsVersion = $this->view['view_modules_version'];
@@ -623,6 +634,10 @@ class Views extends BasePackage
 
     protected function buildAssetsMeta()
     {
+        if (!$this->viewSettings) {
+            return;
+        }
+
         $this->assetsCollections['meta'] = $this->assets->collection('meta');
 
         if (isset($this->viewSettings['head']['meta']['charset'])) {
@@ -649,6 +664,10 @@ class Views extends BasePackage
 
     protected function buildAssetsHeadCss()
     {
+        if (!$this->viewSettings) {
+            return;
+        }
+
         $this->assetsCollections['headLinks'] = $this->assets->collection('headLinks');
 
         $links = $this->viewSettings['head']['link']['href'];
@@ -688,6 +707,10 @@ class Views extends BasePackage
 
     protected function buildAssetsHeadJs()
     {
+        if (!$this->viewSettings) {
+            return;
+        }
+
         $this->assetsCollections['headJs'] = $this->assets->collection('headJs');
 
         $scripts = $this->viewSettings['head']['script']['src'];
@@ -727,6 +750,10 @@ class Views extends BasePackage
 
     protected function buildAssetsBranding()
     {
+        if (!$this->viewSettings) {
+            return;
+        }
+
         $this->assetsCollections['branding'] = $this->assets->collection('branding');
 
         if (isset($this->viewSettings['branding']) && is_array($this->viewSettings['branding']) && count($this->viewSettings['branding']) > 0) {
@@ -748,6 +775,10 @@ class Views extends BasePackage
 
     protected function buildAssetsFavicons()
     {
+        if (!$this->viewSettings) {
+            return;
+        }
+
         $this->assetsCollections['favicons'] = $this->assets->collection('favicons');
 
         if (isset($this->viewSettings['head']['link']['href']['favicons']) &&
@@ -762,6 +793,10 @@ class Views extends BasePackage
 
     protected function buildAssetsFooter()
     {
+        if (!$this->viewSettings) {
+            return;
+        }
+
         $this->assetsCollections['footer'] = $this->assets->collection('footer');
 
         $this->assetsCollections['footer']->addInline(new Inline('footerCopyrightfromYear', $this->viewSettings['footer']['copyright']['fromYear']));
@@ -771,6 +806,10 @@ class Views extends BasePackage
 
     protected function buildAssetsFooterJs()
     {
+        if (!$this->viewSettings) {
+            return;
+        }
+
         $this->assetsCollections['footerJs'] = $this->assets->collection('footerJs');
 
         $scripts = $this->viewSettings['footer']['script']['src'];

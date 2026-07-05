@@ -411,10 +411,10 @@ class Router
 
 			$this->appDefaults['errorComponent'] =
 				isset($this->appInfo['errors_component']) && $this->appInfo['errors_component'] != 0 ?
-				$this->components->getComponentById($this->appInfo['errors_component'])['route'] :
+				($this->components->getComponentById($this->appInfo['errors_component'])['route'] ?? null) :
 				null;
 			$this->appDefaults['view'] =
-				$this->views->getViewById($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
+				$this->views->getViewById($this->domain['apps'][$this->appInfo['id']]['view'])['name'] ?? 'Default';
 		}
 
 		return true;

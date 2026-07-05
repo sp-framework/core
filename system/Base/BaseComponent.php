@@ -871,7 +871,11 @@ abstract class BaseComponent extends Controller
 			$this->view->parent = strtolower($this->helper->last($parents));
 		}
 
-		$this->view->viewName = $this->views['name'];
+		if ($this->views) {
+			$this->view->viewName = $this->views['name'];
+		} else {
+			$this->view->viewName = 'Default';
+		}
 
 		$this->view->activeLayout = $this->modules->views->getActiveLayout();
 
