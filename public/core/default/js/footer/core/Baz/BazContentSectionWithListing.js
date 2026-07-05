@@ -898,19 +898,7 @@
                     $('#' + sectionId + '-search').click(function(e) {
                         e.preventDefault();
 
-                        if (dataType == 0) {
-                            query['conditions'] = '-|' + selectedId + '|equals|' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
-                        } else {
-                            query['conditions'] = '-|' + selectedId + '|like|%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
-                        }
-
-                        query['quick_filter'] = true;
-
-                        that._filterRunAjax(
-                            1,
-                            datatableOptions.paginationCounters.limit,
-                            query
-                        );
+                        that._performQuickSearch(dataType);
                     });
 
                     $('#' + sectionId + '-clear').click(function(e) {
@@ -918,7 +906,33 @@
 
                         resetFilters(true);
                     });
+
+                    $(document).on('keydown', function(e) {
+                        if (e.which === 13) {
+                            var activeField = $(document.activeElement);
+
+                            if ($(activeField)[0].id === sectionId + '-filter-quick') {
+                                that._performQuickSearch(dataType);
+                            }
+                        }
+                    });
                 }
+            }
+
+            _proto._performQuickSearch = function(dataType) {
+                if (dataType == 0) {
+                    query['conditions'] = '-|' + selectedId + '|equals|' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
+                } else {
+                    query['conditions'] = '-|' + selectedId + '|like|%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
+                }
+
+                query['quick_filter'] = true;
+
+                that._filterRunAjax(
+                    1,
+                    datatableOptions.paginationCounters.limit,
+                    query
+                );
             }
 
             //Build listing datatable
