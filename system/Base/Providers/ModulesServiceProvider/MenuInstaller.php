@@ -120,7 +120,7 @@ class MenuInstaller extends BasePackage
 
         $component = $this->modules->components->getComponentByClass($componentClass);
 
-        if ($component) {
+        if ($component && $component['menu_id']) {
             if ($this->opCache) {
                 $this->opCache->removeCache('menus', 'core');
             }
