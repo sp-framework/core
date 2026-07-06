@@ -1,23 +1,23 @@
 {% set canAddButton = null %}
 {% if canAdd %}
-{% set canAddButton = {
-                'componentId'           : componentId,
-                'sectionId'             : 'listing',
-                'buttonType'            : 'button',
-                'buttons'               :
-                    {
-                        'add-business' : {
-                            'title'                   : 'Add New Scope',
-                            'size'                    : 'sm',
-                            'type'                    : 'primary',
-                            'icon'                    : 'plus',
-                            'buttonAdditionalClass'   : 'contentAjaxLink',
-                            'position'                : 'right',
-                            'url'                     : links.url('system/api/server/scopes/q/id/0')
+    {% set canAddButton = {
+                    'componentId'           : componentId,
+                    'sectionId'             : 'listing',
+                    'buttonType'            : 'button',
+                    'buttons'               :
+                        {
+                            'add-scope' : {
+                                'title'                   : 'Add New Scope',
+                                'size'                    : 'sm',
+                                'type'                    : 'primary',
+                                'icon'                    : 'plus',
+                                'buttonAdditionalClass'   : 'contentAjaxLink',
+                                'position'                : 'right',
+                                'url'                     : links.url('system/api/server/scopes/q/id/0')
+                            }
                         }
-                    }
-            }
-%}
+                }
+    %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -37,7 +37,32 @@
         'dtFilters'             : table['filters'],
         'dtFilterColumns'       : table['filterColumns'],
         'dtFixedHeader'         : true,
-        'dtPrimaryButtons'      : canAddButton,
+        'dtPrimaryButtons'      :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'services' : {
+                            'title'                   : 'Services',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/api/server/services')
+                        },
+                        'clients' : {
+                            'title'                   : 'Clients',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/api/server/clients')
+                        }
+                    }
+            },
+        'dtSecondaryButtons'    : canAddButton,
         'dtTable'               : table,
         'dtColumns'             : table['columns'],
         'dtPostUrl'             : table['postUrl'],

@@ -99,7 +99,9 @@ final class Bootstrap
 
             $application->setEventsManager($events);
 
-            $response = $application->handle($_SERVER["REQUEST_URI"]);
+            $helper = $container->getShared('helper');
+
+            $response = $application->handle($helper->reduceSlashes($_SERVER["REQUEST_URI"]));
 
             $this->logger->commit();
         } else {
