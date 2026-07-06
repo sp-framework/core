@@ -93,6 +93,12 @@ class IpFilter extends BasePackage
             $this->init($checkViaAppId);
         }
 
+        if ($this->ipFilterSettings['status'] === 'disable') {
+            $this->addResponse('Firewall is disabled, ip address is allowed!');
+
+            return true;
+        }
+
         $this->ip = $ip;
 
         if (!$this->ip) {
