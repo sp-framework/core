@@ -60,7 +60,7 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     // public $per_day_calls_connections;
 
-    public function getIdentifier()
+    public function getIdentifier() :string
     {
         return $this->client_id;
     }

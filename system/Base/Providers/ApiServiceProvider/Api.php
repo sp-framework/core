@@ -90,11 +90,11 @@ class Api extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->scopes = new Scopes;
-
-        $this->clients = new Clients;
-
         if ($this->container) {
+            $this->scopes = new Scopes;
+
+            $this->clients = new Clients;
+
             if ($this->opCache) {
                 if (!$resetCache && $this->opCache->checkCache('apiServices', 'core')) {
                     $this->apiServices = $this->opCache->getCache('apiServices', 'core');
@@ -1080,6 +1080,10 @@ class Api extends BasePackage
 
     public function getAPIAvailableScopes()
     {
+        if (!$this->scopes) {
+            $this->init();
+        }
+
         return $this->scopes->init()->scopes;
     }
 

@@ -9,6 +9,13 @@ class ClientsComponent extends BaseComponent
 {
     use DynamicTable;
 
+    protected $apiClients;
+
+    public function initialize()
+    {
+        $this->apiClients = $this->api->init()->clients;
+    }
+
     /**
      * @acl(name=view)
      */
@@ -22,7 +29,7 @@ class ClientsComponent extends BaseComponent
                 );
 
             if ($this->getData()['id'] != 0) {
-                $client = $this->api->clients->getById($this->getData()['id']);
+                $client = $this->apiClients->getById($this->getData()['id']);
 
                 if (!$client) {
                     return $this->throwIdNotFound();
@@ -55,7 +62,7 @@ class ClientsComponent extends BaseComponent
             ];
 
         $this->generateDTContent(
-            $this->api->clients,
+            $this->apiClients,
             'system/api/server/clients/view',
             $conditions,
             ['revoked', 'concurrent_calls_count', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
@@ -200,11 +207,11 @@ class ClientsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->api->clients->addClient($this->postData());
+        $this->apiClients->addClient($this->postData());
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode
+            $this->apiClients->packagesData->responseMessage,
+            $this->apiClients->packagesData->responseCode
         );
     }
 
@@ -225,11 +232,11 @@ class ClientsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->api->clients->forceRevoke($this->postData());
+        $this->apiClients->forceRevoke($this->postData());
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode
+            $this->apiClients->packagesData->responseMessage,
+            $this->apiClients->packagesData->responseCode
         );
     }
 
@@ -243,12 +250,12 @@ class ClientsComponent extends BaseComponent
 
         $this->requestIsPost();
 
-        $this->api->clients->generateClientKeys($this->postData());
+        $this->apiClients->generateClientKeys($this->postData());
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode,
-            $this->api->clients->packagesData->responseData
+            $this->apiClients->packagesData->responseMessage,
+            $this->apiClients->packagesData->responseCode,
+            $this->apiClients->packagesData->responseData
         );
     }
 
@@ -256,12 +263,12 @@ class ClientsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->api->clients->generateClientIdAndSecret($this->postData());
+        $this->apiClients->generateClientIdAndSecret($this->postData());
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode,
-            $this->api->clients->packagesData->responseData
+            $this->apiClients->packagesData->responseMessage,
+            $this->apiClients->packagesData->responseCode,
+            $this->apiClients->packagesData->responseData
         );
     }
 
@@ -270,11 +277,11 @@ class ClientsComponent extends BaseComponent
         $this->requestIsPost();
 
         $client = null;
-        $this->api->clients->resetCallsCount([], $client, $this->postData()['id']);
+        $this->apiClients->resetCallsCount([], $client, $this->postData()['id']);
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode
+            $this->apiClients->packagesData->responseMessage,
+            $this->apiClients->packagesData->responseCode
         );
     }
 }

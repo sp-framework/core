@@ -9,6 +9,13 @@ class ServicesComponent extends BaseComponent
 {
     use DynamicTable;
 
+    protected $apiClients;
+
+    public function initialize()
+    {
+        $this->apiClients = $this->api->init()->clients;
+    }
+
     /**
      * @acl(name=view)
      */
@@ -27,7 +34,7 @@ class ServicesComponent extends BaseComponent
             $api['request_url'] = '';
 
             if (isset($api['client_id']) && $api['client_id'] !== '') {
-                $client = $this->api->clients->getFirst('client_id', $api['client_id']);
+                $client = $this->apiClients->getFirst('client_id', $api['client_id']);
 
                 if ($client) {
                     $client = $client->toArray();

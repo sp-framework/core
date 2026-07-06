@@ -148,9 +148,6 @@ class Clients extends BasePackage
         }
     }
 
-    /**
-     *
-     */
     protected function removeClient(array $data)
     {
         //
