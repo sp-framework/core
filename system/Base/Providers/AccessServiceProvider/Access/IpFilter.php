@@ -23,11 +23,15 @@ class IpFilter extends BasePackage
 
     protected $app;
 
-    public function init()
+    public function init($appId = null)
     {
-        $this->app = $this->apps->getAppInfo();
+        if ($appId) {
+            $this->app = $this->apps->apps[$appId];
+        } else {
+            $this->app = $this->apps->getAppInfo();
+        }
 
-        $this->filters = (new Filters())->init();
+        $this->filters = (new Filters())->init($appId);
 
         $this->ip2location = new Ip2location($this);
 
@@ -83,6 +87,10 @@ class IpFilter extends BasePackage
             $this->addResponse('App ID not provided', 1);
 
             return false;
+        }
+
+        if ($checkViaAppId) {
+            $this->init($checkViaAppId);
         }
 
         $this->ip = $ip;

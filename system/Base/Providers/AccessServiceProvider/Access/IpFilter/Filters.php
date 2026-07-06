@@ -20,9 +20,13 @@ class Filters extends BasePackage
 
     protected $opCacheFilters = [];
 
-    public function init()
+    public function init($appId = null)
     {
-        $this->app = $this->apps->getAppInfo();
+        if ($appId) {
+            $this->app = $this->apps->apps[$appId];
+        } else {
+            $this->app = $this->apps->getAppInfo();
+        }
 
         return $this;
     }
