@@ -955,12 +955,13 @@ dataCollectionSection =
                         $("#{{componentId}}-{{sectionId}}-tabs-filters").attr('hidden', false);
                     } else {
                         Swal.fire({
-                            title                       : '<span class="text-danger"> This will reset all app filters. Are you sure?</span>',
+                            title                       : '<span class="text-danger"> Remove all filters and disable Ip Filter? Note: You can disable IP Filter, by changing status to disable or monitor!</span>',
                             icon                        : 'question',
                             background                  : 'rgba(0,0,0,.8)',
                             backdrop                    : 'rgba(0,0,0,.6)',
                             buttonsStyling              : false,
                             confirmButtonText           : 'Yes',
+                            cancelButtonText            : 'No',
                             customClass                 : {
                                 'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
                                 'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
@@ -974,28 +975,45 @@ dataCollectionSection =
                             }
                         }).then((result) => {
                             if (result.value) {
-                                $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', true);
-                                    var url = "{{links.url('apps/resetAppFilters')}}";
-                                    var postData = { };
-                                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+                                var url = "{{links.url('apps/resetAppFilters')}}";
+                                var postData = { };
+                                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
-                                    $.post(url, postData, function(response) {
-                                        if (response.responseCode != 0) {
-                                            paginatedPNotify('error', {
-                                                title   : response.responseMessage
-                                            });
+                                (async () => { await Swal.fire({
+                                        title                       : "Confirmation",
+                                        input                       : "checkbox",
+                                        inputValue                  : 0,
+                                        inputPlaceholder            : 'Confirm deletion of IP Filter rules',
+                                        confirmButtonText           : 'Remove&nbsp;<i class="fa fa-trash"></i>',
+                                        buttonsStyling              : false,
+                                        customClass                 : {
+                                            'confirmButton'             : 'btn btn-danger btn-sm text-uppercase'
+                                        },
+                                        inputValidator: (result) => {
+                                            if (!result) {
+                                                return "You need check the confirmation checkbox.";
+                                            }
 
-                                            return;
+                                            $.post(url, postData, function(response) {
+                                                if (response.responseCode != 0) {
+                                                    paginatedPNotify('error', {
+                                                        title   : response.responseMessage
+                                                    });
+
+                                                    return;
+                                                }
+
+                                                $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', true);
+
+                                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+                                            }, "json");
                                         }
-
-                                        $('#{{componentId}}-{{sectionId}}-incorrect_login_attempt_block_ip').val(0);
-                                        $('#allow').prop('checked', true);
-
-                                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-                                    }, "json");
+                                    });
+                                })();
                             } else {
-                                $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").prop('checked', true);
+                                $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', true);
+                                $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").prop('checked', false);
                             }
                         });
                     }
