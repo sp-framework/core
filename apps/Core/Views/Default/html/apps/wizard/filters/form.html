@@ -111,6 +111,7 @@ dataCollectionSectionForm['funcs']['removeFilter'] = function(childs = false, th
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
     postData["id"] = $(thisButton).data('id');
+    postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
     var color = 'danger';
     var text;
@@ -313,6 +314,7 @@ dataCollectionSectionForm['funcs']['updateFilter'] = function(task, thisButton) 
             var postData = { };
             postData[$('#security-token').attr('name')] = $('#security-token').val();
             postData["id"] = $(thisButton).data('id');
+            postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
             if (task === 'allow-proxy' ||
                 task === 'block-proxy'
