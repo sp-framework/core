@@ -978,7 +978,7 @@ dataCollectionSection =
                                 var url = "{{links.url('apps/resetAppFilters')}}";
                                 var postData = { };
                                 postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+                                postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
                                 (async () => { await Swal.fire({
                                         title                       : "Confirmation",
