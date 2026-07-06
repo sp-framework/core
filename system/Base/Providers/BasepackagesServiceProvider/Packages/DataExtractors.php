@@ -1260,7 +1260,7 @@ class DataExtractors extends BasePackage
         $mimeType = $detector->detectMimeTypeFromFile(base_path($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.ZIP'));
 
         if ($mimeType === 'text/plain' &&
-            $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.CSV')
+            $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['bin_file_code'] . '.ZIP')
         ) {
             return true;//Downloaded file is a plain text file with probably error content received from ip2location site.
         } else {
@@ -1399,8 +1399,10 @@ class DataExtractors extends BasePackage
         $mimeType = $detector->detectMimeTypeFromFile(base_path($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP'));
 
         if ($mimeType === 'text/plain' &&
-            $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.CSV')
+            $this->localContent->fileExists($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP')
         ) {
+            return true;//Downloaded file is a plain text file with probably error content received from ip2location site.
+        } else {
             if ($this->zip->open(base_path($this->varDir . 'ip2location/' . $data['proxy_file_code'] . '.ZIP')) === true) {
                 $this->zip->extractTo(base_path($this->varDir . 'ip2location/'));
 
