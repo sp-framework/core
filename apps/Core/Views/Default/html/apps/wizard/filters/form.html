@@ -1022,7 +1022,7 @@ dataCollectionSection =
                     postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
                     $.post(url, postData, function(response) {
-                        if (response.responseCode != 0) {
+                        if (response.responseCode == 1) {
                             paginatedPNotify('error', {title   : response.responseMessage});
 
                             return;
