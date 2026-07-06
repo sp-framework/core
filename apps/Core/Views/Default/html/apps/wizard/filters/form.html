@@ -682,7 +682,7 @@ dataCollectionSection =
                     var url = "{{links.url('apps/addFilter')}}";
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+                    postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
                     postData['filter_type'] = $('#{{componentId}}-{{sectionId}}-filter_type').find('input[type=radio]:checked').data('value').toLowerCase();
                     postData['address_type'] = $('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value').toLowerCase();
 
