@@ -1001,6 +1001,9 @@ dataCollectionSection =
                                                         title   : response.responseMessage
                                                     });
 
+                                                    $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', false);
+                                                    $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").prop('checked', true);
+
                                                     return;
                                                 }
 
