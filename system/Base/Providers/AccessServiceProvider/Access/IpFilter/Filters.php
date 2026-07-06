@@ -51,7 +51,7 @@ class Filters extends BasePackage
 
             $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-            $filters = $this->getAll()->filters;
+            $filters = $this->getFilterByType('host', true);
         } else {
             $filters = [];
 
@@ -1211,50 +1211,63 @@ class Filters extends BasePackage
 
     public function resetAppFilters(array $data)
     {
-        if (!isset($data['app_id'])) {
-            $this->addResponse('Incorrect App ID', 1);
+        $this->getCachedFilters();
 
-            return;
-        }
+        $data['include_childrens'] = 'true';
+        $filters = $this->getFilters($data);
 
-        if ($this->config->databasetype === 'db') {
-            $app = $this->apps->getFirst('id', $data['app_id']);
+        if ($filters && count($filters) > 0) {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
 
-            $filtersObj = $app->getIpFilters();
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-            if ($filtersObj && $filtersObj->count() > 0) {
-                $filtersObj->delete();
-            }
+            $cached = false;
+            foreach ($filters as $filter) {
+                $this->remove($filter);
 
-            $app->assign(['incorrect_login_attempt_block_ip' => 0, 'ip_filter_default_action' => 'allow']);
+                if ($filter['address_type'] === 'host') {
+                    if (isset($this->opCacheFilters[$filter['address']])) {
+                        unset($this->opCacheFilters[$filter['address']]);
 
-            $app->update();
-
-            return true;
-        } else {
-            $this->apps->setFFRelations(true);
-
-            $app = $this->apps->getFirst('id', (int) $data['app_id']);
-
-            if ($app->data['ipFilters'] && count($app->data['ipFilters']) > 0) {
-                foreach ($app->data['ipFilters'] as $filter) {
-                    $this->removeFilter(['id' => $filter['id']]);
+                        $cached = true;
+                    }
                 }
             }
 
-            $app = $app->toArray();
-
-            $app['incorrect_login_attempt_block_ip'] = 0;
-            $app['ip_filter_default_action'] = 'allow';
-
-            $this->apps->update($app);
-
-            return true;
+            if ($cached) {
+                $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
+            }
         }
 
-        $this->addResponse('Incorrect App ID', 1);
+        unset($data['include_childrens']);
+        $data['defaultStore'] = 'true';
+        $filters = $this->getFilters($data);
+        if ($filters && count($filters) > 0) {
+            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFiltersDefault::class);
 
-        return;
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+            $cached = false;
+            foreach ($filters as $filter) {
+                $this->remove($filter);
+
+                if ($filter['address_type'] === 'host') {
+                    if (isset($this->opCacheFilters[$filter['address']])) {
+                        unset($this->opCacheFilters[$filter['address']]);
+
+                        $cached = true;
+                    }
+                }
+            }
+
+            if ($cached) {
+                $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
+            }
+        }
+
+        $this->addResponse('Removed filters for this app');
+
+        return true;
     }
 
     public function bumpFilterHitCounter($updateIncorrectAttempts = false, $appRoute = null, &$filter = null, $defaultStore = false, $resetIncorrectAttempts = false)

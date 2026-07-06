@@ -512,7 +512,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->filters->addFilter($this->postData());
+        $this->access->ipFilter->init($this->postData()['app_id'])->filters->addFilter($this->postData());
 
         $this->addResponse(
             $this->access->ipFilter->filters->packagesData->responseMessage,
@@ -525,7 +525,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->init($this->postData()['appId'])->filters->updateFilter($this->postData());
+        $this->access->ipFilter->init($this->postData()['app_id'])->filters->updateFilter($this->postData());
 
         $this->addResponse(
             $this->access->ipFilter->filters->packagesData->responseMessage,
@@ -538,7 +538,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->init($this->postData()['appId'])->filters->removeFilter($this->postData());
+        $this->access->ipFilter->init($this->postData()['app_id'])->filters->removeFilter($this->postData());
 
         $this->addResponse(
             $this->access->ipFilter->filters->packagesData->responseMessage,
@@ -550,7 +550,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->filters->resetAppFilters($this->postData());
+        $this->access->ipFilter->init($this->postData()['app_id'])->filters->resetAppFilters($this->postData());
 
         $this->addResponse(
             $this->access->ipFilter->filters->packagesData->responseMessage,
@@ -562,7 +562,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->init($this->postData()['appId'])->checkIp($this->postData()['ip'], null, true);
+        $this->access->ipFilter->init($this->postData()['app_id'])->checkIp($this->postData()['ip'], null, true);
 
         $this->addResponse(
             $this->access->ipFilter->packagesData->responseMessage,
