@@ -1022,6 +1022,12 @@ dataCollectionSection =
                     postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
                     $.post(url, postData, function(response) {
+                        if (response.responseCode != 0) {
+                            paginatedPNotify('error', {title   : response.responseMessage});
+
+                            return;
+                        }
+
                         if (response.responseData && response.responseData.filter && typeof response.responseData.filter === 'object') {
                             dataCollectionSectionForm['checkedFilter'] = response.responseData;
 
