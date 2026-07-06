@@ -562,7 +562,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->checkIp($this->postData()['ip'], null, true);
+        $this->access->ipFilter->checkIp($this->postData()['ip'], null, true, $this->postData()['appId']);
 
         $this->addResponse(
             $this->access->ipFilter->packagesData->responseMessage,
