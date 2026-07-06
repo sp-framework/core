@@ -1022,10 +1022,8 @@ dataCollectionSection =
                     postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
                     $.post(url, postData, function(response) {
-                        if (response.responseCode == 1) {
+                        if (response.responseCode != 0) {
                             paginatedPNotify('error', {title   : response.responseMessage});
-
-                            return;
                         }
 
                         if (response.responseData && response.responseData.filter && typeof response.responseData.filter === 'object') {
@@ -1168,9 +1166,9 @@ dataCollectionSection =
                                 }
                                 $('#{{componentId}}-{{sectionId}}-remove-checked-parent').attr('disabled', false);
                             }
-                        }
 
-                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+                        }
                     }, "json");
                 });
 
