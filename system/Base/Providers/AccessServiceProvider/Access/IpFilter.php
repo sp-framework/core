@@ -120,6 +120,12 @@ class IpFilter extends BasePackage
                 if ($checkViaApp) {
                     $cached = true;
                 } else {
+                    if ($this->ipFilterSettings['status'] === 'monitor') {
+                        $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, $responseData);
+
+                        return true;
+                    }
+
                     return $opCacheFilters[$this->ip];
                 }
             }
@@ -187,6 +193,12 @@ class IpFilter extends BasePackage
                 return true;
             }
 
+            if ($this->ipFilterSettings['status'] === 'monitor') {
+                $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, $responseData);
+
+                return true;
+            }
+
             return false;
         }
 
@@ -245,6 +257,12 @@ class IpFilter extends BasePackage
                             if ($responseData['filter']['filter_type'] === 'allow' ||
                                 $responseData['filter']['filter_type'] === 'monitor'
                             ) {
+                                return true;
+                            }
+
+                            if ($this->ipFilterSettings['status'] === 'monitor') {
+                                $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, $responseData);
+
                                 return true;
                             }
 
@@ -375,6 +393,12 @@ class IpFilter extends BasePackage
                                         if ($responseData['filter']['filter_type'] === 'allow' ||
                                             $responseData['filter']['filter_type'] === 'monitor'
                                         ) {
+                                            return true;
+                                        }
+
+                                        if ($this->ipFilterSettings['status'] === 'monitor') {
+                                            $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, $responseData);
+
                                             return true;
                                         }
 
