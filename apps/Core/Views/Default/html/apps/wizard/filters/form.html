@@ -951,8 +951,28 @@ dataCollectionSection =
 
                 $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").click(function() {
                     if ($(this).is(':checked') === true) {
-                        $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', false);
-                        $("#{{componentId}}-{{sectionId}}-tabs-filters").attr('hidden', false);
+                        Swal.fire({
+                            title                       : '<span class="text-info">Save app to add filters.</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Ok',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-info btn-sm text-uppercase'
+                            },
+                            showCancelButton            : false,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                dataCollection.env.sounds.swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                return;
+                            }
+                        });
                     } else {
                         Swal.fire({
                             title                       : '<span class="text-danger"> Remove all filters and disable Ip Filter? Note: You can disable IP Filter, by changing status to disable or monitor!</span>',
