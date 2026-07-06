@@ -209,7 +209,7 @@ class IpFilter extends BasePackage
         if ($filters && count($filters) > 0) {
             foreach ($filters as $filterKey => $filter) {
                 if (IpUtils::checkIp($this->ip, $filter['address'])) {
-                    $networkCheckIpFilter = $this->filters->checkIPFilter($filter, $ip);
+                    $networkCheckIpFilter = $this->filters->checkIPFilter($filter, $this->ip);
 
                     if (count($profiling) === 0) {
                         $this->basepackages->utils->setMicroTimer('Network Filters', true);
@@ -311,7 +311,7 @@ class IpFilter extends BasePackage
 
                         $lookupMethod = 'getIpDetailsFromIp2location' . $ip2locationLookupOptionsMethod;
 
-                        $response = $this->ip2location->$lookupMethod($ip);
+                        $response = $this->ip2location->$lookupMethod($this->ip);
 
                         if (!$response) {//Not found in primary lookup, we get the secondary from list.
                             unset($ip2locationLookupOptions[$arrayKey[0]]);
@@ -322,7 +322,7 @@ class IpFilter extends BasePackage
 
                             $lookupMethod = 'getIpDetailsFromIp2location' . $ip2locationLookupOptionsMethod;
 
-                            $response = $this->ip2location->$lookupMethod($ip);
+                            $response = $this->ip2location->$lookupMethod($this->ip);
                         }
 
                         if ($response) {
@@ -345,7 +345,7 @@ class IpFilter extends BasePackage
                                     }
                                 }
 
-                                $ip2locationCheckIpFilter = $this->filters->checkIPFilter($filter, $ip);
+                                $ip2locationCheckIpFilter = $this->filters->checkIPFilter($filter, $this->ip);
 
                                 if (count($profiling) === 0) {
                                     $this->basepackages->utils->setMicroTimer('Ip2location Filters', true);
