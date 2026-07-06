@@ -1006,7 +1006,7 @@ class Filters extends BasePackage
                 $resetCache = true;
             }
 
-            if ($resetCache) {
+            if (isset($resetCache)) {
                 $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
             }
 
@@ -1036,7 +1036,7 @@ class Filters extends BasePackage
         }
 
         if ($getChildren && !$removeParent) {
-            if ($resetCache) {
+            if (isset($resetCache)) {
                 $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
             }
 
@@ -1061,7 +1061,7 @@ class Filters extends BasePackage
                 $resetCache = true;
             }
 
-            if ($resetCache) {
+            if (isset($resetCache)) {
                 $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
             }
 
@@ -1150,7 +1150,7 @@ class Filters extends BasePackage
                     $resetCache = true;
                 }
 
-                if ($resetCache) {
+                if (isset($resetCache)) {
                     $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
                 }
 
@@ -1327,7 +1327,7 @@ class Filters extends BasePackage
                     $resetCache = true;
                 }
 
-                if ($resetCache) {
+                if (isset($resetCache)) {
                     $this->opCache->setCache($this->app['route'], $this->opCacheFilters, 'filters');
                 }
             } else {

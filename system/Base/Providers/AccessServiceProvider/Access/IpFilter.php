@@ -127,7 +127,7 @@ class IpFilter extends BasePackage
                     $cached = true;
                 } else {
                     if ($this->ipFilterSettings['status'] === 'monitor') {
-                        $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, $responseData);
+                        $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2);
 
                         return true;
                     }
@@ -137,7 +137,7 @@ class IpFilter extends BasePackage
             }
         }
 
-        if (!$this->filters->validateIP($this->ip)) {
+        if (!$cached && !$this->filters->validateIP($this->ip)) {
             $this->addResponse(
                 $this->filters->packagesData->responseMessage,
                 $this->filters->packagesData->responseCode,
