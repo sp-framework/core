@@ -1024,6 +1024,8 @@ dataCollectionSection =
                     $.post(url, postData, function(response) {
                         if (response.responseCode != 0) {
                             paginatedPNotify('error', {title   : response.responseMessage});
+                        } else if (response.responseCode == 0) {
+                            paginatedPNotify('success', {title   : response.responseMessage});
                         }
 
                         if (response.responseData && response.responseData.filter && typeof response.responseData.filter === 'object') {
