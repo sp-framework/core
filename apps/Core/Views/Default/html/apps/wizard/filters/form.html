@@ -111,7 +111,7 @@ dataCollectionSectionForm['funcs']['removeFilter'] = function(childs = false, th
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
     postData["id"] = $(thisButton).data('id');
-    postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
+    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
     var color = 'danger';
     var text;
@@ -314,7 +314,7 @@ dataCollectionSectionForm['funcs']['updateFilter'] = function(task, thisButton) 
             var postData = { };
             postData[$('#security-token').attr('name')] = $('#security-token').val();
             postData["id"] = $(thisButton).data('id');
-            postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
+            postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
             if (task === 'allow-proxy' ||
                 task === 'block-proxy'
@@ -682,7 +682,7 @@ dataCollectionSection =
                     var url = "{{links.url('apps/addFilter')}}";
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
+                    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
                     postData['filter_type'] = $('#{{componentId}}-{{sectionId}}-filter_type').find('input[type=radio]:checked').data('value').toLowerCase();
                     postData['address_type'] = $('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value').toLowerCase();
 
@@ -978,7 +978,7 @@ dataCollectionSection =
                                 var url = "{{links.url('apps/resetAppFilters')}}";
                                 var postData = { };
                                 postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
+                                postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
                                 (async () => { await Swal.fire({
                                         title                       : "Confirmation",
@@ -1042,7 +1042,7 @@ dataCollectionSection =
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData["ip"] = $("#{{componentId}}-{{sectionId}}-ip").val();
-                    postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
+                    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
                     $.post(url, postData, function(response) {
                         if (response.responseCode != 0) {
