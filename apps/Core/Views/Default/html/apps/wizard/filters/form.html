@@ -1029,6 +1029,12 @@ dataCollectionSection =
                         }
 
                         if (response.responseData && response.responseData.filter && typeof response.responseData.filter === 'object') {
+                            if ($("#{{componentId}}-{{sectionId}}-ip").val() === ''&&
+                                response.responseData.filter.address
+                            ) {
+                                $("#{{componentId}}-{{sectionId}}-ip").val(response.responseData.filter.address);
+                            }
+
                             dataCollectionSectionForm['checkedFilter'] = response.responseData;
 
                             if (response.responseData.profiling && response.responseData.profiling[1]) {
