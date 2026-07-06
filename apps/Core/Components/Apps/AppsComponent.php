@@ -525,7 +525,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->filters->updateFilter($this->postData());
+        $this->access->ipFilter->init($this->postData()['appId'])->filters->updateFilter($this->postData());
 
         $this->addResponse(
             $this->access->ipFilter->filters->packagesData->responseMessage,
@@ -538,7 +538,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->filters->removeFilter($this->postData());
+        $this->access->ipFilter->init($this->postData()['appId'])->filters->removeFilter($this->postData());
 
         $this->addResponse(
             $this->access->ipFilter->filters->packagesData->responseMessage,
@@ -562,7 +562,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->ipFilter->checkIp($this->postData()['ip'], null, true, $this->postData()['appId']);
+        $this->access->ipFilter->init($this->postData()['appId'])->checkIp($this->postData()['ip'], null, true);
 
         $this->addResponse(
             $this->access->ipFilter->packagesData->responseMessage,

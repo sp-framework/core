@@ -81,18 +81,8 @@ class IpFilter extends BasePackage
         return $this->ip;
     }
 
-    public function checkIp($ip = null, array $overrideIp2locationLookupSequence = null, $checkViaApp = false, $checkViaAppId = null)
+    public function checkIp($ip = null, array $overrideIp2locationLookupSequence = null, $checkViaApp = false)
     {
-        if ($checkViaApp && !$checkViaAppId) {
-            $this->addResponse('App ID not provided', 1);
-
-            return false;
-        }
-
-        if ($checkViaAppId) {
-            $this->init($checkViaAppId);
-        }
-
         if ($this->ipFilterSettings['status'] === 'disable') {
             $this->addResponse('Firewall is disabled, ip address is allowed!');
 
