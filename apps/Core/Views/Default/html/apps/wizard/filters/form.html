@@ -1027,6 +1027,8 @@ dataCollectionSection =
                                                     return;
                                                 }
 
+                                                paginatedPNotify('success', {title   : response.responseMessage});
+
                                                 $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', true);
 
                                                 dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
