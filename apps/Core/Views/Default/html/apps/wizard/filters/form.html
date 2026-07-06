@@ -1019,6 +1019,7 @@ dataCollectionSection =
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData["ip"] = $("#{{componentId}}-{{sectionId}}-ip").val();
+                    postData["appId"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
                     $.post(url, postData, function(response) {
                         if (response.responseData && response.responseData.filter && typeof response.responseData.filter === 'object') {
