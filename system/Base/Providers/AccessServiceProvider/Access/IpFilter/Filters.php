@@ -1223,7 +1223,7 @@ class Filters extends BasePackage
 
             $cached = false;
             foreach ($filters as $filter) {
-                $this->remove($filter);
+                $this->remove((int) $filter['id']);
 
                 if ($filter['address_type'] === 'host') {
                     if (isset($this->opCacheFilters[$filter['address']])) {
@@ -1249,7 +1249,7 @@ class Filters extends BasePackage
 
             $cached = false;
             foreach ($filters as $filter) {
-                $this->remove($filter);
+                $this->remove((int) $filter['id']);
 
                 if ($filter['address_type'] === 'host') {
                     if (isset($this->opCacheFilters[$filter['address']])) {
