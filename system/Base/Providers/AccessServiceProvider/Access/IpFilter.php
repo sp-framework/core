@@ -468,7 +468,7 @@ class IpFilter extends BasePackage
         $this->logger->commit();
 
         if ($responseType === 'code') {
-            $this->response->setStatusCode($this->ipFilterSettings['response_type'] ?? 404);
+            $this->response->setStatusCode($this->ipFilterSettings['response_code'] ?? 404);
         } else if ($responseType === 'url') {
             $url = '/';
 
