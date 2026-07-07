@@ -186,6 +186,10 @@ trait DynamicTable {
                 return;
             }
 
+            if ($this->api->isApi()) {
+                return ['rows' => $rows, 'counters' => $package->packagesData->paginationCounters];
+            }
+
             if ($controlActions && is_callable($controlActions)) {
                 $rows = $controlActions($rows);
             } else if ($controlActions) {
@@ -270,10 +274,6 @@ trait DynamicTable {
 
             if ($dtAdditionControlButtons && is_callable($dtAdditionControlButtons)) {
                 $dtAdditionControlButtons = $dtAdditionControlButtons($rows);
-            }
-
-            if ($this->api->isApi()) {
-                return ['rows' => $rows, 'counters' => $package->packagesData->paginationCounters];
             }
 
             $adminltetags = new Adminltetags();
