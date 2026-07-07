@@ -40,7 +40,7 @@ class ServiceProviderApiAccessTokens extends BaseModel implements AccessTokenEnt
         $this->account_id = $identifier;
     }
 
-    public function addScope($scope)
+    public function addScope($scope) :void
     {
         $this->scopes[$scope] = $scope;
     }
