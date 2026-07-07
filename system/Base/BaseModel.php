@@ -101,4 +101,11 @@ abstract class BaseModel extends Model
 			throw new \Exception($e->getMessage());
 		}
 	}
+
+	protected function logException($exception)
+	{
+		if ($this->config->logs->exceptions) {
+			$this->logger->logExceptions->critical(json_trace($exception));
+		}
+	}
 }

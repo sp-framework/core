@@ -1669,4 +1669,11 @@ abstract class BaseComponent extends Controller
 			}
 		}
 	}
+
+	protected function logException($exception)
+	{
+		if ($this->config->logs->exceptions) {
+			$this->logger->logExceptions->critical(json_trace($exception));
+		}
+	}
 }

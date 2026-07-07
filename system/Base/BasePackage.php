@@ -2604,4 +2604,11 @@ abstract class BasePackage extends Controller
 
 		return $data;
 	}
+
+	protected function logException($exception)
+	{
+		if ($this->config->logs->exceptions) {
+			$this->logger->logExceptions->critical(json_trace($exception));
+		}
+	}
 }
