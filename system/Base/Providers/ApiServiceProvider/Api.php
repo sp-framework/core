@@ -381,7 +381,7 @@ class Api extends BasePackage
         if ($usingIsApiCheckVia) {
             if ($this->isApiCheckVia === 'pub') {//Public access API
                 foreach ($this->apiServices as $apiService) {
-                    if (($apiService['is_public'] === '1' || $apiService['is_public'] === true) &&
+                    if (($apiService['is_public'] == '1' || $apiService['is_public'] === true) &&
                         $apiService['app_id'] === $this->apps->getAppInfo()['id'] &&
                         $apiService['domain_id'] === $this->domains->domain['id']
                     ) {
@@ -552,16 +552,22 @@ class Api extends BasePackage
         }
 
         if ($usingDomainApp) {
+            if (!$this->apiServices) {
+                $this->init();
+            }
+
+            $enabledApis = [];
+
             foreach ($this->apiServices as $apiService) {
-                if (($apiService['status'] === '1' || $apiService['status'] === true) &&
+                if (($apiService['status'] == '1' || $apiService['status'] === true) &&
                     $apiService['app_id'] === $this->apps->getAppInfo()['id'] &&
                     $apiService['domain_id'] === $this->domains->domain['id']
                 ) {
-                    $this->api = $apiService;
-
-                    break;
+                    $enabledApis[$apiService['id']] = $apiService;
                 }
             }
+
+            return $enabledApis;
         }
 
         return $this->api;

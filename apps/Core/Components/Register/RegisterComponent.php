@@ -214,15 +214,9 @@ class RegisterComponent extends BaseComponent
         if ($this->postData()['grant_type'] === 'authorization_code' || $this->postData()['grant_type'] === 'refresh_token') {
             $apis = $this->api->getApiInfo(false, true);
 
-            if (isset($apis['id'])) {
-                if ($this->postData()['client_id'] === $apis['client_id']) {
-                    $this->api->api = $apis;
-                }
-            } else {
-                foreach ($apis as $api) {
-                    if ($this->postData()['client_id'] === $api['client_id']) {
-                        $this->api->api = $api;
-                    }
+            foreach ($apis as $api) {
+                if ($this->postData()['client_id'] === $api['client_id']) {
+                    $this->api->api = $api;
                 }
             }
 
