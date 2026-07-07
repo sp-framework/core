@@ -16,7 +16,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
     protected function init()
     {
-        $this->data['api'] = $this->api->getApiInfo(true);
+        $this->data['api'] = $this->api->init()->getApiInfo(true);
         $this->data['app'] = $this->apps->getAppInfo();
         $this->data['domain'] = $this->domains->getDomain();
 

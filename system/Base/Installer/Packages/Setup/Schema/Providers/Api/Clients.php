@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Providers\Api;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Clients
 {
@@ -60,7 +61,7 @@ class Clients
                     'device_id',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 512,
+                        'size'          => 100,
                         'notNull'       => false,
                     ]
                 ),
@@ -68,7 +69,7 @@ class Clients
                     'client_id',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 512,
+                        'size'          => 100,
                         'notNull'       => true
                     ]
                 ),
@@ -163,6 +164,25 @@ class Clients
                     ]
                 )
             ]
+        ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'client_id',
+                    'revoked',
+                    'api_id',
+                    'domain_id',
+                    'app_id',
+                    'email'
+                ],
+                'INDEX'
+            )
         ];
     }
 }

@@ -539,6 +539,9 @@ class Clients extends BasePackage
             $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client);
         }
 
+        $this->ffStore->setIndexing(false);//Disable index as we dont need to update for calls count
+        $this->setFFValidation(false);
+
         $this->update($client);
     }
 }

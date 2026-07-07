@@ -380,32 +380,18 @@ class Api extends BasePackage
 
         if ($usingIsApiCheckVia) {
             if ($this->isApiCheckVia === 'pub') {//Public access API
-                if ($this->config->databasetype === 'db') {
-                    $params =
-                        [
-                            'conditions'    => 'is_public = :is_public: AND app_id = :app_id: AND domain_id = :domain_id:',
-                            'bind'          =>
-                                [
-                                    'is_public'     => '1',
-                                    'app_id'        => $this->apps->getAppInfo()['id'],
-                                    'domain_id'     => $this->domains->domain['id']
-                                ]
-                        ];
-                } else {
-                    $params = [
-                        'conditions' => [
-                            ['is_public', '=', (bool) '1'],
-                            ['app_id', '=', $this->apps->getAppInfo()['id']],
-                            ['domain_id', '=', $this->domains->domain['id']]
-                        ]
-                    ];
+                foreach ($this->apiServices as $apiService) {
+                    if (($apiService['is_public'] === '1' || $apiService['is_public'] === true) &&
+                        $apiService['app_id'] === $this->apps->getAppInfo()['id'] &&
+                        $apiService['domain_id'] === $this->domains->domain['id']
+                    ) {
+                        $api[0] = $apiService;
+
+                        break;
+                    }
                 }
 
-                $api = $this->getByParams($params);
-
-
-                if ($api && isset($api[0]) && $api[0]['status'] == true) {
-
+                if (isset($api[0]) && $api[0]['status'] == true) {
                     $this->caching->init('apcuCache', 7200);
 
                     if ($this->caching->enabled) {
@@ -566,28 +552,15 @@ class Api extends BasePackage
         }
 
         if ($usingDomainApp) {
-            if ($this->config->databasetype === 'db') {
-                $this->api =
-                    $this->getByParams(
-                        [
-                            'conditions'    => 'domain_id = :did: AND app_id = :aid: AND status = :status:',
-                            'bind'          => [
-                                'did'       => (int) $this->domains->domain['id'],
-                                'aid'       => (int) $this->apps->getAppInfo()['id'],
-                                'status'    => 1
-                            ]
-                        ], true
-                    );
-            } else {
-                $this->api = $this->getByParams(
-                    [
-                        'conditions' => [
-                            ['domain_id', '=', (int) $this->domains->domain['id']],
-                            ['app_id', '=', (int) $this->apps->getAppInfo()['id']],
-                            ['status', '=', (bool) true],
-                        ]
-                    ]
-                );
+            foreach ($this->apiServices as $apiService) {
+                if (($apiService['status'] === '1' || $apiService['status'] === true) &&
+                    $apiService['app_id'] === $this->apps->getAppInfo()['id'] &&
+                    $apiService['domain_id'] === $this->domains->domain['id']
+                ) {
+                    $this->api = $apiService;
+
+                    break;
+                }
             }
         }
 
