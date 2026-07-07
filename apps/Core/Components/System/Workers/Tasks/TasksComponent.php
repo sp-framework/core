@@ -114,7 +114,7 @@ class TasksComponent extends BaseComponent
                         'title'             => 'Force Next Run',
                         'icon'              => 'forward',
                         'additionalClass'   => 'rowForceNextRun',
-                        'link'              => '/' . $this->app['route'] . '/system/workers/tasks/forceNextRun'
+                        'link'              => $this->links->url('/system/workers/tasks/forceNextRun')
                     ]
                 ]
             ];
