@@ -34,6 +34,8 @@ class Auth extends BasePackage
 
     protected $otp;
 
+    private $loggedOut = false;
+
     public function init()
     {
         $this->app = $this->apps->getAppInfo();
@@ -224,6 +226,8 @@ class Auth extends BasePackage
 
             $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->apps->getAppInfo()['name']);
         }
+
+        $this->loggedOut = true;
 
         return true;
     }
@@ -786,6 +790,10 @@ class Auth extends BasePackage
 
     public function check($resetCache = false)
     {
+        if ($this->loggedOut) {
+            return false;
+        }
+
         if (!$resetCache && $this->account) {
             return true;
         }
