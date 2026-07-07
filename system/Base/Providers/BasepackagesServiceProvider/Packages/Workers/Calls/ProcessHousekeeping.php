@@ -46,6 +46,8 @@ class ProcessHousekeeping extends Calls
         try {
             $this->basepackages->houseKeeping->run($this->args['tasks']);
 
+            $this->addJobResult($this->packagesData, $args);
+
             if ($this->basepackages->houseKeeping->packagesData->responseCode == 0) {
                 $this->updateJobTask(3, $args);
             } else {
