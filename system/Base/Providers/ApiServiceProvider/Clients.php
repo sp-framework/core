@@ -223,10 +223,13 @@ class Clients extends BasePackage
 
                 if ($oldClient && isset($oldClient[0]['id']) && isset($data['forceRegen']) && (bool) $data['forceRegen'] === true) {
                     $data['id'] = $oldClient[0]['id'];
+
                     if (isset($data['forceRegen'])) {
                         unset($data['forceRegen']);//We unset to avoid loop
                     }
+
                     $data['forceRevoke'] = true;//We set to avoid loop
+
                     if (!$this->forceRevoke($data, $oldClient[0])) {
                         $this->addResponse('Error revoking old keys. Please contact administrator.', 1);
 
@@ -235,30 +238,29 @@ class Clients extends BasePackage
                 }
             }
 
-            $apiName = $api['id'] . '_' . $api['app_id'] . '_' . $api['domain_id'] . '_' . ($account['id'] ?? $this->access->auth->account()['id']);
-            if ($account || $api['client_keys_generation_allowed'] == true) {
-                $newClient['api_id'] = $api['id'];
-                $newClient['app_id'] = $api['app_id'];
-                $newClient['domain_id'] = $api['domain_id'];
-                $newClient['account_id'] = $account['id'] ?? $this->access->auth->account()['id'];
-                $newClient['email'] = $account['email'] ?? $this->access->auth->account()['email'];
-                $newClient['name'] = $apiName;
-                $newClient['client_id'] = $data['client_id'] ?? $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
-                $client_secret = $data['client_secret'] ?? $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
-                $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
-                $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
-                $newClient['revoked'] = '0';
-                $newClient['redirectUri'] = $data['redirect_url'] ?? 'https://';
-                $newClient['device_id'] = null;
-                if (isset($account['device_id'])) {
-                    $newClient['device_id'] = $account['device_id'];
-                }
-                if (isset($api['redirect_uri'])) {
-                    $newClient['redirectUri'] = $api['redirect_uri'];
-                }
-            }
-
             try {
+                if ($account || $api['client_keys_generation_allowed'] == true) {
+                    $newClient['api_id'] = $api['id'];
+                    $newClient['app_id'] = $api['app_id'];
+                    $newClient['domain_id'] = $api['domain_id'];
+                    $newClient['account_id'] = $account['id'] ?? $this->access->auth->account()['id'];
+                    $newClient['email'] = $account['email'] ?? $this->access->auth->account()['email'];
+                    $newClient['name'] = $api['id'] . '_' . $api['app_id'] . '_' . $api['domain_id'] . '_' . ($account['id'] ?? $this->access->auth->account()['id']);
+                    $newClient['client_id'] = $data['client_id'] ?? $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
+                    $client_secret = $data['client_secret'] ?? $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
+                    $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
+                    $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+                    $newClient['revoked'] = '0';
+                    $newClient['redirectUri'] = $data['redirect_url'] ?? 'https://';
+                    $newClient['device_id'] = null;
+                    if (isset($account['device_id'])) {
+                        $newClient['device_id'] = $account['device_id'];
+                    }
+                    if (isset($api['redirect_uri'])) {
+                        $newClient['redirectUri'] = $api['redirect_uri'];
+                    }
+                }
+
                 if (isset($newClient) && $this->addClient($newClient)) {
                     $this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
 
@@ -271,6 +273,8 @@ class Clients extends BasePackage
                     $this->addResponse('Error API does not allow client keys generation. Please contact administrator.', 1);
                 }
             } catch (\Exception $e) {
+                $this->logException($e);
+
                 $this->addResponse('Error generating/updating keys. Please contact administrator.', 1);
             }
 
@@ -376,6 +380,11 @@ class Clients extends BasePackage
 
     protected function emailNewClientDetails($api, $newClient, $clientSecret)
     {
+        //If Email is not configured, we cannot send code.
+        if (!$this->basepackages->email->setup()) {
+            return true;
+        }
+
         $domain = $this->domains->getById($api['domain_id']);
 
         $emailData['app_id'] = $api['app_id'];

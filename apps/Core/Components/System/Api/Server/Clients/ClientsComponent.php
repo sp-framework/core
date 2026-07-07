@@ -28,6 +28,8 @@ class ClientsComponent extends BaseComponent
                     $this->api->getEnabledAPIByType('client_credentials')
                 );
 
+            $this->view->emailservices = $this->basepackages->emailservices->emailServices;
+
             if ($this->getData()['id'] != 0) {
                 $client = $this->apiClients->getById($this->getData()['id']);
 
