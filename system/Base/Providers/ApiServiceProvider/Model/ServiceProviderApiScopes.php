@@ -20,7 +20,7 @@ class ServiceProviderApiScopes extends BaseModel implements ScopeEntityInterface
 
     public $permissions;
 
-    public function getIdentifier() : string
+    public function getIdentifier() :string
     {
         return $this->scope_name;
     }
