@@ -304,7 +304,6 @@ class Dropzone
                     ) .
                     '<ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments">';
                         if ($this->params['attachments'] && count($this->params['attachments']) > 0) {
-                            $counter = 0;
                             foreach ($this->params['attachments'] as $attachmentKey => $attachment) {
                                 if (!isset($attachment['uuid'])) {
                                     continue;
@@ -418,20 +417,16 @@ class Dropzone
                                                     '</div>
                                                 </div>
                                             </li>';
-
-                                $counter++;
                             }
 
-                            if ($counter === 0) {
-                                $preview .=
-                                    '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata">
-                                        <div class="row">
-                                            <div class="col text-uppercase">
-                                                <i class="fa fa-fw fa-exclamation"></i> Add ' . $this->params['allowedUploads'] . '
-                                            </div>
+                            $preview .=
+                                '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata" hidden>
+                                    <div class="row">
+                                        <div class="col text-uppercase">
+                                            <i class="fa fa-fw fa-exclamation"></i> Add ' . $this->params['allowedUploads'] . '
                                         </div>
-                                    </div>';
-                            }
+                                    </div>
+                                </div>';
                         } else {
                             $preview .=
                                 '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata">
