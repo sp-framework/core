@@ -303,6 +303,7 @@ class Dropzone
                         ]
                     ) .
                     '<ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments">';
+                        $counter = 0;
                         if ($this->params['attachments'] && count($this->params['attachments']) > 0) {
                             foreach ($this->params['attachments'] as $attachmentKey => $attachment) {
                                 if (!isset($attachment['uuid'])) {
@@ -417,10 +418,17 @@ class Dropzone
                                                     '</div>
                                                 </div>
                                             </li>';
+
+                                $counter++;
+                            }
+
+                            $noData = 'hidden';
+                            if ($counter === 0) {
+                                $noData = '';
                             }
 
                             $preview .=
-                                '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata" hidden>
+                                '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata" ' . $noData . '>
                                     <div class="row">
                                         <div class="col text-uppercase">
                                             <i class="fa fa-fw fa-exclamation"></i> Add ' . $this->params['allowedUploads'] . '
