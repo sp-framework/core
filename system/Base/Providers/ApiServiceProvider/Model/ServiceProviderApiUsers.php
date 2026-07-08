@@ -10,7 +10,7 @@ class ServiceProviderApiUsers extends BaseModel implements UserEntityInterface
 {
     public $account_id;
 
-    public function getIdentifier()
+    public function getIdentifier() :string
     {
         return $this->account_id;
     }

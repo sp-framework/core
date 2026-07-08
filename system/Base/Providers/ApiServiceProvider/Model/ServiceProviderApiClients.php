@@ -65,12 +65,12 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
         return $this->client_id;
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier() :string
     {
         return $this->account_id;
     }
 
-    public function setRedirectUri(string $uri)
+    public function setRedirectUri(string $uri) :void
     {
         $this->redirectUri = $uri;
     }
