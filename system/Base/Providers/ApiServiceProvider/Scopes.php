@@ -117,7 +117,7 @@ class Scopes extends BasePackage
         $appsArr = $this->apps->apps;
 
         foreach ($appsArr as $appKey => $app) {
-            $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
+            $componentsArr = msort($this->modules->components->getComponentsForAppIdAndAppType($app['id'], $app['app_type']), 'name');
 
             if (count($componentsArr) > 0) {
                 $components[strtolower($app['id'])] =
@@ -133,7 +133,7 @@ class Scopes extends BasePackage
 
                         if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                             $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
-                            $components[strtolower($app['id'])]['childs'][$key]['title'] = $component['name'];
+                            $components[strtolower($app['id'])]['childs'][$key]['title'] = strtoupper($component['name']);
                         }
                     } catch (\throwable $e) {
                         if (str_contains($e->getMessage(), 'does not exist')) {
@@ -162,15 +162,14 @@ class Scopes extends BasePackage
             $scope = $this->getById($rid);
 
             if ($scope) {
-                if ($scope['permissions'] && $scope['permissions'] !== '') {
-                    if (is_string($scope['permissions'])) {
-                        $permissionsArr = $this->helper->decode($scope['permissions'], true);
-                    } else {
-                        $permissionsArr = $scope['permissions'];
-                    }
+                if ($scope['permissions'] && is_string($scope['permissions']) && $scope['permissions'] !== '') {
+                    $permissionsArr = $this->helper->decode($scope['permissions'], true);
+                } else if ($scope['permissions'] && is_array($scope['permissions'])) {
+                    $permissionsArr = $scope['permissions'];
                 } else {
                     $permissionsArr = [];
                 }
+
                 $permissions = [];
 
                 foreach ($appsArr as $appKey => $app) {
@@ -212,7 +211,6 @@ class Scopes extends BasePackage
 
                 $this->packagesData->scope = $scope;
             } else {
-
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Scope Not Found!';

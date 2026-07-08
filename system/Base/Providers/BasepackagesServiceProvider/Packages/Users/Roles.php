@@ -235,7 +235,6 @@ class Roles extends BasePackage
 
                 $this->packagesData->role = $role;
             } else {
-
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Role Not Found!';

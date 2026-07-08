@@ -429,12 +429,12 @@ class Api extends BasePackage
                             );
                         }
 
-                        if ($this->caching->enabled) {
+                        if (isset($client[0]) && $this->caching->enabled) {
                             $client[0] = $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client[0]);
                         }
                     }
 
-                    if (isset($client) && $client) {
+                    if (isset($client[0])) {
                         if ($this->checkCallLimits($client[0], $api[0])) {
                             $this->client = $client[0];
                             $this->apiCallsLimitReached = true;

@@ -194,7 +194,10 @@ gridColumns.push(
     }
 );
 
+var aclsForApp = [];
 for (var acl in acls) {
+    aclsForApp.push(acl);
+
     gridColumns.push(
         {
             header          :   '<p class="text-center mb-0">' +
@@ -339,7 +342,38 @@ dataCollectionSection =
                     }
                 }
 
+                var parentJstreeIds = [];
+                var parentIds = [];
+
                 $.each(allIds, function(index, obj) {
+                    if (obj.parent === '#') {
+                        parentJstreeIds.push(obj.id);
+                        parentIds.push(obj.data.id);
+
+                        $('.jstree-grid-wrapper')
+                            .find('[data-jstreegrid="' + obj.id + '"]')
+                            .each(function(index, column) {
+                                $(column).html('<p class="text-center mb-0">' +
+                                    '<span class="cursor-pointer">' +
+                                        '<i id="{{componentId}}-{{sectionId}}-app-' + obj.data.id + '-denyall" ' +
+                                            'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                            'data-original-title="Deny all ' + obj.data.id + '" class="fas fa-fw fa-times-circle ' +
+                                            'mr-1 text-danger helper app-' + obj.data.id + '" data-app-id="' + obj.data.id + '" data-type="' +
+                                            aclsForApp[index] + '" data-permission="deny">' +
+                                        '</i>' +
+                                    '</span> | ' +
+                                    ' <span class="cursor-pointer">' +
+                                        '<i id="{{componentId}}-{{sectionId}}-app-' + obj.data.id + '-permitall" ' +
+                                            'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                            'data-original-title="Permit all ' + obj.data.id + '" class="fas fa-fw fa-check-circle ' +
+                                            'ml-1 text-success helper app-' + obj.data.id + '" data-app-id="' + obj.data.id + '" data-type="' +
+                                            aclsForApp[index] + '" data-permission="permit">' +
+                                        '</i>' +
+                                    '</span>' +
+                                '</p>');
+                            });
+                    }
+
                     if (gridData[obj.id]) {
                         var jstreeIdStructure =
                             $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['jstree'])
@@ -385,10 +419,13 @@ dataCollectionSection =
                                     spanClass = 'na';
                                     spanData = '<p class="text-secondary">-</p>';
                                 }
+                                $(this).children('span').data('app-id', gridData[jstreeGridId]['app_id']);
+                                $(this).children('span').attr('data-app-id', gridData[jstreeGridId]['app_id']);
                                 $(this).children('span').addClass(spanClass).html(spanData);
                             }
                         );
                     }
+
                     extractData();
                 }
                 buildPermissionsGrid(gridData);
@@ -420,6 +457,10 @@ dataCollectionSection =
                 //Click Toggle
                 $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['jstree'])
                     .on('select_cell.jstree-grid', function(e, data) {
+                        if (parentJstreeIds.includes($(data.node)[0].id)) {
+                            return;
+                        }
+
                         toggleGridCell($(data.grid)[0].id, $(data.node)[0].id, false, null);
                     }
                 );
@@ -524,6 +565,7 @@ dataCollectionSection =
                             }
                         }
                     }
+
                     extractData();
                 }
 
@@ -557,6 +599,28 @@ dataCollectionSection =
                             }
                         });
                     }
+
+                    $(parentIds).each(function(index, id) {
+                        $('#{{componentId}}-{{sectionId}}-app-' + id + '-denyall, #{{componentId}}-{{sectionId}}-app-' + id + '-permitall').click(function(e) {
+                            e.preventDefault();
+
+                            var thisButon = $(this);
+
+                            $('span.' + $(this).data('type') + '[data-app-id="' + $(this).data('app-id') + '"]').each(function(index, span) {
+                                if ($(thisButon).data('permission') === 'permit') {
+                                    $(span).removeClass('text-danger').addClass('text-success');
+                                    $(span).html('<i class="fas fa-fw fa-check-circle"></i>');
+                                    gridData[$(this).parent().data('jstreegrid')]['permissions'][$(thisButon).data('type')] = 1;
+                                } else if ($(thisButon).data('permission') === 'deny') {
+                                    $(span).removeClass('text-success').addClass('text-danger');
+                                    $(span).html('<i class="fas fa-fw fa-times-circle"></i>');
+                                    gridData[$(this).parent().data('jstreegrid')]['permissions'][$(thisButon).data('type')] = 0;
+                                }
+                            });
+
+                            extractData();
+                        });
+                    });
                 })();
 
                 // Function to make bulk changes
@@ -602,6 +666,7 @@ dataCollectionSection =
                             });
                         }
                     });
+
                     extractData();
                 }
 

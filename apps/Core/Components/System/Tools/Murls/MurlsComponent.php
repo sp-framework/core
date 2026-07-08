@@ -68,43 +68,6 @@ class MurlsComponent extends BaseComponent
     }
 
     /**
-     * @api_acl(name=view)
-     */
-    public function apiViewAction()
-    {
-        $this->initialize();
-
-        if (isset($this->getData()['id'])) {
-            if ($this->getData()['id'] != 0) {
-                $murl = $this->murls->getById($this->getData()['id']);
-
-                if (!$murl) {
-                    return $this->throwIdNotFound();
-                }
-            }
-            $this->addResponse('Ok', 0, ['data' => $murl]);
-
-            return;
-        }
-
-        if ($this->request->isPost()) {
-            $data =
-                $this->generateDTContent(
-                    $this->murls,
-                    null,
-                    null,
-                    ['murl', 'hits']
-                );
-
-            if ($data) {
-                $this->addResponse('Ok', 0, ['data' => $data]);
-            }
-
-            return;
-        }
-    }
-
-    /**
      * @acl(name="add")
      */
     public function addAction()
