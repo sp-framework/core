@@ -37,7 +37,24 @@
         'dtFilters'             : table['filters'],
         'dtFilterColumns'       : table['filterColumns'],
         'dtFixedHeader'         : true,
-        'dtPrimaryButtons'      : canAddButton,
+        'dtPrimaryButtons'      :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'accounts' : {
+                            'title'                   : 'Accounts',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/users/accounts')
+                        }
+                    }
+            },
+        'dtSecondaryButtons'    : canAddButton,
         'dtTable'               : table,
         'dtColumns'             : table['columns'],
         'dtPostUrl'             : table['postUrl'],

@@ -1,3 +1,24 @@
+{% set canAddButton = null %}
+{% if canAdd %}
+{% set canAddButton = {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'add-account' : {
+                            'title'                   : 'Add New User',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/users/accounts/q/id/0')
+                        }
+                    }
+            }
+%}
+{% endif %}
 {{adminltetags.useTag('content',
     [
         'component'                 : table['component'],
@@ -17,24 +38,24 @@
         'dtFilters'                 : table['filters'],
         'dtFilterColumns'           : table['filterColumns'],
         'dtFixedHeader'             : true,
-        'dtPrimaryButtons'          :
+        'dtPrimaryButtons'      :
             {
                 'componentId'           : componentId,
                 'sectionId'             : 'listing',
                 'buttonType'            : 'button',
                 'buttons'               :
                     {
-                        'add-account' : {
-                            'title'                   : 'Add New User',
+                        'roles' : {
+                            'title'                   : 'Roles',
                             'size'                    : 'sm',
-                            'type'                    : 'primary',
-                            'icon'                    : 'plus',
+                            'type'                    : 'info',
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
-                            'url'                     : links.url('system/users/accounts/q/id/0')
+                            'url'                     : links.url('system/users/roles')
                         }
                     }
             },
+        'dtSecondaryButtons'        : canAddButton,
         'dtTable'                   : table,
         'dtColumns'                 : table['columns'],
         'dtPostUrl'                 : table['postUrl'],
