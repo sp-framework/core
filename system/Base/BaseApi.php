@@ -104,4 +104,33 @@ abstract class BaseApi extends Controller
             return $this->response->send();
         }
     }
+
+    public function getRows($package, array $columnsForTable = []) {
+        if (isset($this->postData()['columns'])) {
+            $columnsForTable = array_replace($columnsForTable, explode(',', $this->request->getPost()['columns']));
+        }
+
+        $conditions =
+            [
+                'columns' => $columnsForTable
+            ];
+
+        if (isset($this->postData()['conditions'])) {
+            $conditions['conditions'] = $this->postData()['conditions'];
+        }
+
+        try {
+            $rows = $package->getPaged($conditions)->getItems();
+        } catch (\Exception $e) {
+            if ($this->config->logs->exceptions) {
+                $this->logger->logExceptions->critical(json_trace($e));
+            }
+
+            $this->addResponse('API Error! Contact administrator.', 1);
+
+            return;
+        }
+
+        return ['rows' => $rows, 'counters' => $package->packagesData->paginationCounters];
+    }
 }
