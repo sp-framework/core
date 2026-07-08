@@ -35,6 +35,7 @@ class MicroCollection
 
     public function init()
     {
+        // trace([$this->router->getRoutes()[0]->getPattern()]);
         if ($this->router->getRoutes() && count($this->router->getRoutes()) > 0) {
             $routeToMatch = $this->router->getRoutes()[0]->getPattern();
         }
@@ -51,24 +52,22 @@ class MicroCollection
             $routeToMatch = '/api' . $routeToMatch;
         }
 
-        $handler =
-            $this->router->getRoutes()[0]->getPaths()['namespace'] .
-            '\\' .
-            ucfirst($this->router->getRoutes()[0]->getPaths()['controller']) . 'Component';
+        $handler = $this->router->getRoutes()[0]->getPaths()['namespace'] . '\\Api';
+        $action = $this->router->getRoutes()[0]->getPaths()['action'];
+        $controller = $this->router->getRoutes()[0]->getPaths()['controller'];
 
-        if ($this->router->getRoutes()[0]->getPaths()['action'] === 'view' && !$this->request->isPost()) {//Make sure methods are all Caps, else route will not match!
+        if ($action === 'view') {//Make sure methods are all Caps, else route will not match!
             $methods = ['GET'];
-            $handlerMethod = 'apiViewAction';
-        } else if ($this->router->getRoutes()[0]->getPaths()['action'] === 'view' && $this->request->isPost()) {
-            $methods = ['POST'];
-            $handlerMethod = 'apiViewAction';
-        } else {
-            $methods = ['POST'];
-            $handlerMethod = 'api' . ucfirst($this->router->getRoutes()[0]->getPaths()['action']) . 'Action';
+        } else if ($action === 'add' || $action === 'update') {
+            $methods = ['POST','PATCH','PUT'];
+        } else if ($action === 'remove') {
+            $methods = ['DELETE'];
         }
 
+        $handlerMethod = lcfirst($action) . 'Action';
+
         $this->microCollection->setHandler($handler, true);
-        $this->microCollection->mapVia($routeToMatch, $handlerMethod, $methods, $this->router->getRoutes()[0]->getPaths()['controller']);
+        $this->microCollection->mapVia($routeToMatch, $handlerMethod, $methods, $controller);
 
         $this->regitserNotFound();
 

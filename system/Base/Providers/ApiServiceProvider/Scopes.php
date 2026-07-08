@@ -126,12 +126,21 @@ class Scopes extends BasePackage
                         'id' => strtoupper($app['id'])
                     ];
                 foreach ($componentsArr as $key => $component) {
-                    $reflector = $this->annotations->get($component['class']);
-                    $methods = $reflector->getMethodsAnnotations();
+                    try {
+                        $reflector = $this->annotations->get(implode('\\', array_slice(explode('\\', $component['class']), 0, -1)) . '\Api');
 
-                    if ($methods && count($methods) > 2 && isset($methods['apiViewAction'])) {
-                        $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
-                        $components[strtolower($app['id'])]['childs'][$key]['title'] = $component['name'];
+                        $methods = $reflector->getMethodsAnnotations();
+
+                        if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                            $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
+                            $components[strtolower($app['id'])]['childs'][$key]['title'] = $component['name'];
+                        }
+                    } catch (\throwable $e) {
+                        if (str_contains($e->getMessage(), 'does not exist')) {
+                            continue;
+                        }
+
+                        throw $e;
                     }
                 }
             }
@@ -169,21 +178,29 @@ class Scopes extends BasePackage
 
                     foreach ($componentsArr as $key => $component) {
                         if ($component['class'] && $component['class'] !== '') {
-                            $reflector = $this->annotations->get($component['class']);
-                            $methods = $reflector->getMethodsAnnotations();
+                            try {
+                                $reflector = $this->annotations->get(implode('\\', array_slice(explode('\\', $component['class']), 0, -1)) . '\Api');
+                                $methods = $reflector->getMethodsAnnotations();
 
-                            if ($methods && count($methods) > 2 && isset($methods['apiViewAction'])) {
-                                foreach ($methods as $annotation) {
-                                    if ($annotation->getAll('api_acl')) {
-                                        $action = $annotation->getAll('api_acl')[0]->getArguments();
-                                        $acls[$action['name']] = $action['name'];
-                                        if (isset($permissionsArr[$app['id']][$component['id']])) {
-                                            $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
-                                        } else {
-                                            $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                                    foreach ($methods as $annotation) {
+                                        if ($annotation->getAll('api_acl')) {
+                                            $action = $annotation->getAll('api_acl')[0]->getArguments();
+                                            $acls[$action['name']] = $action['name'];
+                                            if (isset($permissionsArr[$app['id']][$component['id']])) {
+                                                $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
+                                            } else {
+                                                $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                            }
                                         }
                                     }
                                 }
+                            } catch (\throwable $e) {
+                                if (str_contains($e->getMessage(), 'does not exist')) {
+                                    continue;
+                                }
+
+                                throw $e;
                             }
                         }
                     }
@@ -212,17 +229,25 @@ class Scopes extends BasePackage
                 foreach ($componentsArr as $key => $component) {
                     //Build ACL Columns
                     if ($component['class'] && $component['class'] !== '') {
-                        $reflector = $this->annotations->get($component['class']);
-                        $methods = $reflector->getMethodsAnnotations();
+                        try {
+                            $reflector = $this->annotations->get(implode('\\', array_slice(explode('\\', $component['class']), 0, -1)) . '\Api');
+                            $methods = $reflector->getMethodsAnnotations();
 
-                        if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
-                            foreach ($methods as $annotation) {
-                                if ($annotation->getAll('api_acl')) {
-                                    $action = $annotation->getAll('api_acl')[0]->getArguments();
-                                    $acls[$action['name']] = $action['name'];
-                                    $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                            if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                                foreach ($methods as $annotation) {
+                                    if ($annotation->getAll('api_acl')) {
+                                        $action = $annotation->getAll('api_acl')[0]->getArguments();
+                                        $acls[$action['name']] = $action['name'];
+                                        $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                    }
                                 }
                             }
+                        } catch (\throwable $e) {
+                            if (str_contains($e->getMessage(), 'does not exist')) {
+                                continue;
+                            }
+
+                            throw $e;
                         }
                     }
                 }

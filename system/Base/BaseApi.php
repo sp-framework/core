@@ -1,0 +1,107 @@
+<?php
+
+namespace System\Base;
+
+use Phalcon\Mvc\Controller;
+
+abstract class BaseApi extends Controller
+{
+    protected $getQueryArr = [];
+
+    protected $apiResponse = [];
+
+    protected function onConstruct()
+    {
+        if (count($this->dispatcher->getParams()) > 0) {
+            $this->buildGetQueryParamsArr();
+        }
+    }
+
+    protected function buildGetQueryParamsArr()
+    {
+        if ($this->request->isGet()) {
+            //Murl
+            if ($this->apps->isMurl) {
+                $arr = $this->helper->chunk(
+                    explode('/', explode('/q/', trim($this->apps->isMurl['url'], '/'))[1]),
+                    2
+                );
+            } else {
+                $arr = $this->helper->chunk($this->dispatcher->getParams(), 2);
+            }
+
+            foreach ($arr as $value) {
+                if (isset($value[0]) && isset($value[1])) {
+                    if (is_string($value[0]) && is_string($value[1])) {
+                        if ($value[1] === '{id}') {
+                            $uriId = 0;
+                            if (str_contains(trim($this->request->getURI(), '/'), '-')) {
+                                $uriArr = explode('-', trim($this->request->getURI(), '/'));
+
+                                if (count($uriArr) > 1) {
+                                    if (isset($apiUri)) {
+                                        $murlApiUri = $this->helper->first($uriArr);
+                                    }
+                                    $murlUri = $this->helper->first($uriArr);
+                                    $uriId = (int) $this->helper->last($uriArr);
+                                }
+                            }
+
+                            if ($uriId > 0) {
+                                $this->getQueryArr[$value[0]] = $uriId;
+                            }
+                        } else {
+                            $this->getQueryArr[$value[0]] = $value[1];
+                        }
+                    }
+                }
+            }
+
+            // getQuery - /admin/setup/q/id/2/filter/4/search//layout/0
+            // Will Result to
+            // array (size=4)
+            //   'id' => string '2' (length=1)
+            //   'filter' => string '4' (length=1)
+            //   'search' => string '' (length=0)
+            //   'layout' => string '0' (length=1)
+        }
+    }
+
+    protected function getData()
+    {
+        return $this->getQueryArr;
+    }
+
+    protected function postData()
+    {
+        return $this->request->getPost();
+    }
+
+    protected function putData()
+    {
+        return $this->request->getPut();
+    }
+
+    protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null)
+    {
+        $this->apiResponse['responseMessage'] = $responseMessage;
+        $this->apiResponse['responseCode'] = $responseCode;
+        if ($responseData !== null) {
+            $this->apiResponse['responseData'] = $responseData;
+        }
+
+        return $this->sendJson();
+    }
+
+    protected function sendJson()
+    {
+        $this->response->setContentType('application/json', 'UTF-8');
+        $this->response->setHeader('Cache-Control', 'no-store');
+
+        if ($this->response->isSent() !== true) {
+            $this->response->setJsonContent($this->apiResponse);
+
+            return $this->response->send();
+        }
+    }
+}
