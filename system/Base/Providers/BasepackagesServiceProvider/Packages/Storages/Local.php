@@ -416,11 +416,11 @@ class Local extends BasePackage
 
         if (in_array($file[0]['type'], $this->imageMimeTypes)) {
             if (isset($this->getData['w'])) {
-                if (count($this->allowedImageSizes) > 0 &&
+                if ((int) $this->getData['w'] <= $this->maxImageSize) {
+                    $sizedImage = $this->getSizedImage($file[0], $this->getData['w']);
+                } else if (count($this->allowedImageSizes) > 0 &&
                     in_array($this->getData['w'], $this->allowedImageSizes)
                 ) {
-                    $sizedImage = $this->getSizedImage($file[0], $this->getData['w']);
-                } else if ((int) $this->getData['w'] <= $this->maxImageSize) {
                     $sizedImage = $this->getSizedImage($file[0], $this->getData['w']);
                 }
 
@@ -608,16 +608,16 @@ class Local extends BasePackage
                 }
             }
 
-            if (count($this->allowedImageSizes) > 0) {
+            if ((int) $width <= $this->maxImageSize) {
+                return $this->getSizedImage($file[0], $width);
+            } else if (count($this->allowedImageSizes) > 0) {
                 if (in_array($width, $this->allowedImageSizes)) {
                     return $this->getSizedImage($file[0], $width);
                 } else {
                     $this->addResponse('Requested Width not registered with system.', 1);
                 }
-            } else if ((int) $width <= $this->maxImageSize) {
-                return $this->getSizedImage($file[0], $width);
             } else {
-                $this->addResponse('Requested Width not registered with system.', 1);
+                $this->addResponse('Requested Width greater than allow size or is not registered with system.', 1);
             }
 
             return false;
