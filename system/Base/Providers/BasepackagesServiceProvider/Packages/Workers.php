@@ -253,6 +253,8 @@ class Workers extends BasePackage
 
             return $call->packagesData;
         } catch (\throwable $e) {
+            $this->logException($e);
+
             $data['responseCode'] = 1;
             $data['responseMessage'] = 'Exception: ' . $e->getMessage();
             $data['responseData'] = [];
@@ -301,6 +303,8 @@ class Workers extends BasePackage
                 }
             }
         } catch (\throwable $e) {
+            $this->logException($e);
+
             $data['responseCode'] = 1;
             $data['responseMessage'] = 'Exception: ' . $e->getMessage();
             $data['responseData'] = [];
@@ -629,7 +633,7 @@ class Workers extends BasePackage
                     (new $class)->run($args);
                 },
                 [],
-                $args['job']['id']
+                (string) $args['job']['id']
             )->everyminute();
         } else if ($schedule['type'] === 'everyxminutes') {
             $this->scheduler->call(
@@ -637,7 +641,7 @@ class Workers extends BasePackage
                     (new $class)->run($args);
                 },
                 [],
-                $args['job']['id']
+                (string) $args['job']['id']
             )->everyminute(
                 (int) $schedule['params']['minutes']
             );
@@ -647,7 +651,7 @@ class Workers extends BasePackage
                     (new $class)->run($args);
                 },
                 [],
-                $args['job']['id']
+                (string) $args['job']['id']
             )->everyminute(
                 (int) $schedule['params']['minutes']
             );
@@ -657,7 +661,7 @@ class Workers extends BasePackage
                     (new $class)->run($args);
                 },
                 [],
-                $args['job']['id']
+                (string) $args['job']['id']
             )->hourly(
                 (int) $schedule['params']['hourly_minutes']
             );
@@ -667,7 +671,7 @@ class Workers extends BasePackage
                     (new $class)->run($args);
                 },
                 [],
-                $args['job']['id']
+                (string) $args['job']['id']
             )->daily(
                 (int) $schedule['params']['daily_hours'],
                 (int) $schedule['params']['daily_minutes']
@@ -678,7 +682,7 @@ class Workers extends BasePackage
                     (new $class)->run($args);
                 },
                 [],
-                $args['job']['id'] . '-' . $this->dayOfWeek
+                (string) $args['job']['id']
             )->weekly(
                 $this->dayOfWeek,
                 (int) $schedule['params']['weekly_hours'],
@@ -690,7 +694,7 @@ class Workers extends BasePackage
                     (new $class)->run($args);
                 },
                 [],
-                $args['job']['id'] . '-' . $this->month
+                (string) $args['job']['id']
             )->monthly(
                 (int) $this->month,
                 (int) $this->dateOfMonth,
