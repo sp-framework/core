@@ -63,15 +63,17 @@ class ProcessSystemBackup extends Calls
 
                                 exec('rclone copy ' . $backupFile . ' ' . $this->args['rclone_remote_drive'] . ':' . $this->args['rclone_remote_path'] . ' -v  2>&1', $output, $result);
 
+                                file_put_contents($filename, implode("\n", $output));
+
                                 if ($result === 0 && count($output) > 0) {
-                                    file_put_contents($filename, implode("\n", $output));
-
                                     $this->addResponse('Backup complete. File uploaded to Google Drive.', 0, ['backupFile' => $backupFile, 'rcloneOutput' => file_get_contents($filename)]);
-
-                                    $this->addJobResult($this->packagesData, $args);
-
-                                    $this->updateJobTask(3, $args);
+                                } else {
+                                    $this->addResponse('Backup complete and stored locally. File not uploaded to Google Drive.', 0, ['backupFile' => $backupFile, 'rcloneOutput' => file_get_contents($filename)]);
                                 }
+
+                                $this->addJobResult($this->packagesData, $args);
+
+                                $this->updateJobTask(3, $args);
                             } catch (\throwable $e) {
                                 throw $e;
                             }
