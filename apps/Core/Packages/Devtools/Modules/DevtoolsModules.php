@@ -2013,6 +2013,29 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ComponentApi.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module component api file.');
+
+            return false;
+        }
+
+        $dataClass = explode('\\', $data['class']);
+        unset($dataClass[$this->helper->lastKey($dataClass)]);
+        $namespaceClass = implode('\\', $dataClass);
+
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass, $file);
+
+        try {
+            $this->localContent->write($moduleFilesLocation . 'Api.php', $file);
+            array_push($this->newFiles, $moduleFilesLocation . 'Api.php');
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component Api file');
+
+            return false;
+        }
+
         if (isset($data['widgets']) && $data['widgets'] !== '') {
             $dataWidgets = $this->helper->decode($data['widgets'], true);
 
@@ -2023,7 +2046,6 @@ class DevtoolsModules extends BasePackage
 
                 return false;
             }
-
 
             $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass, $file);
 
