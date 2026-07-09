@@ -203,7 +203,7 @@ class ClientsComponent extends BaseComponent
     }
 
     /**
-     *
+     * @acl(name=add)
      */
     public function addAction()
     {
@@ -218,7 +218,7 @@ class ClientsComponent extends BaseComponent
     }
 
     /**
-     *
+     * @acl(name=update)
      */
     public function updateAction()
     {

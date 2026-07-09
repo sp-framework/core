@@ -37,6 +37,24 @@ class Clients extends BasePackage
                 return;
             }
 
+            $account = $this->basepackages->accounts->checkAccountBy($data['email'], false);
+
+            //if account does not exist, we use IpFilter middleware to block them
+            if (!$account) {
+                $isAllowed = $this->access->ipFilter->filters->bumpFilterHitCounter(true);
+
+                if (is_object($isAllowed))  {
+                    $this->response->send();
+
+                    exit;
+                }
+
+                //Fake message that keys are generated.
+                $this->addResponse('Keys generated & emailed successfully.', 0);
+
+                return true;
+            }
+
             if ($api['grant_type'] === 'password' && !$viaRegister) {
                 $account = $this->basepackages->accounts->checkAccountBy($data['email']);
 
@@ -121,7 +139,7 @@ class Clients extends BasePackage
                 }
             }
 
-            return $this->generateClientKeys($data, $account);
+            return $this->generateClientKeys($data, $account, null, true, $viaRegister);
         }
 
         $this->resetCallsCount([], $data);
@@ -211,7 +229,7 @@ class Clients extends BasePackage
         return false;
     }
 
-    public function generateClientKeys($data, $account = null, $newClient = null, $emailNewClientDetails = true)
+    public function generateClientKeys($data, $account = null, $newClient = null, $emailNewClientDetails = true, $viaRegister = false)
     {
         $api = $this->api->getById($data['api_id']);
 
@@ -260,7 +278,11 @@ class Clients extends BasePackage
                 }
 
                 if (isset($newClient) && $this->addClient($newClient)) {
-                    $this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
+                    if (!$viaRegister) {
+                        $this->addResponse('Keys generated & emailed successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
+                    } else {
+                        $this->addResponse('Keys generated & emailed successfully.', 0, []);
+                    }
 
                     if ($emailNewClientDetails) {
                         $this->emailNewClientDetails($api, $newClient, $client_secret);

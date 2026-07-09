@@ -480,9 +480,9 @@ class Api extends BasePackage
                             $this->client = $client[0];
                         }
                     } else {
-                        $newClient["api_id"] = $api[0]['id'];
-                        $newClient["app_id"] = $this->apps->getAppInfo()['id'];
-                        $newClient["domain_id"] = $this->domains->domain['id'];
+                        $newClient["api_id"] = (int) $api[0]['id'];
+                        $newClient["app_id"] = (int) $this->apps->getAppInfo()['id'];
+                        $newClient["domain_id"] = (int) $this->domains->domain['id'];
                         $newClient["account_id"] = 0;
                         $newClient["email"] = 'pubapi@' . $this->domains->domain['name'];
                         $newClient["client_id"] = $this->request->getClientAddress();

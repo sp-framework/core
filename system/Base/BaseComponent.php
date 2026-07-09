@@ -930,7 +930,10 @@ abstract class BaseComponent extends Controller
 			$this->response->setHeader('token', $this->token);
 		}
 
-		if ($this->app && $this->view->componentName !== 'auth') {
+		if ($this->app &&
+			$this->view->componentName &&
+			($this->view->componentName !== 'auth' && $this->view->componentName !== 'register')
+		) {
 			if (!$this->app['menu_structure']) {
 				$menus =
 					$this->basepackages->menus->buildMenusForApp($this->app);
@@ -1114,7 +1117,10 @@ abstract class BaseComponent extends Controller
 			$this->componentRoute = 'Errors';
 		}
 
-		if ($this->app && isset($this->componentRoute)) {
+		if ($this->app &&
+			isset($this->componentRoute) &&
+			($this->componentRoute !== 'auth' && $this->componentRoute !== 'register')
+		) {
 			if ($this->componentRoute === '') {
 				$this->view->breadcrumb = 'home';
 			} else {

@@ -200,7 +200,8 @@ class RegisterComponent extends BaseComponent
 
         $this->addResponse(
             $clients->packagesData->responseMessage,
-            $clients->packagesData->responseCode
+            $clients->packagesData->responseCode,
+            $clients->packagesData->responseData ?? []
         );
     }
 
