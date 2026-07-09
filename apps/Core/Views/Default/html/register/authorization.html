@@ -23,6 +23,10 @@ BazCore.header({
     {% set style = 'style="width:60%"' %}
     {% set buttonText = 'Refresh Token' %}
 {% endif %}
+{% if newToken is defined %}
+    {% set style = 'style="width:60%"' %}
+    {% set buttonText = 'Get New Token' %}
+{% endif %}
 <div id="{{componentId}}" class="login-box" {{style}}>
     <div class="card m-0">
         <div class="card-body login-card-body">
@@ -31,190 +35,194 @@ BazCore.header({
             </div>
             <div id="{{componentId}}-regular" hidden>
                 <div id="{{componentId}}-form">
-                    {% if api is defined and code is not defined and refresh is not defined %}
-                        <p class="login-box-msg text-sm font-weight-bold">Authorize client for {{api['name']}}</p>
-                        {% if authorizationTosPp is defined %}
-                            <div class="row" {{rowStyle}}>
-                                <div class="col">{{authorizationTosPp}}</div>
+                    {% if api is defined %}
+                        {% if code is not defined and refresh is not defined and newToken is not defined %}
+                            <p class="login-box-msg text-sm font-weight-bold">Authorize client for {{api['name']}}</p>
+                            {% if authorizationTosPp is defined %}
+                                <div class="row" {{rowStyle}}>
+                                    <div class="col">{{authorizationTosPp}}</div>
+                                </div>
+                            {% endif %}
+                            <div class="row">
+                                <div class="col text-center">
+                                    <button id="{{componentId}}-form-authorize" type="button" class="btn btn-info">
+                                        <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                                        <span class="text-uppercase">{{buttonText}}</span>
+                                    </button>
+                                </div>
                             </div>
-                        {% endif %}
-                        <div class="row">
-                            <div class="col text-center">
-                                <button id="{{componentId}}-form-authorize" type="button" class="btn btn-info">
-                                    <i class="fa fa-cog fa-spin login-spinner" hidden></i>
-                                    <span class="text-uppercase">{{buttonText}}</span>
-                                </button>
-                            </div>
-                        </div>
-                    {% elseif api is defined and code is defined or refresh is defined %}
-                        {% if refresh is defined %}
-                            <p class="login-box-msg text-sm font-weight-bold text-success">Access Token generator using refresh token for {{api['name']}}</p>
-                        {% else %}
-                            <p class="login-box-msg text-sm font-weight-bold text-success">Client authorized for {{api['name']}}</p>
-                        {% endif %}
-                        <div class="row" id="client-info-input">
-                            <div class="col">
-                                {{adminltetags.useTag('fields',
-                                    [
-                                        'componentId'                           : componentId,
-                                        'sectionId'                             : 'form',
-                                        'fieldId'                               : 'client_id',
-                                        'fieldLabel'                            : 'Client ID',
-                                        'fieldType'                             : 'input',
-                                        'fieldRequired'                         : true,
-                                        'fieldInputType'                        : 'text',
-                                        'fieldValue'                            : ''
-                                    ]
-                                )}}
-                            </div>
-                            <div class="col">
-                                {{adminltetags.useTag('fields',
-                                    [
-                                        'componentId'                           : componentId,
-                                        'sectionId'                             : 'form',
-                                        'fieldId'                               : 'client_secret',
-                                        'fieldLabel'                            : 'Client Secret',
-                                        'fieldType'                             : 'input',
-                                        'fieldRequired'                         : true,
-                                        'fieldInputType'                        : 'text',
-                                        'fieldValue'                            : ''
-                                    ]
-                                )}}
-                            </div>
-                        </div>
-                        {% if refresh is defined %}
-                            <div class="row" id="refresh-token-input">
+                        {% elseif code is defined or refresh is defined or newToken is defined %}
+                            {% if refresh is defined %}
+                                <p class="login-box-msg text-sm font-weight-bold text-success">Access Token generator using refresh token for {{api['name']}}</p>
+                            {% elseif newToken is defined %}
+                                <p class="login-box-msg text-sm font-weight-bold text-success">New access token generator for {{api['name']}}</p>
+                            {% else %}
+                                <p class="login-box-msg text-sm font-weight-bold text-success">Client authorized for {{api['name']}}</p>
+                            {% endif %}
+                            <div class="row" id="client-info-input">
                                 <div class="col">
                                     {{adminltetags.useTag('fields',
                                         [
                                             'componentId'                           : componentId,
                                             'sectionId'                             : 'form',
-                                            'fieldId'                               : 'refresh_token_input',
-                                            'fieldLabel'                            : 'Refresh Token',
-                                            'fieldType'                             : 'textarea',
+                                            'fieldId'                               : 'client_id',
+                                            'fieldLabel'                            : 'Client ID',
+                                            'fieldType'                             : 'input',
                                             'fieldRequired'                         : true,
-                                            'fieldHidden'                           : false,
-                                            'fieldTextareaRows'                     : 8,
+                                            'fieldInputType'                        : 'text',
+                                            'fieldValue'                            : ''
+                                        ]
+                                    )}}
+                                </div>
+                                <div class="col">
+                                    {{adminltetags.useTag('fields',
+                                        [
+                                            'componentId'                           : componentId,
+                                            'sectionId'                             : 'form',
+                                            'fieldId'                               : 'client_secret',
+                                            'fieldLabel'                            : 'Client Secret',
+                                            'fieldType'                             : 'input',
+                                            'fieldRequired'                         : true,
+                                            'fieldInputType'                        : 'text',
                                             'fieldValue'                            : ''
                                         ]
                                     )}}
                                 </div>
                             </div>
-                        {% endif %}
-                        {% if code is defined %}
-                            <div class="row">
-                                <div class="col">
-                                    {{adminltetags.useTag('fields',
-                                        [
-                                            'componentId'                           : componentId,
-                                            'sectionId'                             : 'form',
-                                            'fieldId'                               : 'redirect_uri',
-                                            'fieldLabel'                            : 'Redirect URI',
-                                            'fieldType'                             : 'input',
-                                            'fieldDisabled'                         : true,
-                                            'fieldHidden'                           : true,
-                                            'fieldInputType'                        : 'text',
-                                            'fieldValue'                            : client['redirectUri']
-                                        ]
-                                    )}}
+                            {% if refresh is defined %}
+                                <div class="row" id="refresh-token-input">
+                                    <div class="col">
+                                        {{adminltetags.useTag('fields',
+                                            [
+                                                'componentId'                           : componentId,
+                                                'sectionId'                             : 'form',
+                                                'fieldId'                               : 'refresh_token_input',
+                                                'fieldLabel'                            : 'Refresh Token',
+                                                'fieldType'                             : 'textarea',
+                                                'fieldRequired'                         : true,
+                                                'fieldHidden'                           : false,
+                                                'fieldTextareaRows'                     : 8,
+                                                'fieldValue'                            : ''
+                                            ]
+                                        )}}
+                                    </div>
                                 </div>
-                            </div>
-                            <div id="code">
+                            {% endif %}
+                            {% if code is defined %}
                                 <div class="row">
                                     <div class="col">
                                         {{adminltetags.useTag('fields',
                                             [
                                                 'componentId'                           : componentId,
                                                 'sectionId'                             : 'form',
-                                                'fieldId'                               : 'code',
-                                                'fieldLabel'                            : 'Code',
+                                                'fieldId'                               : 'redirect_uri',
+                                                'fieldLabel'                            : 'Redirect URI',
+                                                'fieldType'                             : 'input',
+                                                'fieldDisabled'                         : true,
+                                                'fieldHidden'                           : true,
+                                                'fieldInputType'                        : 'text',
+                                                'fieldValue'                            : client['redirectUri']
+                                            ]
+                                        )}}
+                                    </div>
+                                </div>
+                                <div id="code">
+                                    <div class="row">
+                                        <div class="col">
+                                            {{adminltetags.useTag('fields',
+                                                [
+                                                    'componentId'                           : componentId,
+                                                    'sectionId'                             : 'form',
+                                                    'fieldId'                               : 'code',
+                                                    'fieldLabel'                            : 'Code',
+                                                    'fieldType'                             : 'textarea',
+                                                    'fieldDisabled'                         : true,
+                                                    'fieldHidden'                           : false,
+                                                    'fieldTextareaRows'                     : 8,
+                                                    'fieldValue'                            : code
+                                                ]
+                                            )}}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <div id="codes" class="d-none">
+                                <div class="row">
+                                    <div class="col">
+                                        {{adminltetags.useTag('fields',
+                                            [
+                                                'componentId'                           : componentId,
+                                                'sectionId'                             : 'form',
+                                                'fieldId'                               : 'expires_in',
+                                                'fieldLabel'                            : 'Expires in seconds',
+                                                'fieldType'                             : 'input',
+                                                'fieldInputType'                        : 'text',
+                                                'fieldValue'                            : ''
+                                            ]
+                                        )}}
+                                    </div>
+                                    <div class="col">
+                                        {{adminltetags.useTag('fields',
+                                            [
+                                                'componentId'                           : componentId,
+                                                'sectionId'                             : 'form',
+                                                'fieldId'                               : 'token_type',
+                                                'fieldLabel'                            : 'Token type',
+                                                'fieldType'                             : 'input',
+                                                'fieldInputType'                        : 'text',
+                                                'fieldValue'                            : ''
+                                            ]
+                                        )}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        {{adminltetags.useTag('fields',
+                                            [
+                                                'componentId'                           : componentId,
+                                                'sectionId'                             : 'form',
+                                                'fieldId'                               : 'access_token',
+                                                'fieldLabel'                            : 'Access Token',
                                                 'fieldType'                             : 'textarea',
                                                 'fieldDisabled'                         : true,
-                                                'fieldHidden'                           : false,
                                                 'fieldTextareaRows'                     : 8,
-                                                'fieldValue'                            : code
+                                                'fieldValue'                            : ''
+                                            ]
+                                        )}}
+                                    </div>
+                                </div>
+                                <div id="refresh-token" class="row d-none">
+                                    <div class="col">
+                                        {{adminltetags.useTag('fields',
+                                            [
+                                                'componentId'                           : componentId,
+                                                'sectionId'                             : 'form',
+                                                'fieldId'                               : 'refresh_token',
+                                                'fieldLabel'                            : 'Refresh Token',
+                                                'fieldType'                             : 'textarea',
+                                                'fieldDisabled'                         : true,
+                                                'fieldTextareaRows'                     : 8,
+                                                'fieldValue'                            : ''
                                             ]
                                         )}}
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col text-center">
+                                    <button id="{{componentId}}-form-request" type="button" class="btn btn-info">
+                                        <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                                        <span class="text-uppercase">{{buttonText}}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        {% elseif error is defined %}
+                            <div class="row mt-4">
+                                <div class="col text-center">
+                                    <p class="text-danger font-weight-bold">{{error}}</p>
+                                </div>
+                            </div>
                         {% endif %}
-                        <div id="codes" class="d-none">
-                            <div class="row">
-                                <div class="col">
-                                    {{adminltetags.useTag('fields',
-                                        [
-                                            'componentId'                           : componentId,
-                                            'sectionId'                             : 'form',
-                                            'fieldId'                               : 'expires_in',
-                                            'fieldLabel'                            : 'Expires in seconds',
-                                            'fieldType'                             : 'input',
-                                            'fieldInputType'                        : 'text',
-                                            'fieldValue'                            : ''
-                                        ]
-                                    )}}
-                                </div>
-                                <div class="col">
-                                    {{adminltetags.useTag('fields',
-                                        [
-                                            'componentId'                           : componentId,
-                                            'sectionId'                             : 'form',
-                                            'fieldId'                               : 'token_type',
-                                            'fieldLabel'                            : 'Token type',
-                                            'fieldType'                             : 'input',
-                                            'fieldInputType'                        : 'text',
-                                            'fieldValue'                            : ''
-                                        ]
-                                    )}}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    {{adminltetags.useTag('fields',
-                                        [
-                                            'componentId'                           : componentId,
-                                            'sectionId'                             : 'form',
-                                            'fieldId'                               : 'access_token',
-                                            'fieldLabel'                            : 'Access Token',
-                                            'fieldType'                             : 'textarea',
-                                            'fieldDisabled'                         : true,
-                                            'fieldTextareaRows'                     : 8,
-                                            'fieldValue'                            : ''
-                                        ]
-                                    )}}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    {{adminltetags.useTag('fields',
-                                        [
-                                            'componentId'                           : componentId,
-                                            'sectionId'                             : 'form',
-                                            'fieldId'                               : 'refresh_token',
-                                            'fieldLabel'                            : 'Refresh Token',
-                                            'fieldType'                             : 'textarea',
-                                            'fieldDisabled'                         : true,
-                                            'fieldTextareaRows'                     : 8,
-                                            'fieldValue'                            : ''
-                                        ]
-                                    )}}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col text-center">
-                                <button id="{{componentId}}-form-request" type="button" class="btn btn-info">
-                                    <i class="fa fa-cog fa-spin login-spinner" hidden></i>
-                                    <span class="text-uppercase">{{buttonText}}</span>
-                                </button>
-                            </div>
-                        </div>
-                    {% elseif error is defined %}
-                        <div class="row mt-4">
-                            <div class="col text-center">
-                                <p class="text-danger font-weight-bold">{{error}}</p>
-                            </div>
-                        </div>
                     {% endif %}
                     {% include 'auth/footer.html' %}
                 </div>
@@ -238,7 +246,7 @@ BazCore.header({
 <script>
 /*global BazCore */
 $(document).ready(function() {
-    var isRegister, isApi, api, client, refresh;
+    var isRegister, isApi, api, client, refresh, newToken;
     $('#{{componentId}}-regular').attr('hidden', false).addClass('animated fadeIn');
 
     if ($('#{{componentId}}-form-register').length > 0) {
@@ -265,6 +273,7 @@ $(document).ready(function() {
         api = JSON.parse('{{api}}');
         client = JSON.parse('{{client}}');
         refresh = '{{refresh}}';
+        newToken = '{{newToken}}';
 
         BazCore.footer({
             loadFooterAt : 'authorize'
@@ -317,19 +326,22 @@ $(document).ready(function() {
                 }
             }
         } else if ((typeof client === 'object' && Object.keys(client).length > 0) ||
-                   refresh == true
+                   refresh == true ||
+                   newToken == true
         ) {
             url = '{{links.url("register/apiClient")}}';
             postData['client_id'] = $('#{{componentId}}-form-client_id').val().trim();
             postData['client_secret'] = $('#{{componentId}}-form-client_secret').val().trim();
-            if (refresh != true) {
+            if (refresh != true && newToken != true) {
                 postData['grant_type'] = 'authorization_code';
                 postData['redirect_uri'] = $('#{{componentId}}-form-redirect_uri').val().trim();
                 postData['code'] = $('#{{componentId}}-form-code').val().trim();
-            } else {
+            } else if (refresh == true) {
                 postData['grant_type'] = 'refresh_token';
                 postData['refresh'] = true;
                 postData['refresh_token'] = $('#{{componentId}}-form-refresh_token_input').val().trim();
+            } else if (newToken == true) {
+                postData['grant_type'] = 'client_credentials';
             }
         } else {
             window.location = api['authorization_url'];
@@ -455,6 +467,7 @@ $(document).ready(function() {
             if (typeof client === 'object' && Object.keys(client).length > 0) {
                 if (response.responseData) {
                     $('#codes').removeClass('d-none');
+                    $('#refresh-token').removeClass('d-none');
                     $('#code').addClass('d-none');
                     $('#client-info-input').addClass('d-none');
                     $('.login-spinner').attr('hidden', true);
@@ -477,6 +490,19 @@ $(document).ready(function() {
                     $('#{{componentId}}-form-token_type').val(response.responseData.token_type);
                     $('#{{componentId}}-form-access_token').val(response.responseData.access_token);
                     $('#{{componentId}}-form-refresh_token').val(response.responseData.refresh_token);
+            } else if (newToken == true) {
+                    $('#codes').removeClass('d-none');
+                    $('#client-info-input').addClass('d-none');
+                    $('#refresh-token-input').addClass('d-none');
+                    $('.login-spinner').attr('hidden', true);
+                    $('#{{componentId}}-form-request').attr('hidden', true);
+                    $('#{{componentId}}-form-client_id, #{{componentId}}-form-client_secret').attr('disabled', true);
+                    $('#{{componentId}}-form-request_token_input').attr('disabled', true);
+                    $('#{{componentId}}-form-expires_in').val(response.responseData.expires_in);
+                    $('#{{componentId}}-form-token_type').val(response.responseData.token_type);
+                    $('#{{componentId}}-form-access_token').val(response.responseData.access_token);
+                    $('#{{componentId}}-form-refresh_token').val('');
+                    $('#refresh-token').addClass('d-none');
             } else {
                 setTimeout(function() {
                     $('.login-spinner').attr('hidden', true);

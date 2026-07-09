@@ -96,13 +96,14 @@ class RegisterComponent extends BaseComponent
 
             return;
         } else if (isset($this->getData()['client_id']) &&
-                   (isset($this->getData()['refresh']) && $this->getData()['refresh'] == true)
-        ) {
+                   ((isset($this->getData()['refresh']) && $this->getData()['refresh'] == true) ||
+                    (isset($this->getData()['new']) && $this->getData()['new'] == true))
+        ) {//Token Generator using client and secret & Refresh token
             $this->view->setLayout('auth');
 
             $this->view->pick('register/authorization');
 
-            $api = $this->api->checkAuthorizationLinkData($this->getData());
+            $api = $this->api->init(true)->checkAuthorizationLinkData($this->getData());
 
             if (!$api) {
                 $this->view->error = $this->api->packagesData->responseMessage;
@@ -116,12 +117,18 @@ class RegisterComponent extends BaseComponent
 
             $this->view->api = $api;
 
-            $this->view->refresh = true;
+            if (isset($this->getData()['refresh']) && $this->getData()['refresh'] == true) {
+                $this->view->refresh = true;
+            }
+            if (isset($this->getData()['new']) && $this->getData()['new'] == true) {
+                $this->view->newToken = true;
+            }
 
             return;
         }
 
         $this->view->refresh = false;
+        $this->view->newToken = false;
 
         if (isset($this->getData()['api'])) {
             $api = $this->api->getById($this->getData()['api']);

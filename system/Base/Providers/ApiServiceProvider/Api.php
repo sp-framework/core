@@ -1265,7 +1265,10 @@ class Api extends BasePackage
 
                 $api = $this->getById($client->api_id);
 
-                if ($api && isset($this->getData()['refresh']) && $this->getData()['refresh'] == true) {
+                if ($api &&
+                    (isset($this->getData()['new']) && $this->getData()['new'] == true) ||
+                    (isset($this->getData()['refresh']) && $this->getData()['refresh'] == true)
+                ) {
                     $this->api = $api;
 
                     return $api;

@@ -418,7 +418,11 @@ class Clients extends BasePackage
         if ($newClient['device_id']) {
             $emailData['body'] = 'Device ID: ' . $newClient['device_id'] . '<br>';
         }
-        $emailData['body'] = $emailData['body'] . 'Client ID: ' . $newClient['client_id'] . '<br>' . 'Client Secret: ' . $clientSecret;
+        $emailData['body'] =
+            $emailData['body'] .
+            'Client ID: ' . $newClient['client_id'] . '<br>' .
+            'Client Secret: ' . $clientSecret . '<br>' .
+            'Url: <a href="' . $this->links->url('register/q/client_id/' . $newClient['client_id'] . '/new/true') . '">Generate New Token</a>';
 
         return $this->basepackages->emailqueue->addQueue($emailData);
     }
