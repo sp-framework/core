@@ -30,7 +30,7 @@ class ServiceProviderApiAccessTokens extends BaseModel implements AccessTokenEnt
 
     public $revoked;
 
-    public function getUserIdentifier() :string
+    public function getUserIdentifier() :string|null
     {
         return $this->account_id;
     }

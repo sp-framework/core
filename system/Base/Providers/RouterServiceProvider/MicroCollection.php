@@ -62,6 +62,8 @@ class MicroCollection
             $methods = ['POST','PATCH','PUT'];
         } else if ($action === 'remove') {
             $methods = ['DELETE'];
+        } else {
+            $methods = ['POST'];
         }
 
         $handlerMethod = lcfirst($action) . 'Action';

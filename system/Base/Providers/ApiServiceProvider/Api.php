@@ -88,6 +88,10 @@ class Api extends BasePackage
 
     public $apiCallsLimitReached = false;
 
+    protected $encClientId;
+
+    protected $encDeviceId;
+
     public function init(bool $resetCache = false)
     {
         if ($this->container) {
@@ -330,6 +334,14 @@ class Api extends BasePackage
         }
     }
 
+    /**
+     * Check whether the connection received is API or not.
+     *
+     * - For public access of api (without authentication). ***pub*** is a reserved keyword in apps
+     * - Public URL: {domain}/api(if not exclusive for api)/pub/app_route(if not exclusive to app)/component/method
+     * - Setting client_id with Authorization header is important for our setup as we rely on the client ID to find which API needs to be instantiated
+     * - Post parameter refresh is important if you are grabbing refresh token using web browser
+     */
     public function isApi()
     {
         if (isset($this->isApi)) {
@@ -341,31 +353,37 @@ class Api extends BasePackage
 
         if ($this->request->getBestAccept() === 'application/json') {
             $url = $this->request->getURI();
+
             $urlParts = explode("/", trim($url, '/'));
+
             if (isset($urlParts[0]) && $urlParts[0] === 'api') {
                 $this->isApi = true;
             }
-            //For public access of api (without authentication). pub is a reserved keyword in apps.
-            //URL: {domain}/api(if not exclusive for api)/pub/app_route(if not exclusive to app)/component/method
+
             if ((isset($urlParts[0]) && $urlParts[0] === 'pub') ||
                 (isset($urlParts[1]) && $urlParts[1] === 'pub')
             ) {
                 $this->isApi = true;
+
                 $this->isApiCheckVia = 'pub';
-            } else if ($this->request->getHeader('Authorization') !== '') {//Setting client-id with Authorization header is important for our setup as we rely on the client ID to find which API needs to be instantiated
+            } else if ($this->request->getHeader('Authorization') !== '') {
                 $this->isApi = true;
+
                 $this->isApiCheckVia = 'authorization';
-            } else if ($this->request->get('client_id') &&
-                       !$this->request->get('id') &&
-                       !isset($this->request->getPost()['redirect_uri']) &&
-                       !isset($this->request->getPost()['refresh'])//This is important if you are grabbing refresh token using web browser
-            ) {
-                $this->isApi = true;
-                $this->isApiCheckVia = 'client_id';
-                $this->clientId = $this->request->get('client_id');
-                if ($this->request->get('device_id')) {
-                    $this->deviceId = $this->request->get('device_id');
-                }
+            // } else if ($this->request->get('client_id') &&
+            //            !$this->request->get('id') &&
+            //            !isset($this->request->getPost()['redirect_uri']) &&
+            //            !isset($this->request->getPost()['refresh'])
+            // ) {
+            //     $this->isApi = true;
+
+            //     $this->isApiCheckVia = 'client_id';
+
+            //     $this->clientId = $this->request->get('client_id');
+
+            //     if ($this->request->get('device_id')) {
+            //         $this->deviceId = $this->request->get('device_id');
+            //     }
             }
         }
 
@@ -374,6 +392,25 @@ class Api extends BasePackage
 
     public function getApiInfo($usingIsApiCheckVia = false, $usingDomainApp = false)
     {
+        if ($usingDomainApp) {
+            if (!$this->apiServices) {
+                $this->init();
+            }
+
+            $enabledApis = [];
+
+            foreach ($this->apiServices as $apiService) {
+                if (($apiService['status'] == '1' || $apiService['status'] === true) &&
+                    $apiService['app_id'] === $this->apps->getAppInfo()['id'] &&
+                    $apiService['domain_id'] === $this->domains->domain['id']
+                ) {
+                    $enabledApis[$apiService['id']] = $apiService;
+                }
+            }
+
+            return $enabledApis;
+        }
+
         if ($this->api) {
             return $this->api;
         }
@@ -461,10 +498,10 @@ class Api extends BasePackage
                         $this->client = $this->clients->packagesData->last;
                     }
                 }
-            } else if ($this->isApiCheckVia === 'authorization' ||
-                       $this->isApiCheckVia === 'client_id'
+            } else if ($this->isApiCheckVia === 'authorization'
+                        // || $this->isApiCheckVia === 'client_id'
             ) {
-                if ($this->isApiCheckVia === 'authorization') {
+                // if ($this->isApiCheckVia === 'authorization') {
                     $authorization = \trim((string) \preg_replace('/^\s*Bearer\s/', '', $this->request->getHeader('Authorization')));
                     $authorization = explode('||', $authorization);
 
@@ -474,103 +511,119 @@ class Api extends BasePackage
                         $this->clientId = $this->secTools->decryptBase64($authorization[1]);
                         $this->deviceId = $this->secTools->decryptBase64($authorization[2]);
                     }
-                }
+                // }
 
                 if ($this->clientId) {
-                    $client = null;
-
-                    $this->caching->init('apcuCache', 7200);
-
-                    if ($this->caching->enabled) {
-                        $apcuClient = $this->caching->getCache('api-clients-' . $this->request->getClientAddress());
-
-                        if ($apcuClient) {
-                            $client[0] = $apcuClient;
-                        }
-                    }
-
-                    if ($this->config->databasetype === 'db') {
-                        if ($this->deviceId) {
-                            $params =
-                                [
-                                    'conditions'    => 'client_id = :client_id: AND device_id = :device_id:',
-                                    'bind'          =>
-                                        [
-                                            'client_id'    => $this->clientId,
-                                            'device_id'    => $this->deviceId
-                                        ]
-                                ];
-                        } else {
-                            $params =
-                                [
-                                    'conditions'    => 'client_id = :client_id:',
-                                    'bind'          =>
-                                        [
-                                            'client_id'    => $this->clientId
-                                        ]
-                                ];
-                        }
-                    } else {
-                        if ($this->deviceId) {
-                            $params = [
-                                'conditions' => [
-                                    ['client_id', '=', $this->clientId],
-                                    ['device_id', '=', $this->deviceId]
-                                ]
-                            ];
-                        } else {
-                            $params = [
-                                'conditions' => [
-                                    ['client_id', '=', $this->clientId]
-                                ]
-                            ];
-
-                        }
-                    }
-
-                    $client = $this->clients->getByParams($params);
-
-                    if ($client && $client && is_array($client) && isset($client[0]['api_id'])) {
-                        if ($this->caching->enabled) {
-                            $client[0] = $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client[0]);
-                        }
-
-                        $api = $this->getById($client[0]['api_id']);
-
-                        if ($api['status'] == true) {
-                            if ($this->checkCallLimits($client[0], $api)) {
-                                $this->apiCallsLimitReached = true;
-                                $this->client = $client[0];
-                            } else {
-                                $this->api = $api;
-                                $this->client = $client[0];
-                            }
-                        }
-                    }
+                    $this->setupApiViaClientId();
                 }
             }
-        }
-
-        if ($usingDomainApp) {
-            if (!$this->apiServices) {
-                $this->init();
-            }
-
-            $enabledApis = [];
-
-            foreach ($this->apiServices as $apiService) {
-                if (($apiService['status'] == '1' || $apiService['status'] === true) &&
-                    $apiService['app_id'] === $this->apps->getAppInfo()['id'] &&
-                    $apiService['domain_id'] === $this->domains->domain['id']
-                ) {
-                    $enabledApis[$apiService['id']] = $apiService;
-                }
-            }
-
-            return $enabledApis;
         }
 
         return $this->api;
+    }
+
+    public function setupApiViaClientId($getEncIds = false)
+    {
+        if (!$this->clientId) {
+            if ($this->request->get('client_id')) {
+                $this->clientId = $this->request->get('client_id');
+                if ($getEncIds) {
+                    $this->encClientId = $this->secTools->encryptBase64($this->clientId);
+                }
+            } else if ($this->request->getPost()['client_id']) {
+                $this->clientId = $this->request->getPost()['client_id'];
+                if ($getEncIds) {
+                    $this->encClientId = $this->secTools->encryptBase64($this->clientId);
+                }
+            }
+
+            if ($this->request->get('device_id')) {
+                $this->deviceId = $this->request->get('device_id');
+                if ($getEncIds) {
+                    $this->encDeviceId = $this->secTools->encryptBase64($this->deviceId);
+                }
+            } else if (isset($this->request->getPost()['device_id'])) {
+                $this->deviceId = $this->request->getPost()['device_id'];
+                if ($getEncIds) {
+                    $this->encDeviceId = $this->secTools->encryptBase64($this->deviceId);
+                }
+            }
+        }
+
+        $client = null;
+
+        $this->caching->init('apcuCache', 7200);
+
+        if ($this->caching->enabled) {
+            $apcuClient = $this->caching->getCache('api-clients-' . $this->request->getClientAddress());
+
+            if ($apcuClient) {
+                $client[0] = $apcuClient;
+            }
+        }
+
+        if ($this->config->databasetype === 'db') {
+            if ($this->deviceId) {
+                $params =
+                    [
+                        'conditions'    => 'client_id = :client_id: AND device_id = :device_id:',
+                        'bind'          =>
+                            [
+                                'client_id'    => $this->clientId,
+                                'device_id'    => $this->deviceId
+                            ]
+                    ];
+            } else {
+                $params =
+                    [
+                        'conditions'    => 'client_id = :client_id:',
+                        'bind'          =>
+                            [
+                                'client_id'    => $this->clientId
+                            ]
+                    ];
+            }
+        } else {
+            if ($this->deviceId) {
+                $params = [
+                    'conditions' => [
+                        ['client_id', '=', $this->clientId],
+                        ['device_id', '=', $this->deviceId]
+                    ]
+                ];
+            } else {
+                $params = [
+                    'conditions' => [
+                        ['client_id', '=', $this->clientId]
+                    ]
+                ];
+
+            }
+        }
+
+        $client = $this->clients->getByParams($params);
+
+        if ($client && $client && is_array($client) && isset($client[0]['api_id'])) {
+            if ($this->caching->enabled) {
+                $client[0] = $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client[0]);
+            }
+
+            $api = $this->getById($client[0]['api_id']);
+
+            if ($api['status'] == true) {
+                if ($this->checkCallLimits($client[0], $api)) {
+                    $this->apiCallsLimitReached = true;
+                    $this->client = $client[0];
+                } else {
+                    $this->api = $api;
+                    $this->client = $client[0];
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function checkCallLimits(&$client, $api)
@@ -761,49 +814,35 @@ class Api extends BasePackage
 
             $token = $this->helper->decode((string) $tokenResponse->getBody(), true);
 
-            if ($this->request->get('client_id')) {
-                $clientId = $this->request->get('client_id');
-                $encClientId = $this->secTools->encryptBase64($clientId);
-            } else if ($this->request->getPost()['client_id']) {
-                $clientId = $this->request->getPost()['client_id'];
-                $encClientId = $this->secTools->encryptBase64($clientId);
+            $token['access_token'] = $token['access_token'] . '||' . $this->encClientId;
+
+            if ($this->encDeviceId) {
+                $token['access_token'] = $token['access_token'] . '||' . $this->encDeviceId;
             }
 
-            if ($this->request->get('device_id')) {
-                $deviceId = $this->request->get('device_id');
-                $encDeviceId = $this->secTools->encryptBase64($deviceId);
-            } else if (isset($this->request->getPost()['device_id'])) {
-                $deviceId = $this->request->getPost()['device_id'];
-                $encDeviceId = $this->secTools->encryptBase64($deviceId);
-            }
-
-            $token['access_token'] = $token['access_token'] . '||' . $encClientId;
-
-            if (isset($encDeviceId)) {
-                $token['access_token'] = $token['access_token'] . '||' . $encDeviceId;
-            }
-
-            if ($this->request->getPost()['grant_type'] === 'authorization_code' || $this->request->get('refresh_token')) {
+            // if ($this->request->getPost()['grant_type'] === 'authorization_code' || $this->request->get('refresh_token')) {
                 $this->addResponse('Access token generated!', 0, $token);
 
                 return true;
-            }
+            // }
 
-            $body = Utils::streamFor($this->helper->encode($token));
 
-            return $tokenResponse->withBody($body);
+            // $body = Utils::streamFor($this->helper->encode($token));
+            // trace([$body]);
+            // return $tokenResponse->withBody($body);
         } catch (OAuthServerException $exception) {
             $this->logger->logExceptions->critical(json_trace($exception));
+
             $this->addResponse($exception->getMessage(), 1, []);
-            var_dump($exception);die();
-            // All instances of OAuthServerException can be converted to a PSR-7 response
+
             return $exception->generateHttpResponse($serverResponse);
         } catch (\Exception $exception) {
             $this->logger->logExceptions->critical(json_trace($exception));
+
             $this->addResponse($exception->getMessage(), 1, []);
-            var_dump($exception);die();
-            // Catch unexpected exceptions
+
             $body = $serverResponse->getBody();
+
             $body->write($exception->getMessage());
 
             return $serverResponse->withStatus(500)->withBody($body);

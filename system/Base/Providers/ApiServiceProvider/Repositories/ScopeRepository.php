@@ -16,7 +16,7 @@ class ScopeRepository extends BasePackage implements ScopeRepositoryInterface
 
     protected $scope;
 
-    public function getScopeEntityByIdentifier($identifier)
+    public function getScopeEntityByIdentifier($identifier) :ServiceProviderApiScopes
     {
         $scopeObj = $this->getFirst('scope_name', $identifier);
 
@@ -37,24 +37,29 @@ class ScopeRepository extends BasePackage implements ScopeRepositoryInterface
         array $scopes,
         $grantType,
         ClientEntityInterface $clientEntity,
-        $userIdentifier = null
-    ) {
+        $userIdentifier = null,
+        $authCodeId = null
+    ) :array
+    {
         $result = [];
 
-        $this->modelToUse = ServiceProviderApiClients::class;
-        $this->setFfStoreToUse();
+        $this->setModelToUse($this->modelToUse = ServiceProviderApiClients::class);
+
+        $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
         $clientObj = $this->getFirst('client_id', $clientEntity->getIdentifier());
 
         if ($clientObj) {
-            $this->modelToUse = ServiceProviderApi::class;
-            $this->setFfStoreToUse();
+            $this->setModelToUse($this->modelToUse = ServiceProviderApi::class);
+
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
             $api = $this->getById($clientObj->api_id);
 
             if ($api) {
-                $this->modelToUse = ServiceProviderApiScopes::class;
-                $this->setFfStoreToUse();
+                $this->setModelToUse($this->modelToUse = ServiceProviderApiScopes::class);
+
+                $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
                 $scope = $this->getById($api['scope_id']);
 

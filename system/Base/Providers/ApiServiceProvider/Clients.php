@@ -121,9 +121,7 @@ class Clients extends BasePackage
                 }
             }
 
-            $this->generateClientKeys($data, $account);
-
-            return true;
+            return $this->generateClientKeys($data, $account);
         }
 
         $this->resetCallsCount([], $data);

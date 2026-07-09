@@ -13,6 +13,13 @@ class RegisterComponent extends BaseComponent
         $this->accounts = $this->basepackages->accounts;
     }
 
+    /**
+     * View action for user account or API registration for the user.
+     *
+     * - Users can register for a regular user account if the app permits. The App settings allow registration should be enabled.
+     * - For API registration: API services should allow registration else they will get 404
+     *
+     */
     public function viewAction()
     {
         if (isset($this->getData()['response_type']) &&
@@ -120,7 +127,7 @@ class RegisterComponent extends BaseComponent
             $api = $this->api->getById($this->getData()['api']);
 
             if (!$api ||
-                ($api && ($api['status'] == false || $api && $api['client_keys_generation_allowed'] == false))
+                ($api && ($api['status'] == false || $api && $api['registration_allowed'] == false))
             ) {
                 $this->response->setStatusCode(404);
 
@@ -173,20 +180,33 @@ class RegisterComponent extends BaseComponent
         );
     }
 
+    /**
+     * Register client using web form.
+     *
+     * - Users enter their email address and select if they are registering for device API or user API.
+     * ```
+     * postData() params:
+     * string  email           email address of the user
+     * bool    device_id       true|false
+     * ```
+     */
     public function apiAddNewClientAction()
     {
         $this->requestIsPost();
 
-        $this->api->clients->addClient($this->postData(), true);
+        $clients = $this->api->init(true)->clients;
+
+        $clients->addClient($this->postData(), true);
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode
+            $clients->packagesData->responseMessage,
+            $clients->packagesData->responseCode
         );
     }
 
     public function apiClientAction()
     {
+        // trace([$this->postData()]);
         if (!isset($this->postData()['grant_type']) ||
             isset($this->postData()['grant_type']) && $this->postData()['grant_type'] === ''
         ) {
@@ -212,7 +232,7 @@ class RegisterComponent extends BaseComponent
         }
 
         if ($this->postData()['grant_type'] === 'authorization_code' || $this->postData()['grant_type'] === 'refresh_token') {
-            $apis = $this->api->getApiInfo(false, true);
+            $apis = $this->api->init(true)->getApiInfo(false, true);
 
             foreach ($apis as $api) {
                 if ($this->postData()['client_id'] === $api['client_id']) {
@@ -227,18 +247,18 @@ class RegisterComponent extends BaseComponent
                     $this->api->setupApi();
                 }
             }
+        } else {
+            $this->api->init(true)->setupApiViaClientId(true);
 
-            $this->api->registerClient();
-
-            $this->addResponse(
-                $this->api->packagesData->responseMessage,
-                $this->api->packagesData->responseCode,
-                $this->api->packagesData->responseData,
-            );
-
-            return true;
+            $this->api->setupApi();
         }
 
-        return $this->api->registerClient();
+        $this->api->registerClient();
+
+        $this->addResponse(
+            $this->api->packagesData->responseMessage,
+            $this->api->packagesData->responseCode,
+            $this->api->packagesData->responseData,
+        );
     }
 }

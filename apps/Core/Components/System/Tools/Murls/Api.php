@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * API file for Mulrs component.
+ *
+ * {@inheritDoc}
+ */
 namespace Apps\Core\Components\System\Tools\Murls;
 
 use System\Base\BaseApi;

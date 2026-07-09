@@ -14,12 +14,12 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
 
     protected $token;
 
-    public function getNewRefreshToken()
+    public function getNewRefreshToken() :ServiceProviderApiRefreshTokens
     {
         return new ServiceProviderApiRefreshTokens();
     }
 
-    public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity)
+    public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity) :void
     {
         $refreshToken = $refreshTokenEntity->getIdentifier();
 
@@ -34,28 +34,28 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
                 'conditions'    => 'api_id = :apiId: AND app_id = :appId: AND domain_id = :domainId: AND account_id = :accountId:',
                 'bind'          =>
                     [
-                        'apiId'    => $this->api->getApiInfo()['id'],
-                        'appId'    => $this->apps->getAppInfo()['id'],
-                        'domainId' => $this->domains->domain['id'],
-                        'accountId'=> $accessToken->getClient()->getUserIdentifier()
+                        'apiId'    => (int) $this->api->getApiInfo()['id'],
+                        'appId'    => (int) $this->apps->getAppInfo()['id'],
+                        'domainId' => (int) $this->domains->domain['id'],
+                        'accountId'=> (int) $accessToken->getClient()->getUserIdentifier()
                     ]
             ];
         } else {
             $params['conditions'] = [
-                ['api_id', '=', $this->api->getApiInfo()['id']],
-                ['app_id', '=', $this->apps->getAppInfo()['id']],
-                ['domain_id', '=', $this->domains->domain['id']],
-                ['account_id', '=', $accessToken->getClient()->getUserIdentifier()]
+                ['api_id', '=', (int) $this->api->getApiInfo()['id']],
+                ['app_id', '=', (int) $this->apps->getAppInfo()['id']],
+                ['domain_id', '=', (int) $this->domains->domain['id']],
+                ['account_id', '=', (int) $accessToken->getClient()->getUserIdentifier()]
             ];
         }
 
         $token = $this->getByParams($params, false, false);
 
         $newToken = [
-            'api_id' => $this->api->getApiInfo()['id'],
-            'app_id' => $this->apps->getAppInfo()['id'],
-            'domain_id' => $this->domains->domain['id'],
-            'account_id' => $accessToken->getClient()->getUserIdentifier(),
+            'api_id' => (int) $this->api->getApiInfo()['id'],
+            'app_id' => (int) $this->apps->getAppInfo()['id'],
+            'domain_id' => (int) $this->domains->domain['id'],
+            'account_id' => (int) $accessToken->getClient()->getUserIdentifier(),
             'refresh_token' => $refreshToken,
             'expires' => (\Carbon\Carbon::parse($accessToken->getExpiryDateTime()))->toDateTimeLocalString(),
             'client_id' => $accessToken->getClient()->getIdentifier(),
@@ -75,7 +75,7 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
         }
     }
 
-    public function revokeRefreshToken($tokenId)
+    public function revokeRefreshToken($tokenId) :void
     {
         if ($result = $this->getFirst('refresh_token', $tokenId)) {
 
@@ -87,7 +87,7 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
         }
     }
 
-    public function isRefreshTokenRevoked($tokenId)
+    public function isRefreshTokenRevoked($tokenId) :bool
     {
         if ($result = $this->getFirst('refresh_token', $tokenId)) {
             return (int) $result->revoked == 1;
