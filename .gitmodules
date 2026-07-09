@@ -7,3 +7,6 @@
 [submodule "apps/Core/Packages/Devtools/GeoExtractData/Data"]
 	path = apps/Core/Packages/Devtools/GeoExtractData/Data
 	url = https://github.com/sp-framework/geodata.git
+[submodule "devdocs"]
+	path = devdocs
+	url = https://github.com/sp-framework/devdocs.git
