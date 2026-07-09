@@ -46,4 +46,5 @@ psalm.xml
 docker*
 phpunit*
 .phpdoc*
-devdocs/cache*
+docs*
+devdocs*
