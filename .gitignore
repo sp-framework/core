@@ -45,3 +45,5 @@ phpstan.neon
 psalm.xml
 docker*
 phpunit*
+.phpdoc*
+devdocs/cache*
