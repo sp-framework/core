@@ -59,10 +59,17 @@ class MiddlewaresServiceProvider extends Injectable
 
                         throw $e;
                     }
+
                     //If there is a redirect or null returned from process
                     if ($mw && $mw instanceof \Phalcon\Http\Response) {
                         if ($mw->getHeaders()->toArray()['Status'] === '302 Found') {
                             $notFound = true;
+
+                            //If we are requesting via API/Json, we send 404 instead of redirect
+                            if ($this->request->getBestAccept() === 'application/json') {
+                                $this->response->setStatusCode(404);
+                            }
+
                             break;
                         }
                     }
@@ -148,7 +155,9 @@ class MiddlewaresServiceProvider extends Injectable
         }
 
         if ($ipFilter) {
-            if ($this->request->isPost()) {
+            if ($this->request->isGet()) {
+                $this->data['guestAccess'] = [];
+            } else if ($this->request->isPost()) {
                 $this->data['guestAccess'] =
                 [
                     $this->data['appRoute'] . '/apps/checkip',
