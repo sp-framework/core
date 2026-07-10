@@ -33,9 +33,21 @@ class MicroCollection
         $this->microCollection = new Collection;
     }
 
+    /**
+     * Match route and assign handler to the micro collection
+     *
+     * Example Route (Public API Access):
+     * Domain not exclusive for API or default App -  api.sp.local/api/pub/core/system/tools/murls
+     * Domain exclusive for API and not exclusive for default App -  api.sp.local/pub/core/system/tools/murls
+     * Domain exclusive for API and default App -  api.sp.local/pub/system/tools/murls
+     * Example Route (Non Public API Access):
+     * Domain not exclusive for API or default App -  api.sp.local/api/core/system/tools/murls
+     * Domain exclusive for API and not exclusive for default App -  api.sp.local/core/system/tools/murls
+     * Domain exclusive for API and default App -  api.sp.local/system/tools/murls
+     *
+     */
     public function init()
     {
-        // trace([$this->router->getRoutes()[0]->getPattern()]);
         if ($this->router->getRoutes() && count($this->router->getRoutes()) > 0) {
             $routeToMatch = $this->router->getRoutes()[0]->getPattern();
         }
