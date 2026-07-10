@@ -73,7 +73,7 @@ class FilterInstaller extends BasePackage
                                         'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
                                         'auto_generated'    => 0,
                                         'account_id'        => 0,
-                                        'archived'          => $filterArr['archived'] == 'true' ? 1 : 0,
+                                        'archived'          => $filterArr['archived'] == 'true' ? 1 : 0
                                     ]
                                 );
                             } else {
