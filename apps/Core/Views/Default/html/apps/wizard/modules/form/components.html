@@ -377,6 +377,7 @@ dataCollectionSection =
                     window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['components'] = { };
 
                     for (var componentCheckbox in componentIds) {
+                        $('#' + componentCheckbox).off();
                         $('#' + componentCheckbox).click(function() {
                             var id = $(this)[0].id;
                             extractComponentCheckboxData(id, componentIds[componentCheckbox], true);
@@ -385,27 +386,19 @@ dataCollectionSection =
                     }
                 }
 
-                function extractComponentCheckboxData(componentCheckbox, component, switchMenu = false) {
+                function extractComponentCheckboxData(componentCheckbox, component, enableDisableCheckboxes = false) {
                     var componentId = $('#' + componentCheckbox).data('id');
                     var menuId = $('#' + componentCheckbox).data('menu');
                     var appId = $('#' + componentCheckbox).data('app_id');
 
                     if ($('#' + componentCheckbox)[0].checked === true) {
                         window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['components'][componentId] = true;
-                        if (switchMenu &&
-                            Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)).length > 0
-                        ) {
-                            $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', false);
-                            // $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = true;
-                            window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = true;
-                        } else {
-                            //matched during onload extractComponentCheckboxData
+                        if (enableDisableCheckboxes) {
                             if (Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)).length > 0) {
                                 $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', false);
+                            }
+                            if (Object.keys($('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId)).length > 0) {
                                 $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', false);
-                                // $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = true;
-                                // window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = true;
                             }
                         }
                         $('#{{componentId}}-{{sectionId}}-default_component_guests').find('[value="' + componentId + '"]').attr('disabled', false);
@@ -416,16 +409,17 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-errors_component').trigger('change');
                     } else {
                         window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['components'][componentId] = false;
-                        $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', true);
-                        if (switchMenu &&
-                            Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)).length > 0
-                        ) {
-                            $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = false;
-                            window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = false;
-                            $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId)[0].checked = false;
-                            window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'][componentId] = false;
+                        if (enableDisableCheckboxes) {
+                            if (Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)).length > 0) {
+                                $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = false;
+                                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = false;
+                            }
+                            if (Object.keys($('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId)).length > 0) {
+                                $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId)[0].checked = false;
+                                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'][componentId] = false;
+                            }
                         }
                         $('#{{componentId}}-{{sectionId}}-default_component_guests').find('[value="' + componentId + '"]').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-default_component_guests').trigger('change');
