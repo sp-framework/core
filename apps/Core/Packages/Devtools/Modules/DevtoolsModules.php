@@ -266,8 +266,10 @@ class DevtoolsModules extends BasePackage
                         $module = $this->modules->{$data['module_type']}->packagesData->last;
                         $this->addUpdateComponentMenu($module);
                         $module = $this->modules->{$data['module_type']}->packagesData->last;
+                        $module = array_merge($module, $data);
                         $this->addUpdateComponentWidgets($module);
                         $module = $this->modules->{$data['module_type']}->packagesData->last;
+                        $module = array_merge($module, $data);
                         $this->addUpdateComponentFilters($module);
                     }
 
@@ -2562,6 +2564,13 @@ $file .= '
             $defaultFilter = null;
 
             foreach ($data['filters'] as $filterArr) {
+                if (!isset($filterArr['is_default'])) {
+                    $filterArr['is_default'] = false;
+                }
+                if (!isset($filterArr['archived'])) {
+                    $filterArr['archived'] = false;
+                }
+
                 if (!isset($filterArr['name']) || !isset($filterArr['conditions'])) {
                     continue;
                 }
@@ -2579,7 +2588,8 @@ $file .= '
                             'filter_type'       => 0,//System
                             'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
                             'auto_generated'    => 1,
-                            'account_id'        => 0
+                            'account_id'        => 0,
+                            'archived'          => $filterArr['archived'] == 'true' ? 1 : 0
                         ]
                     );
                 } else {
@@ -2592,7 +2602,8 @@ $file .= '
                             'filter_type'       => 0,//System
                             'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
                             'auto_generated'    => 1,
-                            'account_id'        => 0
+                            'account_id'        => 0,
+                            'archived'          => 0
                         ]
                     );
 

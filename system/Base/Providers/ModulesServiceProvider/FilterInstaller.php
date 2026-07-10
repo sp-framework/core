@@ -48,6 +48,13 @@ class FilterInstaller extends BasePackage
                         $defaultFilter = null;
 
                         foreach ($installComponentJsonFile['filters'] as $filterArr) {
+                            if (!isset($filterArr['is_default'])) {
+                                $filterArr['is_default'] = false;
+                            }
+                            if (!isset($filterArr['archived'])) {
+                                $filterArr['archived'] = false;
+                            }
+
                             if (!isset($filterArr['name']) || !isset($filterArr['conditions'])) {
                                 continue;
                             }
