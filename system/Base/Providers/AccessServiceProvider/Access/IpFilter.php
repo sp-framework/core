@@ -35,7 +35,7 @@ class IpFilter extends BasePackage
 
         $this->ip2location = new Ip2location($this);
 
-        $this->getIpFilterSettings();
+        $this->getIpFilterSettings($appId);
 
         $this->filters->setFilterSettings($this->ipFilterSettings);
 
@@ -44,9 +44,9 @@ class IpFilter extends BasePackage
         return $this;
     }
 
-    public function getIpFilterSettings()
+    public function getIpFilterSettings($appId = null)
     {
-        if (!$this->ipFilterSettings) {
+        if ($appId || !$this->ipFilterSettings) {
             $ipfilterMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('IpFilter', $this->app['id']);
 
             if ($ipfilterMiddleware) {
