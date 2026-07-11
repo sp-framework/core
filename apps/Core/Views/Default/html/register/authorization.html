@@ -59,6 +59,10 @@ BazCore.header({
                             {% else %}
                                 <p class="login-box-msg text-sm font-weight-bold text-success">Client authorized for {{api['name']}}</p>
                             {% endif %}
+                            {% set clientID = '' %}
+                            {% if clientId is defined %}
+                                {% set clientID = clientId %}
+                            {% endif %}
                             <div class="row" id="client-info-input">
                                 <div class="col">
                                     {{adminltetags.useTag('fields',
@@ -70,7 +74,7 @@ BazCore.header({
                                             'fieldType'                             : 'input',
                                             'fieldRequired'                         : true,
                                             'fieldInputType'                        : 'text',
-                                            'fieldValue'                            : ''
+                                            'fieldValue'                            : clientID
                                         ]
                                     )}}
                                 </div>

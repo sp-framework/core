@@ -32,21 +32,21 @@ class RegisterComponent extends BaseComponent
 
             $this->view->pick('register/authorization');
 
-            $api = $this->api->checkAuthorizationLinkData($this->getData());
+            $apiArr = $this->api->checkAuthorizationLinkData($this->getData());
 
-            if (!$api) {
+            if (!$apiArr) {
                 $this->view->error = $this->api->packagesData->responseMessage;
 
                 return;
             }
 
             $this->view->authorizationTosPp = null;
-            if (isset($api['authorization_tos_pp']) && $api['authorization_tos_pp'] !== '') {
-                $this->view->authorizationTosPp = html_entity_decode($api['authorization_tos_pp']);
-                unset($api['authorization_tos_pp']);
+            if (isset($apiArr['authorization_tos_pp']) && $apiArr['authorization_tos_pp'] !== '') {
+                $this->view->authorizationTosPp = html_entity_decode($apiArr['authorization_tos_pp']);
+                unset($apiArr['authorization_tos_pp']);
             }
 
-            $this->view->api = $api;
+            $this->view->api = $this->removeApiKeysInfo($apiArr);
 
             if (isset($this->getData()['state'])) {
                 $this->view->state = $this->getData()['state'];
@@ -74,20 +74,20 @@ class RegisterComponent extends BaseComponent
 
             $this->view->pick('register/authorization');
 
-            $api = $this->api->checkAuthorizationLinkData($this->request->getQuery());
+            $apiArr = $this->api->checkAuthorizationLinkData($this->request->getQuery());
 
-            if (!$api) {
+            if (!$apiArr) {
                 $this->view->error = $this->api->packagesData->responseMessage;
 
                 return;
             }
 
             $this->view->authorizationTosPp = null;
-            if (isset($api['authorization_tos_pp']) && $api['authorization_tos_pp'] !== '') {
-                unset($api['authorization_tos_pp']);
+            if (isset($apiArr['authorization_tos_pp']) && $apiArr['authorization_tos_pp'] !== '') {
+                unset($apiArr['authorization_tos_pp']);
             }
 
-            $this->view->api = $api;
+            $this->view->api = $this->removeApiKeysInfo($apiArr);
             $this->view->client = $this->api->client;
             $this->view->code = $this->request->getQuery()['code'];
             if ($this->request->getQuery()['state']) {
@@ -103,19 +103,19 @@ class RegisterComponent extends BaseComponent
 
             $this->view->pick('register/authorization');
 
-            $api = $this->api->init(true)->checkAuthorizationLinkData($this->getData());
+            $apiArr = $this->api->init(true)->checkAuthorizationLinkData($this->getData());
 
-            if (!$api) {
+            if (!$apiArr) {
                 $this->view->error = $this->api->packagesData->responseMessage;
 
                 return;
             }
 
-            if (isset($api['authorization_tos_pp']) && $api['authorization_tos_pp'] !== '') {
-                unset($api['authorization_tos_pp']);
+            if (isset($apiArr['authorization_tos_pp']) && $apiArr['authorization_tos_pp'] !== '') {
+                unset($apiArr['authorization_tos_pp']);
             }
 
-            $this->view->api = $api;
+            $this->view->api = $this->removeApiKeysInfo($apiArr);
 
             if (isset($this->getData()['refresh']) && $this->getData()['refresh'] == true) {
                 $this->view->refresh = true;
@@ -124,6 +124,8 @@ class RegisterComponent extends BaseComponent
                 $this->view->newToken = true;
             }
 
+            $this->view->clientId =$this->getData()['client_id'];
+
             return;
         }
 
@@ -131,10 +133,10 @@ class RegisterComponent extends BaseComponent
         $this->view->newToken = false;
 
         if (isset($this->getData()['api'])) {
-            $api = $this->api->getById($this->getData()['api']);
+            $apiArr = $this->api->getById($this->getData()['api']);
 
-            if (!$api ||
-                ($api && ($api['status'] == false || $api && $api['registration_allowed'] == false))
+            if (!$apiArr ||
+                ($apiArr && ($apiArr['status'] == false || $apiArr && $apiArr['registration_allowed'] == false))
             ) {
                 $this->response->setStatusCode(404);
 
@@ -145,7 +147,7 @@ class RegisterComponent extends BaseComponent
 
             $this->view->setLayout('auth');
 
-            $this->view->api = $api;
+            $this->view->api = $this->removeApiKeysInfo($apiArr);
 
             $this->view->pick('register/view');
 
@@ -171,6 +173,15 @@ class RegisterComponent extends BaseComponent
         if ($this->request->isAjax()) {
             $this->view->disable();
         }
+    }
+
+    protected function removeApiKeysInfo($apiArr)
+    {
+        unset($apiArr['private_key_passphrase']);
+        unset($apiArr['private_key']);
+        unset($apiArr['private_key_location']);
+
+        return $apiArr;
     }
 
     public function registerNewAccountAction()
