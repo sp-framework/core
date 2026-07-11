@@ -40,7 +40,7 @@ class Clients extends BasePackage
             $account = $this->basepackages->accounts->checkAccountBy($data['email'], false);
 
             //if account does not exist, we use IpFilter middleware to block them
-            if (!$account) {
+            if (!$account && $viaRegister) {
                 $isAllowed = $this->access->ipFilter->filters->bumpFilterHitCounter(true);
 
                 if (is_object($isAllowed))  {
@@ -53,6 +53,10 @@ class Clients extends BasePackage
                 $this->addResponse('Keys generated & emailed successfully.', 0);
 
                 return true;
+            } else if (!$account) {
+                $this->addResponse('Account with email id does not exist.', 1);
+
+                return false;
             }
 
             if ($api['grant_type'] === 'password' && !$viaRegister) {
@@ -233,6 +237,10 @@ class Clients extends BasePackage
     {
         $api = $this->api->getById($data['api_id']);
 
+        if (!$account) {
+            $account = $this->access->auth->account();
+        }
+
         if ($api) {
             if (isset($data['forceRevoke']) || isset($data['forceRegen'])) {
                 $oldClient = $this->checkClientExists($api, $account);
@@ -255,7 +263,7 @@ class Clients extends BasePackage
             }
 
             try {
-                if ($account || $api['client_keys_generation_allowed'] == true) {
+                if ($account && $api['client_keys_generation_allowed'] == true) {
                     $newClient['api_id'] = $api['id'];
                     $newClient['app_id'] = $api['app_id'];
                     $newClient['domain_id'] = $api['domain_id'];

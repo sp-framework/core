@@ -69,7 +69,7 @@ class ClientsComponent extends BaseComponent
             $conditions,
             ['revoked', 'concurrent_calls_count', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
             true,
-            ['revoked', 'concurrent_calls_count', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
+            ['revoked', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
             null,
             ['api_id' => 'api', 'concurrent_calls_count' => 'Calls Count'],
             $replaceColumns,

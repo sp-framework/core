@@ -72,19 +72,9 @@ class Api extends BasePackage
 
     protected $resource;
 
-    protected $accessTokenRepository;
-
-    protected $authCodeRepository;
-
-    protected $clientRepository;
+    protected $headerAttributes;
 
     protected $refreshTokenRepository;
-
-    protected $scopeRepository;
-
-    protected $userRepository;
-
-    protected $headerAttributes;
 
     public $apiCallsLimitReached = false;
 
@@ -733,19 +723,14 @@ class Api extends BasePackage
 
     protected function initApiServer()
     {
-        $this->accessTokenRepository = new AccessTokenRepository();
-        $this->authCodeRepository = new AuthCodeRepository();
-        $this->clientRepository = new ClientRepository();
-        $this->refreshTokenRepository = new RefreshTokenRepository();
-        $this->scopeRepository = new ScopeRepository();
-        $this->userRepository = new UserRepository();
-
         $this->keys = $this->getAPIKeys();
 
+        $this->refreshTokenRepository = new RefreshTokenRepository();
+
         $this->server = new AuthorizationServer(
-            $this->clientRepository,
-            $this->accessTokenRepository,
-            $this->scopeRepository,
+            new ClientRepository(),
+            new AccessTokenRepository(),
+            new ScopeRepository(),
             new CryptKey($this->keys['private_location'], $this->keys['pki_passphrase']),
             $this->keys['enc']
         );
@@ -753,8 +738,9 @@ class Api extends BasePackage
 
     protected function initPassword()//Password Grant
     {
+
         $grant = new PasswordGrant(
-            $this->userRepository,
+            new UserRepository(),
             $this->refreshTokenRepository
         );
 
@@ -779,7 +765,7 @@ class Api extends BasePackage
     protected function initAuthorization_code()//Authorization Code Grant
     {
         $grant = new AuthCodeGrant(
-             $this->authCodeRepository,
+             new AuthCodeRepository(),
              $this->refreshTokenRepository,
              new \DateInterval('PT10M') // authorization codes will expire after 10 minutes
          );
@@ -879,16 +865,32 @@ class Api extends BasePackage
 
     public function authCheck()
     {
-        $this->accessTokenRepository = new AccessTokenRepository();
+        trace([$this->api]);
+        $data['user'] = $this->request->getBasicAuth()['username'];
+        $data['pass'] = $this->request->getBasicAuth()['password'];
+
+        if (!$this->access->auth->checkAccount($data)) {
+            $isAllowed = $this->access->ipFilter->filters->bumpFilterHitCounter(true);
+
+            if (is_object($isAllowed))  {
+                $this->response->send();
+
+                exit;
+            }
+
+            return false;
+        }
+                //
+        $accessTokenRepository = new AccessTokenRepository();
 
         $this->keys = $this->getAPIKeys();
 
         try {
             $this->resource = new ResourceServer(
-                $this->accessTokenRepository,
+                $accessTokenRepository,
                 new CryptKey($this->keys['public_location'], $this->keys['pki_passphrase']),
                 new BearerTokenValidator(
-                    $this->accessTokenRepository
+                    $accessTokenRepository
                 )
             );
 
@@ -896,7 +898,7 @@ class Api extends BasePackage
 
             $this->headerAttributes = $validateToken->getAttributes();
 
-            if ($this->accessTokenRepository->isTokenExpired($this->headerAttributes['oauth_access_token_id'])) {
+            if ($accessTokenRepository->isTokenExpired($this->headerAttributes['oauth_access_token_id'])) {
                 throw new \Exception('Token Expired!');
             }
 

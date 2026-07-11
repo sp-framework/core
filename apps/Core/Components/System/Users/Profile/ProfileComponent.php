@@ -68,7 +68,9 @@ class ProfileComponent extends BaseComponent
             $passwordApis = [];
             if ($apis && count($apis) > 0) {
                 foreach ($apis as $apiKey => $api) {
-                    if (isset($api['grant_type']) && $api['grant_type'] === 'password') {
+                    if (isset($api['grant_type']) && $api['grant_type'] === 'password' &&
+                        isset($api['client_keys_generation_allowed']) && $api['client_keys_generation_allowed'] == true
+                    ) {
                         $passwordApis[$api['id']] = $api;
                     }
                 }

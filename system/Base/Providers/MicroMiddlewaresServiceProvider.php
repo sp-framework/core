@@ -188,7 +188,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
         }
         $this->data['guestAccess'] =
         [
-            $this->data['appRoute'] . '/register/client',
+            $this->data['appRoute'] . '/register/apiclient',
         ];
 
         if (in_array($this->data['givenRoute'], $this->data['guestAccess'])) {
@@ -300,7 +300,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
                 return false;
             }
 
-            $this->addResponse('API not available or Incorrect client ID or No Authorization Code set.', 404);
+            $this->addResponse('API not available or Incorrect client credentials.', 404);
 
             return false;
         }
@@ -309,7 +309,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
         if (isset($this->data['api']['registration_allowed']) &&
             $this->data['api']['registration_allowed'] == false &&
-            str_contains($url, 'register/client') &&
+            str_contains($url, 'register/apiclient') &&
             isset($this->request->getPost()['grant_type']) &&
             $this->request->getPost()['grant_type'] !== 'refresh_token'
         ) {
