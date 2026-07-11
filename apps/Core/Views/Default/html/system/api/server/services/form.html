@@ -117,10 +117,11 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                                          : { },
         '{{componentId}}-{{sectionId}}-name'                                        : { },
         '{{componentId}}-{{sectionId}}-status'                                      : { },
-        '{{componentId}}-{{sectionId}}-is_public'                                   : {
+        '{{componentId}}-{{sectionId}}-api_type'                                    : {
+            placeholder: "SELECT API TYPE",
             afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-is_public').change(function() {
-                    if ($(this)[0].checked === true) {
+                $('#{{componentId}}-{{sectionId}}-api_type').on('select2:select' , function(e) {
+                    if (e.params.data.id === 'public' || e.params.data.id === 'protected_user_credentials') {
                         $('#{{componentId}}-{{sectionId}}-grant_type').val(0).trigger('change');
                         $('#{{componentId}}-{{sectionId}}-grant_type, ' +
                           '#{{componentId}}-{{sectionId}}-client_keys_generation_allowed, ' +
@@ -332,6 +333,7 @@ dataCollectionSection =
             ignore      : ':submit, :reset, :image, :disabled, .ignore, :hidden',
             rules       : {
                 '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-api_type'                        : 'required',
                 '{{componentId}}-{{sectionId}}-client_id_length'                : 'required',
                 '{{componentId}}-{{sectionId}}-client_secret_length'            : 'required',
                 '{{componentId}}-{{sectionId}}-grant_type'                      : 'required',
@@ -347,6 +349,7 @@ dataCollectionSection =
             },
             messages    : {
                 '{{componentId}}-{{sectionId}}-name'                            : 'Please enter api name',
+                '{{componentId}}-{{sectionId}}-api_type'                        : 'Please select api type',
                 '{{componentId}}-{{sectionId}}-client_id_length'                : 'Enter client ID length',
                 '{{componentId}}-{{sectionId}}-client_secret_length'            : 'Enter client Secret Length',
                 '{{componentId}}-{{sectionId}}-grant_type'                      : 'Select Grant Type',
@@ -362,6 +365,7 @@ dataCollectionSection =
             }
         }
     });
+
 function generateClientId(force = false) {
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();

@@ -117,7 +117,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
             }
 
             if ($middleware['enabled'] == true) {
-                if ($middleware['name'] === 'Auth' && $this->data['api']['is_public'] == true) {
+                if ($middleware['name'] === 'Auth' && $this->data['api']['api_type'] === 'public') {
                     continue;
                 }
 
@@ -128,7 +128,10 @@ class MicroMiddlewaresServiceProvider extends Injectable
                         $this->logger->logExceptions->critical(json_trace($e));
                     }
 
-                    if (str_contains(strtolower($e->getMessage()), 'denied') || str_contains(strtolower($e->getMessage()), 'expired')) {
+                    if (str_contains(strtolower($e->getMessage()), 'denied') ||
+                        str_contains(strtolower($e->getMessage()), 'expired') ||
+                        str_contains(strtolower($e->getMessage()), 'incorrect')
+                    ) {
                         return 'auth';
                     }
 
@@ -160,13 +163,13 @@ class MicroMiddlewaresServiceProvider extends Injectable
         if (isset($this->data['domain']['exclusive_for_api']) &&
             $this->data['domain']['exclusive_for_api'] == 1
         ) {
-            if ($this->data['api']['is_public'] == true) {
+            if ($this->data['api']['api_type'] === 'public') {
                 $this->data['appRoute'] = '/pub';
             } else {
                 $this->data['appRoute'] = '';
             }
         } else {
-            if ($this->data['api']['is_public'] == true) {
+            if ($this->data['api']['api_type'] === 'public') {
                 $this->data['appRoute'] = '/api/pub';
             } else {
                 $this->data['appRoute'] = '/api';
@@ -194,7 +197,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
         if (in_array($this->data['givenRoute'], $this->data['guestAccess'])) {
             return true;
         } else if ($middleware['name'] === 'Auth' &&
-                   $this->data['api']['is_public'] == false &&
+                   $this->data['api']['api_type'] !== 'public' &&
                    !$this->componentsNeedsAuth()
         ) {
             return true;

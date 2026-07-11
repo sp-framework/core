@@ -22,6 +22,8 @@ class ServicesComponent extends BaseComponent
     public function viewAction()
     {
         $this->view->availableAPIScopes = $this->api->getAPIAvailableScopes();
+        $this->view->availableAPITypes = $this->api->getAPIAvailableTypes();
+        $this->view->availableAPIGrantTypes = $this->api->getAvailableAPIGrantTypes();
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
@@ -65,7 +67,6 @@ class ServicesComponent extends BaseComponent
             $this->view->api = $api;
             $this->view->apps = $this->apps->apps;
             $this->view->domains = $this->domains->domains;
-            $this->view->availableAPIGrantTypes = $this->api->getAvailableAPIGrantTypes();
             $this->view->availableOpensslKeyBits = $this->api->getOpensslKeyBits();
             $this->view->availableOpensslAlgorithms = $this->api->getOpensslAlgorithms();
             $this->view->apiKeysParams = $this->api->getAPIKeysParams($this->getData()['id']);
@@ -115,9 +116,9 @@ class ServicesComponent extends BaseComponent
             $this->api,
             'system/api/server/services/view',
             $conditions,
-            ['name', 'status', 'is_public', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
+            ['name', 'status', 'api_type', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
             true,
-            ['name', 'status', 'is_public', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
+            ['name', 'status', 'api_type', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
             $controlActions,
             ['app_id' => 'app', 'domain_id' => 'domain', 'scope_id' => 'scope', 'account_id' => 'Account'],
             $replaceColumns,
@@ -140,11 +141,14 @@ class ServicesComponent extends BaseComponent
             } else if ($data['status'] == '1') {
                 $data['status'] = '<span class="badge badge-success text-uppercase">Yes</span>';
             }
-            if ($data['is_public'] == '0') {
-                $data['is_public'] = '<span class="badge badge-secondary text-uppercase">No</span>';
-            } else if ($data['is_public'] == '1') {
-                $data['is_public'] = '<span class="badge badge-warning text-uppercase">Yes</span>';
+            if ($data['api_type'] === 'public' || $data['api_type'] === 'protected_user_credentials') {
                 $data['grant_type'] = '-';
+            }
+
+            $data['api_type'] = $this->view->availableAPITypes[$data['api_type']]['name'];
+
+            if ($data['grant_type'] !== '-') {
+                $data['grant_type'] = $this->view->availableAPIGrantTypes[$data['grant_type']]['name'];
             }
             $app = $this->apps->getById($data['app_id']);
             if ($app) {

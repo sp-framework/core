@@ -29,9 +29,10 @@ class Api
                     ]
                 ),
                 new Column(
-                    'is_public',
+                    'api_type',
                     [
-                        'type'          => Column::TYPE_BOOLEAN,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
                         'notNull'       => true,
                     ]
                 ),
@@ -247,6 +248,7 @@ class Api
                 new Index(
                     'column_UNIQUE',
                     [
+                        'api_type',
                         'app_id',
                         'domain_id',
                         'grant_type',

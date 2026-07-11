@@ -7,7 +7,7 @@
     {% set apiId = api['id'] %}
     {% set apiName = api['name'] %}
     {% set apiStatus = api['status'] %}
-    {% set apiIsPublic = api['is_public'] %}
+    {% set apiType = api['api_type'] %}
     {% set apiClientKeysGenerationAllowed = api['client_keys_generation_allowed'] %}
     {% set apiRegistrationAllowed = api['registration_allowed'] %}
     {% set apiDescription = api['description'] %}
@@ -34,7 +34,7 @@
     {% set apiId = '' %}
     {% set apiName = '' %}
     {% set apiStatus = '' %}
-    {% set apiIsPublic = '' %}
+    {% set apiType = '' %}
     {% set apiClientKeysGenerationAllowed = '' %}
     {% set apiRegistrationAllowed = '' %}
     {% set apiDescription = '' %}
@@ -81,7 +81,7 @@
 {% if apiRegistrationAllowed == '1' %}
     {% set apiRegistrationAllowedChecked = true %}
 {% endif %}
-{% if apiIsPublic == '1' %}
+{% if apiType == 'public' or apiType == 'protected_user_credentials' %}
     {% set apiIsPublicChecked = true %}
     {% set apiClientKeysGenerationAllowedChecked = false %}
     {% set apiClientKeysGenerationAllowedDisabled = true %}
@@ -156,22 +156,25 @@
     <div class="col">
         {{adminltetags.useTag('fields',
             [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'is_public',
-                'fieldLabel'                     : 'Is Public API?',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Check if api is public api.',
-                'fieldType'                      : 'checkbox',
-                'fieldCheckboxType'              : 'success',
-                'fieldCheckboxChecked'           : apiIsPublicChecked,
-                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'api_type',
+                'fieldLabel'                            : 'API Type',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select API type.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : availableAPITypes,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : apiType
             ]
         )}}
     </div>

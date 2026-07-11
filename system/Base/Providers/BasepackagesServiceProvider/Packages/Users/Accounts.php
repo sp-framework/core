@@ -1096,9 +1096,17 @@ class Accounts extends BasePackage
         if ($this->app) {
             $account = $this->checkAccountBy($username, $getSecurity);
 
-            if ($this->app['acceptable_usernames'] && $this->app['acceptable_usernames'] !== '') {
+            if (!$account &&
+                $this->app['acceptable_usernames'] && $this->app['acceptable_usernames'] !== ''
+            ) {
                 if (is_string($this->app['acceptable_usernames'])) {
                     $this->app['acceptable_usernames'] = $this->helper->decode($this->app['acceptable_usernames'], true);
+                }
+
+                if (count($this->app['acceptable_usernames']) === 0) {
+                    $this->logger->log->debug('App does not have any acceptable usernames set');
+
+                    return false;
                 }
 
                 foreach ($this->app['acceptable_usernames'] as $acceptableUsername) {
