@@ -1,24 +1,30 @@
 {
-    "name"          : "ReposGitea",
-    "display_name"  : "Gitea repositories API",
-    "description"   : "Package for connecting to Repository Gitea using API",
-    "module_type"   : "packages",
-    "app_type"      : "core",
-    "category"      : "basepackagesApis",
-    "version"       : "0.0.0",
-    "repo"          : "https://.../",
-    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\Repos\\Gitea\\ApisReposGitea",
-    "dependencies"  : {
-        "core"          : {
-            "name"      : "Core",
-            "version"   : "0.0.0",
-            "repo"      : "https://.../"
-        },
-        "components"    : [],
-        "packages"      : [],
-        "middlewares"   : [],
-        "views"         : [],
-        "external"      : []
-    },
-    "settings"      : {"componentRoute":"system/api/clients/services"}
+	"name" : "ReposGitea",
+	"display_name" : "Gitea repositories API",
+	"description" : "Package for connecting to Repository Gitea using API",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "basepackagesApis",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\Repos\\Gitea\\ReposGitea",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : [],
+		"externals" : []
+	},
+	"settings" : 
+	{
+		"componentRoute" : "system/api/clients/services"
+	}
 }
