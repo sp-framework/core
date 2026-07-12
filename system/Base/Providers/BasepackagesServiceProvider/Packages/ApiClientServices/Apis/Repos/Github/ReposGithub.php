@@ -1,10 +1,10 @@
 <?php
 
-namespace System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Gitea;
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Repos;
 
-class ApisReposGitea extends Repos
+class ReposGithub extends Repos
 {
     public function init($apiConfig = null, $api = null, $httpOptions = null, $monitorProgress = null)
     {
@@ -12,7 +12,7 @@ class ApisReposGitea extends Repos
             $apiConfig['category'] = 'Repos';
         }
         if (!isset($apiConfig['provider'])) {
-            $apiConfig['provider'] = 'Gitea';
+            $apiConfig['provider'] = 'Github';
         }
 
         parent::init($apiConfig, $api, $httpOptions, $monitorProgress);
