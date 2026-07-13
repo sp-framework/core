@@ -370,7 +370,7 @@ class MurlsApi
         }
 
 
-        $resourcePath = '/system/tools/murls';
+        $resourcePath = '/system/tools/murls/update';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
