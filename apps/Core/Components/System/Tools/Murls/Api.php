@@ -34,6 +34,13 @@ class Api extends BaseApi
                 content: new OA\JsonContent(
                     ref: BaseApi::class
                 )
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'permission denied',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
             )
         ]
     ),
@@ -60,6 +67,20 @@ class Api extends BaseApi
             new OA\Response(
                 response: 200,
                 description: 'successful operation',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'permission denied',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'not found',
                 content: new OA\JsonContent(
                     ref: BaseApi::class
                 )

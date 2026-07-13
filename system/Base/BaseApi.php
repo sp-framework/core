@@ -18,7 +18,7 @@ abstract class BaseApi extends Controller
     #[OA\Property(title: 'responseMessage', description: 'Response Message')]
     private string $responseMessage;
 
-    #[OA\Property(title: 'responseData', description: 'Response Data')]
+    #[OA\Property(title: 'responseData', description: 'Response Data', nullable: true)]
     private object $responseData;
 
     protected $getQueryArr = [];
