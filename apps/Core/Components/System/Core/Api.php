@@ -30,12 +30,7 @@ class Api extends BaseApi
             new OA\Response(
                 response: 200,
                 description: 'successful operation',
-                content: new OA\JsonContent(
-                    additionalProperties: new OA\AdditionalProperties(
-                        type: 'integer',
-                        format: 'int32'
-                    )
-                )
+                content: new OA\JsonContent()
             )
         ]
     )]
