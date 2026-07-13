@@ -16,9 +16,6 @@
     {% set apiLocation = api['location'] %}
     {% set apiDescription = api['description'] %}
     {% set apiApiUrl = api['api_url'] %}
-    {% set apiOrgUser = api['org_user'] %}
-    {% set apiRepoUrl = api['repo_url'] %}
-    {% set apiBranch = api['branch'] %}
     {% set apiAuthType = api['auth_type'] %}
     {% set apiUsername = api['username'] %}
     {% set apiPassword = api['password'] %}
@@ -40,9 +37,6 @@
     {% endif %}
     {% set apiDescription = '' %}
     {% set apiApiUrl = '' %}
-    {% set apiOrgUser = '' %}
-    {% set apiRepoUrl = '' %}
-    {% set apiBranch = '' %}
     {% set apiAuthType = 'none' %}
     {% set apiUsername = '' %}
     {% set apiPassword = '' %}
@@ -89,74 +83,6 @@
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 1024,
                         'fieldValue'                     : apiApiUrl
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'org_user',
-                        'fieldLabel'                     : 'Org/User',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Org/User name. Note: For modules, ',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 1024,
-                        'fieldValue'                     : apiOrgUser
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'repo_url',
-                        'fieldLabel'                     : 'Org/User/Repo Url',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Org/User/Repo Url',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 1024,
-                        'fieldValue'                     : apiRepoUrl
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'branch',
-                        'fieldLabel'                     : 'Repo Branch',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Repo Branch',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 1024,
-                        'fieldValue'                     : apiBranch
                     ]
                 )}}
             </div>
@@ -355,9 +281,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-used_by'                             : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },
         '{{componentId}}-{{sectionId}}-api_url'                             : { },
-        '{{componentId}}-{{sectionId}}-org_user'                            : { },
-        '{{componentId}}-{{sectionId}}-repo_url'                            : { },
-        '{{componentId}}-{{sectionId}}-branch'                              : { },
         '{{componentId}}-{{sectionId}}-auth_type'                           : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-auth_type').click(function() {
@@ -386,9 +309,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-category'                    : 'required',
                 '{{componentId}}-{{sectionId}}-location'                    : 'required',
                 '{{componentId}}-{{sectionId}}-api_url'                     : 'required',
-                '{{componentId}}-{{sectionId}}-org_user'                    : 'required',
-                '{{componentId}}-{{sectionId}}-repo_url'                    : 'required',
-                '{{componentId}}-{{sectionId}}-branch'                      : 'required',
                 '{{componentId}}-{{sectionId}}-username'                    : 'required',
                 '{{componentId}}-{{sectionId}}-password'                    : 'required',
                 '{{componentId}}-{{sectionId}}-access_token'                : 'required',
@@ -399,9 +319,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-category'                    : 'Please enter api category',
                 '{{componentId}}-{{sectionId}}-location'                    : 'Please enter api location',
                 '{{componentId}}-{{sectionId}}-api_url'                     : 'Please enter repo url',
-                '{{componentId}}-{{sectionId}}-org_user'                    : 'Please enter org name or username',
-                '{{componentId}}-{{sectionId}}-repo_url'                    : 'Please enter repo url',
-                '{{componentId}}-{{sectionId}}-branch'                      : 'Please enter branch (main/dev)',
                 '{{componentId}}-{{sectionId}}-username'                    : 'Please enter username',
                 '{{componentId}}-{{sectionId}}-password'                    : 'Please enter password',
                 '{{componentId}}-{{sectionId}}-access_token'                : 'Please enter api access token',
