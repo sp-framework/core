@@ -1509,7 +1509,8 @@ class Api extends BasePackage
             try {
                 $src =
                     [
-                        base_path('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/Install.php')
+                        base_path('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/Install.php'),
+                        base_path('system/Base/BaseApi.php')
                     ];
 
                 $componentsDir = $this->basepackages->utils->scanDir('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Components/');
@@ -1517,7 +1518,7 @@ class Api extends BasePackage
                 if (count($componentsDir['files']) > 0) {
                     foreach ($componentsDir['files'] as $files) {
                         if (str_ends_with($files, 'Api.php')) {
-                            array_push($src, $files);
+                            array_push($src, base_path($files));
                         }
                     }
                 }
@@ -1533,7 +1534,7 @@ class Api extends BasePackage
                         }
 
                         if (str_contains($files, '/Model/')) {
-                            array_push($modelFiles, $files);
+                            array_push($modelFiles, base_path($files));
                         }
                     }
 

@@ -7,9 +7,20 @@
 namespace System\Base;
 
 use Phalcon\Mvc\Controller;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(schema: 'ApiResponse', title: 'Api response', description: 'Api response')]
 abstract class BaseApi extends Controller
 {
+    #[OA\Property(title: 'Code', description: 'Code', format: 'int32')]
+    private int $code;
+
+    #[OA\Property(title: 'Type', description: 'Type')]
+    private int $type;
+
+    #[OA\Property(title: 'message', description: 'Message')]
+    private int $message;
+
     protected $getQueryArr = [];
 
     protected $apiResponse = [];
