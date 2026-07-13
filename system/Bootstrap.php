@@ -84,6 +84,7 @@ final class Bootstrap
 
         $this->response = $container->getShared('response');
         $this->logger = $container->getShared('logger');
+        $helper = $container->getShared('helper');
 
         if ($this->isApi) {
             $application = new Micro($container);
@@ -99,17 +100,13 @@ final class Bootstrap
 
             $application->setEventsManager($events);
 
-            $helper = $container->getShared('helper');
-
-            $response = $application->handle($helper->reduceSlashes($_SERVER["REQUEST_URI"]));
+            $application->handle($helper->reduceSlashes($_SERVER["REQUEST_URI"]));
 
             $this->logger->commit();
         } else {
             $this->error = $container->getShared('error');
 
             $application = new Application($container);
-
-            $helper = $container->getShared('helper');
 
             $response = $application->handle($helper->reduceSlashes($_SERVER["REQUEST_URI"]));
 

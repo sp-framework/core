@@ -267,10 +267,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
     {
         $this->apiResponse['responseMessage'] = $responseMessage;
         $this->apiResponse['responseCode'] = $responseCode;
-
-        if ($responseData) {
-            $this->apiResponse['responseData'] = $responseData;
-        }
+        $this->apiResponse['responseData'] = $responseData;
 
         $this->sendJson($responseCode);
     }

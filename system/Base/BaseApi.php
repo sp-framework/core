@@ -101,15 +101,25 @@ abstract class BaseApi extends Controller
     {
         $this->apiResponse['responseMessage'] = $responseMessage;
         $this->apiResponse['responseCode'] = $responseCode;
-        if ($responseData !== null) {
-            $this->apiResponse['responseData'] = $responseData;
-        }
+        $this->apiResponse['responseData'] = $responseData;
 
-        return $this->sendJson();
+        return $this->sendJson($responseCode);
     }
 
-    protected function sendJson()
+    protected function setHeader($responseCode = 200)
     {
+        $this->response->setContentType('application/json', 'UTF-8');
+        $this->response->setHeader('Cache-Control', 'no-store');
+
+        if ($responseCode !== 0 || $responseCode !== 1) {
+            $this->response->setStatusCode($responseCode);
+        }
+    }
+
+    protected function sendJson($responseCode)
+    {
+        $this->setHeader($responseCode);
+
         $this->response->setContentType('application/json', 'UTF-8');
         $this->response->setHeader('Cache-Control', 'no-store');
 
