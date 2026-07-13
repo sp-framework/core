@@ -85,7 +85,7 @@ class ApiResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     protected static array $openAPINullables = [
         'response_code' => false,
         'response_message' => false,
-        'response_data' => false
+        'response_data' => true
     ];
 
     /**
@@ -379,7 +379,14 @@ class ApiResponse implements ModelInterface, ArrayAccess, \JsonSerializable
     public function setResponseData($response_data)
     {
         if (is_null($response_data)) {
-            throw new \InvalidArgumentException('non-nullable response_data cannot be null');
+            array_push($this->openAPINullablesSetToNull, 'response_data');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('response_data', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
         }
         $this->container['response_data'] = $response_data;
 

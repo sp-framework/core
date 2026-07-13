@@ -96,19 +96,17 @@ class Api extends BaseApi
                 $murls = $this->murls->getById($this->getData()['id']);
 
                 if (!$murls) {
-                    return $this->throwIdNotFound();
+                    return $this->addResponse('Id ' . $this->getData()['id'] . ' not found!', 404);
                 }
             }
 
-            $this->addResponse('Ok', 0, $murls ??[]);
-
-            return;
+            return $this->addResponse('Ok', 0, $murls ?? []);
         }
 
         //Get All Murls
         $data = $this->getRows($this->murls);
 
-        $this->addResponse('Ok', 0, $data ?? []);
+        return $this->addResponse('Ok', 0, $data ?? []);
     }
 
     /**

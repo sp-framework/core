@@ -43,6 +43,6 @@ class Api extends BaseApi
         unset($data['id']);
 
         //Get Core information
-        $this->addResponse('Ok', 0, $data ?? []);
+        return $this->addResponse('Ok', 0, $data ?? []);
     }
 }
