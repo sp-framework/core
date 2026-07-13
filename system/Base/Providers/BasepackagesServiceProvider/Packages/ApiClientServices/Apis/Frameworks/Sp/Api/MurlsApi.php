@@ -1,6 +1,6 @@
 <?php
 /**
- * CoreApi
+ * MurlsApi
  * PHP version 8.1
  *
  * @category Class
@@ -44,14 +44,14 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\ObjectSerializer;
 
 /**
- * CoreApi Class Doc Comment
+ * MurlsApi Class Doc Comment
  *
  * @category Class
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech
  */
-class CoreApi
+class MurlsApi
 {
     /**
      * @var ClientInterface
@@ -75,7 +75,10 @@ class CoreApi
 
     /** @var string[] $contentTypes **/
     public const contentTypes = [
-        'viewCore' => [
+        'viewMurlById' => [
+            'application/json',
+        ],
+        'viewMurls' => [
             'application/json',
         ],
     ];
@@ -127,36 +130,38 @@ class CoreApi
     }
 
     /**
-     * Operation viewCore
+     * Operation viewMurlById
      *
-     * Returns Core Information
+     * Returns Murl Information
      *
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewCore'] to see the possible values for this operation
+     * @param  int $murl_id ID of murl that needs to be fetched (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurlById'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
      * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse
      */
-    public function viewCore(string $contentType = self::contentTypes['viewCore'][0])
+    public function viewMurlById($murl_id, string $contentType = self::contentTypes['viewMurlById'][0])
     {
-        list($response) = $this->viewCoreWithHttpInfo($contentType);
+        list($response) = $this->viewMurlByIdWithHttpInfo($murl_id, $contentType);
         return $response;
     }
 
     /**
-     * Operation viewCoreWithHttpInfo
+     * Operation viewMurlByIdWithHttpInfo
      *
-     * Returns Core Information
+     * Returns Murl Information
      *
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewCore'] to see the possible values for this operation
+     * @param  int $murl_id ID of murl that needs to be fetched (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurlById'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
      * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse, HTTP status code, HTTP response headers (array of strings)
      */
-    public function viewCoreWithHttpInfo(string $contentType = self::contentTypes['viewCore'][0])
+    public function viewMurlByIdWithHttpInfo($murl_id, string $contentType = self::contentTypes['viewMurlById'][0])
     {
-        $request = $this->viewCoreRequest($contentType);
+        $request = $this->viewMurlByIdRequest($murl_id, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -228,18 +233,19 @@ class CoreApi
     }
 
     /**
-     * Operation viewCoreAsync
+     * Operation viewMurlByIdAsync
      *
-     * Returns Core Information
+     * Returns Murl Information
      *
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewCore'] to see the possible values for this operation
+     * @param  int $murl_id ID of murl that needs to be fetched (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurlById'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function viewCoreAsync(string $contentType = self::contentTypes['viewCore'][0])
+    public function viewMurlByIdAsync($murl_id, string $contentType = self::contentTypes['viewMurlById'][0])
     {
-        return $this->viewCoreAsyncWithHttpInfo($contentType)
+        return $this->viewMurlByIdAsyncWithHttpInfo($murl_id, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -248,19 +254,20 @@ class CoreApi
     }
 
     /**
-     * Operation viewCoreAsyncWithHttpInfo
+     * Operation viewMurlByIdAsyncWithHttpInfo
      *
-     * Returns Core Information
+     * Returns Murl Information
      *
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewCore'] to see the possible values for this operation
+     * @param  int $murl_id ID of murl that needs to be fetched (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurlById'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function viewCoreAsyncWithHttpInfo(string $contentType = self::contentTypes['viewCore'][0])
+    public function viewMurlByIdAsyncWithHttpInfo($murl_id, string $contentType = self::contentTypes['viewMurlById'][0])
     {
         $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse';
-        $request = $this->viewCoreRequest($contentType);
+        $request = $this->viewMurlByIdRequest($murl_id, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -299,18 +306,285 @@ class CoreApi
     }
 
     /**
-     * Create request for operation 'viewCore'
+     * Create request for operation 'viewMurlById'
      *
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewCore'] to see the possible values for this operation
+     * @param  int $murl_id ID of murl that needs to be fetched (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurlById'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function viewCoreRequest(string $contentType = self::contentTypes['viewCore'][0])
+    public function viewMurlByIdRequest($murl_id, string $contentType = self::contentTypes['viewMurlById'][0])
+    {
+
+        // verify the required parameter 'murl_id' is set
+        if ($murl_id === null || (is_array($murl_id) && count($murl_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $murl_id when calling viewMurlById'
+            );
+        }
+        if ($murl_id < 1) {
+            throw new \InvalidArgumentException('invalid value for "$murl_id" when calling MurlsApi.viewMurlById, must be bigger than or equal to 1.');
+        }
+        
+
+        $resourcePath = '/system/tools/murls/q/id/{murlId}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($murl_id !== null) {
+            $resourcePath = str_replace(
+                '{murlId}',
+                ObjectSerializer::toPathValue($murl_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation viewMurls
+     *
+     * Returns All Murls Information
+     *
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurls'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse
+     */
+    public function viewMurls(string $contentType = self::contentTypes['viewMurls'][0])
+    {
+        list($response) = $this->viewMurlsWithHttpInfo($contentType);
+        return $response;
+    }
+
+    /**
+     * Operation viewMurlsWithHttpInfo
+     *
+     * Returns All Murls Information
+     *
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurls'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function viewMurlsWithHttpInfo(string $contentType = self::contentTypes['viewMurls'][0])
+    {
+        $request = $this->viewMurlsRequest($contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+
+            switch($statusCode) {
+                case 200:
+                    return $this->handleResponseWithDataType(
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse',
+                        $request,
+                        $response,
+                    );
+            }
+
+            
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return $this->handleResponseWithDataType(
+                '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse',
+                $request,
+                $response,
+            );
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+            }
+        
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation viewMurlsAsync
+     *
+     * Returns All Murls Information
+     *
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurls'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function viewMurlsAsync(string $contentType = self::contentTypes['viewMurls'][0])
+    {
+        return $this->viewMurlsAsyncWithHttpInfo($contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation viewMurlsAsyncWithHttpInfo
+     *
+     * Returns All Murls Information
+     *
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurls'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function viewMurlsAsyncWithHttpInfo(string $contentType = self::contentTypes['viewMurls'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse';
+        $request = $this->viewMurlsRequest($contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'viewMurls'
+     *
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurls'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function viewMurlsRequest(string $contentType = self::contentTypes['viewMurls'][0])
     {
 
 
-        $resourcePath = '/system/core';
+        $resourcePath = '/system/tools/murls';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];

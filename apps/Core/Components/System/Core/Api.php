@@ -22,7 +22,7 @@ class Api extends BaseApi
      */
     #[OA\Get(
         path: '/system/core',
-        operationId: 'coreViewAction',
+        operationId: 'viewCore',
         description: 'Returns Core Information',
         summary: 'Returns Core Information',
         tags: ['core'],
@@ -43,6 +43,6 @@ class Api extends BaseApi
         unset($data['id']);
 
         //Get Core information
-        $this->addResponse('Ok', 0, ['data' => $data ?? []]);
+        $this->addResponse('Ok', 0, $data ?? []);
     }
 }
