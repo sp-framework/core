@@ -59,9 +59,9 @@ class ApiResponse implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $openAPITypes = [
-        'code' => 'int',
-        'type' => 'int',
-        'message' => 'int'
+        'response_code' => 'int',
+        'response_message' => 'string',
+        'response_data' => 'object'
     ];
 
     /**
@@ -72,9 +72,9 @@ class ApiResponse implements ModelInterface, ArrayAccess, \JsonSerializable
      * @psalm-var array<string, string|null>
      */
     protected static $openAPIFormats = [
-        'code' => 'int32',
-        'type' => null,
-        'message' => null
+        'response_code' => 'int32',
+        'response_message' => null,
+        'response_data' => null
     ];
 
     /**
@@ -83,9 +83,9 @@ class ApiResponse implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var boolean[]
      */
     protected static array $openAPINullables = [
-        'code' => false,
-        'type' => false,
-        'message' => false
+        'response_code' => false,
+        'response_message' => false,
+        'response_data' => false
     ];
 
     /**
@@ -174,9 +174,9 @@ class ApiResponse implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $attributeMap = [
-        'code' => 'code',
-        'type' => 'type',
-        'message' => 'message'
+        'response_code' => 'responseCode',
+        'response_message' => 'responseMessage',
+        'response_data' => 'responseData'
     ];
 
     /**
@@ -185,9 +185,9 @@ class ApiResponse implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $setters = [
-        'code' => 'setCode',
-        'type' => 'setType',
-        'message' => 'setMessage'
+        'response_code' => 'setResponseCode',
+        'response_message' => 'setResponseMessage',
+        'response_data' => 'setResponseData'
     ];
 
     /**
@@ -196,9 +196,9 @@ class ApiResponse implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $getters = [
-        'code' => 'getCode',
-        'type' => 'getType',
-        'message' => 'getMessage'
+        'response_code' => 'getResponseCode',
+        'response_message' => 'getResponseMessage',
+        'response_data' => 'getResponseData'
     ];
 
     /**
@@ -258,9 +258,9 @@ class ApiResponse implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     public function __construct(?array $data = null)
     {
-        $this->setIfExists('code', $data ?? [], null);
-        $this->setIfExists('type', $data ?? [], null);
-        $this->setIfExists('message', $data ?? [], null);
+        $this->setIfExists('response_code', $data ?? [], null);
+        $this->setIfExists('response_message', $data ?? [], null);
+        $this->setIfExists('response_data', $data ?? [], null);
     }
 
     /**
@@ -306,82 +306,82 @@ class ApiResponse implements ModelInterface, ArrayAccess, \JsonSerializable
 
 
     /**
-     * Gets code
+     * Gets response_code
      *
      * @return int|null
      */
-    public function getCode()
+    public function getResponseCode()
     {
-        return $this->container['code'];
+        return $this->container['response_code'];
     }
 
     /**
-     * Sets code
+     * Sets response_code
      *
-     * @param int|null $code Code
+     * @param int|null $response_code Response Code
      *
      * @return self
      */
-    public function setCode($code)
+    public function setResponseCode($response_code)
     {
-        if (is_null($code)) {
-            throw new \InvalidArgumentException('non-nullable code cannot be null');
+        if (is_null($response_code)) {
+            throw new \InvalidArgumentException('non-nullable response_code cannot be null');
         }
-        $this->container['code'] = $code;
+        $this->container['response_code'] = $response_code;
 
         return $this;
     }
 
     /**
-     * Gets type
+     * Gets response_message
      *
-     * @return int|null
+     * @return string|null
      */
-    public function getType()
+    public function getResponseMessage()
     {
-        return $this->container['type'];
+        return $this->container['response_message'];
     }
 
     /**
-     * Sets type
+     * Sets response_message
      *
-     * @param int|null $type Type
+     * @param string|null $response_message Response Message
      *
      * @return self
      */
-    public function setType($type)
+    public function setResponseMessage($response_message)
     {
-        if (is_null($type)) {
-            throw new \InvalidArgumentException('non-nullable type cannot be null');
+        if (is_null($response_message)) {
+            throw new \InvalidArgumentException('non-nullable response_message cannot be null');
         }
-        $this->container['type'] = $type;
+        $this->container['response_message'] = $response_message;
 
         return $this;
     }
 
     /**
-     * Gets message
+     * Gets response_data
      *
-     * @return int|null
+     * @return object|null
      */
-    public function getMessage()
+    public function getResponseData()
     {
-        return $this->container['message'];
+        return $this->container['response_data'];
     }
 
     /**
-     * Sets message
+     * Sets response_data
      *
-     * @param int|null $message Message
+     * @param object|null $response_data Response Data
      *
      * @return self
      */
-    public function setMessage($message)
+    public function setResponseData($response_data)
     {
-        if (is_null($message)) {
-            throw new \InvalidArgumentException('non-nullable message cannot be null');
+        if (is_null($response_data)) {
+            throw new \InvalidArgumentException('non-nullable response_data cannot be null');
         }
-        $this->container['message'] = $message;
+        $this->container['response_data'] = $response_data;
 
         return $this;
     }

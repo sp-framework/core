@@ -94,7 +94,7 @@ class Configuration
      *
      * @var string
      */
-    protected $host = 'https://api.sp.oyeaussie.dev/sandbox';
+    protected $host = 'https://api.sp.local/sandbox';
 
     /**
      * User agent of the HTTP request, set to "OpenAPI-Generator/{version}/PHP" by default
@@ -530,11 +530,11 @@ class Configuration
     {
         return [
             [
-                "url" => "https://api.sp.oyeaussie.dev/sandbox",
+                "url" => "https://api.sp.local/sandbox",
                 "description" => "SP Framework API (Sandbox)",
             ],
             [
-                "url" => "https://api.sp.oyeaussie.dev",
+                "url" => "https://api.sp.local/pub",
                 "description" => "SP Framework API (Production)",
             ]
         ];
