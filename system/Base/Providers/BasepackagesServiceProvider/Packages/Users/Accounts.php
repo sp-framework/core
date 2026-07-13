@@ -1544,10 +1544,12 @@ class Accounts extends BasePackage
 
                 foreach ($componentsArr as $key => $component) {
                     $reflector = $this->annotations->get($component['class']);
+
                     $methods = $reflector->getMethodsAnnotations();
 
-                    if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                    if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                         $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
+
                         $components[strtolower($app['id'])]['childs'][$key]['title'] = strtoupper($component['name']);
                     }
                 }
@@ -1582,6 +1584,7 @@ class Accounts extends BasePackage
 
                 if ($account['security']['permissions'] && $account['security']['permissions'] !== '') {
                     $permissionsArr = $account['security']['permissions'];
+
                     if (is_string($permissionsArr)) {
                         $permissionsArr = $this->helper->decode($permissionsArr, true);
                     }
@@ -1597,18 +1600,22 @@ class Accounts extends BasePackage
                     foreach ($componentsArr as $key => $component) {
                         if ($component['class'] && $component['class'] !== '') {
                             $reflector = $this->annotations->get($component['class']);
+
                             $methods = $reflector->getMethodsAnnotations();
 
-                            if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                            if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                                 foreach ($methods as $annotation) {
                                     if ($annotation->getAll('acl')) {
                                         $action = $annotation->getAll('acl')[0]->getArguments();
+
                                         if (isset($account['security']['role_id']) && $account['security']['role_id'] != 1 &&
                                             ($action['name'] === 'msview' || $action['name'] === 'msupdate')
                                         ) {
                                             continue;
                                         }
+
                                         $acls[$action['name']] = $action['name'];
+
                                         if (isset($permissionsArr[$app['id']][$component['id']])) {
                                             $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
                                         } else {
@@ -1624,6 +1631,7 @@ class Accounts extends BasePackage
                 $this->packagesData->acls = $this->helper->encode($acls);
 
                 $account['security']['permissions'] = $this->helper->encode($permissions);
+
                 $account['profile'] = $this->basepackages->profiles->getProfile($account['id']);
 
                 $this->packagesData->account = $account;
@@ -1646,13 +1654,16 @@ class Accounts extends BasePackage
                     //Build ACL Columns
                     if ($component['class'] && $component['class'] !== '') {
                         $reflector = $this->annotations->get($component['class']);
+
                         $methods = $reflector->getMethodsAnnotations();
 
-                        if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                        if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                             foreach ($methods as $annotation) {
                                 if ($annotation->getAll('acl')) {
                                     $action = $annotation->getAll('acl')[0]->getArguments();
+
                                     $acls[$action['name']] = $action['name'];
+
                                     $permissions[$app['id']][$component['id']][$action['name']] = 0;
                                 }
                             }
@@ -1662,7 +1673,9 @@ class Accounts extends BasePackage
             }
 
             $this->packagesData->acls = $this->helper->encode($acls);
+
             $account['security']['permissions'] = $this->helper->encode($permissions);
+
             $this->packagesData->account = $account;
         }
 

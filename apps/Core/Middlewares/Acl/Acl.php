@@ -312,16 +312,18 @@ class Acl extends BaseMiddleware
                 $reflector = $this->annotations->get($component['class']);
                 $methods = $reflector->getMethodsAnnotations();
 
-                if ($methods && count($methods) > 2) {
-                    if (isset($methods['viewAction'])) {
-                        $this->components[$component['id']]['name'] = strtolower($component['name']);
-                        $this->components[$component['id']]['route'] = strtolower($component['route']);
-                        $this->components[$component['id']]['description'] = $component['description'];
-                        foreach ($methods as $annotation) {
-                            if ($annotation->getAll('acl')) {
-                                $action = $annotation->getAll('acl')[0]->getArguments();
-                                $this->components[$component['id']]['acls'][$action['name']] = $action['name'];
-                            }
+                if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
+                    $this->components[$component['id']]['name'] = strtolower($component['name']);
+
+                    $this->components[$component['id']]['route'] = strtolower($component['route']);
+
+                    $this->components[$component['id']]['description'] = $component['description'];
+
+                    foreach ($methods as $annotation) {
+                        if ($annotation->getAll('acl')) {
+                            $action = $annotation->getAll('acl')[0]->getArguments();
+
+                            $this->components[$component['id']]['acls'][$action['name']] = $action['name'];
                         }
                     }
                 }
@@ -331,16 +333,18 @@ class Acl extends BaseMiddleware
                     $reflector = $this->annotations->get(implode('\\', array_slice(explode('\\', $component['class']), 0, -1)) . '\Api');
                     $methods = $reflector->getMethodsAnnotations();
 
-                    if ($methods && count($methods) > 2) {
-                        if (isset($methods['viewAction'])) {
-                            $this->components[$component['id']]['name'] = strtolower($component['name']);
-                            $this->components[$component['id']]['route'] = strtolower($component['route']);
-                            $this->components[$component['id']]['description'] = $component['description'];
-                            foreach ($methods as $annotation) {
-                                if ($annotation->getAll('api_acl')) {
-                                    $action = $annotation->getAll('api_acl')[0]->getArguments();
-                                    $this->components[$component['id']]['api_acls'][$action['name']] = $action['name'];
-                                }
+                    if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
+                        $this->components[$component['id']]['name'] = strtolower($component['name']);
+
+                        $this->components[$component['id']]['route'] = strtolower($component['route']);
+
+                        $this->components[$component['id']]['description'] = $component['description'];
+
+                        foreach ($methods as $annotation) {
+                            if ($annotation->getAll('api_acl')) {
+                                $action = $annotation->getAll('api_acl')[0]->getArguments();
+
+                                $this->components[$component['id']]['api_acls'][$action['name']] = $action['name'];
                             }
                         }
                     }

@@ -131,7 +131,7 @@ class Scopes extends BasePackage
 
                         $methods = $reflector->getMethodsAnnotations();
 
-                        if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                        if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                             $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
                             $components[strtolower($app['id'])]['childs'][$key]['title'] = strtoupper($component['name']);
                         }
@@ -181,7 +181,7 @@ class Scopes extends BasePackage
                                 $reflector = $this->annotations->get(implode('\\', array_slice(explode('\\', $component['class']), 0, -1)) . '\Api');
                                 $methods = $reflector->getMethodsAnnotations();
 
-                                if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                                if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                                     foreach ($methods as $annotation) {
                                         if ($annotation->getAll('api_acl')) {
                                             $action = $annotation->getAll('api_acl')[0]->getArguments();
@@ -231,7 +231,7 @@ class Scopes extends BasePackage
                             $reflector = $this->annotations->get(implode('\\', array_slice(explode('\\', $component['class']), 0, -1)) . '\Api');
                             $methods = $reflector->getMethodsAnnotations();
 
-                            if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                            if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                                 foreach ($methods as $annotation) {
                                     if ($annotation->getAll('api_acl')) {
                                         $action = $annotation->getAll('api_acl')[0]->getArguments();

@@ -72,6 +72,7 @@ class Roles extends BasePackage
                             if (isset($component['msview'])) {
                                 $component['msview'] = 0;
                             }
+
                             if (isset($component['msupdate'])) {
                                 $component['msupdate'] = 0;
                             }
@@ -160,10 +161,12 @@ class Roles extends BasePackage
                     ];
                 foreach ($componentsArr as $key => $component) {
                     $reflector = $this->annotations->get($component['class']);
+
                     $methods = $reflector->getMethodsAnnotations();
 
-                    if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                    if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                         $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
+
                         $components[strtolower($app['id'])]['childs'][$key]['title'] = strtoupper($component['name']);
                     }
                 }
@@ -202,22 +205,27 @@ class Roles extends BasePackage
                     foreach ($componentsArr as $key => $component) {
                         if ($component['class'] && $component['class'] !== '') {
                             $reflector = $this->annotations->get($component['class']);
+
                             $methods = $reflector->getMethodsAnnotations();
 
-                            if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                            if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                                 foreach ($methods as $annotation) {
                                     if ($annotation->getAll('acl')) {
                                         $action = $annotation->getAll('acl')[0]->getArguments();
+
                                         if ($rid && $rid != 1 &&
                                             ($action['name'] === 'msview' || $action['name'] === 'msupdate')
                                         ) {
                                             continue;
                                         }
+
                                         $acls[$action['name']] = $action['name'];
+
                                         if (isset($permissionsArr[$app['id']][$component['id']])) {
                                             if (!isset($permissionsArr[$app['id']][$component['id']][$action['name']])) {
                                                 $permissionsArr[$app['id']][$component['id']][$action['name']] = 0;
                                             }
+
                                             $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
                                         } else {
                                             $permissions[$app['id']][$component['id']][$action['name']] = 0;
@@ -252,13 +260,16 @@ class Roles extends BasePackage
                     //Build ACL Columns
                     if ($component['class'] && $component['class'] !== '') {
                         $reflector = $this->annotations->get($component['class']);
+
                         $methods = $reflector->getMethodsAnnotations();
 
-                        if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                        if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                             foreach ($methods as $annotation) {
                                 if ($annotation->getAll('acl')) {
                                     $action = $annotation->getAll('acl')[0]->getArguments();
+
                                     $acls[$action['name']] = $action['name'];
+
                                     $permissions[$app['id']][$component['id']][$action['name']] = 0;
                                 }
                             }
@@ -268,7 +279,9 @@ class Roles extends BasePackage
             }
 
             $this->packagesData->acls = $this->helper->encode($acls);
+
             $role['permissions'] = $this->helper->encode($permissions);
+
             $this->packagesData->role = $role;
         }
 
@@ -300,6 +313,7 @@ class Roles extends BasePackage
 
             foreach ($searchRoles as $roleKey => $roleValue) {
                 $roles[$roleKey]['id'] = $roleValue['id'];
+
                 $roles[$roleKey]['name'] = $roleValue['name'];
             }
 
