@@ -71,6 +71,24 @@ class ServiceProviderApi extends BaseModel
 
     public $per_day_calls_limit;
 
+    public $openapi_name;
+
+    public $openapi_description;
+
+    public $openapi_email;
+
+    public $openapi_license_name;
+
+    public $openapi_license_url;
+
+    public $openapi_server_sandbox_url;
+
+    public $openapi_server_sandbox_description;
+
+    public $openapi_server_production_url;
+
+    public $openapi_server_production_description;
+
     public function initialize()
     {
         $this->modelRelations['scope']['relationObj'] = $this->hasOne(

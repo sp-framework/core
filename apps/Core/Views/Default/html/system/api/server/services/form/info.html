@@ -30,6 +30,15 @@
     {% set apiPerMinuteCallsLimit = api['per_minute_calls_limit'] %}
     {% set apiPerHourCallsLimit = api['per_hour_calls_limit'] %}
     {% set apiPerDayCallsLimit = api['per_day_calls_limit'] %}
+    {% set openapiTitle = api['openapi_name'] %}
+    {% set openapiDescription = api['openapi_description'] %}
+    {% set openapiEmail = api['openapi_email'] %}
+    {% set openapiLicenseName = api['openapi_license_name'] %}
+    {% set openapiLicenseUrl = api['openapi_license_url'] %}
+    {% set openapiServerSandboxUrl = api['openapi_server_sandbox_url'] %}
+    {% set openapiServerSandboxDescription = api['openapi_server_sandbox_description'] %}
+    {% set openapiServerProductionUrl = api['openapi_server_production_url'] %}
+    {% set openapiServerProductionDescription = api['openapi_server_production_description'] %}
 {% else %}
     {% set apiId = '' %}
     {% set apiName = '' %}
@@ -57,6 +66,15 @@
     {% set apiPerMinuteCallsLimit = '' %}
     {% set apiPerHourCallsLimit = '' %}
     {% set apiPerDayCallsLimit = '' %}
+    {% set openapiTitle = '' %}
+    {% set openapiDescription = '' %}
+    {% set openapiEmail = '' %}
+    {% set openapiLicenseName = '' %}
+    {% set openapiLicenseUrl = '' %}
+    {% set openapiServerSandboxUrl = '' %}
+    {% set openapiServerSandboxDescription = '' %}
+    {% set openapiServerProductionUrl = '' %}
+    {% set openapiServerProductionDescription = '' %}
 {% endif %}
 {% set apiStatusChecked = false %}
 {% set apiIsPublicChecked = false %}
@@ -97,11 +115,11 @@
     {% set apiPkiAlgorithmDisabled = true %}
     {% set apiEncryptionKeySizeDisabled = true %}
 {% endif %}
-{% if apiGrantType === 'client_credentials' %}
+{% if apiGrantType == 'client_credentials' %}
     {% set apiRefreshTokenTimeoutDisabled = true %}
     {% set clientCredentialsGrantHidden = '' %}
 {% endif %}
-{% if apiGrantType === 'authorization_code' %}
+{% if apiGrantType == 'authorization_code' %}
     {% set authoCodeGrantHidden = '' %}
     {% set reGenerateHidden = false %}
     {% set generateHidden = true %}

@@ -8,6 +8,7 @@ use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Utils;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
@@ -1442,5 +1443,174 @@ class Api extends BasePackage
         }
 
         return false;
+    }
+
+    public function generateOpenapiFile($data)
+    {
+        if (!isset($data['id'])) {
+            $this->addResponse('Api ID not set', 1);
+
+            return false;
+        }
+
+        $api = $this->getById((int) $data['id']);
+
+        if (!$api) {
+            $this->addResponse('Api with ID not found', 1);
+
+            return false;
+        }
+
+        $version = '0.0.0';
+
+        if ($this->apps->apps[$api['app_id']]['app_type'] === 'core') {
+            $version = $this->core->core['version'];
+        } else {
+            try {
+                if ($this->localContent->fileExists('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/type.json')) {
+                    $type = $this->helper->decode($this->localContent->read('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/type.json'), true);
+
+                    if (isset($type['version'])) {
+                        $version = $type['version'];
+                    }
+                }
+            } catch (\throwable | UnableToCheckExistence | UnableToReadFile | FilesystemException $e) {
+                $this->logException($e);
+
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+        }
+
+        //Read File Content
+        try {
+            if ($this->localContent->fileExists('var/api/openapi/' . $api['id'] . '/openapi.json')) {
+                $fileContentArr = $this->helper->decode($this->localContent->read('var/api/openapi/' . $api['id'] . '/openapi.json'), true);
+
+                if (isset($fileContentArr['openapi']) && $fileContentArr['openapi'] === $version) {
+                    $fileContent = $this->helper->encode($fileContentArr, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
+                }
+            }
+        } catch (\throwable | UnableToCheckExistence | UnableToReadFile | FilesystemException $e) {
+            $this->logException($e);
+
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        //Extract File Content and write to openapi.json file.
+        if (!isset($fileContent)) {
+            try {
+                $srcDirs =
+                    [
+                        base_path('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/Install.php'),
+                        base_path('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Packages/'),
+                    ];
+
+                if ($this->apps->apps[$api['app_id']]['app_type'] === 'core') {
+                    $providersDir = [];
+                    $dirsArr = $this->basepackages->utils->scanDir('system/Base/Providers/');
+                    foreach ($dirsArr['dirs'] as $dirs) {
+                        if (str_contains($dirs, 'ApiClientServices')) {
+                            continue;
+                        }
+
+                        array_push($providersDir, $dirs);
+                    }
+
+                    $srcDirs = array_merge($srcDirs, $providersDir);
+                }
+
+                $result = (new \OpenApi\Builder())->setSources($srcDirs)->setVersion($version)->build();
+
+                if ($result) {
+                    $result = $this->helper->decode($result->toJson(), true);
+
+                    if (isset($api['openapi_name']) && $api['openapi_name'] !== '') {
+                        $result['info']['title'] = $api['openapi_name'];
+                    }
+                    if (isset($api['openapi_description']) && $api['openapi_description'] !== '') {
+                        $result['info']['description'] = $api['openapi_description'];
+                    }
+                    if (isset($api['openapi_email']) && $api['openapi_email'] !== '') {
+                        $result['info']['contact']['email'] = $api['openapi_email'];
+                    }
+                    if (isset($api['openapi_license_name']) && $api['openapi_license_name'] !== '') {
+                        $result['info']['license']['name'] = $api['openapi_license_name'];
+                    }
+                    if (isset($api['openapi_license_url']) && $api['openapi_license_url'] !== '') {
+                        $result['info']['license']['url'] = $api['openapi_license_url'];
+                    }
+
+                    $devDefinedServers = $result['servers'];
+                    $result['servers'] = [];
+
+                    if (isset($api['openapi_server_sandbox_url']) && $api['openapi_server_sandbox_url'] !== '') {
+                        $sandbox = [];
+                        $sandbox['name'] = 'Sandbox';
+                        $sandbox['url'] = $api['openapi_server_sandbox_url'];
+
+                        if (isset($api['openapi_server_sandbox_description']) && $api['openapi_server_sandbox_description'] !== '') {
+                            $sandbox['description'] = $api['openapi_server_sandbox_description'];
+                        }
+
+                        array_push($result['servers'], $sandbox);
+                    }
+
+                    if (isset($api['openapi_server_production_url']) && $api['openapi_server_production_url'] !== '') {
+                        $production = [];
+                        $production['name'] = 'Production';
+                        $production['url'] = $api['openapi_server_production_url'];
+
+                        if (isset($api['openapi_server_production_description']) && $api['openapi_server_production_description'] !== '') {
+                            $production['description'] = $api['openapi_server_production_description'];
+                        }
+
+                        array_push($result['servers'], $production);
+                    }
+
+                    if (count($result['servers']) === 0) {
+                        if (isset($devDefinedServers) && count($devDefinedServers) > 0) {
+                            foreach ($devDefinedServers as $server) {
+                                $serverArr = [];
+                                if (str_contains($server['url'], 'sandbox')) {
+                                    $serverArr['name'] = 'Sandbox';
+                                } else {
+                                    $serverArr['name'] = 'Production';
+                                }
+
+                                $serverArr['url'] = $server['url'];
+                                $serverArr['description'] = $server['description'];
+
+                                array_push($result['servers'], $serverArr);
+                            }
+                        }
+                    }
+
+                    try {
+                        $fileContent = $this->helper->encode($result, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
+
+                        $this->localContent->write('var/api/openapi/' . $api['id'] . '/openapi.json', $fileContent);
+
+                        $this->addResponse('Ok', 0, ['fileContent' => $fileContent]);
+                    } catch (\throwable | UnableToWriteFile | FilesystemException $e) {
+                        $this->addResponse('Unable to write Json File to folder var/api/openapi. Check permission or contact developer.', 1);
+
+                        return false;
+                    }
+                    //
+                }
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+        }
+
+        $this->addResponse('Generated openapi specs successfully.', 0, ['fileContent' => $fileContent]);
+
+        return true;
     }
 }

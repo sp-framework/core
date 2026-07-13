@@ -1389,6 +1389,31 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
+        try {
+            if ($this->localContent->fileExists('apps/' . ucfirst($appType['app_type']) . '/Install/Install.php')) {
+                return true;
+            }
+
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ApptypesInstallInstall.txt');
+        } catch (FilesystemException | UnableToReadFile | UnableToCheckExistence $exception) {
+            $this->addResponse('Unable to read module base component file.');
+
+            return false;
+        }
+
+        $apptypeFilesLocation = 'apps/' . ucfirst($appType['app_type']) . '/Install';
+        $fileName = $apptypeFilesLocation . '/Install.php';
+        $apptypeFilesLocationClass = str_replace('/', '\\', ucfirst($apptypeFilesLocation));
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $apptypeFilesLocationClass . ';', $file);
+
+        try {
+            $this->localContent->write($fileName, $file);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write app type install file');
+
+            return false;
+        }
+
         return true;
     }
 

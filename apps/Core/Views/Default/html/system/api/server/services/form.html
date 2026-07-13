@@ -39,6 +39,51 @@
     <div class="col-md-10">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {% set tabsData =
+                    [
+                        'info'   :
+                        [
+                            'tabTitle'          : 'Info',
+                            'tabInclude'        : 'services/form/info'
+                        ],
+                        'bind'   :
+                        [
+                            'tabTitle'          : 'Bind',
+                            'tabInclude'        : 'services/form/bind'
+                        ],
+                        'grant'   :
+                        [
+                            'tabTitle'          : 'Grant',
+                            'tabInclude'        : 'services/form/grant'
+                        ],
+                        'keys'   :
+                        [
+                            'tabTitle'          : 'Keys',
+                            'tabInclude'        : 'services/form/keys'
+                        ],
+                        'calls'   :
+                        [
+                            'tabTitle'          : 'Calls',
+                            'tabInclude'        : 'services/form/calls'
+                        ],
+                        'general'   :
+                        [
+                            'tabTitle'          : 'General',
+                            'tabInclude'        : 'services/form/general'
+                        ]
+                    ]
+                %}
+                {% if api['id'] is defined %}
+                    {% set tabsData = array_merge(tabsData,
+                        [
+                            'openapi'   :
+                            [
+                                'tabTitle'          : 'OpenAPI',
+                                'tabInclude'        : 'services/form/openapi'
+                            ]
+                        ])
+                    %}
+                {% endif %}
                 {{adminltetags.useTag('tabs',
                     [
                         'component'                     : component,
@@ -47,39 +92,7 @@
                         'sectionId'                     : 'main',
                         'tabsId'                        : 'tabs',
                         'tabsStyle'                     : 'card-outline-tabs',
-                        'tabsData'                      :
-                            [
-                                'info'   :
-                                [
-                                    'tabTitle'          : 'Info',
-                                    'tabInclude'        : 'services/form/info'
-                                ],
-                                'bind'   :
-                                [
-                                    'tabTitle'          : 'Bind',
-                                    'tabInclude'        : 'services/form/bind'
-                                ],
-                                'grant'   :
-                                [
-                                    'tabTitle'          : 'Grant',
-                                    'tabInclude'        : 'services/form/grant'
-                                ],
-                                'keys'   :
-                                [
-                                    'tabTitle'          : 'Keys',
-                                    'tabInclude'        : 'services/form/keys'
-                                ],
-                                'calls'   :
-                                [
-                                    'tabTitle'          : 'Calls',
-                                    'tabInclude'        : 'services/form/calls'
-                                ],
-                                'general'   :
-                                [
-                                    'tabTitle'          : 'General',
-                                    'tabInclude'        : 'services/form/general'
-                                ]
-                            ]
+                        'tabsData'                      : tabsData
                     ]
                 )}}
             </fieldset>
@@ -329,6 +342,25 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-per_minute_calls_limit'                      : { },
         '{{componentId}}-{{sectionId}}-per_hour_calls_limit'                        : { },
         '{{componentId}}-{{sectionId}}-per_day_calls_limit'                         : { },
+        '{{componentId}}-{{sectionId}}-openapi_name'                                : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-openapi-file').off();
+                $('#{{componentId}}-{{sectionId}}-generate-openapi-file').click(function(e) {
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    generateOpenapiFile();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-openapi_description'                         : { },
+        '{{componentId}}-{{sectionId}}-openapi_email'                               : { },
+        '{{componentId}}-{{sectionId}}-openapi_license_name'                        : { },
+        '{{componentId}}-{{sectionId}}-openapi_license_url'                         : { },
+        '{{componentId}}-{{sectionId}}-openapi_server_sandbox_url'                  : { },
+        '{{componentId}}-{{sectionId}}-openapi_server_sandbox_description'          : { },
+        '{{componentId}}-{{sectionId}}-openapi_server_production_url'               : { },
+        '{{componentId}}-{{sectionId}}-openapi_server_production_description'       : { },
         '{{componentId}}-{{sectionId}}-form'                                        : {
             ignore      : ':submit, :reset, :image, :disabled, .ignore, :hidden',
             rules       : {
@@ -440,4 +472,38 @@ function generateRedirectUrl(id) {
     }, 'json');
 }
 
+function generateOpenapiFile() {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+
+    $.post('{{links.url("system/api/server/services/generateOpenapiFile")}}', postData, function(response) {
+        $('#{{componentId}}-{{sectionId}}-generate-openapi-file').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-generate-openapi-file').children('i').attr('hidden', true);
+
+        if (response.responseCode == 0) {
+            paginatedPNotify('success', response.responseMessage);
+
+            if (response.responseData.fileContent && response.responseData.fileContent !== '') {
+                try {
+                    var fileContent = JSON.parse(response.responseData.fileContent);
+                } catch (error) {
+                    paginatedPNotify('error', error.message);
+
+                    return;
+                }
+
+                var newWindow = window.open("", "Openapi Specs for API");
+                newWindow.document.write('<pre>' + JSON.stringify(fileContent, null, 4) + '</pre>');
+            }
+        } else {
+            paginatedPNotify('error', response.responseMessage);
+        }
+
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+    }, 'json');
+}
 </script>

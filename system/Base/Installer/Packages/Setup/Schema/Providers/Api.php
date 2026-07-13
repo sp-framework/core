@@ -59,6 +59,14 @@ class Api
                     ]
                 ),
                 new Column(
+                    'description',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
                     'app_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
@@ -77,14 +85,6 @@ class Api
                     [
                         'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true,
-                    ]
-                ),
-                new Column(
-                    'description',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 2048,
-                        'notNull'       => false,
                     ]
                 ),
                 new Column(
@@ -240,6 +240,78 @@ class Api
                     'per_day_calls_limit',
                     [
                         'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_name',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_description',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_email',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_license_name',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_license_url',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_server_sandbox_url',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_server_sandbox_description',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_server_production_url',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_server_production_description',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
                         'notNull'       => false,
                     ]
                 ),

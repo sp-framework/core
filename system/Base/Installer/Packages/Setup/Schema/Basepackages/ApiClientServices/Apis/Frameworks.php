@@ -1,0 +1,131 @@
+<?php
+
+namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis;
+
+use Phalcon\Db\Column;
+use Phalcon\Db\Index;
+
+class Repos
+{
+    public function columns()
+    {
+        return
+            [
+               'columns' => [
+                    new Column(
+                        'id',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => true,
+                            'autoIncrement' => true,
+                            'primary'       => true,
+                        ]
+                    ),
+                    new Column(
+                        'api_url',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 100,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
+                        'auth_type',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 50,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
+                        'username',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 100,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
+                        'password',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 512,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
+                        'device_id',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 100,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'client_id',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 100,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'client_secret',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 1024,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'code',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 100,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'access_token',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 1024,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'token_type',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 50,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'expires_in',
+                        [
+                            'type'          => Column::TYPE_SMALLINTEGER,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'refresh_token',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 512,
+                            'notNull'       => false,
+                        ]
+                    )
+                ],
+                'indexes' => [
+                    new Index(
+                        'column_UNIQUE',
+                        [
+                            'api_url'
+                        ],
+                        'UNIQUE'
+                    )
+                ]
+            ];
+    }
+}
