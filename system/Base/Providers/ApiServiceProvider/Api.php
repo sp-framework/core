@@ -1541,10 +1541,12 @@ class Api extends BasePackage
                     $src = array_merge($src, $modelFiles);
                 }
 
-                $result = (new \OpenApi\Builder())->setSources($src)->setVersion($version)->build();
+                $result = (new \OpenApi\Builder())->setSources($src)->build();
 
                 if ($result) {
                     $result = $this->helper->decode($result->toJson(), true);
+
+                    $result['info']['version'] = $version;
 
                     if (isset($api['openapi_name']) && $api['openapi_name'] !== '') {
                         $result['info']['title'] = $api['openapi_name'];
