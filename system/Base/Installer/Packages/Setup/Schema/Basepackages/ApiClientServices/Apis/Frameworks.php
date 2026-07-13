@@ -5,7 +5,7 @@ namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServ
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 
-class Repos
+class Frameworks
 {
     public function columns()
     {

@@ -6,6 +6,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\ApiClientServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\ApiClientServicesCalls;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis\Frameworks;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis\Repos;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ContactBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
@@ -412,6 +413,10 @@ class Schema
                     ],
                 'basepackages_api_client_services_apis_repos'=> [
                         'schema'    => new Repos,
+                        'model'     => null
+                    ],
+                'basepackages_api_client_services_apis_frameworks'=> [
+                        'schema'    => new Frameworks,
                         'model'     => null
                     ],
                 'service_provider_api'                       => [
