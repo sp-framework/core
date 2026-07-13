@@ -216,7 +216,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
             $methods = (new \ReflectionClass($componentValue['class']))->getMethods();
 
             foreach ($methods as $key => $method) {
-                if ((strtolower($method->class) === strtolower($componentValue['class']) && str_contains($method->name, 'api') && str_contains($method->name, 'Action'))) {
+                if ((strtolower($method->class) === strtolower($componentValue['class']) && str_contains($method->name, 'Action'))) {
                     if (strtolower($this->data['givenRoute']) ===
                         strtolower(
                             $this->data['appRoute'] . '/' . $componentValue['route'] . '/' . str_replace('Action', '', $method->name)

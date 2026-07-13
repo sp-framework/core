@@ -73,7 +73,7 @@ class MicroCollection
         } else if ($action === 'add' || $action === 'update') {
             $methods = ['POST','PATCH','PUT'];
         } else if ($action === 'remove') {
-            $methods = ['DELETE'];
+            $methods = ['POST','DELETE'];
         } else {
             $methods = ['POST'];
         }
@@ -100,9 +100,10 @@ class MicroCollection
         $this->application->notFound(
             function () use ($application) {
                 $application->response
-                            ->setStatusCode(404, 'API Route Not Found')
-                            ->sendHeaders()
-                            ->setContent('API Route Not Found')
+                            ->setStatusCode(404)
+                            ->sendHeaders('Cache-Control', 'no-store')
+                            ->setContentType('application/json', 'UTF-8')
+                            ->setJsonContent(['responseCode' => 404, 'responseMessage' => 'API Route Not Found', 'responseData' => null])
                             ->send();
             }
         );

@@ -283,7 +283,7 @@ class Router
 			foreach ($routeArray as $route) {
 				$this->givenRouteClass .= '\\' . ucfirst($route);
 			}
-		} elseif ($this->request->isPost()) {
+		} elseif ($this->request->isPost() || $this->request->isPut() || $this->request->isPatch() || $this->request->isDelete()) {
 			$this->action = $this->helper->last($routeArray);
 			unset($routeArray[$this->helper->lastKey($routeArray)]);
 			$this->controller = $this->helper->last($routeArray);

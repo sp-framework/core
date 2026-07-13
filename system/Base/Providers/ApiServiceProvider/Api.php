@@ -364,6 +364,7 @@ class Api extends BasePackage
                 $this->isApiCheckVia = 'pub';
             } else if ($this->request->getHeader('Authorization') !== '') {
                 $this->isApi = true;
+
                 if (str_contains($this->request->getHeader('Authorization'), 'Bearer')) {
                     $this->isApiCheckVia = 'authorization';
                 } else if (str_contains($this->request->getHeader('Authorization'), 'Basic') &&
