@@ -1507,27 +1507,40 @@ class Api extends BasePackage
         //Extract File Content and write to openapi.json file.
         if (!isset($fileContent)) {
             try {
-                $srcDirs =
+                $src =
                     [
-                        base_path('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/Install.php'),
-                        base_path('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Packages/'),
+                        base_path('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/Install.php')
                     ];
 
+                $componentsDir = $this->basepackages->utils->scanDir('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Components/');
+
+                if (count($componentsDir['files']) > 0) {
+                    foreach ($componentsDir['files'] as $files) {
+                        if (str_ends_with($files, 'Api.php')) {
+                            array_push($src, $files);
+                        }
+                    }
+                }
+
                 if ($this->apps->apps[$api['app_id']]['app_type'] === 'core') {
-                    $providersDir = [];
-                    $dirsArr = $this->basepackages->utils->scanDir('system/Base/Providers/');
-                    foreach ($dirsArr['dirs'] as $dirs) {
-                        if (str_contains($dirs, 'ApiClientServices')) {
+                    $modelFiles = [];
+
+                    $providersArr = $this->basepackages->utils->scanDir('system/Base/Providers/');
+
+                    foreach ($providersArr['files'] as $files) {
+                        if (str_contains($files, 'ApiClientServices')) {
                             continue;
                         }
 
-                        array_push($providersDir, $dirs);
+                        if (str_contains($files, '/Model/')) {
+                            array_push($modelFiles, $files);
+                        }
                     }
 
-                    $srcDirs = array_merge($srcDirs, $providersDir);
+                    $src = array_merge($src, $modelFiles);
                 }
 
-                $result = (new \OpenApi\Builder())->setSources($srcDirs)->setVersion($version)->build();
+                $result = (new \OpenApi\Builder())->setSources($src)->setVersion($version)->build();
 
                 if ($result) {
                     $result = $this->helper->decode($result->toJson(), true);
