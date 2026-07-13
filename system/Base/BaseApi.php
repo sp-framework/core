@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Base file for all API classes.
+ *
+ * @author Guru (email@oyeaussie.dev)
+ */
 namespace System\Base;
 
 use Phalcon\Mvc\Controller;

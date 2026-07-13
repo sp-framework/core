@@ -803,6 +803,10 @@ class Api extends BasePackage
             new CryptKey($this->keys['private_location'], $this->keys['pki_passphrase']),
             $this->keys['enc']
         );
+
+        $this->api['access_token_timeout'] = $this->api['access_token_timeout'] ?? 'PT1H';//1 Hour
+        $this->api['refresh_token_timeout'] = $this->api['refresh_token_timeout'] ?? 'P1M';//1 Month
+        $this->api['authorization_code_timeout'] = $this->api['authorization_code_timeout'] ?? 'PT10M';//10 Minutes
     }
 
     //Password Grant
@@ -814,12 +818,12 @@ class Api extends BasePackage
         );
 
         //Refresh tokens will expire after 1 month
-        $grant->setRefreshTokenTTL(new DateInterval($this->api['refresh_token_timeout'] ?? 'P1M'));
+        $grant->setRefreshTokenTTL(new DateInterval($this->api['refresh_token_timeout']));
 
         // Enable the password grant on the server with a token TTL of 1 hour
         $this->server->enableGrantType(
             $grant,
-            new DateInterval($this->api['access_token_timeout'] ?? 'PT1H')
+            new DateInterval($this->api['access_token_timeout'])
         );
     }
 
@@ -829,7 +833,7 @@ class Api extends BasePackage
         // Enable the client credentials grant on the server token TTL of 1 hour
         $this->server->enableGrantType(
             new ClientCredentialsGrant(),
-            new DateInterval($this->api['access_token_timeout'] ?? 'PT1H')
+            new DateInterval($this->api['access_token_timeout'])
         );
     }
 
@@ -840,16 +844,16 @@ class Api extends BasePackage
         $grant = new AuthCodeGrant(
              new AuthCodeRepository(),
              $this->refreshTokenRepository,
-             new \DateInterval('PT10M')
+             new \DateInterval($this->api['authorization_code_timeout'])
          );
 
         //Refresh tokens will expire after 1 month
-        $grant->setRefreshTokenTTL(new \DateInterval($this->api['refresh_token_timeout'] ?? 'P1M'));
+        $grant->setRefreshTokenTTL(new \DateInterval($this->api['refresh_token_timeout']));
 
         // Enable the authentication code grant on the server token TTL of 1 hour
         $this->server->enableGrantType(
             $grant,
-            new \DateInterval($this->api['access_token_timeout'] ?? 'PT1H')
+            new \DateInterval($this->api['access_token_timeout'])
         );
     }
 
@@ -859,12 +863,12 @@ class Api extends BasePackage
         $grant = new RefreshTokenGrant($this->refreshTokenRepository);
 
         // Refresh tokens will expire after 1 month
-        $grant->setRefreshTokenTTL(new \DateInterval($this->api['refresh_token_timeout'] ?? 'P1M'));
+        $grant->setRefreshTokenTTL(new \DateInterval($this->api['refresh_token_timeout']));
 
         // Enable the refresh token grant on the server token TTL of 1 hour
         $this->server->enableGrantType(
             $grant,
-            new \DateInterval($this->api['access_token_timeout'] ?? 'PT1H')
+            new \DateInterval($this->api['access_token_timeout'])
         );
     }
 
@@ -1600,7 +1604,6 @@ class Api extends BasePackage
 
                         return false;
                     }
-                    //
                 }
             } catch (\throwable $e) {
                 $this->addResponse($e->getMessage(), 1);
