@@ -8,6 +8,7 @@ namespace Apps\Core\Components\System\Tools\Murls;
 
 use OpenApi\Attributes as OA;
 use System\Base\BaseApi;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMurls;
 
 class Api extends BaseApi
 {
@@ -120,6 +121,50 @@ class Api extends BaseApi
     /**
      * @api_acl(name=update)
      */
+    #[OA\Put(
+        path: '/system/tools/murls',
+        operationId: 'updateMurl',
+        description: 'Update Murl',
+        summary: 'Update Murl',
+        tags: ['murls'],
+        requestBody: new OA\RequestBody(
+            description: 'Update murl',
+            required: true,
+            content: new OA\JsonContent(
+                ref: BasepackagesMurls::class
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'successful operation',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'permission denied',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'not found',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Incorrect murl data provided',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            )
+        ]
+    )]
     public function updateAction()
     {
         trace(['update']);
