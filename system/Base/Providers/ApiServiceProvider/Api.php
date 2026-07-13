@@ -1569,7 +1569,6 @@ class Api extends BasePackage
 
                     if (isset($api['openapi_server_sandbox_url']) && $api['openapi_server_sandbox_url'] !== '') {
                         $sandbox = [];
-                        $sandbox['name'] = 'Sandbox';
                         $sandbox['url'] = $api['openapi_server_sandbox_url'];
 
                         if (isset($api['openapi_server_sandbox_description']) && $api['openapi_server_sandbox_description'] !== '') {
@@ -1581,7 +1580,6 @@ class Api extends BasePackage
 
                     if (isset($api['openapi_server_production_url']) && $api['openapi_server_production_url'] !== '') {
                         $production = [];
-                        $production['name'] = 'Production';
                         $production['url'] = $api['openapi_server_production_url'];
 
                         if (isset($api['openapi_server_production_description']) && $api['openapi_server_production_description'] !== '') {
@@ -1595,12 +1593,6 @@ class Api extends BasePackage
                         if (isset($devDefinedServers) && count($devDefinedServers) > 0) {
                             foreach ($devDefinedServers as $server) {
                                 $serverArr = [];
-                                if (str_contains($server['url'], 'sandbox')) {
-                                    $serverArr['name'] = 'Sandbox';
-                                } else {
-                                    $serverArr['name'] = 'Production';
-                                }
-
                                 $serverArr['url'] = $server['url'];
                                 $serverArr['description'] = $server['description'];
 
