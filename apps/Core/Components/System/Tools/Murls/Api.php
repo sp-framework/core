@@ -122,7 +122,7 @@ class Api extends BaseApi
      * @api_acl(name=update)
      */
     #[OA\Put(
-        path: '/system/tools/murls',
+        path: '/system/tools/murls/update',
         operationId: 'updateMurl',
         description: 'Update Murl',
         summary: 'Update Murl',
