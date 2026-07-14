@@ -134,6 +134,7 @@ class Store
             $rmd = [];
             $rmd['dataTypes'] = [];
             $rmd['number'] = [];
+            $rmd['required'] = [];
             $rmd['columns'] = [];
             $rmd['columnSize'] = [];
             $rmd['columnUnique'] = [];
@@ -161,12 +162,19 @@ class Store
             $md['dataTypes'] = [];
             $md['number'] = [];
             $md['columns'] = [];
+            $md['required'] = [];
             $md['columnSize'] = [];
 
             if (isset($schemaArr['properties'])) {
                 foreach ($schemaArr['properties'] as $column => $property) {
                     if (isset($property['type'][1]) && $property['type'][1] === 'array') {
                         continue;
+                    }
+
+                    if (in_array($column, $schemaArr['required'])) {
+                        $md['required'][$column] = true;
+                    } else {
+                        $md['required'][$column] = false;
                     }
 
                     if (!is_array($property['type'])) {
