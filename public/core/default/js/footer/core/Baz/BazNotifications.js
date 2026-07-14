@@ -81,6 +81,10 @@ var BazNotifications = function() {
         if (responseData && Object.keys(responseData).length > 0) {
             processResponseData(responseData);
         } else {
+            if (!dataCollection.env.profile) {
+                return;
+            }
+
             var url = dataCollection.env.rootPath + appRoute + 'system/notifications/fetchNewNotificationsCount';
 
             var postData = { };
@@ -163,6 +167,9 @@ var BazNotifications = function() {
     }
 
     function initPullNotifications(offline) {
+        if (!dataCollection.env.profile) {
+            return;
+        }
         //eslint-disable-next-line
         console.log(promiseInit);
         if (offline && !promiseInit) {
