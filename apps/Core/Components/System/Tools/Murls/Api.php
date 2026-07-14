@@ -171,7 +171,6 @@ class Api extends BaseApi
         $this->initialize();
 
         $data = $this->postData();
-
         if (!isset($data['id'])) {
             return $this->addResponse('Id not provided!', 400);
         }
@@ -182,17 +181,11 @@ class Api extends BaseApi
             return $this->addResponse('Id ' . $data['id'] . ' not found!', 404);
         }
 
-        $this->validation->init()->add('id', PresenceOf::class, ["message" => "Please provide murl Id."]);
-        $this->validation->add('url', PresenceOf::class, ["message" => "Please provide URL."]);
-        $this->validation->add('murl', PresenceOf::class, ["message" => "Please provide mURL."]);
-        if (!isset($data['api_id']) ||
-            (isset($data['api_id']) && $data['api_id'] === '')
-        ) {
-            $this->validation->add('app_id', PresenceOf::class, ["message" => "Please provide app information."]);
-            $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain information."]);
-        }
+        $validated = $this->murls->validateDataWithMetaData($data);
 
-        if (!$this->doValidation($data)) {
+        if ($validated !== true) {
+            $this->addResponse($validated, 400);
+
             return false;
         }
 
@@ -226,24 +219,5 @@ class Api extends BaseApi
     public function removeAction()
     {
         trace(['remove']);
-    }
-
-    protected function doValidation($data)
-    {
-         $validated = $this->validation->validate($data)->jsonSerialize();
-
-        if (count($validated) > 0) {
-            $messages = 'Error: ';
-
-            foreach ($validated as $key => $value) {
-                $messages .= $value['message'] . ' ';
-            }
-
-            $this->addResponse($messages, 400);
-
-            return false;
-        }
-
-        return true;
     }
 }
