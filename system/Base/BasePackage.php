@@ -2499,95 +2499,6 @@ abstract class BasePackage extends Controller
 
 		return false;
 	}
-	// protected function addRefId($data)
-	// {
-	// 	if (!isset($data['ref_id'])) {
-	// 		$data['ref_id'] = null;
-	// 	}
-
-	// 	if (!$data['ref_id'] || $data['ref_id'] === '') {
-	// 		if (isset($data['entity_id'])) {
-	// 			$packageName = $this->helper->last($this->getClassName());
-
-	// 			$entitiesPackage = new \Apps\Core\Packages\Business\Entities\Entities;
-
-	// 			$entities = $entitiesPackage->getAll()->entities;
-
-	// 			if ($entities && count($entities) > 0) {
-	// 				foreach ($entities as $entityKey => $entity) {
-	// 					if ($entity['id'] === $data['entity_id']) {
-	// 						$entityId = $entity['id'];
-	// 						break;
-	// 					}
-	// 				}
-	// 			} else {
-	// 				$entityId = 0;
-	// 			}
-
-	// 			if (isset($entities[$entityId])) {
-	// 				$settings = $entities[$entityId]['settings'];
-
-	// 				if (isset($settings['prefix-seq'][$packageName])) {
-	// 					$settings = $settings['prefix-seq'][$packageName];
-
-	// 					$model = $this->useModel();
-
-	// 					$table = $model->getSource();
-
-	// 					if ($settings['prefix'] !== '') {
-	// 						$settings['prefix'] = explode('%', $settings['prefix']);
-
-	// 						$prefixValue = '';
-	// 						foreach ($settings['prefix'] as $prefix) {
-	// 							if ($prefix === 'Y') {
-	// 								$prefixValue .= date('Y');
-	// 							} else if ($prefix === 'm') {
-	// 								$prefixValue .= date('m');
-	// 							} else if ($prefix === 'd') {
-	// 								$prefixValue .= date('d');
-	// 							} else {
-	// 								$prefixValue .= $prefix;
-	// 							}
-	// 						}
-
-	// 						$currentId = (int) $data['id'];
-
-	// 						if (isset($settings['next_seq_number'])) {
-	// 							$nextSeqNumber = (int) $settings['next_seq_number'];
-
-	// 							if ($nextSeqNumber > 0) {
-
-	// 								if ($nextSeqNumber > $currentId) {
-	// 									$prefixValue .= $nextSeqNumber;
-
-	// 									$sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
-
-	// 									$this->db->execute($sql, [$nextSeqNumber, $currentId]);
-
-	// 									$data['id'] = $nextSeqNumber;
-	// 								} else {
-	// 									$prefixValue .= $currentId;
-	// 								}
-	// 							} else {
-	// 								$prefixValue .= $currentId;
-	// 							}
-	// 						} else {
-	// 							$prefixValue .= $currentId;
-	// 						}
-
-	// 						$sql = "UPDATE `{$table}` SET `ref_id` = ? WHERE `{$table}`.`id` = ?";
-
-	// 						$this->db->execute($sql, [$prefixValue, $data['id']]);
-
-	// 						$data['ref_id'] = $prefixValue;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-
-	// 	return $data;
-	// }
 
 	protected function extractNumbers($string)
 	{
@@ -2610,5 +2521,100 @@ abstract class BasePackage extends Controller
 		if ($this->config->logs->exceptions) {
 			$this->logger->logExceptions->critical(json_trace($exception));
 		}
+	}
+
+	/**
+	 * Validate data with provided or default parameter of PresenseOf to check if the data is not empty if the field is required as per metadata.
+	 *
+	 * @param array 	$data 				Array of data
+	 * @param string	$model				Model to get the metadata from if not default model of the package
+	 * @param array		$customMessages		Custom Messages can be provided for each field if the validation fails
+	 * @param array		$fieldsToCheck 		If provided, it will override the default PresenseOf check for the column.
+	 * 										For a single check set $fieldsToCheck[$column]['class'] & $fieldsToCheck[$column]['check']
+	 * 										For multiple checks set $fieldsToCheck[$column][0]['class'] & $fieldsToCheck[$column][0]['check'] & so on.
+	 * ```
+	 *  $data['email'] = null;
+	 *	$validated = $this->validateDataWithMetaData($data, null, [],
+	 *		['email' =>
+	 *			[
+	 *				[
+	 *					'class' => \Phalcon\Filter\Validation\Validator\PresenceOf::class,
+	 *					'check' => [
+	 *						'message' => 'Enter Email!'
+	 *					]
+	 *				],
+	 *				[
+	 *					'class' => \Phalcon\Filter\Validation\Validator\Email::class,
+	 *					'check' => [
+	 *						'message' => 'Enter Correct Email!'
+	 *					]
+	 *				]
+	 *			]
+	 *		]
+	 *	);
+	 * ```
+	 */
+	public function validateDataWithMetaData($data, $model = null, $customMessages = [], $fieldsToCheck = [])
+	{
+		if ($model) {
+			$this->setModelToUse($model);
+		}
+
+		$metadata = $this->getModelsMetaData();
+
+		$this->validation->init();
+
+		if (isset($metadata['columns']) && count($metadata['columns']) > 0) {
+			foreach ($metadata['columns'] as $column) {
+				if (isset($fieldsToCheck[$column])) {
+					if (isset($fieldsToCheck[$column]['class']) && isset($fieldsToCheck[$column]['check'])) {
+						$this->validation->add($column, $fieldsToCheck[$column]['class'], $fieldsToCheck[$column]['check']);
+					} else if (isset($fieldsToCheck[$column][0])) {//Multiple Checks
+						foreach ($fieldsToCheck[$column] as $key => $checks) {
+							$this->validation->add($column, $checks['class'], $checks['check']);
+						}
+					}
+				} else {
+					if (isset($metadata['required'][$column]) && $metadata['required'][$column] === true) {
+						$this->validation->add($column,
+											   \Phalcon\Filter\Validation\Validator\PresenceOf::class,
+											   [
+												   'message' => isset($customMessages[$column]) ? $customMessages[$column] : 'Enter valid ' . $column
+											   ]
+						);
+					}
+					if (isset($metadata['dataTypes'][$column]) && $metadata['dataTypes'][$column] === 'string') {
+						if (isset($metadata['columnSize'][$column])) {
+							if ($metadata['columnSize'][$column] > 0 && strlen($data[$column]) > 0) {
+								$this->validation->add($column,
+													   \Phalcon\Filter\Validation\Validator\StringLength\Max::class,
+													   [
+														   'max' => $metadata['columnSize'][$column],
+														   'included' => true,
+														   'message' => isset($customMessages[$column]) ?
+																		$customMessages[$column] :
+																		'Field ' . $column . ' has a max length of ' . $metadata['columnSize'][$column] . ' characters.'
+													   ]
+								);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		$validated = $this->validation->validate($data)->jsonSerialize();
+
+		if (count($validated) > 0) {
+			$messages = 'Error: ';
+
+			foreach ($validated as $key => $value) {
+				$messages .= $value['message'] . ' ';
+			}
+
+			return trim($messages);
+		}
+
+		return true;
 	}
 }
