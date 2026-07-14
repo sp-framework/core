@@ -84,7 +84,9 @@ class Api extends BasePackage
 
     protected $encDeviceId;
 
-    protected $account;
+    protected $account = null;
+
+    protected $authenticated = false;
 
     public function init(bool $resetCache = false)
     {
@@ -686,6 +688,15 @@ class Api extends BasePackage
         return false;
     }
 
+    public function account()
+    {
+        if ($this->authenticated) {
+            return $this->account;
+        }
+
+        return false;
+    }
+
     public function checkCallLimits(&$client, $api)
     {
         if ((int) $api['concurrent_calls_limit'] > 0) {
@@ -955,6 +966,8 @@ class Api extends BasePackage
 
             $this->access->ipFilter->filters->bumpFilterHitCounter(false, null, $filter, false, true);
 
+            $this->authenticated = true;
+
             return true;
         }
 
@@ -979,6 +992,8 @@ class Api extends BasePackage
             if ($accessTokenRepository->isTokenExpired($this->headerAttributes['oauth_access_token_id'])) {
                 throw new \Exception('Token Expired!');
             }
+
+            $this->authenticated = true;
 
             return $validateToken;
         } catch (\Exception $e) {
