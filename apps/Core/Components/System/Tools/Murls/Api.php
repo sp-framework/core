@@ -7,6 +7,7 @@
 namespace Apps\Core\Components\System\Tools\Murls;
 
 use OpenApi\Attributes as OA;
+use Phalcon\Filter\Validation\Validator\PresenceOf;
 use System\Base\BaseApi;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMurls;
 
@@ -167,7 +168,56 @@ class Api extends BaseApi
     )]
     public function updateAction()
     {
-        trace(['update']);
+        $this->initialize();
+
+        $data = $this->postData();
+
+        if (!isset($data['id'])) {
+            return $this->addResponse('Id not provided!', 400);
+        }
+
+        $murl = $this->murls->getById($data['id']);
+
+        if (!$murl) {
+            return $this->addResponse('Id ' . $data['id'] . ' not found!', 404);
+        }
+
+        $this->validation->init()->add('id', PresenceOf::class, ["message" => "Please provide murl Id."]);
+        $this->validation->add('url', PresenceOf::class, ["message" => "Please provide URL."]);
+        $this->validation->add('murl', PresenceOf::class, ["message" => "Please provide mURL."]);
+        if (!isset($data['api_id']) ||
+            (isset($data['api_id']) && $data['api_id'] === '')
+        ) {
+            $this->validation->add('app_id', PresenceOf::class, ["message" => "Please provide app information."]);
+            $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain information."]);
+        }
+
+        if (!$this->doValidation($data)) {
+            return false;
+        }
+
+        if (isset($data['api_id']) && $data['api_id'] != 0) {
+            $api = $this->api->getById($data['api_id']);
+
+            if (!$api) {
+                $this->addResponse('API ID Incorrect', 1);
+
+                return false;
+            }
+
+            $data['app_id'] = $api['app_id'];
+            $data['domain_id'] = $api['domain_id'];
+        }
+
+        $data['account_id'] = $this->api->account()['id'];
+
+        if ($this->murls->update($data)) {
+            $this->addResponse('Murl updated');
+
+            return true;
+        }
+
+        $this->addResponse('Error Updating Murl', 1);
     }
 
     /**
@@ -176,5 +226,24 @@ class Api extends BaseApi
     public function removeAction()
     {
         trace(['remove']);
+    }
+
+    protected function doValidation($data)
+    {
+         $validated = $this->validation->validate($data)->jsonSerialize();
+
+        if (count($validated) > 0) {
+            $messages = 'Error: ';
+
+            foreach ($validated as $key => $value) {
+                $messages .= $value['message'] . ' ';
+            }
+
+            $this->addResponse($messages, 400);
+
+            return false;
+        }
+
+        return true;
     }
 }
