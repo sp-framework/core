@@ -32,6 +32,6 @@ class BasepackagesMurls extends BaseModel
     #[OA\Property(nullable: true, title: 'Hits', description: 'Hits', type: 'integer', format: 'int64')]
     public $hits;
 
-    #[OA\Property(nullable: false, title: 'Valid Till', maximum: 50, description: 'Valid Till', type: 'string', format: 'datetime')]
+    #[OA\Property(nullable: true, title: 'Valid Till', maximum: 50, description: 'Valid Till', type: 'string', format: 'datetime')]
     public $valid_till;
 }

@@ -103,7 +103,7 @@ class BasepackagesMurls implements ModelInterface, ArrayAccess, \JsonSerializabl
         'url' => false,
         'murl' => false,
         'hits' => true,
-        'valid_till' => false
+        'valid_till' => true
     ];
 
     /**
@@ -592,7 +592,14 @@ class BasepackagesMurls implements ModelInterface, ArrayAccess, \JsonSerializabl
     public function setValidTill($valid_till)
     {
         if (is_null($valid_till)) {
-            throw new \InvalidArgumentException('non-nullable valid_till cannot be null');
+            array_push($this->openAPINullablesSetToNull, 'valid_till');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('valid_till', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
         }
 
 
