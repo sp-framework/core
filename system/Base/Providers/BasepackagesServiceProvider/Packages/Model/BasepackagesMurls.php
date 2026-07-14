@@ -11,6 +11,9 @@ class BasepackagesMurls extends BaseModel
     #[OA\Property(nullable: false, title: 'ID', description: 'ID', type: 'integer', format: 'int64')]
     public $id;
 
+    #[OA\Property(nullable: false, title: 'Api ID', description: 'Api ID', type: 'integer', format: 'int64')]
+    public $api_id;
+
     #[OA\Property(nullable: false, title: 'App ID', description: 'App ID', type: 'integer', format: 'int64')]
     public $app_id;
 

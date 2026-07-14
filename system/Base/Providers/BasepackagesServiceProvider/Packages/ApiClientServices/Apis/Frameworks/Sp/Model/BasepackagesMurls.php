@@ -60,6 +60,7 @@ class BasepackagesMurls implements ModelInterface, ArrayAccess, \JsonSerializabl
      */
     protected static $openAPITypes = [
         'id' => 'int',
+        'api_id' => 'int',
         'app_id' => 'int',
         'domain_id' => 'int',
         'account_id' => 'int',
@@ -78,6 +79,7 @@ class BasepackagesMurls implements ModelInterface, ArrayAccess, \JsonSerializabl
      */
     protected static $openAPIFormats = [
         'id' => 'int64',
+        'api_id' => 'int64',
         'app_id' => 'int64',
         'domain_id' => 'int64',
         'account_id' => 'int64',
@@ -94,6 +96,7 @@ class BasepackagesMurls implements ModelInterface, ArrayAccess, \JsonSerializabl
      */
     protected static array $openAPINullables = [
         'id' => false,
+        'api_id' => false,
         'app_id' => false,
         'domain_id' => false,
         'account_id' => false,
@@ -190,6 +193,7 @@ class BasepackagesMurls implements ModelInterface, ArrayAccess, \JsonSerializabl
      */
     protected static $attributeMap = [
         'id' => 'id',
+        'api_id' => 'api_id',
         'app_id' => 'app_id',
         'domain_id' => 'domain_id',
         'account_id' => 'account_id',
@@ -206,6 +210,7 @@ class BasepackagesMurls implements ModelInterface, ArrayAccess, \JsonSerializabl
      */
     protected static $setters = [
         'id' => 'setId',
+        'api_id' => 'setApiId',
         'app_id' => 'setAppId',
         'domain_id' => 'setDomainId',
         'account_id' => 'setAccountId',
@@ -222,6 +227,7 @@ class BasepackagesMurls implements ModelInterface, ArrayAccess, \JsonSerializabl
      */
     protected static $getters = [
         'id' => 'getId',
+        'api_id' => 'getApiId',
         'app_id' => 'getAppId',
         'domain_id' => 'getDomainId',
         'account_id' => 'getAccountId',
@@ -289,6 +295,7 @@ class BasepackagesMurls implements ModelInterface, ArrayAccess, \JsonSerializabl
     public function __construct(?array $data = null)
     {
         $this->setIfExists('id', $data ?? [], null);
+        $this->setIfExists('api_id', $data ?? [], null);
         $this->setIfExists('app_id', $data ?? [], null);
         $this->setIfExists('domain_id', $data ?? [], null);
         $this->setIfExists('account_id', $data ?? [], null);
@@ -363,6 +370,33 @@ class BasepackagesMurls implements ModelInterface, ArrayAccess, \JsonSerializabl
             throw new \InvalidArgumentException('non-nullable id cannot be null');
         }
         $this->container['id'] = $id;
+
+        return $this;
+    }
+
+    /**
+     * Gets api_id
+     *
+     * @return int|null
+     */
+    public function getApiId()
+    {
+        return $this->container['api_id'];
+    }
+
+    /**
+     * Sets api_id
+     *
+     * @param int|null $api_id Api ID
+     *
+     * @return self
+     */
+    public function setApiId($api_id)
+    {
+        if (is_null($api_id)) {
+            throw new \InvalidArgumentException('non-nullable api_id cannot be null');
+        }
+        $this->container['api_id'] = $api_id;
 
         return $this;
     }
