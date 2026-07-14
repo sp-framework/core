@@ -111,7 +111,7 @@ abstract class BaseApi extends Controller
         $this->response->setContentType('application/json', 'UTF-8');
         $this->response->setHeader('Cache-Control', 'no-store');
 
-        if ($responseCode !== 0 || $responseCode !== 1) {
+        if ($responseCode >= 100) {
             $this->response->setStatusCode($responseCode);
         }
     }
