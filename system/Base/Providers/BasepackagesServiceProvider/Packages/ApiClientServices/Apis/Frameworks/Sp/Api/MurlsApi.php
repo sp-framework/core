@@ -1369,19 +1369,16 @@ class MurlsApi
      *
      * Returns All Murls Information
      *
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\BasepackagesMurls|null $columns Provide columns to get (optional)
-     * @param  string|null $conditions Provide search conditions (optional)
-     * @param  int|null $limit Limit rows of data (optional)
-     * @param  int|null $page Page number (optional)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ViewMurlsRequest|null $view_murls_request view_murls_request (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurls'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
      * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse
      */
-    public function viewMurls($columns = null, $conditions = null, $limit = null, $page = null, string $contentType = self::contentTypes['viewMurls'][0])
+    public function viewMurls($view_murls_request = null, string $contentType = self::contentTypes['viewMurls'][0])
     {
-        list($response) = $this->viewMurlsWithHttpInfo($columns, $conditions, $limit, $page, $contentType);
+        list($response) = $this->viewMurlsWithHttpInfo($view_murls_request, $contentType);
         return $response;
     }
 
@@ -1390,19 +1387,16 @@ class MurlsApi
      *
      * Returns All Murls Information
      *
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\BasepackagesMurls|null $columns Provide columns to get (optional)
-     * @param  string|null $conditions Provide search conditions (optional)
-     * @param  int|null $limit Limit rows of data (optional)
-     * @param  int|null $page Page number (optional)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ViewMurlsRequest|null $view_murls_request (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurls'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
      * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse, HTTP status code, HTTP response headers (array of strings)
      */
-    public function viewMurlsWithHttpInfo($columns = null, $conditions = null, $limit = null, $page = null, string $contentType = self::contentTypes['viewMurls'][0])
+    public function viewMurlsWithHttpInfo($view_murls_request = null, string $contentType = self::contentTypes['viewMurls'][0])
     {
-        $request = $this->viewMurlsRequest($columns, $conditions, $limit, $page, $contentType);
+        $request = $this->viewMurlsRequest($view_murls_request, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -1492,18 +1486,15 @@ class MurlsApi
      *
      * Returns All Murls Information
      *
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\BasepackagesMurls|null $columns Provide columns to get (optional)
-     * @param  string|null $conditions Provide search conditions (optional)
-     * @param  int|null $limit Limit rows of data (optional)
-     * @param  int|null $page Page number (optional)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ViewMurlsRequest|null $view_murls_request (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurls'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function viewMurlsAsync($columns = null, $conditions = null, $limit = null, $page = null, string $contentType = self::contentTypes['viewMurls'][0])
+    public function viewMurlsAsync($view_murls_request = null, string $contentType = self::contentTypes['viewMurls'][0])
     {
-        return $this->viewMurlsAsyncWithHttpInfo($columns, $conditions, $limit, $page, $contentType)
+        return $this->viewMurlsAsyncWithHttpInfo($view_murls_request, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -1516,19 +1507,16 @@ class MurlsApi
      *
      * Returns All Murls Information
      *
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\BasepackagesMurls|null $columns Provide columns to get (optional)
-     * @param  string|null $conditions Provide search conditions (optional)
-     * @param  int|null $limit Limit rows of data (optional)
-     * @param  int|null $page Page number (optional)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ViewMurlsRequest|null $view_murls_request (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurls'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function viewMurlsAsyncWithHttpInfo($columns = null, $conditions = null, $limit = null, $page = null, string $contentType = self::contentTypes['viewMurls'][0])
+    public function viewMurlsAsyncWithHttpInfo($view_murls_request = null, string $contentType = self::contentTypes['viewMurls'][0])
     {
         $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ApiResponse';
-        $request = $this->viewMurlsRequest($columns, $conditions, $limit, $page, $contentType);
+        $request = $this->viewMurlsRequest($view_murls_request, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -1569,28 +1557,16 @@ class MurlsApi
     /**
      * Create request for operation 'viewMurls'
      *
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\BasepackagesMurls|null $columns Provide columns to get (optional)
-     * @param  string|null $conditions Provide search conditions (optional)
-     * @param  int|null $limit Limit rows of data (optional)
-     * @param  int|null $page Page number (optional)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Frameworks\Sp\Model\ViewMurlsRequest|null $view_murls_request (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['viewMurls'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function viewMurlsRequest($columns = null, $conditions = null, $limit = null, $page = null, string $contentType = self::contentTypes['viewMurls'][0])
+    public function viewMurlsRequest($view_murls_request = null, string $contentType = self::contentTypes['viewMurls'][0])
     {
 
 
-
-        if ($limit !== null && $limit < 1) {
-            throw new \InvalidArgumentException('invalid value for "$limit" when calling MurlsApi.viewMurls, must be bigger than or equal to 1.');
-        }
-        
-        if ($page !== null && $page < 1) {
-            throw new \InvalidArgumentException('invalid value for "$page" when calling MurlsApi.viewMurls, must be bigger than or equal to 1.');
-        }
-        
 
         $resourcePath = '/system/tools/murls';
         $formParams = [];
@@ -1599,42 +1575,6 @@ class MurlsApi
         $httpBody = '';
         $multipart = false;
 
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $columns,
-            'columns', // param base name
-            '', // openApiType
-            '', // style
-            false, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $conditions,
-            'conditions', // param base name
-            'string', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $limit,
-            'limit', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $page,
-            'page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
 
 
 
@@ -1646,7 +1586,14 @@ class MurlsApi
         );
 
         // for model (json/xml)
-        if (count($formParams) > 0) {
+        if (isset($view_murls_request)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($view_murls_request));
+            } else {
+                $httpBody = $view_murls_request;
+            }
+        } elseif (count($formParams) > 0) {
             if ($multipart) {
                 $multipartContents = [];
                 foreach ($formParams as $formParamName => $formParamValue) {
@@ -1685,7 +1632,7 @@ class MurlsApi
         $operationHost = $this->config->getHost();
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
-            'GET',
+            'POST',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
