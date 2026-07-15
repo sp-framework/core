@@ -15,6 +15,8 @@ class IpFilter extends BaseMiddleware
 
             $this->access->ipFilter->processMiddlewareResponse();
         } catch (\throwable $e) {
+            $this->logException($e);
+
             $this->logger->logIpFilters->alert('Error while checking for IP Filter List: ' . $e->getMessage() . '. Allowing unconditionally.');
 
             return true;

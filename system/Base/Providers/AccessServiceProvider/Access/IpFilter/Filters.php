@@ -368,6 +368,10 @@ class Filters extends BasePackage
                 ];
         }
 
+        $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+        $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
         if ($defaultStore) {
             $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFiltersDefault::class);
 
@@ -376,19 +380,15 @@ class Filters extends BasePackage
 
         $filter = $this->getByParams($conditions);
 
+        $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
+
+        $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
         if (isset($filter[0])) {
-            $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
-
-            $this->ffStore = $this->ff->store($this->ffStoreToUse);
-
             $this->addResponse('Ok', 0, ['filter' => $filter[0]]);
 
             return $filter[0];
         }
-
-        $this->setModelToUse($this->modelToUse = ServiceProviderAccessIpFilters::class);
-
-        $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
         $this->addResponse('No filter found for the given address ' . $address, 1);
 
@@ -1083,16 +1083,8 @@ class Filters extends BasePackage
 
     public function checkIPFilter($filter, $ip = false, $defaultStore = false)
     {
-        if ($ip) {//Check if IP is in default store and remove it
-            $inDefaultFilter = $this->getFilterByAddress($ip, false, true);
-
-            if ($inDefaultFilter) {
-                $this->removeFilter($inDefaultFilter, true);
-            }
-
-            if ($filter['address_type'] === 'host') {
-                $ip = false;
-            }
+        if ($ip && $filter['address_type'] === 'host') {
+            $ip = false;
         }
 
         if ($ip) {//Add a new Host Filter
