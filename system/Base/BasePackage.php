@@ -2585,7 +2585,7 @@ abstract class BasePackage extends Controller
 					}
 					if (isset($metadata['dataTypes'][$column]) && $metadata['dataTypes'][$column] === 'string') {
 						if (isset($metadata['columnSize'][$column])) {
-							if ($metadata['columnSize'][$column] > 0 && strlen($data[$column]) > 0) {
+							if ($metadata['columnSize'][$column] > 0 && isset($data[$column]) && strlen($data[$column]) > 0) {
 								$this->validation->add($column,
 													   \Phalcon\Filter\Validation\Validator\StringLength\Max::class,
 													   [
