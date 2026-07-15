@@ -114,6 +114,50 @@ class Api extends BaseApi
     /**
      * @api_acl(name=add)
      */
+    #[OA\Post(
+        path: '/system/tools/murls/add',
+        operationId: 'addMurl',
+        description: 'Add Murl',
+        summary: 'Add Murl',
+        tags: ['murls'],
+        requestBody: new OA\RequestBody(
+            description: 'Add murl',
+            required: true,
+            content: new OA\JsonContent(
+                ref: BasepackagesMurls::class
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'successful operation',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'permission denied',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'not found',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Incorrect murl data provided',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            )
+        ]
+    )]
     public function addAction()
     {
         $this->initialize();
@@ -273,6 +317,50 @@ class Api extends BaseApi
     /**
      * @api_acl(name=remove)
      */
+    #[OA\Post(
+        path: '/system/tools/murls/remove',
+        operationId: 'removeMurl',
+        description: 'Remove Murl',
+        summary: 'Remove Murl',
+        tags: ['murls'],
+        requestBody: new OA\RequestBody(
+            description: 'Remove murl',
+            required: true,
+            content: new OA\JsonContent(
+                ref: BasepackagesMurls::class
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'successful operation',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'permission denied',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'not found',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Incorrect murl data provided',
+                content: new OA\JsonContent(
+                    ref: BaseApi::class
+                )
+            )
+        ]
+    )]
     public function removeAction()
     {
         $this->initialize();

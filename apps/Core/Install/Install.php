@@ -25,6 +25,13 @@ use OpenApi\Attributes as OA;
     description: 'Find out more about SP Framework',
     url: 'https://sp.oyeaussie.dev/docs/'
 ))]
+#[OA\SecurityScheme(
+    securityScheme: 'Basic',
+    type: 'http',
+    name: 'basicAuthentication',
+    description: 'Basic username/password authentication',
+    in: 'header'
+)]
 class Install
 {
 }
