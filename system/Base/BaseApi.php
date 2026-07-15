@@ -144,8 +144,34 @@ abstract class BaseApi extends Controller
             $conditions['conditions'] = $this->postData()['conditions'];
         }
 
+        $conditions['page'] = 1;
+        if (isset($this->postData()['page'])) {
+            $conditions['page'] = (int) $this->postData()['page'];
+
+            if ($conditions['page'] <= 0) {
+                $conditions['page'] = 1;
+            }
+        }
+
+        $conditions['limit'] = 1;
+        if (isset($this->postData()['limit'])) {
+            $conditions['limit'] = (int) $this->postData()['limit'];
+
+            if ($conditions['limit'] <= 0) {
+                $conditions['limit'] = 1;
+            }
+        }
+
         try {
             $rows = $package->getPaged($conditions)->getItems();
+
+            if (isset($this->postData()['page']) && isset($package->packagesData->paginationCounters['last'])) {
+                if ((int) $this->postData()['page'] > $package->packagesData->paginationCounters['last']) {
+                    $this->addResponse('Max page allowed is ' . $package->packagesData->paginationCounters['last'], 400);
+
+                    return false;
+                }
+            }
         } catch (\Exception $e) {
             $this->logException($e);
 
