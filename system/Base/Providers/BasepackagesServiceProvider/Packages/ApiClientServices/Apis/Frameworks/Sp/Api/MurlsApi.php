@@ -1568,7 +1568,7 @@ class MurlsApi
 
 
 
-        $resourcePath = '/system/tools/murls';
+        $resourcePath = '/system/tools/murls/view';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
