@@ -116,7 +116,52 @@ class Api extends BaseApi
      */
     public function addAction()
     {
-        trace(['add']);
+        $this->initialize();
+
+        $data = $this->postData();
+
+        $validated = $this->murls->validateDataWithMetaData(data: $data, ignoreFields: ['id']);
+
+        if ($validated !== true) {
+            $this->addResponse($validated, 400);
+
+            return false;
+        }
+
+        if (isset($data['api_id']) && $data['api_id'] != 0) {
+            $api = $this->api->getById($data['api_id']);
+
+            if (!$api) {
+                $this->addResponse('API ID Incorrect', 1);
+
+                return false;
+            }
+
+            $data['app_id'] = $api['app_id'];
+            $data['domain_id'] = $api['domain_id'];
+        }
+
+        $data['account_id'] = $this->api->account()['id'];
+
+        try {
+            if ($this->murls->add($data)) {
+                $this->addResponse('Murl added', 0, $this->murls->packagesData->last);
+
+                return true;
+            }
+        } catch (\throwable $e) {
+            $this->logException($e);
+
+            if (str_contains($e->getMessage(), 'Duplicate')) {
+                $this->addResponse('Duplicate entry found!', 400, ['error' => $e->getMessage()]);
+            }
+
+            $this->addResponse('Error adding murl!', 400, ['error' => $e->getMessage()]);
+
+            return false;
+        }
+
+        $this->addResponse('Error adding murl', 1);
     }
 
     /**
@@ -204,13 +249,25 @@ class Api extends BaseApi
 
         $data['account_id'] = $this->api->account()['id'];
 
-        if ($this->murls->update($data)) {
-            $this->addResponse('Murl updated');
+        try {
+            if ($this->murls->update($data)) {
+                $this->addResponse('Murl updated', 0, $this->murls->packagesData->last);
 
-            return true;
+                return true;
+            }
+        } catch (\throwable $e) {
+            $this->logException($e);
+
+            if (str_contains($e->getMessage(), 'Duplicate')) {
+                $this->addResponse('Duplicate entry found!', 400, ['error' => $e->getMessage()]);
+            }
+
+            $this->addResponse('Error adding murl!', 400, ['error' => $e->getMessage()]);
+
+            return false;
         }
 
-        $this->addResponse('Error Updating Murl', 1);
+        $this->addResponse('Error updating murl', 1);
     }
 
     /**
@@ -218,6 +275,31 @@ class Api extends BaseApi
      */
     public function removeAction()
     {
-        trace(['remove']);
+        $this->initialize();
+
+        $data = $this->postData();
+        if (!isset($data['id'])) {
+            return $this->addResponse('Id not provided!', 400);
+        }
+
+        $murl = $this->murls->getById($data['id']);
+
+        if (!$murl) {
+            return $this->addResponse('Id ' . $data['id'] . ' not found!', 404);
+        }
+
+        try {
+            if ($this->murls->remove($murl['id'])) {
+                $this->addResponse('Murl removed', 0, ['id' => $murl['id']]);
+
+                return true;
+            }
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 500);
+
+            return false;
+        }
+
+        $this->addResponse('Error removing murl', 1);
     }
 }

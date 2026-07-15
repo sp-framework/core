@@ -56,7 +56,7 @@ class MurlsComponent extends BaseComponent
             'system/tools/murls/view',
             null,
             ['murl', 'hits', 'valid_till'],
-            false,
+            true,
             ['murl', 'hits', 'valid_till'],
             $controlActions,
             null,
