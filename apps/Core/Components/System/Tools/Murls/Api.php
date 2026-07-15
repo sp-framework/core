@@ -29,6 +29,48 @@ class Api extends BaseApi
         description: 'Returns All Murls Information',
         summary: 'Returns All Murls Information',
         tags: ['murls'],
+        parameters: [
+            new OA\Parameter(
+                name: 'columns',
+                description: 'Provide columns to get',
+                in: 'query',
+                required: false,
+                content: new OA\JsonContent(
+                    ref: BasepackagesMurls::class
+                )
+            ),
+            new OA\Parameter(
+                name: 'conditions',
+                description: 'Provide search conditions',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(
+                    type: 'string'
+                )
+            ),
+            new OA\Parameter(
+                name: 'limit',
+                description: 'Limit rows of data',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(
+                    type: 'integer',
+                    format: 'int64',
+                    minimum: 1
+                )
+            ),
+            new OA\Parameter(
+                name: 'page',
+                description: 'Page number',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(
+                    type: 'integer',
+                    format: 'int64',
+                    minimum: 1
+                )
+            ),
+        ],
         responses: [
             new OA\Response(
                 response: 200,

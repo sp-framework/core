@@ -26,11 +26,12 @@ use OpenApi\Attributes as OA;
     url: 'https://sp.oyeaussie.dev/docs/'
 ))]
 #[OA\SecurityScheme(
-    securityScheme: 'Basic',
+    securityScheme: 'BasicAuth',
     type: 'http',
     name: 'basicAuthentication',
     description: 'Basic username/password authentication',
-    in: 'header'
+    in: 'header',
+    scheme: 'basic'
 )]
 class Install
 {
