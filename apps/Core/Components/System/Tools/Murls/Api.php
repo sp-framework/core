@@ -24,7 +24,7 @@ class Api extends BaseApi
      * @api_acl(name=view)
      */
     #[OA\Post(
-        path: '/system/tools/murls',
+        path: '/system/tools/murls/view',
         operationId: 'viewMurls',
         description: 'Returns All Murls Information',
         summary: 'Returns All Murls Information',
