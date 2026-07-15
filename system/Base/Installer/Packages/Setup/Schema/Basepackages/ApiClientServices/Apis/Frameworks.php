@@ -54,6 +54,14 @@ class Frameworks
                         ]
                     ),
                     new Column(
+                        'authorization',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 512,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
                         'device_id',
                         [
                             'type'          => Column::TYPE_VARCHAR,

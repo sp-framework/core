@@ -93,8 +93,18 @@ class Apis extends BasePackage
             }
         };
 
-        if (strtolower($apiConfig['provider']) === 'github') {
-            $this->httpOptions['headers']['Authorization'] = 'Bearer ' . $apiConfig['authorization'];
+        if ($apiConfig['auth_type'] === 'auth') {
+            $credentials = base64_encode($apiConfig['username'] . ':' . $apiConfig['password']);
+
+            $this->httpOptions['headers']['Authorization'] = 'Basic ' . $credentials;
+        } else if ($apiConfig['auth_type'] === 'authorization') {//With prefix of Bearer or token or anything that the server wants
+            $this->httpOptions['headers']['Authorization'] = $apiConfig['authorization'];
+        } else if ($apiConfig['auth_type'] === 'token') {
+            //
+        } else if ($apiConfig['auth_type'] === 'client_credentials') {
+            //
+        } else if ($apiConfig['auth_type'] === 'oauth') {
+            //
         }
 
         $this->remoteWebContent = (new \System\Base\Providers\ContentServiceProvider\RemoteWeb\Content)->init($this->httpOptions);
@@ -116,22 +126,6 @@ class Apis extends BasePackage
             $this->config->setDebug(true);
             $this->config->setDebugFile(base_path("var/log/api_{$this->apiConfig['category']}_{$this->apiConfig['provider']}.log"));
             $this->httpOptions['debug'] = true;
-        }
-
-        $this->config->setUsername(null);
-        $this->config->setPassword(null);
-        $this->config->setApiKey('access_token', null);
-        if ($this->apiConfig['auth_type'] === 'auth') {
-            $this->config->setUsername($this->apiConfig['username']);
-            $this->config->setPassword($this->apiConfig['password']);
-        } else if ($this->apiConfig['auth_type'] === 'access_token') {
-            $this->config->setApiKey('access_token', $this->apiConfig['access_token']);
-        } else if ($this->apiConfig['auth_type'] === 'autho') {
-            if (strtolower($this->apiConfig['provider']) === 'gitea') {
-                $this->config->setApiKey('Authorization', $this->apiConfig['authorization']);
-                $this->config->setApiKeyPrefix('Authorization', 'token');
-            }
-            //Set Authorization for github via $this->httpOptions as Openapi tool does not generate method to include authentication.
         }
     }
 

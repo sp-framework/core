@@ -119,17 +119,17 @@
                                         'type'                            : 'primary',
                                         'dataValue'                       : 'auth'
                                     ],
-                                'access_token' :
-                                    [
-                                        'title'                           : 'Token',
-                                        'type'                            : 'primary',
-                                        'dataValue'                       : 'access_token'
-                                    ],
                                 'autho' :
                                     [
                                         'title'                           : 'Authorization',
                                         'type'                            : 'primary',
                                         'dataValue'                       : 'autho'
+                                    ],
+                                'access_token' :
+                                    [
+                                        'title'                           : 'Access Token',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'access_token'
                                     ]
                             ],
                         'fieldRadioChecked'              : apiAuthType
@@ -193,6 +193,31 @@
                                 'componentName'                         : componentName,
                                 'componentId'                           : componentId,
                                 'sectionId'                             : sectionId,
+                                'fieldId'                               : 'authorization',
+                                'fieldLabel'                            : 'Authorization Code',
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'password',
+                                'fieldHelp'                             : true,
+                                'fieldInputPasswordToggleVisibility'    : true,
+                                'fieldHelpTooltipContent'               : 'Authorization Code with prefix. Example: Baerer XXXXXX or token XXXXXX',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDisabled'                         : authoDisabled,
+                                'fieldValue'                            : apiAuthorization
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
                                 'fieldId'                               : 'access_token',
                                 'fieldLabel'                            : 'Access Token',
                                 'fieldType'                             : 'input',
@@ -206,31 +231,6 @@
                                 'fieldBazPostOnUpdate'                  : true,
                                 'fieldDisabled'                         : accessTokenDisabled,
                                 'fieldValue'                            : apiAccessToken
-                            ]
-                        )}}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{adminltetags.useTag('fields',
-                            [
-                                'component'                             : component,
-                                'componentName'                         : componentName,
-                                'componentId'                           : componentId,
-                                'sectionId'                             : sectionId,
-                                'fieldId'                               : 'authorization',
-                                'fieldLabel'                            : 'Authorization Code',
-                                'fieldType'                             : 'input',
-                                'fieldInputType'                        : 'password',
-                                'fieldHelp'                             : true,
-                                'fieldInputPasswordToggleVisibility'    : true,
-                                'fieldHelpTooltipContent'               : 'Authorization Code',
-                                'fieldRequired'                         : true,
-                                'fieldBazScan'                          : true,
-                                'fieldBazPostOnCreate'                  : true,
-                                'fieldBazPostOnUpdate'                  : true,
-                                'fieldDisabled'                         : authoDisabled,
-                                'fieldValue'                            : apiAuthorization
                             ]
                         )}}
                     </div>

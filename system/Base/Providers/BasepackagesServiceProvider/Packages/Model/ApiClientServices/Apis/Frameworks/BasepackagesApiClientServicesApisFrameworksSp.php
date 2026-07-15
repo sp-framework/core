@@ -16,6 +16,8 @@ class BasepackagesApiClientServicesApisFrameworksSp extends BaseModel
 
     public $password;
 
+    public $authorization;
+
     public $device_id;
 
     public $client_id;
