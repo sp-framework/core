@@ -147,9 +147,7 @@ abstract class BaseApi extends Controller
         try {
             $rows = $package->getPaged($conditions)->getItems();
         } catch (\Exception $e) {
-            if ($this->config->logs->exceptions) {
-                $this->logger->logExceptions->critical(json_trace($e));
-            }
+            $this->logException($e);
 
             $this->addResponse('API Error! Contact administrator.', 1);
 
@@ -157,5 +155,12 @@ abstract class BaseApi extends Controller
         }
 
         return ['rows' => $rows, 'counters' => $package->packagesData->paginationCounters];
+    }
+
+    protected function logException($exception)
+    {
+        if ($this->config->logs->exceptions) {
+            $this->logger->logExceptions->critical(json_trace($exception));
+        }
     }
 }
