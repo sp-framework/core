@@ -187,6 +187,10 @@ var BazTunnels = function() {
     }
 
     function sendPing() {
+        if (!dataCollection.env.profile) {
+            return;
+        }
+
         var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/wsping/';
 
         var postData = { };
