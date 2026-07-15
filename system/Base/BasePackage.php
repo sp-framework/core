@@ -2554,7 +2554,7 @@ abstract class BasePackage extends Controller
 	 *	);
 	 * ```
 	 */
-	public function validateDataWithMetaData($data, $model = null, $customMessages = [], $fieldsToCheck = [])
+	public function validateDataWithMetaData($data, $model = null, $customMessages = [], $fieldsToCheck = [], $ignoreFields = [])
 	{
 		if ($model) {
 			$this->setModelToUse($model);
@@ -2566,6 +2566,10 @@ abstract class BasePackage extends Controller
 
 		if (isset($metadata['columns']) && count($metadata['columns']) > 0) {
 			foreach ($metadata['columns'] as $column) {
+				if (in_array($column, $ignoreFields)) {
+					continue;
+				}
+
 				if (isset($fieldsToCheck[$column])) {
 					if (isset($fieldsToCheck[$column]['class']) && isset($fieldsToCheck[$column]['check'])) {
 						$this->validation->add($column, $fieldsToCheck[$column]['class'], $fieldsToCheck[$column]['check']);
