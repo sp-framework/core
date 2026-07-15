@@ -70,6 +70,9 @@ class MicroCollection
 
         if ($action === 'view') {//Make sure methods are all Caps, else route will not match!
             $methods = ['GET'];
+            if ($this->request->isPost()) {
+                $methods = ['POST'];
+            }
         } else if ($action === 'add' || $action === 'update') {
             $methods = ['POST','PATCH','PUT'];
         } else if ($action === 'remove') {
