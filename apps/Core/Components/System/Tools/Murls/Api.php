@@ -23,54 +23,39 @@ class Api extends BaseApi
     /**
      * @api_acl(name=view)
      */
-    #[OA\Get(
+    #[OA\Post(
         path: '/system/tools/murls',
         operationId: 'viewMurls',
         description: 'Returns All Murls Information',
         summary: 'Returns All Murls Information',
         tags: ['murls'],
-        parameters: [
-            new OA\Parameter(
-                name: 'columns',
-                description: 'Provide columns to get',
-                in: 'query',
-                required: false,
-                content: new OA\JsonContent(
-                    ref: BasepackagesMurls::class
-                )
-            ),
-            new OA\Parameter(
-                name: 'conditions',
-                description: 'Provide search conditions',
-                in: 'query',
-                required: false,
-                schema: new OA\Schema(
-                    type: 'string'
-                )
-            ),
-            new OA\Parameter(
-                name: 'limit',
-                description: 'Limit rows of data',
-                in: 'query',
-                required: false,
-                schema: new OA\Schema(
-                    type: 'integer',
-                    format: 'int64',
-                    minimum: 1
-                )
-            ),
-            new OA\Parameter(
-                name: 'page',
-                description: 'Page number',
-                in: 'query',
-                required: false,
-                schema: new OA\Schema(
-                    type: 'integer',
-                    format: 'int64',
-                    minimum: 1
-                )
-            ),
-        ],
+        requestBody: new OA\RequestBody(
+            required: false,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(
+                        property: 'columns',
+                        type: 'string',
+                        example: 'id,name'
+                    ),
+                    new OA\Property(
+                        property: 'conditions',
+                        type: 'string',
+                        example: '-|murl|like|%job%|&'
+                    ),
+                    new OA\Property(
+                        property: 'limit',
+                        type: 'integer',
+                        example: 5
+                    ),
+                    new OA\Property(
+                        property: 'page',
+                        type: 'integer',
+                        example: 2
+                    )
+                ]
+            )
+        ),
         responses: [
             new OA\Response(
                 response: 200,
