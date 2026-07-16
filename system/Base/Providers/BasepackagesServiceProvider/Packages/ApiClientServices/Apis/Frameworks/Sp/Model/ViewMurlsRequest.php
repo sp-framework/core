@@ -61,7 +61,8 @@ class ViewMurlsRequest implements ModelInterface, ArrayAccess, \JsonSerializable
         'columns' => 'string',
         'conditions' => 'string',
         'limit' => 'int',
-        'page' => 'int'
+        'page' => 'int',
+        'order' => 'string'
     ];
 
     /**
@@ -75,7 +76,8 @@ class ViewMurlsRequest implements ModelInterface, ArrayAccess, \JsonSerializable
         'columns' => null,
         'conditions' => null,
         'limit' => null,
-        'page' => null
+        'page' => null,
+        'order' => null
     ];
 
     /**
@@ -87,7 +89,8 @@ class ViewMurlsRequest implements ModelInterface, ArrayAccess, \JsonSerializable
         'columns' => false,
         'conditions' => false,
         'limit' => false,
-        'page' => false
+        'page' => false,
+        'order' => false
     ];
 
     /**
@@ -179,7 +182,8 @@ class ViewMurlsRequest implements ModelInterface, ArrayAccess, \JsonSerializable
         'columns' => 'columns',
         'conditions' => 'conditions',
         'limit' => 'limit',
-        'page' => 'page'
+        'page' => 'page',
+        'order' => 'order'
     ];
 
     /**
@@ -191,7 +195,8 @@ class ViewMurlsRequest implements ModelInterface, ArrayAccess, \JsonSerializable
         'columns' => 'setColumns',
         'conditions' => 'setConditions',
         'limit' => 'setLimit',
-        'page' => 'setPage'
+        'page' => 'setPage',
+        'order' => 'setOrder'
     ];
 
     /**
@@ -203,7 +208,8 @@ class ViewMurlsRequest implements ModelInterface, ArrayAccess, \JsonSerializable
         'columns' => 'getColumns',
         'conditions' => 'getConditions',
         'limit' => 'getLimit',
-        'page' => 'getPage'
+        'page' => 'getPage',
+        'order' => 'getOrder'
     ];
 
     /**
@@ -267,6 +273,7 @@ class ViewMurlsRequest implements ModelInterface, ArrayAccess, \JsonSerializable
         $this->setIfExists('conditions', $data ?? [], null);
         $this->setIfExists('limit', $data ?? [], null);
         $this->setIfExists('page', $data ?? [], null);
+        $this->setIfExists('order', $data ?? [], null);
     }
 
     /**
@@ -415,6 +422,33 @@ class ViewMurlsRequest implements ModelInterface, ArrayAccess, \JsonSerializable
             throw new \InvalidArgumentException('non-nullable page cannot be null');
         }
         $this->container['page'] = $page;
+
+        return $this;
+    }
+
+    /**
+     * Gets order
+     *
+     * @return string|null
+     */
+    public function getOrder()
+    {
+        return $this->container['order'];
+    }
+
+    /**
+     * Sets order
+     *
+     * @param string|null $order order
+     *
+     * @return self
+     */
+    public function setOrder($order)
+    {
+        if (is_null($order)) {
+            throw new \InvalidArgumentException('non-nullable order cannot be null');
+        }
+        $this->container['order'] = $order;
 
         return $this;
     }
