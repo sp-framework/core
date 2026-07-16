@@ -196,13 +196,7 @@ class Api extends BaseApi
 
         $data = $this->postData();
 
-        $validated = $this->murls->validateDataWithMetaData(data: $data, ignoreFields: ['id']);
-
-        if ($validated !== true) {
-            $this->addResponse($validated, 400);
-
-            return false;
-        }
+        $this->murls->validateDataWithMetaData(data: $data, ignoreFields: ['id'], throwException: false);
 
         if (isset($data['api_id']) && $data['api_id'] != 0) {
             $api = $this->api->getById($data['api_id']);
@@ -292,22 +286,13 @@ class Api extends BaseApi
         $this->initialize();
 
         $data = $this->postData();
-        if (!isset($data['id'])) {
-            return $this->addResponse('Id not provided!', 400);
-        }
+
+        $this->murls->validateDataWithMetaData(data: $data);
 
         $murl = $this->murls->getById($data['id']);
 
         if (!$murl) {
             return $this->addResponse('Id ' . $data['id'] . ' not found!', 404);
-        }
-
-        $validated = $this->murls->validateDataWithMetaData($data);
-
-        if ($validated !== true) {
-            $this->addResponse($validated, 400);
-
-            return false;
         }
 
         if (isset($data['api_id']) && $data['api_id'] != 0) {

@@ -10,6 +10,7 @@ use Phalcon\Paginator\Adapter\NativeArray;
 use Phalcon\Paginator\Exception;
 use System\Base\Exceptions\IdNotFoundException;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
+use System\Base\Providers\ErrorServiceProvider\Exceptions\DataValidationFailException;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
 abstract class BasePackage extends Controller
@@ -2580,9 +2581,9 @@ abstract class BasePackage extends Controller
 	 * ```
 	 */
 	public function validateDataWithMetaData(
-		$data, $model = null, $customMessages = [],
+		$data, $checkFields = [], $model = null, $customMessages = [],
 		$fieldsCustomCheck = [], $ignoreFields = [], $nonZeroFields = [], $callbacks = [],
-		$replaceColumnNames = []
+		$replaceColumnNames = [], $throwException = true
 	) {
 		if ($model) {
 			$this->setModelToUse($model);
@@ -2593,6 +2594,16 @@ abstract class BasePackage extends Controller
 		$this->validation->init();
 
 		if (isset($metadata['columns']) && count($metadata['columns']) > 0) {
+			if (count($checkFields) > 0) {
+				$checkFieldsColumns = [];
+
+				foreach ($checkFields as $checkField) {
+					$checkFieldsColumns[$checkField] = $checkField;
+				}
+
+				$metadata['columns'] = $checkFieldsColumns;
+			}
+
 			if (count($replaceColumnNames) === 0) {
 				$replaceColumnNames = $metadata['columns'];
 			} else {
@@ -2685,6 +2696,10 @@ abstract class BasePackage extends Controller
 
 			foreach ($validated as $key => $value) {
 				$messages .= $value['message'] . ' ';
+			}
+
+			if ($throwException) {
+				throw new DataValidationFailException(trim($messages));
 			}
 
 			return trim($messages);

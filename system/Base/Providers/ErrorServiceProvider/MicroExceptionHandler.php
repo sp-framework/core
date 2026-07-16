@@ -83,6 +83,7 @@ class MicroExceptionHandler
     {
         $this->apiResponse['responseMessage'] = 'Application not found!';
         $this->apiResponse['responseCode'] = 1;
+        $this->apiResponse['responseData'] = null;
 
         return $this->sendJson();
     }
@@ -91,6 +92,7 @@ class MicroExceptionHandler
     {
         $this->apiResponse['responseMessage'] = 'Component not found!';
         $this->apiResponse['responseCode'] = 1;
+        $this->apiResponse['responseData'] = null;
 
         return $this->sendJson();
     }
@@ -103,5 +105,14 @@ class MicroExceptionHandler
         $this->response->setJsonContent($this->apiResponse);
 
         return $this->response->send();
+    }
+
+    public function handleDatavalidationFailException()
+    {
+        $this->apiResponse['responseMessage'] = $this->exception->getMessage();
+        $this->apiResponse['responseCode'] = 400;
+        $this->apiResponse['responseData'] = null;
+
+        return $this->sendJson();
     }
 }
