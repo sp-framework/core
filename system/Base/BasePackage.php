@@ -2637,6 +2637,15 @@ abstract class BasePackage extends Controller
 					);
 				}
 
+				if (count($checkFields) > 0 && !isset($metadata['required'][$column])) {
+					$this->validation->add($column,
+										   \Phalcon\Filter\Validation\Validator\PresenceOf::class,
+										   [
+											   'message' => isset($customMessages[$column]) ? $customMessages[$column] : 'Enter valid ' . $replaceColumnNames[$column]
+										   ]
+					);
+				}
+
 				if (isset($metadata['dataTypes'][$column]) && $metadata['dataTypes'][$column] === 'string') {
 					if (isset($metadata['columnSize'][$column])) {
 						if ($metadata['columnSize'][$column] > 0 && isset($data[$column]) && strlen($data[$column]) > 0) {
