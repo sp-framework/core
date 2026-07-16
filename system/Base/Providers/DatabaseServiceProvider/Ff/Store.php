@@ -326,6 +326,8 @@ class Store
             $dataArr = $qb->getQuery()->fetch();
 
             if ($dataArr && count($dataArr) > 0) {
+                $this->criteriaCount = count($dataArr);
+
                 if ($getRelations) {
                     foreach ($dataArr as &$data) {
                         $data = $this->getRelations($data, $relationsConditions, $relationsStores);
@@ -391,6 +393,8 @@ class Store
             $dataArr = $qb->getQuery()->fetch();
 
             if ($dataArr && count($dataArr) > 0) {
+                $this->criteriaCount = count($dataArr);
+
                 if ($getRelations) {
                     foreach ($dataArr as &$data) {
                         $data = $this->getRelations($data, $relationsConditions, $relationsStores);
@@ -1095,12 +1099,12 @@ class Store
         return $this->primaryKey;
     }
 
-    public function count($recount = false, $criteria = null): int
+    public function count($recount = false, array $criteria = null, array $orderBy = null, int $limit = null, int $offset = null): int
     {
         if ($criteria && !is_null($this->criteriaCount)) {
             return $this->criteriaCount;
         } else if ($criteria) {
-            $data = $this->findBy($criteria);
+            $data = $this->findBy($criteria, $orderBy, $limit, $offset);
 
             if ($data && is_array($data)) {
                 return count($data);

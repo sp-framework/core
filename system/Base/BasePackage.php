@@ -749,7 +749,32 @@ abstract class BasePackage extends Controller
 				if ($this->config->databasetype === 'db') {
 					$paginationCounters['filtered_items'] = $this->modelToUse::count($this->filterConditions);
 				} else {
-					$paginationCounters['filtered_items'] = $this->ffStore->count(false, $this->filterConditions);
+					$order = null;
+					$limit = null;
+					$offset = null;
+
+					if (isset($params['order'])) {
+						$orderParamsArr = explode(' ', $params['order']);
+						$orderParamsArr = $this->helper->chunk($orderParamsArr, 2);
+
+						$orderParams = [];
+
+						foreach ($orderParamsArr as $orderParam) {
+							if (isset($orderParam[1])) {
+								$orderParams[$orderParam[0]] = $orderParam[1];
+							}
+						}
+
+						$order = $orderParams;
+					}
+					if (isset($params['limit'])) {
+						$limit = $params['limit'];
+					}
+					if (isset($params['offset'])) {
+						$offset = $params['offset'];
+					}
+
+					$paginationCounters['filtered_items'] = $this->ffStore->count(false, $this->filterConditions, $order, $limit, $offset);
 				}
 			}
 
