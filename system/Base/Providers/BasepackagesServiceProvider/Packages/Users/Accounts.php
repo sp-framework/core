@@ -1685,4 +1685,33 @@ class Accounts extends BasePackage
 
         return true;
     }
+
+    public function searchAccounts(string $accountQueryString)
+    {
+        if ($this->config->databasetype === 'db') {
+            $searchAccounts = $this->getByParams(
+                [
+                    'conditions'    => 'email LIKE :cEmail:',
+                    'bind'          => [
+                        'cEmail'     => '%' . $accountQueryString . '%'
+                    ]
+                ]
+            );
+        } else {
+            $searchAccounts = $this->getByParams(['conditions' => ['email', 'LIKE', '%' . $accountQueryString . '%']]);
+        }
+
+        $accounts = [];
+
+        if ($searchAccounts) {
+            foreach ($searchAccounts as $accountKey => $accountValue) {
+                $accounts[$accountKey]['id'] = $accountValue['id'];
+                $accounts[$accountKey]['email'] = $accountValue['email'];
+            }
+        }
+
+        $this->addResponse('Ok', 0, ['accounts' => $accounts]);
+
+        return $accounts;
+    }
 }

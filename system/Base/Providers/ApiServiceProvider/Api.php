@@ -113,94 +113,53 @@ class Api extends BasePackage
 
     public function addApi(array $data)
     {
-        $data['account_id'] = 0;
-
-        if ($this->access->auth->account()) {
-            $data['account_id'] = $this->access->auth->account()['id'];
+        if (!isset($data['account_id'])) {
+            $data['account_id'] = 0;
         }
 
         $data['private_key_passphrase'] = '0';
         $data['private_key'] = '0';
         $data['private_key_location'] = '0';
 
-        if (($data = $this->checkTimeouts($data)) === false) {
+        if (($data = $this->preCheck($data)) === false) {
             return false;
-        }
-
-        if (isset($data['authorization_tos_pp']) && $data['authorization_tos_pp'] !== '') {
-            $data['authorization_tos_pp'] = $this->escaper->html($data['authorization_tos_pp']);
         }
 
         if ($this->add($data)) {
             $newApi = $this->packagesData->last;
 
-            if ($data['api_type'] === 'protected_grant') {
+            if ($newApi && $newApi['api_type'] === 'protected_grant') {
                 $newApi = $this->generatePKIKeys($newApi);
 
-                if ($newApi) {
-                    $this->updateApi($newApi);
-
-                    $this->addResponse('Added ' . $data['name'] . ' api');
-                } else {
+                if (!$newApi) {
                     $this->removeApi($newApi);
+
+                    $this->addResponse('Error generating Pki keys for ' . $newApi['name'] . ' api', 1);
 
                     return false;
                 }
 
                 if ($newApi['grant_type'] === 'authorization_code') {
-                    if ((isset($newApi['client_id']) && $newApi['client_id'] === '') ||
-                        !isset($newApi['client_id'])
-                    ) {
-                        $client = $this->clients->generateClientKeys(
-                            [
-                                'api_id'        => $data['id'],
-                                'client_id'     => $data['client_id'],
-                                'client_secret' => $data['client_secret'],
-                                'redirect_url'  => $data['redirect_url']
-                            ],
-                            $this->access->auth->account(),
-                            null,
-                            false
-                        );
+                    $client = $this->clients->generateClientKeys(
+                        data:
+                        [
+                            'api_id'        => $newApi['id'],
+                        ],
+                        emailNewClientDetails: false
+                    );
 
-                        $newApi['client_id'] = $client['client_id'];
+                    $newApi['client_id'] = $client['client_id'];
 
-                        $this->updateApi($newApi);
-                    } else {
-                        $client = $this->clients->getFirst('client_id', $newApi['client_id']);
-
-                        if (!$client && ($newApi['client_id'] !== $data['client_id'])) {
-                            $client = $this->clients->generateClientKeys(
-                                [
-                                    'api_id'        => $data['id'],
-                                    'client_id'     => $data['client_id'],
-                                    'client_secret' => $data['client_secret'],
-                                    'redirect_url'  => $data['redirect_url'],
-                                    'forceRegen'    => true
-                                ],
-                                $this->access->auth->account(),
-                                null,
-                                false,
-                                $data['client_id'],
-                                $data['client_secret'],
-                            );
-
-                            $newApi['client_id'] = $client['client_id'];
-
-                            $this->updateApi($newApi);
-                        } else {
-                            $client = $client->toArray();
-
-                            $client['redirectUri'] = $data['redirect_url'];
-
-                            $this->clients->updateClient($client);
-                        }
-                    }
+                    $this->update($newApi);
                 }
             }
-        } else {
-            $this->addResponse('Error adding new api.', 1);
+
+            $this->addResponse('Added ' . $newApi['name'] . ' api');
+
+            return true;
         }
+
+        $this->addResponse('Error adding new api.', 1);
     }
 
     public function updateApi(array $data)
@@ -213,64 +172,64 @@ class Api extends BasePackage
             return false;
         }
 
-        if (($data = $this->checkTimeouts($data)) === false) {
+        $data = array_merge($api, $data);
+
+        if (($data = $this->preCheck($data)) === false) {
             return false;
         }
-
-        $data = array_merge($api, $data);
 
         if ($data['api_type'] === 'protected_grant') {
             if (isset($data['regenerate_pki_keys']) && $data['regenerate_pki_keys'] == 1) {
                 $data = $this->generatePKIKeys($data);
             }
 
-            if ($data['grant_type'] === 'client_credentials') {
+            if ($data['grant_type'] === 'client_credentials' && !isset($data['refresh_token_timeout'])) {
                 $data['refresh_token_timeout'] = 'P1M';
             }
 
             if ($data['grant_type'] === 'authorization_code') {
-                if ((isset($data['client_id']) && $data['client_id'] === '') ||
-                    !isset($data['client_id'])
-                ) {
-                    $client = $this->clients->generateClientKeys(
-                        [
-                            'api_id'        => $data['id'],
-                            'client_id'     => $data['client_id'],
-                            'client_secret' => $data['client_secret'],
-                            'redirect_url'  => $data['redirect_url']
-                        ],
-                        $this->access->auth->account(),
-                        null,
-                        false
-                    );
+                if (isset($data['account_id'])) {
+                    $account = $this->basepackages->accounts->getById($data['account_id']);
 
-                    $data['client_id'] = $client['client_id'];
-                } else {
-                    $client = $this->clients->getFirst('client_id', $data['client_id']);
+                    if ($account) {
+                        if ((isset($data['client_id']) && $data['client_id'] === '') ||
+                            !isset($data['client_id'])
+                        ) {
+                            $client = $this->clients->generateClientKeys(
+                                data:
+                                [
+                                    'api_id'        => $newApi['id'],
+                                ],
+                                emailNewClientDetails: false,
+                                account: $account,
+                                viaApi: true
+                            );
 
-                    if (!$client && ($api['client_id'] !== $data['client_id'])) {
-                        $client = $this->clients->generateClientKeys(
-                            [
-                                'api_id'        => $data['id'],
-                                'client_id'     => $data['client_id'],
-                                'client_secret' => $data['client_secret'],
-                                'redirect_url'  => $data['redirect_url'],
-                                'forceRegen'    => true
-                            ],
-                            $this->access->auth->account(),
-                            null,
-                            false,
-                            $data['client_id'],
-                            $data['client_secret']
-                        );
+                            $data['client_id'] = $client['client_id'];
+                        } else {
+                            $client = $this->clients->getFirst('client_id', $data['client_id']);
 
-                        $data['client_id'] = $client['client_id'];
-                    } else {
-                        $client = $client->toArray();
+                            if (!$client && ($api['client_id'] !== $data['client_id'])) {
+                                $client = $this->clients->generateClientKeys(
+                                    data:
+                                    [
+                                        'api_id'        => $data['id'],
+                                        'forceRegen'    => true
+                                    ],
+                                    emailNewClientDetails: false,
+                                    account: $account,
+                                    viaApi: true
+                                );
 
-                        $client['redirectUri'] = $data['redirect_url'];
+                                $data['client_id'] = $client['client_id'];
+                            } else {
+                                $client = $client->toArray();
 
-                        $this->clients->updateClient($client);
+                                $client['redirectUri'] = $data['redirect_url'];
+
+                                $this->clients->updateClient($client);
+                            }
+                        }
                     }
                 }
             }
@@ -285,6 +244,23 @@ class Api extends BasePackage
         } else {
             $this->addResponse('Error updating api.', 1);
         }
+    }
+
+    protected function preCheck($data)
+    {
+        if (($data = $this->checkTimeouts($data)) === false) {
+            return false;
+        }
+
+        $nonZeroFields = ['app_id', 'domain_id', 'scope_id'];
+
+        if ($data['grant_type'] === 'authorization_code') {
+            array_push($nonZeroFields, 'account_id');
+        }
+
+        $this->validateDataWithMetaData(data: $data, ignoreFields: ['id'], nonZeroFields: $nonZeroFields);
+
+        return $data;
     }
 
     protected function checkTimeouts($data)
@@ -318,10 +294,22 @@ class Api extends BasePackage
 
     public function removeApi(array $data)
     {
+        $this->validateDataWithMetaData(data: $data, checkFields: ['id']);
+
+        $api = $this->getById($data['id']);
+
+        if (!$api) {
+            $this->addResponse('Api with ID not found.', 1);
+
+            return false;
+        }
+
+        trace([$api]);
         if (isset($data['id'])) {
             if ($this->remove($data['id'], true, false)) {
-
                 $this->deleteAPIKeys($data['id']);
+
+                //Revoke all clients
 
                 $this->addResponse('Removed api');
             } else {
@@ -903,13 +891,13 @@ class Api extends BasePackage
 
             return true;
         } catch (OAuthServerException $exception) {
-            $this->logger->logExceptions->critical(json_trace($exception));
+            $this->logException($exception);
 
             $this->addResponse($exception->getMessage(), 1, []);
 
             return $exception->generateHttpResponse($serverResponse);
         } catch (\Exception $exception) {
-            $this->logger->logExceptions->critical(json_trace($exception));
+            $this->logException($exception);
 
             $this->addResponse($exception->getMessage(), 1, []);
 
@@ -934,17 +922,19 @@ class Api extends BasePackage
 
             return $this->server->completeAuthorizationRequest($authoRequest, $serverResponse);
         } catch (OAuthServerException $exception) {
-            var_dump($exception);die();
-
+            $this->logException($exception);
+            trace([$exception]);
             // All instances of OAuthServerException can be formatted into a HTTP response
             return $exception->generateHttpResponse($serverResponse);
-
         } catch (\Exception $exception) {
-            var_dump($exception);die();
+            $this->logException($exception);
+            trace([$exception]);
 
             // Unknown exception
             $body = new Stream(fopen('php://temp', 'r+'));
+
             $body->write($exception->getMessage());
+
             return $serverResponse->withStatus(500)->withBody($body);
         }
     }

@@ -188,7 +188,7 @@ class Clients extends BasePackage
         if ($client) {
             $api = $this->api->getById($client['api_id']);
 
-            if ($api['is_public'] == true) {
+            if ($api['api_type'] === 'public') {
                 $this->addResponse('Cannot revoke or generate key for public client.', 1);
 
                 return false;
@@ -233,15 +233,15 @@ class Clients extends BasePackage
         return false;
     }
 
-    public function generateClientKeys($data, $account = null, $newClient = null, $emailNewClientDetails = true, $viaRegister = false)
+    public function generateClientKeys($data, $account = null, $newClient = null, $emailNewClientDetails = true, $viaRegister = false, $viaApi = false)
     {
         $api = $this->api->getById($data['api_id']);
 
-        if (!$account) {
-            $account = $this->access->auth->account();
-        }
-
         if ($api) {
+            if (!$account) {
+                $account = $this->access->auth->account();
+            }
+
             if (isset($data['forceRevoke']) || isset($data['forceRegen'])) {
                 $oldClient = $this->checkClientExists($api, $account);
 
@@ -263,13 +263,16 @@ class Clients extends BasePackage
             }
 
             try {
-                if ($account && $api['client_keys_generation_allowed'] == true) {
+                if (isset($account['id']) &&
+                    isset($account['email']) &&
+                    ($api['client_keys_generation_allowed'] == true || $viaApi)
+                ) {
                     $newClient['api_id'] = $api['id'];
                     $newClient['app_id'] = $api['app_id'];
                     $newClient['domain_id'] = $api['domain_id'];
-                    $newClient['account_id'] = $account['id'] ?? $this->access->auth->account()['id'];
-                    $newClient['email'] = $account['email'] ?? $this->access->auth->account()['email'];
-                    $newClient['name'] = $api['id'] . '_' . $api['app_id'] . '_' . $api['domain_id'] . '_' . ($account['id'] ?? $this->access->auth->account()['id']);
+                    $newClient['account_id'] = $account['id'];
+                    $newClient['email'] = $account['email'];
+                    $newClient['name'] = $api['id'] . '_' . $api['app_id'] . '_' . $api['domain_id'] . '_' . $account['id'];
                     $newClient['client_id'] = $data['client_id'] ?? $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
                     $client_secret = $data['client_secret'] ?? $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
                     $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
@@ -277,9 +280,6 @@ class Clients extends BasePackage
                     $newClient['revoked'] = '0';
                     $newClient['redirectUri'] = $data['redirect_url'] ?? 'https://';
                     $newClient['device_id'] = null;
-                    if (isset($account['device_id'])) {
-                        $newClient['device_id'] = $account['device_id'];
-                    }
                     if (isset($api['redirect_uri'])) {
                         $newClient['redirectUri'] = $api['redirect_uri'];
                     }

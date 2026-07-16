@@ -67,6 +67,20 @@ class ServicesComponent extends BaseComponent
                 $api['client_secret'] = '';
             }
 
+            if ($api['account_id'] && $api['account_id'] != 0) {
+                $account = $this->basepackages->accounts->getById($api['account_id']);
+
+                if ($account) {
+                    $api['account_email'] = $account['email'];
+                } else {
+                    $api['account_id'] = 0;
+                    $api['account_email'] = '';
+                }
+            } else {
+                $api['account_id'] = 0;
+                $api['account_email'] = '';
+            }
+
             if ($this->getData()['id'] != 0) {//Read dev provided openapi information via Install.php file
                 try {
                     $version = '0.0.0';
@@ -171,24 +185,10 @@ class ServicesComponent extends BaseComponent
                 ]
             ];
 
-        if ($this->access->auth->account()['security']['role_id'] != '1') {
-            $conditions =
-                [
-                    'conditions'    =>
-                        '-|account_id|equals|' . $this->access->auth->account()['id'] . '&',
-                    'order'         => 'id desc'
-                ];
-        } else {
-            $conditions =
-                [
-                    'order'         => 'id desc'
-                ];
-        }
-
         $this->generateDTContent(
             $this->api,
             'system/api/server/services/view',
-            $conditions,
+            null,
             ['name', 'status', 'api_type', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
             true,
             ['name', 'status', 'api_type', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
