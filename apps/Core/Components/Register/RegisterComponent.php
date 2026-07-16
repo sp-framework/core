@@ -22,12 +22,21 @@ class RegisterComponent extends BaseComponent
      */
     public function viewAction()
     {
+        if (isset($this->getData()['authorized']) &&
+            isset($this->getData()['test_authorized'])
+        ) {
+            return true;
+        }
+
+        $this->view->refresh = false;
+        $this->view->newToken = false;
+
         if (isset($this->getData()['response_type']) &&
             $this->getData()['response_type'] === 'code' &&
             isset($this->getData()['client_id']) &&
             isset($this->getData()['redirect_uri']) &&
             isset($this->getData()['scope'])
-        ) {//Authorize Flow 1
+        ) {//Authorize Flow 1, state is not set
             $this->view->setLayout('auth');
 
             $this->view->pick('register/authorization');
@@ -90,7 +99,8 @@ class RegisterComponent extends BaseComponent
             $this->view->api = $this->removeApiKeysInfo($apiArr);
             $this->view->client = $this->api->client;
             $this->view->code = $this->request->getQuery()['code'];
-            if ($this->request->getQuery()['state']) {
+
+            if (isset($this->request->getQuery()['state'])) {
                 $this->view->state = $this->request->getQuery()['state'];
             }
 
@@ -128,9 +138,6 @@ class RegisterComponent extends BaseComponent
 
             return;
         }
-
-        $this->view->refresh = false;
-        $this->view->newToken = false;
 
         if (isset($this->getData()['api'])) {
             $apiArr = $this->api->getById($this->getData()['api']);
@@ -252,13 +259,13 @@ class RegisterComponent extends BaseComponent
 
         if ($this->postData()['grant_type'] === 'authorization_code' || $this->postData()['grant_type'] === 'refresh_token') {
             $apis = $this->api->init(true)->getApiInfo(false, true);
-
+            trace([$apis]);
             foreach ($apis as $api) {
                 if ($this->postData()['client_id'] === $api['client_id']) {
                     $this->api->api = $api;
                 }
             }
-
+            trace([$this->api->api]);
             if ($this->api->api) {
                 if ($this->postData()['grant_type'] === 'refresh_token') {
                     $this->api->setupApi(true);

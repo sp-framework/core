@@ -774,8 +774,8 @@ class Api extends BasePackage
     public function setupApi($refreshTokenSet = false)
     {
         if ($this->api['grant_type']) {
-            if (!isset($this->{$this->api['grant_type']})) {
-                if (method_exists($this, $grant = "init" . ucfirst("{$this->api['grant_type']}"))) {
+            if (method_exists($this, $grant = "init" . ucfirst("{$this->api['grant_type']}"))) {
+                try {
                     $this->initApiServer();
 
                     if ($refreshTokenSet) {
@@ -785,6 +785,8 @@ class Api extends BasePackage
                     }
 
                     $this->{$grant}();
+                } catch (\throwable $e) {
+                    trace([$e]);
                 }
             }
         }
@@ -915,7 +917,6 @@ class Api extends BasePackage
 
         try {
             $authoRequest = $this->server->validateAuthorizationRequest(ServerRequest::fromGlobals());
-
             $authoRequest->setUser(new ServiceProviderApiUsers());
 
             $authoRequest->setAuthorizationApproved(true);
@@ -1247,20 +1248,7 @@ class Api extends BasePackage
     {
         $url = false;
 
-        if (!isset($data['type'])) {
-            $this->addResponse('Please set url type.', 1);
-
-            return false;
-        }
-
-        $this->validation->add('app_id', PresenceOf::class, ["message" => "Please provide app id."]);
-        $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain id."]);
-
-        if (($validatedMessages = $this->validateData($data)) !== true) {
-            $this->addResponse($validatedMessages, 1);
-
-            return false;
-        }
+        $this->validateDataWithMetaData(data: $data, checkFields: ['type', 'app_id', 'domain_id']);
 
         $app = $this->apps->getById($data['app_id']);
         if (!$app) {
@@ -1283,15 +1271,7 @@ class Api extends BasePackage
         }
 
         if ($data['type'] === 'request' || $data['type'] === 'authorization') {
-            $this->validation->add('client_id', PresenceOf::class, ["message" => "Please provide client id."]);
-            $this->validation->add('redirect_url', PresenceOf::class, ["message" => "Please provide redirect URL."]);
-            $this->validation->add('scope_id', PresenceOf::class, ["message" => "Please provide scope id."]);
-
-            if (($validatedMessages = $this->validateData($data)) !== true) {
-                $this->addResponse($validatedMessages, 1);
-
-                return false;
-            }
+            $this->validateDataWithMetaData(data: $data, checkFields: ['client_id', 'redirect_url', 'scope_id']);
 
             $scope = $this->scopes->getById($data['scope_id']);
             if (!$scope) {
@@ -1304,24 +1284,21 @@ class Api extends BasePackage
 
             if ($data['type'] === 'authorization') {
                 $url = $url . 'csrf/' . $data['csrf'] . '/?response_type=code&client_id=' . $data['client_id'] . '&redirect_url=' . $data['redirect_url'];
-                if (isset($data['state']) && $data['state'] !== '') {
+                if (isset($data['state']) && $data['state'] !== '' && $data['state'] !== '%7B%7Byour_state_code%7D%7D') {
                     $url = $url . '&state=' . $data['state'];
                 }
             } else {
                 $url = $url . 'response_type/code/client_id/' . $data['client_id'] . '/scope/' . $scope['scope_name'];
 
-                $url = $url . '/state/' . ($data['state'] ?? '{{your_state_code}}');
+                $url = $url . '/state/' . ($data['state'] ?? '%7B%7Byour_state_code%7D%7D');
 
                 $url = $url . '/redirect_uri/__' . $data['redirect_url'] . '__';
             }
 
             $this->addResponse('Generated Url', 0, ['url' => $url]);
         } else if ($data['type'] === 'redirect') {
-            if (($validatedMessages = $this->validateData($data)) !== true) {
-                $this->addResponse($validatedMessages, 1);
+            $this->validateDataWithMetaData(data: $data, checkFields: ['client_id', 'app_id', 'domain_id', 'scope_id']);
 
-                return false;
-            }
             $url = $url . 'register/q/authorized/true';
 
             $this->addResponse('Generated Url', 0, ['url' => $url]);
@@ -1330,24 +1307,10 @@ class Api extends BasePackage
         return $url;
     }
 
-    protected function validateData($data)
-    {
-        $validated = $this->validation->validate($data)->jsonSerialize();
-
-        if (count($validated) > 0) {
-            $messages = 'Error: ';
-
-            foreach ($validated as $key => $value) {
-                $messages .= $value['message'] . ' ';
-            }
-            return $messages;
-        } else {
-            return true;
-        }
-    }
-
     public function checkAuthorizationLinkData($getData)
     {
+        $this->init();
+
         try {
             if (isset($getData['code']) && isset($getData['api_id']) ||
                (isset($getData['code']) && isset($getData['state']) && isset($getData['api_id']))
@@ -1388,32 +1351,48 @@ class Api extends BasePackage
                 }
 
                 if (!$api || ($api && $api['grant_type'] !== 'authorization_code')) {
-                    throw new \Exception('No API associated with this client ID.');
+                    $this->addResponse('No API associated with this client ID.', 1);
+
+                    return false;
                 }
 
                 $scope = $this->scopes->getById($api['scope_id']);
 
                 if ($scope && $scope['scope_name'] !== $getData['scope']) {
-                    throw new \Exception('Scope is incorrect.');
+                    $this->addResponse('Scope is incorrect.', 1);
+
+                    return false;
                 }
 
                 $uri = $this->request->getUri();
                 preg_match('/__.*/', $uri, $redirectUrl);
                 if (isset($redirectUrl) && is_array($redirectUrl) && count($redirectUrl) === 1 && $redirectUrl[0] !== '') {
                     $redirectUrl = str_replace('__', '', $redirectUrl[0]);
+
                     if ($redirectUrl !== $client->redirectUri) {
-                        throw new \Exception('Redirect URI is incorrect.');
+                        $this->addResponse('Redirect URI is incorrect.', 1);
+
+                        return false;
                     }
 
                     $api['redirect_url'] = $redirectUrl;
 
-                    $testRedirectUrl = $this->remoteWebContent->request('GET', $redirectUrl, ['timeout' => 1]);
+                    try {
+                        $testRedirectUrl = $this->remoteWebContent->request('GET', $redirectUrl . '/test_authorized/true', ['timeout' => 1]);
+                    } catch (\throwable $e) {
+                        $this->addResponse('Redirect URI is incorrect. Error Code: ' . $e->getMessage(), 1);
 
+                        return false;
+                    }
                     if ($testRedirectUrl->getStatusCode() !== 200) {
-                        throw new \Exception('Redirect URI is incorrect. Error Code: ' . $testRedirectUrl->getStatusCode());
+                        $this->addResponse('Redirect URI is incorrect. Error Code: ' . $testRedirectUrl->getStatusCode(), 1);
+
+                        return false;
                     }
                 } else {
-                    throw new \Exception('Redirect URI is incorrect.');
+                    $this->addResponse('Redirect URI is incorrect.', 1);
+
+                    return false;
                 }
 
                 $api['csrf'] = $this->secTools->random->base58(32);
@@ -1429,7 +1408,9 @@ class Api extends BasePackage
                 $api = $this->getFirst('csrf', $getData['csrf'], false, false, null, [], true);
 
                 if ($getData['csrf'] !== $api['csrf']) {
-                    throw new \Exception('CSRF mismatch. Restart authorization process!');
+                    $this->addResponse('CSRF mismatch. Restart authorization process!', 1);
+
+                    return false;
                 }
 
                 $this->client = $this->clients->getFirst('client_id', $api['client_id'], false, false, null, [], true);
