@@ -153,13 +153,18 @@ abstract class BaseApi extends Controller
             }
         }
 
-        $conditions['limit'] = 1;
+        $conditions['limit'] = null;
         if (isset($this->postData()['limit'])) {
             $conditions['limit'] = (int) $this->postData()['limit'];
 
             if ($conditions['limit'] <= 0) {
                 $conditions['limit'] = 1;
             }
+        }
+
+        $conditions['order'] = null;
+        if (isset($this->postData()['order'])) {
+            $conditions['order'] = $this->postData()['order'];
         }
 
         try {
