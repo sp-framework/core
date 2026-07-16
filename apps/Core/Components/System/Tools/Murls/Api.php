@@ -52,6 +52,11 @@ class Api extends BaseApi
                         property: 'page',
                         type: 'integer',
                         example: 2
+                    ),
+                    new OA\Property(
+                        property: 'order',
+                        type: 'string',
+                        example: 'id desc'
                     )
                 ]
             )
