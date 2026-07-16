@@ -2529,9 +2529,9 @@ abstract class BasePackage extends Controller
 	 * @param array 	$data 				Array of data
 	 * @param string	$model				Model to get the metadata from if not default model of the package
 	 * @param array		$customMessages		Custom Messages can be provided for each field if the validation fails
-	 * @param array		$fieldsToCheck 		If provided, it will override the default PresenseOf check for the column.
-	 * 										For a single check set $fieldsToCheck[$column]['class'] & $fieldsToCheck[$column]['check']
-	 * 										For multiple checks set $fieldsToCheck[$column][0]['class'] & $fieldsToCheck[$column][0]['check'] & so on.
+	 * @param array		$fieldsCustomCheck 	If provided, it will override the default PresenseOf check for the column.
+	 * 										For a single check set $fieldsCustomCheck[$column]['class'] & $fieldsCustomCheck[$column]['check']
+	 * 										For multiple checks set $fieldsCustomCheck[$column][0]['class'] & $fieldsCustomCheck[$column][0]['check'] & so on.
 	 * ```
 	 *  $data['email'] = null;
 	 *	$validated = $this->validateDataWithMetaData($data, null, [],
@@ -2556,7 +2556,7 @@ abstract class BasePackage extends Controller
 	 */
 	public function validateDataWithMetaData(
 		$data, $model = null, $customMessages = [],
-		$fieldsToCheck = [], $ignoreFields = [], $nonZeroFields = [], $callbacks = [],
+		$fieldsCustomCheck = [], $ignoreFields = [], $nonZeroFields = [], $callbacks = [],
 		$replaceColumnNames = []
 	) {
 		if ($model) {
@@ -2580,72 +2580,74 @@ abstract class BasePackage extends Controller
 					continue;
 				}
 
-				if (isset($fieldsToCheck[$column])) {
-					if (isset($fieldsToCheck[$column]['class']) && isset($fieldsToCheck[$column]['check'])) {
-						$this->validation->add($column, $fieldsToCheck[$column]['class'], $fieldsToCheck[$column]['check']);
-					} else if (isset($fieldsToCheck[$column][0])) {//Multiple Checks
-						foreach ($fieldsToCheck[$column] as $key => $checks) {
+				if (isset($fieldsCustomCheck[$column])) {
+					if (isset($fieldsCustomCheck[$column]['class']) && isset($fieldsCustomCheck[$column]['check'])) {
+						$this->validation->add($column, $fieldsCustomCheck[$column]['class'], $fieldsCustomCheck[$column]['check']);
+					} else if (isset($fieldsCustomCheck[$column][0])) {//Multiple Checks
+						foreach ($fieldsCustomCheck[$column] as $key => $checks) {
 							$this->validation->add($column, $checks['class'], $checks['check']);
 						}
 					}
-				} else {
-					if (isset($metadata['required'][$column]) && $metadata['required'][$column] === true) {
-						$this->validation->add($column,
-											   \Phalcon\Filter\Validation\Validator\PresenceOf::class,
-											   [
-												   'message' => isset($customMessages[$column]) ? $customMessages[$column] : 'Enter valid ' . $replaceColumnNames[$column]
-											   ]
-						);
-					}
 
-					if (isset($metadata['dataTypes'][$column]) && $metadata['dataTypes'][$column] === 'string') {
-						if (isset($metadata['columnSize'][$column])) {
-							if ($metadata['columnSize'][$column] > 0 && isset($data[$column]) && strlen($data[$column]) > 0) {
-								$this->validation->add($column,
-													   \Phalcon\Filter\Validation\Validator\StringLength\Max::class,
-													   [
-														   'max' => $metadata['columnSize'][$column],
-														   'included' => true,
-														   'message' => isset($customMessages[$column]) ?
-																		$customMessages[$column] :
-																		'Field ' . $replaceColumnNames[$column] . ' has a max length of ' . $metadata['columnSize'][$column] . ' characters.'
-													   ]
-								);
-							}
-						}
-					}
+					continue;
+				}
 
-					if (count($nonZeroFields) > 0 && in_array($column, $nonZeroFields)) {
-						if (isset($metadata['dataTypes'][$column]) && $metadata['dataTypes'][$column] === 'integer') {
-							if (isset($metadata['number'][$column])) {
-								$this->validation->add($column,
-													   \Phalcon\Filter\Validation\Validator\Callback::class,
-													   [
-															'callback' => function($data) use($column) {
-																if ((int) $data[$column] === 0) {
-																	return false;
-																}
+				if (isset($metadata['required'][$column]) && $metadata['required'][$column] === true) {
+					$this->validation->add($column,
+										   \Phalcon\Filter\Validation\Validator\PresenceOf::class,
+										   [
+											   'message' => isset($customMessages[$column]) ? $customMessages[$column] : 'Enter valid ' . $replaceColumnNames[$column]
+										   ]
+					);
+				}
 
-																return true;
-															},
-															'message' => isset($customMessages[$column]) ? $customMessages[$column] : 'Enter valid ' . $replaceColumnNames[$column]
-													   ]
-								);
-							}
-						}
-					}
-
-					if (count($callbacks) > 0) {
-						if (isset($metadata['dataTypes'][$column]) &&
-							isset($callbacks[$column]['callback']) &&
-							is_callable($callbacks[$column]['callback']) &&
-							isset($callbacks[$column]['message'])
-						) {
+				if (isset($metadata['dataTypes'][$column]) && $metadata['dataTypes'][$column] === 'string') {
+					if (isset($metadata['columnSize'][$column])) {
+						if ($metadata['columnSize'][$column] > 0 && isset($data[$column]) && strlen($data[$column]) > 0) {
 							$this->validation->add($column,
-												   \Phalcon\Filter\Validation\Validator\Callback::class,
-												   $callbacks[$column]
+												   \Phalcon\Filter\Validation\Validator\StringLength\Max::class,
+												   [
+													   'max' => $metadata['columnSize'][$column],
+													   'included' => true,
+													   'message' => isset($customMessages[$column]) ?
+																	$customMessages[$column] :
+																	'Field ' . $replaceColumnNames[$column] . ' has a max length of ' . $metadata['columnSize'][$column] . ' characters.'
+												   ]
 							);
 						}
+					}
+				}
+
+				if (count($nonZeroFields) > 0 && in_array($column, $nonZeroFields)) {
+					if (isset($metadata['dataTypes'][$column]) && $metadata['dataTypes'][$column] === 'integer') {
+						if (isset($metadata['number'][$column])) {
+							$this->validation->add($column,
+												   \Phalcon\Filter\Validation\Validator\Callback::class,
+												   [
+														'callback' => function($data) use($column) {
+															if ((int) $data[$column] === 0) {
+																return false;
+															}
+
+															return true;
+														},
+														'message' => isset($customMessages[$column]) ? $customMessages[$column] : 'Enter valid ' . $replaceColumnNames[$column]
+												   ]
+							);
+						}
+					}
+				}
+
+				if (count($callbacks) > 0) {
+					if (isset($metadata['dataTypes'][$column]) &&
+						isset($callbacks[$column]['callback']) &&
+						is_callable($callbacks[$column]['callback']) &&
+						isset($callbacks[$column]['message'])
+					) {
+						$this->validation->add($column,
+											   \Phalcon\Filter\Validation\Validator\Callback::class,
+											   $callbacks[$column]
+						);
 					}
 				}
 			}
