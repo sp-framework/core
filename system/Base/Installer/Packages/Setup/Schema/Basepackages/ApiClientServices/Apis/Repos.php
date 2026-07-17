@@ -81,8 +81,16 @@ class Repos
                         'access_token',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 512,
+                            'size'    => 2048,
                             'notNull' => false,
+                        ]
+                    ),
+                    new Column(
+                        'refresh_token',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 2048,
+                            'notNull'       => false,
                         ]
                     ),
                     new Column(

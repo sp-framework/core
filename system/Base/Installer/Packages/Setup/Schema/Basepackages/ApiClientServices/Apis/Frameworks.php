@@ -97,7 +97,7 @@ class Frameworks
                         'access_token',
                         [
                             'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 1024,
+                            'size'          => 2048,
                             'notNull'       => false,
                         ]
                     ),
@@ -120,7 +120,7 @@ class Frameworks
                         'refresh_token',
                         [
                             'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 512,
+                            'size'          => 2048,
                             'notNull'       => false,
                         ]
                     )
