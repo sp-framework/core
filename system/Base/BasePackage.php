@@ -2552,36 +2552,48 @@ abstract class BasePackage extends Controller
 	/**
 	 * Validate data with provided or default parameter of PresenseOf to check if the data is not empty if the field is required as per metadata.
 	 *
-	 * @param array 	$data 				Array of data
-	 * @param string	$model				Model to get the metadata from if not default model of the package
-	 * @param array		$customMessages		Custom Messages can be provided for each field if the validation fails
-	 * @param array		$fieldsCustomCheck 	If provided, it will override the default PresenseOf check for the column.
-	 * 										For a single check set $fieldsCustomCheck[$column]['class'] & $fieldsCustomCheck[$column]['check']
-	 * 										For multiple checks set $fieldsCustomCheck[$column][0]['class'] & $fieldsCustomCheck[$column][0]['check'] & so on.
+	 * @param array 	$data 					Array of data
+	 * @param array		$checkFields			Provide an array of fields that you want to check, this will replace the metadata fields.
+	 * @param bool		$checkFieldsReplace		Replace the provided checkFields or merge them.
+	 * @param array		$forceFieldRequired		Provide an array of fields that are not required by you want to check their presence.
+	 * @param string	$model					Model to get the metadata from if not default model of the package
+	 * @param array		$customMessages			Custom Messages can be provided for each field if the validation fails
+	 * @param array		$fieldsCustomCheck 		If provided, it will override the default PresenseOf check for the column.
+	 * 											For a single check set $fieldsCustomCheck[$column]['class'] & $fieldsCustomCheck[$column]['check']
+	 * 											For multiple checks set $fieldsCustomCheck[$column][0]['class'] & $fieldsCustomCheck[$column][0]['check'] & so on.
+	 * @param array		$ignoreFields			Provide an array of fields that you want to ignore
+	 * @param array		$nonZeroFields			Provide an array of fields that you want to check if the value is set to > 0
+	 * @param array		$callbacks				Like fieldsCustomCheck, but you can provide a callback for the fields. must have array keys callback and message set.
+	 * @param array		$replaceColumnNames		Provide an array field names to change in the response message.
+	 * 											Example app_id can be changed to "App" so the message will be Invalid App instead of Invalid app_id
+	 * @param array		$throwException			We can either throw exception or return a list of messages that we can process.
+	 * 											Exception is caught by Error ExceptionHandlers, which respond with JSON data with validation messages.
 	 * ```
 	 *  $data['email'] = null;
-	 *	$validated = $this->validateDataWithMetaData($data, null, [],
-	 *		['email' =>
-	 *			[
+	 *	$validated = $this->validateDataWithMetaData(
+	 * 		data: $data,
+	 * 		fieldsCustomCheck:
+	 *			['email' =>
 	 *				[
-	 *					'class' => \Phalcon\Filter\Validation\Validator\PresenceOf::class,
-	 *					'check' => [
-	 *						'message' => 'Enter Email!'
-	 *					]
-	 *				],
-	 *				[
-	 *					'class' => \Phalcon\Filter\Validation\Validator\Email::class,
-	 *					'check' => [
-	 *						'message' => 'Enter Correct Email!'
+	 *					[
+	 *						'class' => \Phalcon\Filter\Validation\Validator\PresenceOf::class,
+	 *						'check' => [
+	 *							'message' => 'Enter Email!'
+	 *						]
+	 *					],
+	 *					[
+	 *						'class' => \Phalcon\Filter\Validation\Validator\Email::class,
+	 *						'check' => [
+	 *							'message' => 'Enter Correct Email!'
+	 *						]
 	 *					]
 	 *				]
 	 *			]
-	 *		]
 	 *	);
 	 * ```
 	 */
 	public function validateDataWithMetaData(
-		$data, $checkFields = [], $model = null, $customMessages = [],
+		$data, $checkFields = [], $checkFieldsReplace = true, $forceFieldRequired = [], $model = null, $customMessages = [],
 		$fieldsCustomCheck = [], $ignoreFields = [], $nonZeroFields = [], $callbacks = [],
 		$replaceColumnNames = [], $throwException = true
 	) {
@@ -2601,7 +2613,11 @@ abstract class BasePackage extends Controller
 					$checkFieldsColumns[$checkField] = $checkField;
 				}
 
-				$metadata['columns'] = $checkFieldsColumns;
+				if ($checkFieldsReplace) {
+					$metadata['columns'] = $checkFieldsColumns;
+				} else {
+					$metadata['columns'] = array_merge($metadata['columns'], $checkFieldsColumns);
+				}
 			}
 
 			if (count($replaceColumnNames) === 0) {
@@ -2626,6 +2642,12 @@ abstract class BasePackage extends Controller
 					}
 
 					continue;
+				}
+
+				if (count($forceFieldRequired) > 0 && in_array($column, $forceFieldRequired)) {
+					if (isset($metadata['required'][$column]) && $metadata['required'][$column] === false) {
+						$metadata['required'][$column] = true;
+					}
 				}
 
 				if (isset($metadata['required'][$column]) && $metadata['required'][$column] === true) {
