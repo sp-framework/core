@@ -108,6 +108,7 @@ class EmailQueue extends BasePackage
 
             return;
         }
+
         if ($this->queueLock === true && $processPriority === $this->priorityToProcess) {
             $this->addResponse('Another process is clearing the queue, please wait...', 1);
 

@@ -68,19 +68,19 @@ class Email extends BasePackage
                 $appId = $this->apps->getAppInfo()['id'];
             }
 
-            if (!$this->domain && $domainId) {
+            if ($domainId) {
                 $this->domain = $this->domains->getById($domainId);
+            }
 
-                if (!is_array($this->domain['apps']) && $this->domain['apps'] !== '') {
-                    $this->domain['apps'] = $this->helper->decode($this->domain['apps'], true);
-                }
+            if (!is_array($this->domain['apps']) && $this->domain['apps'] !== '') {
+                $this->domain['apps'] = $this->helper->decode($this->domain['apps'], true);
             }
 
             if ($this->domain && isset($this->domain['apps'][$appId]['email_service']) &&
                 $this->domain['apps'][$appId]['email_service'] !== ''
             ) {
                 $this->emailSettings =
-                    $emailservices->init()->getById($this->domain['apps'][$appId]['email_service']);
+                    $emailservices->init()->getById((int) $this->domain['apps'][$appId]['email_service']);
             } else {
                 // throw new EmailException(
                 //     'No Email Service Configured & attached to the Domain. Please setup email service and attach it to domain ' . $this->domain['name']
