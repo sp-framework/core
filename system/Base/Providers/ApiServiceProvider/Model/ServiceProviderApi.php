@@ -39,8 +39,6 @@ class ServiceProviderApi extends BaseModel
 
     public $client_id;
 
-    public $csrf;
-
     public $authorization_tos_pp;
 
     public $state;

@@ -125,14 +125,6 @@ class Api
                     ]
                 ),
                 new Column(
-                    'csrf',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false
-                    ]
-                ),
-                new Column(
                     'authorization_tos_pp',
                     [
                         'type'          => Column::TYPE_TEXT,
@@ -143,7 +135,7 @@ class Api
                     'state',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 512,
+                        'size'          => 100,
                         'notNull'       => false
                     ]
                 ),

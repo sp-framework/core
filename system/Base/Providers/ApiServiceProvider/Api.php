@@ -125,6 +125,18 @@ class Api extends BasePackage
             return false;
         }
 
+        if ($data['grant_type'] === 'authorization_code') {
+            if (isset($data['account_id'])) {
+                $account = $this->basepackages->accounts->getById($data['account_id']);
+
+                if (!$account) {
+                    $this->addResponse('Account with ID not found.', 1);
+
+                    return false;
+                }
+            }
+        }
+
         if ($this->add($data)) {
             $newApi = $this->packagesData->last;
 
@@ -140,14 +152,6 @@ class Api extends BasePackage
                 }
 
                 if ($newApi['grant_type'] === 'authorization_code') {
-                    $client = $this->clients->generateClientKeys(
-                        data:
-                        [
-                            'api_id'        => $newApi['id'],
-                        ],
-                        emailNewClientDetails: false
-                    );
-
                     $newApi['client_id'] = $client['client_id'];
 
                     $this->update($newApi);
@@ -178,6 +182,18 @@ class Api extends BasePackage
             return false;
         }
 
+        if ($data['grant_type'] === 'authorization_code') {
+            if (isset($data['account_id'])) {
+                $account = $this->basepackages->accounts->getById($data['account_id']);
+
+                if (!$account) {
+                    $this->addResponse('Account with ID not found.', 1);
+
+                    return false;
+                }
+            }
+        }
+
         if ($data['api_type'] === 'protected_grant') {
             if (isset($data['regenerate_pki_keys']) && $data['regenerate_pki_keys'] == 1) {
                 $data = $this->generatePKIKeys($data);
@@ -188,49 +204,25 @@ class Api extends BasePackage
             }
 
             if ($data['grant_type'] === 'authorization_code') {
-                if (isset($data['account_id'])) {
-                    $account = $this->basepackages->accounts->getById($data['account_id']);
+                $client = $this->clients->getFirst('client_id', $data['client_id']);
 
-                    if ($account) {
-                        if ((isset($data['client_id']) && $data['client_id'] === '') ||
-                            !isset($data['client_id'])
-                        ) {
-                            $client = $this->clients->generateClientKeys(
-                                data:
-                                [
-                                    'api_id'        => $newApi['id'],
-                                ],
-                                emailNewClientDetails: false,
-                                account: $account,
-                                viaApi: true
-                            );
+                if (!$client) {
+                    $client = $this->clients->generateClientKeys(
+                        data:
+                        [
+                            'api_id'        => $api['id'],
+                            'client_id'     => $data['client_id'],
+                            'client_secret' => $data['client_secret'],
+                            'redirect_url'  => $data['redirect_url'],
+                            'request_url'   => $data['request_url'],
+                            'forceRevoke'   => true
+                        ],
+                        emailNewClientDetails: ($data['email_client_details_to_user'] == '1') ? true : false,
+                        account: $account,
+                        viaApi: true
+                    );
 
-                            $data['client_id'] = $client['client_id'];
-                        } else {
-                            $client = $this->clients->getFirst('client_id', $data['client_id']);
-
-                            if (!$client && ($api['client_id'] !== $data['client_id'])) {
-                                $client = $this->clients->generateClientKeys(
-                                    data:
-                                    [
-                                        'api_id'        => $data['id'],
-                                        'forceRegen'    => true
-                                    ],
-                                    emailNewClientDetails: false,
-                                    account: $account,
-                                    viaApi: true
-                                );
-
-                                $data['client_id'] = $client['client_id'];
-                            } else {
-                                $client = $client->toArray();
-
-                                $client['redirectUri'] = $data['redirect_url'];
-
-                                $this->clients->updateClient($client);
-                            }
-                        }
-                    }
+                    $data['client_id'] = $client['client_id'];
                 }
             }
 
@@ -253,12 +245,21 @@ class Api extends BasePackage
         }
 
         $nonZeroFields = ['app_id', 'domain_id', 'scope_id'];
+        $forceFieldRequired = [];
+        $checkFields = [];
+        $checkFieldsReplace = true;
 
         if ($data['grant_type'] === 'authorization_code') {
             array_push($nonZeroFields, 'account_id');
+
+            $forceFieldRequired = ['client_id', 'client_secret', 'redirect_url', 'request_url'];
+            $checkFields = ['client_id', 'client_secret', 'redirect_url', 'request_url'];
+            $checkFieldsReplace = false;
         }
 
-        $this->validateDataWithMetaData(data: $data, ignoreFields: ['id'], nonZeroFields: $nonZeroFields);
+        $this->validateDataWithMetaData(data: $data, ignoreFields: ['id'],
+                                        nonZeroFields: $nonZeroFields, forceFieldRequired: $forceFieldRequired,
+                                        checkFields: $checkFields, checkFieldsReplace: $checkFieldsReplace);
 
         return $data;
     }
@@ -786,7 +787,9 @@ class Api extends BasePackage
 
                     $this->{$grant}();
                 } catch (\throwable $e) {
-                    trace([$e]);
+                    $this->logException($e);
+
+                    throw new \Exception($e->getMessage());
                 }
             }
         }
@@ -881,15 +884,17 @@ class Api extends BasePackage
         try {
             $tokenResponse = $this->server->respondToAccessTokenRequest(ServerRequest::fromGlobals(), $serverResponse);
 
-            $token = $this->helper->decode((string) $tokenResponse->getBody(), true);
+            $responseData = $this->helper->decode((string) $tokenResponse->getBody(), true);
 
-            $token['access_token'] = $token['access_token'] . '||' . $this->encClientId;
+            $responseData['access_token'] .= '||' . $this->encClientId;
 
             if ($this->encDeviceId) {
-                $token['access_token'] = $token['access_token'] . '||' . $this->encDeviceId;
+                $responseData['access_token'] .= '||' . $this->encDeviceId;
             }
 
-            $this->addResponse('Access token generated!', 0, $token);
+            $responseData['refresh_url'] = $this->links->url('register/apiClient');
+
+            $this->addResponse('Access token generated!', 0, $responseData);
 
             return true;
         } catch (OAuthServerException $exception) {
@@ -1283,14 +1288,9 @@ class Api extends BasePackage
             $url = $url . 'register/q/';
 
             if ($data['type'] === 'authorization') {
-                $url = $url . 'csrf/' . $data['csrf'] . '/?response_type=code&client_id=' . $data['client_id'] . '&redirect_url=' . $data['redirect_url'];
-                if (isset($data['state']) && $data['state'] !== '' && $data['state'] !== '%7B%7Byour_state_code%7D%7D') {
-                    $url = $url . '&state=' . $data['state'];
-                }
+                $url = $url . 'state/' . $data['state'] . '/?response_type=code&client_id=' . $data['client_id'] . '&redirect_url=' . $data['redirect_url'];
             } else {
                 $url = $url . 'response_type/code/client_id/' . $data['client_id'] . '/scope/' . $scope['scope_name'];
-
-                $url = $url . '/state/' . ($data['state'] ?? '%7B%7Byour_state_code%7D%7D');
 
                 $url = $url . '/redirect_uri/__' . $data['redirect_url'] . '__';
             }
@@ -1326,7 +1326,7 @@ class Api extends BasePackage
 
                     $this->api = $api;
                 }
-            } else if (!isset($getData['csrf'])) {
+            } else if (!isset($getData['state'])) {//Authorize Flow 1, state is not set
                 $client = $this->clients->getFirst('client_id', $getData['client_id']);
 
                 if (!$client || ($client && $client->revoked != 0)) {
@@ -1380,10 +1380,11 @@ class Api extends BasePackage
                     try {
                         $testRedirectUrl = $this->remoteWebContent->request('GET', $redirectUrl . '/test_authorized/true', ['timeout' => 1]);
                     } catch (\throwable $e) {
-                        $this->addResponse('Redirect URI is incorrect. Error Code: ' . $e->getMessage(), 1);
+                        $this->addResponse('Redirect URI is incorrect. Error: ' . $e->getMessage(), 1);
 
                         return false;
                     }
+
                     if ($testRedirectUrl->getStatusCode() !== 200) {
                         $this->addResponse('Redirect URI is incorrect. Error Code: ' . $testRedirectUrl->getStatusCode(), 1);
 
@@ -1395,7 +1396,7 @@ class Api extends BasePackage
                     return false;
                 }
 
-                $api['csrf'] = $this->secTools->random->base58(32);
+                $api['state'] = $this->secTools->random->base58(32);
 
                 $this->update($api);
 
@@ -1405,10 +1406,10 @@ class Api extends BasePackage
 
                 $this->api = $api;
             } else {
-                $api = $this->getFirst('csrf', $getData['csrf'], false, false, null, [], true);
+                $api = $this->getFirst('state', $getData['state'], false, false, null, [], true);
 
-                if ($getData['csrf'] !== $api['csrf']) {
-                    $this->addResponse('CSRF mismatch. Restart authorization process!', 1);
+                if ($getData['state'] !== $api['state']) {
+                    $this->addResponse('State mismatch. Restart authorization process!', 1);
 
                     return false;
                 }
