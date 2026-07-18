@@ -46,6 +46,18 @@ class ServicesComponent extends BaseComponent
                 } else if (isset($api['used_by']) && $api['used_by'] === '') {
                     $api['used_by'] = '-';
                 }
+
+                if (!$categoryProviderClass = $this->apiPackage->useApi([
+                        'config' =>
+                            [
+                                'category'     => $api['category'],
+                                'provider'     => $api['provider'],
+                                'checkOnly'    => true//Set this to check if the API exists and can be instantiated.
+                            ]
+                    ])
+                ) {
+                    throw new ControllerNotFoundException;
+                }
             } else {
                 $api = [];
                 $api['setup'] = 0;
@@ -76,6 +88,7 @@ class ServicesComponent extends BaseComponent
                     $api['location'] = $this->apiPackage->apiLocation;
                 }
             }
+
             $this->view->availableAPIGrantTypes = [];
             if (method_exists($categoryProviderClass, 'getAvailableAPIGrantTypes')) {
                 $this->view->availableAPIGrantTypes = $this->api->getAvailableAPIGrantTypes();
