@@ -537,13 +537,14 @@ dataCollectionSection =
 
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
                     postData['grant_type'] = $('#{{componentId}}-{{sectionId}}-grant_type').val();
                     postData['client_id'] = $('#{{componentId}}-{{sectionId}}-client_id').val();
                     postData['client_secret'] = $('#{{componentId}}-{{sectionId}}-client_secret').val();
                     postData['request_url'] = $('#{{componentId}}-{{sectionId}}-request_url').val();
                     postData['redirect_uri'] = $('#{{componentId}}-{{sectionId}}-redirect_uri').val();
 
-                    $.post('{{links.url("system/api/client/services/registerOAuthClientAction")}}', postData, function(response) {
+                    $.post('{{links.url("system/api/client/services/registerOAuthClient")}}', postData, function(response) {
                         if (response.responseCode == 0) {
                             paginatedPNotify('success', response.responseMessage);
                             //
