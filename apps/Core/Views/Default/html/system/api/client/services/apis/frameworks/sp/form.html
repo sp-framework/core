@@ -56,7 +56,7 @@
     {% set apiRequestUrl = '' %}
     {% set apiRedirectUri = '' %}
     {% set apiRefreshUrl = '' %}
-    {% set apiAccessToken = '' %}
+    {% set apiAccessToken = ' ' %}
     {% set apiTokenType = '' %}
     {% set apiExpires = '' %}
     {% set apiRefreshToken = '' %}
@@ -289,7 +289,8 @@
                                 'fieldId'                               : 'client_secret',
                                 'fieldLabel'                            : 'Client Secret',
                                 'fieldType'                             : 'input',
-                                'fieldInputType'                        : 'client_secret',
+                                'fieldInputType'                        : 'password',
+                                'fieldInputPasswordToggleVisibility'    : true,
                                 'fieldHelp'                             : true,
                                 'fieldInputPasswordToggleVisibility'    : true,
                                 'fieldHelpTooltipContent'               : 'Client Secret',
@@ -385,6 +386,48 @@
                                 'fieldBazPostOnCreate'                  : true,
                                 'fieldBazPostOnUpdate'                  : true,
                                 'fieldValue'                            : apiRefreshUrl
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'token_type',
+                                'fieldLabel'                            : 'Token Type',
+                                'fieldType'                             : 'input',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Token Type',
+                                'fieldDisabled'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldValue'                            : apiTokenType
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'expires',
+                                'fieldLabel'                            : 'Expires',
+                                'fieldType'                             : 'input',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Expires',
+                                'fieldDisabled'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldValue'                            : apiExpires
                             ]
                         )}}
                     </div>
@@ -551,7 +594,22 @@ dataCollectionSection =
                     $.post('{{links.url("system/api/client/services/registerOAuthClient")}}', postData, function(response) {
                         if (response.responseCode == 0) {
                             paginatedPNotify('success', response.responseMessage);
-                            //
+
+                            if (response.responseData.token_type) {
+                                $('#{{componentId}}-{{sectionId}}-token_type').val(response.responseData.token_type);
+                            }
+                            if (response.responseData.access_token) {
+                                $('#{{componentId}}-{{sectionId}}-access_token').val(response.responseData.access_token);
+                            }
+                            if (response.responseData.refresh_token) {
+                                $('#{{componentId}}-{{sectionId}}-refresh_token').val(response.responseData.refresh_token);
+                            }
+                            if (response.responseData.refresh_url) {
+                                $('#{{componentId}}-{{sectionId}}-refresh_url').val(response.responseData.refresh_url);
+                            }
+                            if (response.responseData.expires_in) {
+                                $('#{{componentId}}-{{sectionId}}-expires').val(response.responseData.expires_in);
+                            }
                         } else {
                             paginatedPNotify('error', response.responseMessage);
                         }
@@ -566,6 +624,8 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-redirect_uri'                        : { },
         '{{componentId}}-{{sectionId}}-refresh_url'                         : { },
+        '{{componentId}}-{{sectionId}}-token_type'                          : { },
+        '{{componentId}}-{{sectionId}}-expires'                             : { },
         '{{componentId}}-{{sectionId}}-access_token'                        : { },
         '{{componentId}}-{{sectionId}}-refresh_token'                       : { },
         '{{componentId}}-{{sectionId}}-form'                                : {

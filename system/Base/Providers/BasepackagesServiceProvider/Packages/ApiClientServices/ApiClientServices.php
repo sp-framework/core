@@ -211,6 +211,10 @@ class ApiClientServices extends BasePackage
 
         $this->switchApiModel($data);
 
+        if (isset($data['expires']) && $data['expires'] === '') {
+            $data['expires'] = null;
+        }
+
         if ($this->add($data)) {
             $data['api_category_id'] = $this->packagesData->last['id'];
 
@@ -254,6 +258,10 @@ class ApiClientServices extends BasePackage
 
         $apiId = $data['id'];
         unset($data['id']);
+
+        if (isset($data['expires']) && $data['expires'] === '') {
+            $data['expires'] = null;
+        }
 
         $api = $this->getById($data['api_category_id'], false, false);
         $api = array_merge($api, $data);
@@ -523,7 +531,10 @@ class ApiClientServices extends BasePackage
             if ($data['auth_type'] == 'auth') {
                 $data['password'] = $this->crypt->encryptBase64(trim($data['password']), $this->secTools->getSigKey());
             } else if ($data['auth_type'] == 'access_token') {
+                $data['client_id'] = $this->crypt->encryptBase64(trim($data['client_id']), $this->secTools->getSigKey());
+                $data['client_secret'] = $this->crypt->encryptBase64(trim($data['client_secret']), $this->secTools->getSigKey());
                 $data['access_token'] = $this->crypt->encryptBase64(trim($data['access_token']), $this->secTools->getSigKey());
+                $data['refresh_token'] = $this->crypt->encryptBase64(trim($data['refresh_token']), $this->secTools->getSigKey());
             } else if ($data['auth_type'] == 'autho') {
                 $data['authorization'] = $this->crypt->encryptBase64(trim($data['authorization']), $this->secTools->getSigKey());
             }
@@ -538,7 +549,10 @@ class ApiClientServices extends BasePackage
             if ($data['auth_type'] == 'auth' && $data['password'] !== '') {
                 $data['password'] = $this->crypt->decryptBase64($data['password'], $this->secTools->getSigKey());
             } else if ($data['auth_type'] == 'access_token' && $data['access_token'] !== '') {
+                $data['client_id'] = $this->crypt->decryptBase64($data['client_id'], $this->secTools->getSigKey());
+                $data['client_secret'] = $this->crypt->decryptBase64($data['client_secret'], $this->secTools->getSigKey());
                 $data['access_token'] = $this->crypt->decryptBase64($data['access_token'], $this->secTools->getSigKey());
+                $data['refresh_token'] = $this->crypt->decryptBase64($data['refresh_token'], $this->secTools->getSigKey());
             } else if ($data['auth_type'] == 'autho' && $data['authorization'] !== '') {
                 $data['authorization'] = $this->crypt->decryptBase64($data['authorization'], $this->secTools->getSigKey());
             }
