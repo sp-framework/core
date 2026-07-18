@@ -317,6 +317,7 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-account_email'                               : { },
+        '{{componentId}}-{{sectionId}}-email_client_details_to_user'                : { },
         '{{componentId}}-{{sectionId}}-cc_max_devices'                              : { },
         '{{componentId}}-{{sectionId}}-client_id'                                   : {
             afterInit: function() {
@@ -391,8 +392,6 @@ dataCollectionSection =
                     }
 
                     var thisButton = this;
-                    $(this).attr('disabled', true);
-                    $(this).children('i').attr('hidden', false);
 
                     var urlType;
 
@@ -530,6 +529,8 @@ function generateClientId(force = false) {
                 setTimeout(() => {
                     generateUrl('{{componentId}}-{{sectionId}}-generate-request-url', true);
                 }, 100);
+
+                $('#{{componentId}}-{{sectionId}}-email_client_details_to_user').attr('disabled', false);
             }
             if (response.responseData && response.responseData.client_secret) {
                 $('#{{componentId}}-{{sectionId}}-client_secret').val(response.responseData.client_secret);

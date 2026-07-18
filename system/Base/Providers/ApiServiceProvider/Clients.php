@@ -406,7 +406,7 @@ class Clients extends BasePackage
         return $responseArr;
     }
 
-    protected function emailNewClientDetails($api, $newClient, $clientSecret)
+    protected function emailNewClientDetails($api, $newClient, $clientSecret, $data)
     {
         //If Email is not configured, we cannot send code.
         if (!$this->basepackages->email->setup()) {
@@ -426,11 +426,21 @@ class Clients extends BasePackage
         if ($newClient['device_id']) {
             $emailData['body'] = 'Device ID: ' . $newClient['device_id'] . '<br>';
         }
-        $emailData['body'] =
-            $emailData['body'] .
+
+        $emailData['body'] .=
             'Client ID: ' . $newClient['client_id'] . '<br>' .
-            'Client Secret: ' . $clientSecret . '<br>' .
-            'Url: <a href="' . $this->links->url('register/q/client_id/' . $newClient['client_id'] . '/new/true') . '">Generate New Token</a>';
+            'Client Secret: ' . $clientSecret . '<br>';
+
+        if (isset($data['request_url']) && isset($data['redirect_url'])) {
+            $emailData['body'] .=
+                'Request URL: ' . $data['request_url'] . '<br>' .
+                'Redirect URI: ' . $data['redirect_url'] . '<br>' .
+                'Web based Registration URL: <a href="' . $data['request_url'] . '">Generate New Token</a>';
+        } else {
+            $emailData['body'] .=
+                'Request URL: ' . $this->links->url('register/q/client_id/' . $newClient['client_id'] . '/new/true') . '<br>' .
+                'Web based Registration URL: <a href="' . $this->links->url('register/q/client_id/' . $newClient['client_id'] . '/new/true') . '">Generate New Token</a>';
+        }
 
         return $this->basepackages->emailqueue->addQueue($emailData);
     }

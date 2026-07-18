@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col">
+    <div class="col-md-3">
         {{adminltetags.useTag('fields',
             [
                 'component'                             : component,
@@ -115,6 +115,27 @@
                 'fieldBazPostOnCreate'                  : false,
                 'fieldBazPostOnUpdate'                  : false,
                 'fieldValue'                            : apiAccountEmail
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'email_client_details_to_user',
+                'fieldLabel'                     : 'Email Client details to user?',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Email generated client id and client secret with urls to the user? NOTE: Only new generated or regenerated client ID and secret can be emailed!',
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
             ]
         )}}
     </div>
@@ -244,7 +265,7 @@
                     'fieldLabel'                            : 'Redirect Url',
                     'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Redirect Url for API authentication.',
+                    'fieldHelpTooltipContent'               : 'Redirect Url for API authentication at the end of OAuth process.',
                     'fieldGroupPostAddonButtons'          :
                         [
                             'generate-redirect-url'   : [
@@ -277,7 +298,7 @@
                     'fieldLabel'                            : 'Request Url',
                     'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Request Url for API authentication. This will be overwritten when the user makes a connection with their state parameter set.',
+                    'fieldHelpTooltipContent'               : 'Request Url for API authentication. This is the starting point.',
                     'fieldGroupPostAddonButtons'          :
                         [
                             'generate-request-url'   : [
@@ -288,7 +309,7 @@
                                 'position'                : 'right'
                             ]
                         ],
-                    'fieldRequired'                         : false,
+                    'fieldRequired'                         : true,
                     'fieldDisabled'                         : true,
                     'fieldBazScan'                          : true,
                     'fieldBazJstreeSearch'                  : true,
