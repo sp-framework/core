@@ -301,6 +301,10 @@
                 <div class="row">
                     <div class="col">
                         {% set fieldGroupPostAddonButtons = [] %}
+                        {% set canRegisterDisabled = true %}
+                        {% if apiRequestUrl != '' %}
+                            {% set canRegisterDisabled = false %}
+                        {% endif %}
                         {% if canRegister %}
                             {% set fieldGroupPostAddonButtons =
                                 [
@@ -309,7 +313,7 @@
                                         'icon'                    : 'cog fa-spin',
                                         'iconHidden'              : true,
                                         'noMargin'                : true,
-                                        'disabled'                : true,
+                                        'disabled'                : canRegisterDisabled,
                                         'buttonAdditionalClass'   : 'rounded-0 text-white',
                                         'position'                : 'right'
                                     ]
@@ -530,6 +534,28 @@ dataCollectionSection =
 
                         return false;
                     }
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['grant_type'] = $('#{{componentId}}-{{sectionId}}-grant_type').val();
+                    postData['client_id'] = $('#{{componentId}}-{{sectionId}}-client_id').val();
+                    postData['client_secret'] = $('#{{componentId}}-{{sectionId}}-client_secret').val();
+                    postData['request_url'] = $('#{{componentId}}-{{sectionId}}-request_url').val();
+                    postData['redirect_uri'] = $('#{{componentId}}-{{sectionId}}-redirect_uri').val();
+
+                    $.post('{{links.url("system/api/client/services/registerOAuthClientAction")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            paginatedPNotify('success', response.responseMessage);
+                            //
+                        } else {
+                            paginatedPNotify('error', response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
                 });
             }
         },
