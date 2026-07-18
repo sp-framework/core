@@ -142,6 +142,14 @@ class Frameworks
                         ]
                     ),
                     new Column(
+                        'token_type',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 20,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
                         'expires',
                         [
                             'type'          => Column::TYPE_TIMESTAMP,

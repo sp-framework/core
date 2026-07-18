@@ -18,6 +18,7 @@
     {% set apiApiUrl = api['api_url'] %}
     {% set apiAuthType = api['auth_type'] %}
     {% set apiUsername = api['username'] %}
+    {% set apiAuthorization = api['authorization'] %}
     {% set apiPassword = api['password'] %}
     {% set apiGrantType = api['grant_type'] %}
     {% set apiClientId = api['client_id'] %}
@@ -27,7 +28,8 @@
     {% set apiRequestUrl = api['request_url'] %}
     {% set apiRedirectUri = api['redirect_uri'] %}
     {% set apiRefreshUrl = api['refresh_url'] %}
-    {% set apiAuthorization = api['authorization'] %}
+    {% set apiTokenType = api['token_type'] %}
+    {% set apiExpires = api['expires'] %}
     {% set locationDisabled = true %}
 {% else %}
     {% set apiId = '' %}
@@ -47,6 +49,7 @@
     {% set apiAuthType = 'none' %}
     {% set apiUsername = '' %}
     {% set apiPassword = '' %}
+    {% set apiAuthorization = '' %}
     {% set apiGrantType = '' %}
     {% set apiClientId = '' %}
     {% set apiClientSecret = '' %}
@@ -54,8 +57,9 @@
     {% set apiRedirectUri = '' %}
     {% set apiRefreshUrl = '' %}
     {% set apiAccessToken = '' %}
+    {% set apiTokenType = '' %}
+    {% set apiExpires = '' %}
     {% set apiRefreshToken = '' %}
-    {% set apiAuthorization = '' %}
 {% endif %}
 {% set otherHidde = '' %}
 {% set oauthHidden = 'hidden' %}

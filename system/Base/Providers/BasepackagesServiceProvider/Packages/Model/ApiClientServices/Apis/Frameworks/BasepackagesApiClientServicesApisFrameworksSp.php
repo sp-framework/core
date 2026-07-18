@@ -38,6 +38,8 @@ class BasepackagesApiClientServicesApisFrameworksSp extends BaseModel
 
     public $grant_type;
 
+    public $token_type;
+
     public $expires;
 
     public function init($app = null)
