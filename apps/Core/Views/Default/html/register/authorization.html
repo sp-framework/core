@@ -44,12 +44,12 @@ BazCore.header({
                     {% else %}
                         {% if api is defined %}
                             {% if code is defined or (refresh is defined and refresh == true) or (newToken is defined and newToken == true) %}
-                                {% if refresh is defined %}
-                                    <p class="login-box-msg text-sm font-weight-bold text-success">Access Token generator using refresh token for {{api['name']}}</p>
-                                {% elseif newToken is defined %}
-                                    <p class="login-box-msg text-sm font-weight-bold text-success">New access token generator for {{api['name']}}</p>
-                                {% else %}
-                                    <p class="login-box-msg text-sm font-weight-bold text-success">Client authorized for {{api['name']}}</p>
+                                {% if refresh is defined and refresh == true %}
+                                    <p class="login-box-msg text-sm font-weight-bold">Access Token generator using refresh token for {{api['name']}}</p>
+                                {% elseif newToken is defined and newToken == true %}
+                                    <p class="login-box-msg text-sm font-weight-bold">New access token generator for {{api['name']}}</p>
+                                {% elseif code is defined %}
+                                    <p class="login-box-msg text-sm font-weight-bold">Authorize client for {{api['name']}}</p>
                                 {% endif %}
                                 {% set clientID = '' %}
                                 {% if clientId is defined %}
@@ -85,7 +85,7 @@ BazCore.header({
                                         )}}
                                     </div>
                                 </div>
-                                {% if refresh is defined %}
+                                {% if refresh is defined and refresh == true %}
                                     <div class="row" id="refresh-token-input">
                                         <div class="col">
                                             {{adminltetags.useTag('fields',
@@ -228,8 +228,10 @@ BazCore.header({
                                     </div>
                                 </div>
                             {% endif %}
+                            {% include 'auth/footer.html' %}
+                        {% else %}
+                            <p class="login-box-msg text-sm font-weight-bold text-success">Client Authorized! You may close this window.</p>
                         {% endif %}
-                        {% include 'auth/footer.html' %}
                     {% endif %}
                 </div>
             </div>
@@ -344,7 +346,6 @@ $(document).ready(function() {
                 postData['code'] = $('#{{componentId}}-form-code').val().trim();
             } else if (refresh == true) {
                 postData['grant_type'] = 'refresh_token';
-                postData['refresh'] = true;
                 postData['refresh_token'] = $('#{{componentId}}-form-refresh_token_input').val().trim();
             } else if (newToken == true) {
                 postData['grant_type'] = 'client_credentials';
@@ -486,6 +487,7 @@ $(document).ready(function() {
                 }
             } else if (refresh == true) {
                     $('#codes').removeClass('d-none');
+                    $('#refresh-token').removeClass('d-none');
                     $('#client-info-input').addClass('d-none');
                     $('#refresh-token-input').addClass('d-none');
                     $('.login-spinner').attr('hidden', true);
@@ -498,6 +500,7 @@ $(document).ready(function() {
                     $('#{{componentId}}-form-refresh_token').val(response.responseData.refresh_token);
             } else if (newToken == true) {
                     $('#codes').removeClass('d-none');
+                    $('#refresh-token').removeClass('d-none');
                     $('#client-info-input').addClass('d-none');
                     $('#refresh-token-input').addClass('d-none');
                     $('.login-spinner').attr('hidden', true);

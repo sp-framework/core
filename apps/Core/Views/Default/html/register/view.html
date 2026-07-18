@@ -217,7 +217,6 @@ $(document).ready(function() {
                 postData['code'] = $('#{{componentId}}-form-code').val().trim();
             } else if (refresh == true) {
                 postData['grant_type'] = 'refresh_token';
-                postData['refresh'] = true;
                 postData['refresh_token'] = $('#{{componentId}}-form-refresh_token_input').val().trim();
             } else if (newToken == true) {
                 postData['grant_type'] = 'client_credentials';
@@ -359,6 +358,7 @@ $(document).ready(function() {
                 }
             } else if (refresh == true) {
                     $('#codes').removeClass('d-none');
+                    $('#refresh-token').removeClass('d-none');
                     $('#client-info-input').addClass('d-none');
                     $('#refresh-token-input').addClass('d-none');
                     $('.login-spinner').attr('hidden', true);
@@ -371,6 +371,7 @@ $(document).ready(function() {
                     $('#{{componentId}}-form-refresh_token').val(response.responseData.refresh_token);
             } else if (newToken == true) {
                     $('#codes').removeClass('d-none');
+                    $('#refresh-token').removeClass('d-none');
                     $('#client-info-input').addClass('d-none');
                     $('#refresh-token-input').addClass('d-none');
                     $('.login-spinner').attr('hidden', true);
