@@ -25,7 +25,7 @@
     {% set apiAccessToken = api['access_token'] %}
     {% set apiRefreshToken = api['refresh_token'] %}
     {% set apiRequestUrl = api['request_url'] %}
-    {% set apiRedirectUrl = api['redirect_url'] %}
+    {% set apiRedirectUri = api['redirect_uri'] %}
     {% set apiRefreshUrl = api['refresh_url'] %}
     {% set apiAuthorization = api['authorization'] %}
     {% set locationDisabled = true %}
@@ -51,7 +51,7 @@
     {% set apiClientId = '' %}
     {% set apiClientSecret = '' %}
     {% set apiRequestUrl = '' %}
-    {% set apiRedirectUrl = '' %}
+    {% set apiRedirectUri = '' %}
     {% set apiRefreshUrl = '' %}
     {% set apiAccessToken = '' %}
     {% set apiRefreshToken = '' %}
@@ -354,7 +354,7 @@
                                 'fieldBazScan'                          : true,
                                 'fieldBazPostOnCreate'                  : true,
                                 'fieldBazPostOnUpdate'                  : true,
-                                'fieldValue'                            : apiRedirectUrl
+                                'fieldValue'                            : apiRedirectUri
                             ]
                         )}}
                     </div>
