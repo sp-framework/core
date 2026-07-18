@@ -94,7 +94,7 @@ class Frameworks
                         ]
                     ),
                     new Column(
-                        'register_url',
+                        'request_url',
                         [
                             'type'          => Column::TYPE_VARCHAR,
                             'size'          => 2048,
