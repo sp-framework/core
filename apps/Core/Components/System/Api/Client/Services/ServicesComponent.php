@@ -240,6 +240,12 @@ class ServicesComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        trace([$this->postData()]);
+        $this->validateData($this->postData(), ['id', 'grant_type', 'client_id', 'request_url', 'redirect_uri']);
+
+        $api = $this->apiPackage->useApi((int) $this->postData()['id']);
+
+        $api->registerOAuthClient($this->postData());
+
+        $this->addResponse($api->packagesData->responseMessage, $api->packagesData->responseCode, $api->packagesData->responseData);
     }
 }
