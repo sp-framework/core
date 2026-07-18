@@ -61,7 +61,7 @@ class ServicesComponent extends BaseComponent
                     $api['provider'] = $this->getData()['provider'];
 
                     //Check if provider class exists
-                    if (!$this->apiPackage->useApi([
+                    if (!$categoryProviderClass = $this->apiPackage->useApi([
                             'config' =>
                                 [
                                     'category'     => $this->getData()['category'],
@@ -75,6 +75,15 @@ class ServicesComponent extends BaseComponent
 
                     $api['location'] = $this->apiPackage->apiLocation;
                 }
+            }
+            $this->view->availableAPIGrantTypes = [];
+            if (method_exists($categoryProviderClass, 'getAvailableAPIGrantTypes')) {
+                $this->view->availableAPIGrantTypes = $this->api->getAvailableAPIGrantTypes();
+            }
+
+            $this->view->canRegister = false;
+            if (method_exists($categoryProviderClass, 'registerOAuthClient')) {
+                $this->view->canRegister = true;
             }
 
             $this->view->api = $api;
@@ -212,5 +221,12 @@ class ServicesComponent extends BaseComponent
             $this->apiPackage->packagesData->responseMessage,
             $this->apiPackage->packagesData->responseCode
         );
+    }
+
+    public function registerOAuthClientAction()
+    {
+        $this->requestIsPost();
+
+        trace([$this->postData()]);
     }
 }

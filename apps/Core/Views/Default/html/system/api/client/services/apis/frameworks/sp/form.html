@@ -19,8 +19,14 @@
     {% set apiAuthType = api['auth_type'] %}
     {% set apiUsername = api['username'] %}
     {% set apiPassword = api['password'] %}
+    {% set apiGrantType = api['grant_type'] %}
+    {% set apiClientId = api['client_id'] %}
+    {% set apiClientSecret = api['client_secret'] %}
     {% set apiAccessToken = api['access_token'] %}
     {% set apiRefreshToken = api['refresh_token'] %}
+    {% set apiRequestUrl = api['request_url'] %}
+    {% set apiRedirectUrl = api['redirect_url'] %}
+    {% set apiRefreshUrl = api['refresh_url'] %}
     {% set apiAuthorization = api['authorization'] %}
     {% set locationDisabled = true %}
 {% else %}
@@ -41,30 +47,31 @@
     {% set apiAuthType = 'none' %}
     {% set apiUsername = '' %}
     {% set apiPassword = '' %}
+    {% set apiGrantType = '' %}
+    {% set apiClientId = '' %}
+    {% set apiClientSecret = '' %}
+    {% set apiRequestUrl = '' %}
+    {% set apiRedirectUrl = '' %}
+    {% set apiRefreshUrl = '' %}
     {% set apiAccessToken = '' %}
     {% set apiRefreshToken = '' %}
     {% set apiAuthorization = '' %}
 {% endif %}
+{% set otherHidde = '' %}
+{% set oauthHidden = 'hidden' %}
+{% set authDisabled = true %}
+{% set authoDisabled = true %}
 {% if apiAuthType == 'auth' %}
     {% set authDisabled = false %}
     {% set authoDisabled = true %}
-    {% set accessTokenDisabled = true %}
-    {% set refreshTokenDisabled = true %}
-{% elseif apiAuthType == 'access_token' %}
-    {% set authDisabled = true %}
-    {% set authoDisabled = true %}
-    {% set accessTokenDisabled = false %}
-    {% set refreshTokenDisabled = false %}
 {% elseif apiAuthType == 'autho' %}
     {% set authDisabled = true %}
     {% set authoDisabled = false %}
-    {% set accessTokenDisabled = true %}
-    {% set refreshTokenDisabled = true %}
-{% else %}
+{% elseif apiAuthType == 'oauth' %}
     {% set authDisabled = true %}
     {% set authoDisabled = true %}
-    {% set accessTokenDisabled = true %}
-    {% set refreshTokenDisabled = true %}
+    {% set otherHidde = 'hidden' %}
+    {% set oauthHidden = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -95,7 +102,7 @@
         </div>
         <hr>
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-2">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -131,18 +138,18 @@
                                         'type'                            : 'primary',
                                         'dataValue'                       : 'autho'
                                     ],
-                                'access_token' :
+                                'oauth' :
                                     [
-                                        'title'                           : 'Access Token',
+                                        'title'                           : 'OAuth',
                                         'type'                            : 'primary',
-                                        'dataValue'                       : 'access_token'
+                                        'dataValue'                       : 'oauth'
                                     ]
                             ],
                         'fieldRadioChecked'              : apiAuthType
                     ]
                 )}}
             </div>
-            <div class="col">
+            <div id="other-auth" class="col" {{otherHidde}}>
                 <div class="row">
                     <div class="col">
                         {{adminltetags.useTag('fields',
@@ -216,6 +223,164 @@
                         )}}
                     </div>
                 </div>
+            </div>
+            <div id="oauth-auth" class="col" {{oauthHidden}}>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'grant_type',
+                                'fieldLabel'                            : 'API Grant Type',
+                                'fieldType'                             : 'select2',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Select API grant type.',
+                                'fieldBazScan'                          : true,
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataSelect2Options'               : availableAPIGrantTypes,
+                                'fieldDataSelect2OptionsKey'            : 'id',
+                                'fieldDataSelect2OptionsValue'          : 'name',
+                                'fieldDataSelect2OptionsArray'          : true,
+                                'fieldDataSelect2OptionsSelected'       : apiGrantType
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'client_id',
+                                'fieldLabel'                     : 'Client ID',
+                                'fieldType'                      : 'input',
+                                'fieldRequired'                  : true,
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Client ID',
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazScan'                   : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 50,
+                                'fieldValue'                     : apiClientId
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'client_secret',
+                                'fieldLabel'                            : 'Client Secret',
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'client_secret',
+                                'fieldHelp'                             : true,
+                                'fieldInputPasswordToggleVisibility'    : true,
+                                'fieldHelpTooltipContent'               : 'Client Secret',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldValue'                            : apiClientSecret
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {% set fieldGroupPostAddonButtons = [] %}
+                        {% if canRegister %}
+                            {% set fieldGroupPostAddonButtons =
+                                [
+                                    'register'   : [
+                                        'title'                   : 'Register',
+                                        'icon'                    : 'cog fa-spin',
+                                        'iconHidden'              : true,
+                                        'noMargin'                : true,
+                                        'disabled'                : true,
+                                        'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                        'position'                : 'right'
+                                    ]
+                                ]
+                            %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'request_url',
+                                'fieldLabel'                            : 'Request Url',
+                                'fieldType'                             : 'input',
+                                'fieldHelp'                             : true,
+                                'fieldGroupPostAddonButtons'            : fieldGroupPostAddonButtons,
+                                'fieldHelpTooltipContent'               : 'Request Url, required if you want to register.',
+                                'fieldRequired'                         : false,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldValue'                            : apiRequestUrl
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'redirect_uri',
+                                'fieldLabel'                            : 'Redirect URL',
+                                'fieldType'                             : 'input',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Redirect URL, required if you want to register.',
+                                'fieldRequired'                         : false,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldValue'                            : apiRedirectUrl
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'refresh_url',
+                                'fieldLabel'                            : 'Refresh Url',
+                                'fieldType'                             : 'input',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Refresh Url. Usually will be supplied by the API provider or can be received by the server.',
+                                'fieldRequired'                         : false,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldValue'                            : apiRefreshUrl
+                            ]
+                        )}}
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col">
                         {{adminltetags.useTag('fields',
@@ -235,7 +400,6 @@
                                 'fieldBazScan'                          : true,
                                 'fieldBazPostOnCreate'                  : true,
                                 'fieldBazPostOnUpdate'                  : true,
-                                'fieldDisabled'                         : accessTokenDisabled,
                                 'fieldValue'                            : apiAccessToken
                             ]
                         )}}
@@ -260,7 +424,6 @@
                                 'fieldBazScan'                          : true,
                                 'fieldBazPostOnCreate'                  : true,
                                 'fieldBazPostOnUpdate'                  : true,
-                                'fieldDisabled'                         : refreshTokenDisabled,
                                 'fieldValue'                            : apiRefreshToken
                             ]
                         )}}
@@ -271,6 +434,7 @@
     </fieldset>
 </form>
 <script>
+/*global paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -317,25 +481,64 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-auth_type').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'none') {
                         $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-access_token, #{{componentId}}-{{sectionId}}-refresh_token, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
+                        $('#other-auth').attr('hidden', false);
+                        $('#oauth-auth').attr('hidden', true);
                     } else if ($(this).find('input[type=radio]:checked').data('value') == 'auth') {
                         $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-access_token, #{{componentId}}-{{sectionId}}-refresh_token, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
-                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'access_token') {
-                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-access_token, #{{componentId}}-{{sectionId}}-refresh_token').attr('disabled', false);
+                        $('#other-auth').attr('hidden', false);
+                        $('#oauth-auth').attr('hidden', true);
                     } else if ($(this).find('input[type=radio]:checked').data('value') == 'autho') {
                         $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-access_token, #{{componentId}}-{{sectionId}}-refresh_token').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-authorization').attr('disabled', false);
+                        $('#other-auth').attr('hidden', false);
+                        $('#oauth-auth').attr('hidden', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'oauth') {
+                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-access_token, #{{componentId}}-{{sectionId}}-refresh_token').attr('disabled', false);
+                        $('#other-auth').attr('hidden', true);
+                        $('#oauth-auth').attr('hidden', false);
                     }
                 });
             }
         },
         '{{componentId}}-{{sectionId}}-username'                            : { },
         '{{componentId}}-{{sectionId}}-password'                            : { },
+        '{{componentId}}-{{sectionId}}-grant_type'                          : {
+            placeholder: "SELECT API GRANT TYPE"
+        },
+        '{{componentId}}-{{sectionId}}-client_id'                           : { },
+        '{{componentId}}-{{sectionId}}-client_secret'                       : { },
         '{{componentId}}-{{sectionId}}-authorization'                       : { },
+        '{{componentId}}-{{sectionId}}-request_url'                         : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-request_url').off();
+                $('#{{componentId}}-{{sectionId}}-request_url').keyup(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-request_url').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-register').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-register').attr('disabled', false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-register').off();
+                $('#{{componentId}}-{{sectionId}}-register').click(function(e) {
+                    e.preventDefault();
+
+                    if ($('#{{componentId}}-{{sectionId}}-id').val() === '') {
+                        paginatedPNotify('error', 'Please save API to register client!');
+
+                        return false;
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-redirect_uri'                        : { },
+        '{{componentId}}-{{sectionId}}-refresh_url'                         : { },
         '{{componentId}}-{{sectionId}}-access_token'                        : { },
         '{{componentId}}-{{sectionId}}-refresh_token'                       : { },
         '{{componentId}}-{{sectionId}}-form'                                : {
+            ignore      : ':submit, :reset, :image, :disabled, .ignore, :hidden',
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'required',
                 '{{componentId}}-{{sectionId}}-category'                    : 'required',
@@ -343,6 +546,8 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-api_url'                     : 'required',
                 '{{componentId}}-{{sectionId}}-username'                    : 'required',
                 '{{componentId}}-{{sectionId}}-password'                    : 'required',
+                '{{componentId}}-{{sectionId}}-client_id'                   : 'required',
+                '{{componentId}}-{{sectionId}}-client_secret'               : 'required',
                 '{{componentId}}-{{sectionId}}-access_token'                : 'required',
                 '{{componentId}}-{{sectionId}}-authorization'               : 'required'
             },
@@ -353,6 +558,8 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-api_url'                     : 'Please enter repo url',
                 '{{componentId}}-{{sectionId}}-username'                    : 'Please enter username',
                 '{{componentId}}-{{sectionId}}-password'                    : 'Please enter password',
+                '{{componentId}}-{{sectionId}}-client_id'                   : 'Please enter client id',
+                '{{componentId}}-{{sectionId}}-client_secret'               : 'Please enter client secret',
                 '{{componentId}}-{{sectionId}}-access_token'                : 'Please enter api access token',
                 '{{componentId}}-{{sectionId}}-authorization'               : 'Please enter api authorization code'
             }

@@ -94,7 +94,7 @@ class Frameworks
                         ]
                     ),
                     new Column(
-                        'access_token',
+                        'register_url',
                         [
                             'type'          => Column::TYPE_VARCHAR,
                             'size'          => 2048,
@@ -102,17 +102,26 @@ class Frameworks
                         ]
                     ),
                     new Column(
-                        'token_type',
+                        'redirect_uri',
                         [
                             'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 50,
+                            'size'          => 2048,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
-                        'expires_in',
+                        'refresh_url',
                         [
-                            'type'          => Column::TYPE_SMALLINTEGER,
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 2048,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'access_token',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 2048,
                             'notNull'       => false,
                         ]
                     ),
@@ -123,7 +132,22 @@ class Frameworks
                             'size'          => 2048,
                             'notNull'       => false,
                         ]
-                    )
+                    ),
+                    new Column(//password, client_credentials, authorization_code
+                        'grant_type',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 50,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'expires',
+                        [
+                            'type'          => Column::TYPE_TIMESTAMP,
+                            'notNull'       => false,
+                        ]
+                    ),
                 ],
                 'indexes' => [
                     new Index(

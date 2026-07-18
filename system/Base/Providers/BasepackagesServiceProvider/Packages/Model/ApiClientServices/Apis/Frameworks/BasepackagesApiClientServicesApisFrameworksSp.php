@@ -26,13 +26,19 @@ class BasepackagesApiClientServicesApisFrameworksSp extends BaseModel
 
     public $code;
 
+    public $request_url;
+
+    public $redirect_uri;
+
+    public $refresh_url;
+
     public $access_token;
 
-    public $token_type;
-
-    public $expires_in;
-
     public $refresh_token;
+
+    public $grant_type;
+
+    public $expires;
 
     public function init($app = null)
     {

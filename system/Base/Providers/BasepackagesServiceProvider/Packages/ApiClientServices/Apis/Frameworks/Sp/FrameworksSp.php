@@ -19,4 +19,31 @@ class FrameworksSp extends Frameworks
 
         return $this;
     }
+
+    public function registerOAuthClient()
+    {
+        //
+    }
+
+    public function getAvailableAPIGrantTypes()
+    {
+        return
+            [
+                'password'    =>
+                    [
+                        'id'            => 'password',
+                        'name'          => 'Password Grant (With Refresh Token)',
+                    ],
+                'client_credentials'   =>
+                    [
+                        'id'            => 'client_credentials',
+                        'name'          => 'Client Credential Grant'
+                    ],
+                'authorization_code'    =>
+                    [
+                        'id'            => 'authorization_code',
+                        'name'          => 'Authorization Code Grant (With Refresh Token)',
+                    ]
+            ];
+    }
 }

@@ -99,10 +99,6 @@ class Apis extends BasePackage
             $this->httpOptions['headers']['Authorization'] = 'Basic ' . $credentials;
         } else if ($apiConfig['auth_type'] === 'authorization') {//With prefix of Bearer or token or anything that the server wants
             $this->httpOptions['headers']['Authorization'] = $apiConfig['authorization'];
-        } else if ($apiConfig['auth_type'] === 'token') {
-            //
-        } else if ($apiConfig['auth_type'] === 'client_credentials') {
-            //
         } else if ($apiConfig['auth_type'] === 'oauth') {
             //
         }
