@@ -122,6 +122,13 @@ class FrameworksSp extends Frameworks
                 return false;
             }
 
+            if ($tokenResponse['responseData']['expires_in'] && $tokenResponse['responseData']['expires_in'] > 0) {
+                $now = (\Carbon\Carbon::now('UTC'))->timestamp;
+
+                $tokenResponse['responseData']['expires_in'] = $now + $tokenResponse['responseData']['expires_in'];
+                $tokenResponse['responseData']['expires_in'] = \Carbon\Carbon::parse($tokenResponse['responseData']['expires_in'])->toAtomString();
+            }
+
             $this->addResponse($tokenResponse['responseMessage'], $tokenResponse['responseCode'], $tokenResponse['responseData']);
 
             return true;
