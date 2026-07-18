@@ -72,7 +72,7 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
             'domain_id' => (int) $this->domains->domain['id'],
             'account_id' => (int) $accessTokenEntity->getClient()->getUserIdentifier(),
             'access_token' => $accessToken,
-            'expires' => (\Carbon\Carbon::parse($accessTokenEntity->getExpiryDateTime()))->toDateTimeLocalString(),
+            'expires' => (\Carbon\Carbon::parse($accessTokenEntity->getExpiryDateTime())->setTimezone('UTC'))->toAtomString(),
             'client_id' => $accessTokenEntity->getClient()->getIdentifier(),
             'revoked' => 0
         ];

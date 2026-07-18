@@ -57,7 +57,7 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
             'domain_id' => (int) $this->domains->domain['id'],
             'account_id' => (int) $accessToken->getClient()->getUserIdentifier(),
             'refresh_token' => $refreshToken,
-            'expires' => (\Carbon\Carbon::parse($accessToken->getExpiryDateTime()))->toDateTimeLocalString(),
+            'expires' => (\Carbon\Carbon::parse($accessToken->getExpiryDateTime())->setTimezone('UTC'))->toAtomString(),
             'client_id' => $accessToken->getClient()->getIdentifier(),
             'revoked' => 0,
         ];
