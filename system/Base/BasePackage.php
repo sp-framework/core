@@ -2623,8 +2623,7 @@ abstract class BasePackage extends Controller
 			if (count($replaceColumnNames) === 0) {
 				$replaceColumnNames = $metadata['columns'];
 			} else {
-				$metadataColumns = $metadata['columns'];
-				$replaceColumnNames = array_replace($metadataColumns, $replaceColumnNames);
+				$replaceColumnNames = array_replace($metadata['columns'], $replaceColumnNames);
 			}
 
 			foreach ($metadata['columns'] as $column) {
