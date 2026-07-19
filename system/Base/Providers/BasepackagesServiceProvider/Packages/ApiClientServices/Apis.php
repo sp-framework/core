@@ -100,7 +100,19 @@ class Apis extends BasePackage
         } else if ($apiConfig['auth_type'] === 'authorization') {//With prefix of Bearer or token or anything that the server wants
             $this->httpOptions['headers']['Authorization'] = $apiConfig['authorization'];
         } else if ($apiConfig['auth_type'] === 'oauth') {
-            //
+            if (method_exists($this, 'refreshOAuthClient')) {
+                $apiConfig = $this->refreshOAuthClient($apiConfig);
+            }
+
+            if ($apiConfig['token_type'] !== '' &&
+                !str_starts_with($apiConfig['access_token'], $apiConfig['token_type'] . ' ')
+            ) {
+                $apiConfig['access_token'] = $apiConfig['token_type'] . ' ' . $apiConfig['access_token'];
+            } else {
+                $apiConfig['access_token'] = 'Bearer ' . $apiConfig['access_token'];
+            }
+
+            $this->httpOptions['headers']['Authorization'] = $apiConfig['access_token'];
         }
 
         $this->remoteWebContent = (new \System\Base\Providers\ContentServiceProvider\RemoteWeb\Content)->init($this->httpOptions);

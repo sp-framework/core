@@ -31,7 +31,6 @@ class FrameworksSp extends Frameworks
                     ]
                 ]);
             } catch (\throwable $e) {
-                trace([$e]);
                 $this->addResponse($e->getMessage(), 1);
 
                 return false;
@@ -41,13 +40,11 @@ class FrameworksSp extends Frameworks
                 $stateResponse = json_decode($state->getBody()->getContents(), true);
 
                 if (!isset($stateResponse['responseData']['authorization_url'])) {
-                    trace(['meme']);
                     $this->addResponse('Did not receive valid authorization url from the server. Contact developer', 1);
 
                     return false;
                 }
             } else {
-                    trace(['meme']);
                 $this->addResponse((string) $state->getBody(), 1);
 
                 return false;
@@ -61,7 +58,6 @@ class FrameworksSp extends Frameworks
                     ]
                 ]);
             } catch (\throwable $e) {
-                trace([$e]);
                 $this->addResponse($e->getMessage(), 1);
 
                 return false;
@@ -73,13 +69,11 @@ class FrameworksSp extends Frameworks
                 if (!isset($codeResponse['responseData']['registration_url']) &&
                     !isset($codeResponse['responseData']['code'])
                 ) {
-                    trace(['meme']);
                     $this->addResponse('Did not receive valid code from the server. Contact developer', 1);
 
                     return false;
                 }
             } else {
-                    trace(['meme']);
                 $this->addResponse((string) $code->getBody(), 1);
 
                 return false;
@@ -100,7 +94,6 @@ class FrameworksSp extends Frameworks
                     ]
                 ]);
             } catch (\throwable $e) {
-                trace([$e]);
                 $this->addResponse($e->getMessage(), 1);
 
                 return false;
@@ -135,6 +128,87 @@ class FrameworksSp extends Frameworks
         } else if ($data['grant_type'] === 'client_credentials') {
             //
         }
+    }
+
+    public function refreshOAuthClient($data)
+    {
+        if ($data['grant_type'] === 'authorization_code') {
+            $refresh = false;
+
+            if ($data['expires'] === '') {
+                return $data;
+            }
+
+            try {
+                $expiry = \Carbon\Carbon::parse($data['expires'])->setTimezone('UTC');
+
+                if ($expiry->isPast()) {
+                    $refresh = true;
+                }
+
+                if (abs($expiry->diffInMinutes(\Carbon\Carbon::now()->setTimezone('UTC'))) < 5) {
+                    $refresh = true;
+                }
+            } catch (\Exception $e) {
+                throw $e;
+            }
+
+            if ($refresh &&
+                isset($data['refresh_url']) &&
+                $data['refresh_url'] !== '' &&
+                isset($data['refresh_token']) &&
+                $data['refresh_token'] !== ''
+            ) {
+                try {
+                    $refresh = $this->remoteWebContent->post($data['refresh_url'], [
+                        'headers' => [
+                            'Accept'        => 'application/json'
+                        ],
+                        'form_params'       => [
+                            'grant_type'        => 'refresh_token',
+                            'client_id'         => $data['client_id'],
+                            'client_secret'     => $data['client_secret'],
+                            'refresh_token'     => $data['refresh_token']
+                        ]
+                    ]);
+                } catch (\throwable $e) {
+                    $this->addResponse($e->getMessage(), 1);
+
+                    return false;
+                }
+
+                if ($refresh->getStatusCode() === 200) {
+                    $tokenResponse = json_decode($refresh->getBody()->getContents(), true);
+
+                    if (!isset($tokenResponse['responseData']['access_token']) &&
+                        !isset($tokenResponse['responseData']['refresh_token'])
+                    ) {
+                        $this->addResponse('Did not receive valid access token from the server. Contact developer', 1);
+
+                        return false;
+                    }
+                } else {
+                    $this->addResponse((string) $refresh->getBody(), 1);
+
+                    return false;
+                }
+
+                if ($tokenResponse['responseData']['expires_in'] && $tokenResponse['responseData']['expires_in'] > 0) {
+                    $now = (\Carbon\Carbon::now('UTC'))->timestamp;
+
+                    $tokenResponse['responseData']['expires_in'] = $now + $tokenResponse['responseData']['expires_in'];
+                    $tokenResponse['responseData']['expires'] = \Carbon\Carbon::parse($tokenResponse['responseData']['expires_in'])->toAtomString();
+                }
+
+                $data = array_merge($data, $tokenResponse['responseData']);
+
+                $this->apiClientServices->updateApi($data);
+            }
+        } else if ($data['grant_type'] === 'client_credentials') {
+            //
+        }
+
+        return $data;
     }
 
     public function getAvailableAPIGrantTypes()
