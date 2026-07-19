@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ApiServiceProvider\Repositories;
 
-use Carbon\Carbon;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
@@ -120,7 +119,7 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
             }
 
             try {
-                $expiry = (new Carbon)->parse($result['expires']);
+                $expiry = \Carbon\Carbon::parse($result['expires'])->setTimezone('UTC');
 
                 if ($expiry->isPast()) {
                     return true;
