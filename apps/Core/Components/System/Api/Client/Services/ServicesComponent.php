@@ -98,6 +98,10 @@ class ServicesComponent extends BaseComponent
             if (method_exists($categoryProviderClass, 'registerOAuthClient')) {
                 $this->view->canRegister = true;
             }
+            $this->view->canRefresh = false;
+            if (method_exists($categoryProviderClass, 'refreshOAuthClient')) {
+                $this->view->canRefresh = true;
+            }
 
             $this->view->api = $api;
 
@@ -244,7 +248,20 @@ class ServicesComponent extends BaseComponent
 
         $api = $this->apiPackage->useApi((int) $this->postData()['id']);
 
-        $api->registerOAuthClient($this->postData());
+        $api->registerOAuthClient($this->apiPackage->getApiById($this->postData()['id']));
+
+        $this->addResponse($api->packagesData->responseMessage, $api->packagesData->responseCode, $api->packagesData->responseData);
+    }
+
+    public function refreshOAuthClientAction()
+    {
+        $this->requestIsPost();
+
+        $this->validateData($this->postData(), ['id', 'grant_type', 'client_id', 'client_secret', 'refresh_token', 'force']);
+
+        $api = $this->apiPackage->useApi((int) $this->postData()['id']);
+
+        $api->refreshOAuthClient($this->apiPackage->getApiById($this->postData()['id']), $this->postData()['force']);
 
         $this->addResponse($api->packagesData->responseMessage, $api->packagesData->responseCode, $api->packagesData->responseData);
     }

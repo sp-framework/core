@@ -305,13 +305,13 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        {% set fieldGroupPostAddonButtons = [] %}
+                        {% set requestFieldGroupPostAddonButtons = [] %}
                         {% set canRegisterDisabled = true %}
                         {% if apiRequestUrl != '' %}
                             {% set canRegisterDisabled = false %}
                         {% endif %}
                         {% if canRegister %}
-                            {% set fieldGroupPostAddonButtons =
+                            {% set requestFieldGroupPostAddonButtons =
                                 [
                                     'register'   : [
                                         'title'                   : 'Register',
@@ -335,7 +335,7 @@
                                 'fieldLabel'                            : 'Request Url',
                                 'fieldType'                             : 'input',
                                 'fieldHelp'                             : true,
-                                'fieldGroupPostAddonButtons'            : fieldGroupPostAddonButtons,
+                                'fieldGroupPostAddonButtons'            : requestFieldGroupPostAddonButtons,
                                 'fieldHelpTooltipContent'               : 'Request Url, required if you want to register.',
                                 'fieldRequired'                         : false,
                                 'fieldBazScan'                          : true,
@@ -370,6 +370,26 @@
                 </div>
                 <div class="row">
                     <div class="col">
+                        {% set refreshFieldGroupPostAddonButtons = [] %}
+                        {% set canRefreshDisabled = true %}
+                        {% if apiRefreshUrl != '' %}
+                            {% set canRefreshDisabled = false %}
+                        {% endif %}
+                        {% if canRegister %}
+                            {% set refreshFieldGroupPostAddonButtons =
+                                [
+                                    'refresh'   : [
+                                        'title'                   : 'Refresh',
+                                        'icon'                    : 'cog fa-spin',
+                                        'iconHidden'              : true,
+                                        'noMargin'                : true,
+                                        'disabled'                : canRefreshDisabled,
+                                        'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                        'position'                : 'right'
+                                    ]
+                                ]
+                            %}
+                        {% endif %}
                         {{adminltetags.useTag('fields',
                             [
                                 'component'                             : component,
@@ -380,6 +400,7 @@
                                 'fieldLabel'                            : 'Refresh Url',
                                 'fieldType'                             : 'input',
                                 'fieldHelp'                             : true,
+                                'fieldGroupPostAddonButtons'            : refreshFieldGroupPostAddonButtons,
                                 'fieldHelpTooltipContent'               : 'Refresh Url. Usually will be supplied by the API provider or can be received by the server.',
                                 'fieldRequired'                         : false,
                                 'fieldBazScan'                          : true,
@@ -485,7 +506,7 @@
     </fieldset>
 </form>
 <script>
-/*global paginatedPNotify */
+/*global paginatedPNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -582,6 +603,9 @@ dataCollectionSection =
                         return false;
                     }
 
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
@@ -607,8 +631,8 @@ dataCollectionSection =
                             if (response.responseData.refresh_url) {
                                 $('#{{componentId}}-{{sectionId}}-refresh_url').val(response.responseData.refresh_url);
                             }
-                            if (response.responseData.expires_in) {
-                                $('#{{componentId}}-{{sectionId}}-expires').val(response.responseData.expires_in);
+                            if (response.responseData.expires) {
+                                $('#{{componentId}}-{{sectionId}}-expires').val(response.responseData.expires);
                             }
                         } else {
                             paginatedPNotify('error', response.responseMessage);
@@ -618,12 +642,115 @@ dataCollectionSection =
                             $("#security-token").attr("name", response.tokenKey);
                             $("#security-token").val(response.token);
                         }
+
+                        $('#{{componentId}}-{{sectionId}}-register').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-register').children('i').attr('hidden', true);
                     }, 'json');
                 });
             }
         },
         '{{componentId}}-{{sectionId}}-redirect_uri'                        : { },
-        '{{componentId}}-{{sectionId}}-refresh_url'                         : { },
+        '{{componentId}}-{{sectionId}}-refresh_url'                         : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-refresh_url').off();
+                $('#{{componentId}}-{{sectionId}}-refresh_url').keyup(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-refresh_url').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-refresh').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-refresh').attr('disabled', false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-refresh').off();
+                $('#{{componentId}}-{{sectionId}}-refresh').click(function(e) {
+                    e.preventDefault();
+
+                    if ($('#{{componentId}}-{{sectionId}}-id').val() === '') {
+                        paginatedPNotify('error', 'Please save API to refresh client!');
+
+                        return false;
+                    }
+
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    processRefresh();
+                });
+
+                function processRefresh(force = false) {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['grant_type'] = $('#{{componentId}}-{{sectionId}}-grant_type').val();
+                    postData['client_id'] = $('#{{componentId}}-{{sectionId}}-client_id').val();
+                    postData['client_secret'] = $('#{{componentId}}-{{sectionId}}-client_secret').val();
+                    postData['refresh_token'] = $('#{{componentId}}-{{sectionId}}-refresh_token').val();
+                    postData['force'] = false;
+                    if (force) {
+                        postData['force'] = true;
+                    }
+
+                    $.post('{{links.url("system/api/client/services/refreshOAuthClient")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            paginatedPNotify('success', response.responseMessage);
+
+                            if (response.responseData.token_type) {
+                                $('#{{componentId}}-{{sectionId}}-token_type').val(response.responseData.token_type);
+                            }
+                            if (response.responseData.access_token) {
+                                $('#{{componentId}}-{{sectionId}}-access_token').val(response.responseData.access_token);
+                            }
+                            if (response.responseData.refresh_token) {
+                                $('#{{componentId}}-{{sectionId}}-refresh_token').val(response.responseData.refresh_token);
+                            }
+                            if (response.responseData.refresh_url) {
+                                $('#{{componentId}}-{{sectionId}}-refresh_url').val(response.responseData.refresh_url);
+                            }
+                            if (response.responseData.expires) {
+                                $('#{{componentId}}-{{sectionId}}-expires').val(response.responseData.expires);
+                            }
+                        } else if (response.responseCode == 2) {//Use force for refresh
+                           Swal.fire({
+                                title                       : '<span class="text-danger"> Token is still valid, force refresh?</span>',
+                                icon                        : 'question',
+                                background                  : 'rgba(0,0,0,.8)',
+                                backdrop                    : 'rgba(0,0,0,.6)',
+                                buttonsStyling              : false,
+                                confirmButtonText           : 'Refresh',
+                                customClass                 : {
+                                    'confirmButton'             : 'btn btn-danger text-uppercase',
+                                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                                },
+                                showCancelButton            : true,
+                                keydownListenerCapture      : true,
+                                allowOutsideClick           : true,
+                                allowEscapeKey              : true,
+                                didOpen                     : function() {
+                                    window.dataCollection.env.sounds.swalSound.play();
+                                }
+                            }).then((result) => {
+                                if (result.value) {
+                                    $('#{{componentId}}-{{sectionId}}-refresh').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-refresh').children('i').attr('hidden', false);
+
+                                    processRefresh(true);
+                                }
+                            });
+                        } else {
+                            paginatedPNotify('error', response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-refresh').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-refresh').children('i').attr('hidden', true);
+                    }, 'json');
+                }
+            }
+        },
         '{{componentId}}-{{sectionId}}-token_type'                          : { },
         '{{componentId}}-{{sectionId}}-expires'                             : { },
         '{{componentId}}-{{sectionId}}-access_token'                        : { },

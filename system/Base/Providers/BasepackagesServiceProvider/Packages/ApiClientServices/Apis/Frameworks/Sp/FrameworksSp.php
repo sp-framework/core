@@ -119,10 +119,14 @@ class FrameworksSp extends Frameworks
                 $now = (\Carbon\Carbon::now('UTC'))->timestamp;
 
                 $tokenResponse['responseData']['expires_in'] = $now + $tokenResponse['responseData']['expires_in'];
-                $tokenResponse['responseData']['expires_in'] = \Carbon\Carbon::parse($tokenResponse['responseData']['expires_in'])->toAtomString();
+                $tokenResponse['responseData']['expires'] = \Carbon\Carbon::parse($tokenResponse['responseData']['expires_in'])->toAtomString();
             }
 
             $this->addResponse($tokenResponse['responseMessage'], $tokenResponse['responseCode'], $tokenResponse['responseData']);
+
+            $data = array_merge($data, $tokenResponse['responseData']);
+
+            $this->apiClientServices->updateApi($data);
 
             return true;
         } else if ($data['grant_type'] === 'client_credentials') {
@@ -130,27 +134,31 @@ class FrameworksSp extends Frameworks
         }
     }
 
-    public function refreshOAuthClient($data)
+    public function refreshOAuthClient($data, $force = 'false')
     {
         if ($data['grant_type'] === 'authorization_code') {
-            $refresh = false;
+            if ($force == 'false') {
+                $refresh = false;
 
-            if ($data['expires'] === '') {
-                return $data;
-            }
-
-            try {
-                $expiry = \Carbon\Carbon::parse($data['expires'])->setTimezone('UTC');
-
-                if ($expiry->isPast()) {
-                    $refresh = true;
+                if ($data['expires'] === '') {
+                    return $data;
                 }
 
-                if (abs($expiry->diffInMinutes(\Carbon\Carbon::now()->setTimezone('UTC'))) < 5) {
-                    $refresh = true;
+                try {
+                    $expiry = \Carbon\Carbon::parse($data['expires'])->setTimezone('UTC');
+
+                    if ($expiry->isPast()) {
+                        $refresh = true;
+                    }
+
+                    if (abs($expiry->diffInMinutes(\Carbon\Carbon::now()->setTimezone('UTC'))) < 5) {
+                        $refresh = true;
+                    }
+                } catch (\Exception $e) {
+                    throw $e;
                 }
-            } catch (\Exception $e) {
-                throw $e;
+            } else {
+                $refresh = true;
             }
 
             if ($refresh &&
@@ -183,7 +191,7 @@ class FrameworksSp extends Frameworks
                     if (!isset($tokenResponse['responseData']['access_token']) &&
                         !isset($tokenResponse['responseData']['refresh_token'])
                     ) {
-                        $this->addResponse('Did not receive valid access token from the server. Contact developer', 1);
+                        $this->addResponse('Did not receive valid access token from the server. ' . $tokenResponse['responseMessage'], 1);
 
                         return false;
                     }
@@ -200,9 +208,15 @@ class FrameworksSp extends Frameworks
                     $tokenResponse['responseData']['expires'] = \Carbon\Carbon::parse($tokenResponse['responseData']['expires_in'])->toAtomString();
                 }
 
+                $this->addResponse($tokenResponse['responseMessage'], $tokenResponse['responseCode'], $tokenResponse['responseData']);
+
                 $data = array_merge($data, $tokenResponse['responseData']);
 
                 $this->apiClientServices->updateApi($data);
+            } else {
+                $this->addResponse('Refresh not required', 2);
+
+                return false;
             }
         } else if ($data['grant_type'] === 'client_credentials') {
             //
