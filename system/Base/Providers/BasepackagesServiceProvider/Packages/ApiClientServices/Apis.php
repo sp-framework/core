@@ -102,6 +102,10 @@ class Apis extends BasePackage
         } else if ($apiConfig['auth_type'] === 'oauth') {
             if (method_exists($this, 'refreshOAuthClient')) {
                 $apiConfig = $this->refreshOAuthClient($apiConfig);
+
+                if (!$apiConfig) {
+                    throw new \Exception($this->packagesData->responseMessage);
+                }
             }
 
             if ($apiConfig['token_type'] !== '' &&

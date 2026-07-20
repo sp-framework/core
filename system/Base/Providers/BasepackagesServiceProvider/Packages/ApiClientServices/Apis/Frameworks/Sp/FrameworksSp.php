@@ -216,7 +216,7 @@ class FrameworksSp extends Frameworks
             } else {
                 $this->addResponse('Refresh not required', 2);
 
-                return false;
+                return $data;
             }
         } else if ($data['grant_type'] === 'client_credentials') {
             //
