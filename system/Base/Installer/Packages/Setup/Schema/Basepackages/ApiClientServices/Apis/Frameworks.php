@@ -161,7 +161,11 @@ class Frameworks
                     new Index(
                         'column_UNIQUE',
                         [
-                            'api_url'
+                            'api_url',
+                            'auth_type',
+                            'username',
+                            'authorization',
+                            'client_id'
                         ],
                         'UNIQUE'
                     )
