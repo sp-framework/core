@@ -244,7 +244,13 @@ class ServicesComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->validateData($this->postData(), ['id', 'grant_type', 'client_id', 'request_url', 'redirect_uri']);
+        $checkFields = ['id', 'grant_type', 'client_id', 'request_url'];
+
+        if (isset($this->postData()['grant_type']) && $this->postData()['grant_type'] === 'authorization_code') {
+            $checkFields = array_merge($checkFields, ['redirect_uri']);
+        }
+
+        $this->validateData($this->postData(), $checkFields);
 
         $api = $this->apiPackage->useApi((int) $this->postData()['id']);
 
