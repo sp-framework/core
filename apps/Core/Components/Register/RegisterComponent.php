@@ -306,6 +306,10 @@ class RegisterComponent extends BaseComponent
                     $this->api->setupApi();
                 }
             }
+
+            $this->addResponse('Incorrect client ID provided or API does not exist!', 1, []);
+
+            return;
         } else {
             $this->api->init(true)->setupApiViaClientId(true);
 
