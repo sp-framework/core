@@ -27,13 +27,17 @@ class RegisterComponent extends BaseComponent
         }
 
         //Authorize Flow 1, test authorization redirect url
-        if (isset($this->getData()['authorized']) && !isset($this->getData()['response_type'])) {
+        if (isset($this->getData()['authorized']) &&
+            !isset($this->getData()['response_type']) &&
+            !isset($this->request->getQuery()['code'])
+        ) {
             $this->view->refresh = false;
             $this->view->newToken = false;
 
             if (isset($this->getData()['test_authorized'])) {
                 return true;
             }
+
             $this->view->setLayout('auth');
 
             $this->view->pick('register/authorization');
@@ -61,6 +65,9 @@ class RegisterComponent extends BaseComponent
                 }
 
                 $this->view->error = $this->api->packagesData->responseMessage;
+
+                $this->view->refresh = false;
+                $this->view->newToken = false;
 
                 return;
             }

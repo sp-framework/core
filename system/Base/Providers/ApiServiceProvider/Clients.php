@@ -264,11 +264,13 @@ class Clients extends BasePackage
                         return false;
                     }
 
-                    if (isset($data['client_id'])) {
-                        unset($data['client_id']);
-                    }
-                    if (isset($data['client_secret'])) {
-                        unset($data['client_secret']);
+                    if (!$viaRegister && !$viaApi) {
+                        if (isset($data['client_id'])) {
+                            unset($data['client_id']);
+                        }
+                        if (isset($data['client_secret'])) {
+                            unset($data['client_secret']);
+                        }
                     }
                 }
             }
