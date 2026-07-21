@@ -898,7 +898,9 @@ class Api extends BasePackage
                 $responseData['access_token'] .= '||' . $this->encDeviceId;
             }
 
-            $responseData['refresh_url'] = $this->links->url('register/apiClient');
+            if (isset($responseData['refresh_token'])) {
+                $responseData['refresh_url'] = $this->links->url('register/apiClient');
+            }
 
             if ($responseData['expires_in'] && $responseData['expires_in'] > 0) {
                 $now = (\Carbon\Carbon::now('UTC'))->timestamp;
