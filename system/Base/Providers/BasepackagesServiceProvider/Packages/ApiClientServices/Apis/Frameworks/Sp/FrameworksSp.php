@@ -130,7 +130,53 @@ class FrameworksSp extends Frameworks
 
             return true;
         } else if ($data['grant_type'] === 'client_credentials') {
-            //
+            try {
+                $token = $this->remoteWebContent->post($data['request_url'], [
+                    'headers' => [
+                        'Accept'        => 'application/json'
+                    ],
+                    'form_params'       => [
+                        'client_id'         => $data['client_id'],
+                        'client_secret'     => $data['client_secret'],
+                        'grant_type'        => $data['grant_type']
+                    ]
+                ]);
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+
+            if ($token->getStatusCode() === 200) {
+                $tokenResponse = json_decode($token->getBody()->getContents(), true);
+
+                if (!isset($tokenResponse['responseData']['access_token']) &&
+                    !isset($tokenResponse['responseData']['refresh_token'])
+                ) {
+                    $this->addResponse('Did not receive valid access token from the server. ' . $tokenResponse['responseMessage'], 1);
+
+                    return false;
+                }
+            } else {
+                $this->addResponse((string) $token->getBody(), 1);
+
+                return false;
+            }
+
+            if ($tokenResponse['responseData']['expires_in'] && $tokenResponse['responseData']['expires_in'] > 0) {
+                $now = (\Carbon\Carbon::now('UTC'))->timestamp;
+
+                $tokenResponse['responseData']['expires_in'] = $now + $tokenResponse['responseData']['expires_in'];
+                $tokenResponse['responseData']['expires'] = \Carbon\Carbon::parse($tokenResponse['responseData']['expires_in'])->toAtomString();
+            }
+
+            $this->addResponse($tokenResponse['responseMessage'], $tokenResponse['responseCode'], $tokenResponse['responseData']);
+
+            $data = array_merge($data, $tokenResponse['responseData']);
+
+            $this->apiClientServices->updateApi($data);
+
+            return true;
         }
     }
 
@@ -216,8 +262,6 @@ class FrameworksSp extends Frameworks
             } else {
                 $this->addResponse('Refresh not required', 2);
             }
-        } else if ($data['grant_type'] === 'client_credentials') {
-            //
         }
 
         return $data;
