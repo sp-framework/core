@@ -215,8 +215,6 @@ class FrameworksSp extends Frameworks
                 $this->apiClientServices->updateApi($data);
             } else {
                 $this->addResponse('Refresh not required', 2);
-
-                return $data;
             }
         } else if ($data['grant_type'] === 'client_credentials') {
             //
