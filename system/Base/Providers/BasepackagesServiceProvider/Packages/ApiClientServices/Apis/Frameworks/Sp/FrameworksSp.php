@@ -40,7 +40,7 @@ class FrameworksSp extends Frameworks
                 $stateResponse = json_decode($state->getBody()->getContents(), true);
 
                 if (!isset($stateResponse['responseData']['authorization_url'])) {
-                    $this->addResponse('Did not receive valid authorization url from the server. Contact developer', 1);
+                    $this->addResponse('Did not receive valid authorization url from the server. ' . $stateResponse['responseMessage'], 1);
 
                     return false;
                 }
@@ -69,7 +69,7 @@ class FrameworksSp extends Frameworks
                 if (!isset($codeResponse['responseData']['registration_url']) &&
                     !isset($codeResponse['responseData']['code'])
                 ) {
-                    $this->addResponse('Did not receive valid code from the server. Contact developer', 1);
+                    $this->addResponse('Did not receive valid code from the server. ' . $codeResponse['responseMessage'], 1);
 
                     return false;
                 }
@@ -105,7 +105,7 @@ class FrameworksSp extends Frameworks
                 if (!isset($tokenResponse['responseData']['access_token']) &&
                     !isset($tokenResponse['responseData']['refresh_token'])
                 ) {
-                    $this->addResponse('Did not receive valid access token from the server. Contact developer', 1);
+                    $this->addResponse('Did not receive valid access token from the server. ' . $tokenResponse['responseMessage'], 1);
 
                     return false;
                 }
