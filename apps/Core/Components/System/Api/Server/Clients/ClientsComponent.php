@@ -91,7 +91,7 @@ class ClientsComponent extends BaseComponent
                 $data['device_id'] = '-';
             }
 
-            if ($api['api_type'] === 'public') {
+            if ($api['api_type'] === 'public' || $api['api_type'] === 'protected_user_credentials') {
                 $data['revoked'] = '-';
                 $dataRevoked = false;
             } else {

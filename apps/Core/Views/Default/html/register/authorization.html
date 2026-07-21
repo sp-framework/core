@@ -149,8 +149,8 @@ BazCore.header({
                                                 [
                                                     'componentId'                           : componentId,
                                                     'sectionId'                             : 'form',
-                                                    'fieldId'                               : 'expires_in',
-                                                    'fieldLabel'                            : 'Expires in seconds',
+                                                    'fieldId'                               : 'expires',
+                                                    'fieldLabel'                            : 'Expires (seconds)',
                                                     'fieldType'                             : 'input',
                                                     'fieldInputType'                        : 'text',
                                                     'fieldValue'                            : ''
@@ -480,7 +480,11 @@ $(document).ready(function() {
                     $('.login-spinner').attr('hidden', true);
                     $('#{{componentId}}-form-request').attr('hidden', true);
                     $('#{{componentId}}-form-client_id, #{{componentId}}-form-client_secret').attr('disabled', true);
-                    $('#{{componentId}}-form-expires_in').val(response.responseData.expires_in);
+                    if (response.responseData.expires && response.responseData.expires_in) {
+                        $('#{{componentId}}-form-expires').val(response.responseData.expires + ' (' + response.responseData.expires_in + ')');
+                    } else {
+                        $('#{{componentId}}-form-expires').val(response.responseData.expires_in);
+                    }
                     $('#{{componentId}}-form-token_type').val(response.responseData.token_type);
                     $('#{{componentId}}-form-access_token').val(response.responseData.access_token);
                     $('#{{componentId}}-form-refresh_token').val(response.responseData.refresh_token);
@@ -494,7 +498,11 @@ $(document).ready(function() {
                     $('#{{componentId}}-form-request').attr('hidden', true);
                     $('#{{componentId}}-form-client_id, #{{componentId}}-form-client_secret').attr('disabled', true);
                     $('#{{componentId}}-form-request_token_input').attr('disabled', true);
-                    $('#{{componentId}}-form-expires_in').val(response.responseData.expires_in);
+                    if (response.responseData.expires && response.responseData.expires_in) {
+                        $('#{{componentId}}-form-expires').val(response.responseData.expires + ' (' + response.responseData.expires_in + ')');
+                    } else {
+                        $('#{{componentId}}-form-expires').val(response.responseData.expires_in);
+                    }
                     $('#{{componentId}}-form-token_type').val(response.responseData.token_type);
                     $('#{{componentId}}-form-access_token').val(response.responseData.access_token);
                     $('#{{componentId}}-form-refresh_token').val(response.responseData.refresh_token);
@@ -507,7 +515,11 @@ $(document).ready(function() {
                     $('#{{componentId}}-form-request').attr('hidden', true);
                     $('#{{componentId}}-form-client_id, #{{componentId}}-form-client_secret').attr('disabled', true);
                     $('#{{componentId}}-form-request_token_input').attr('disabled', true);
-                    $('#{{componentId}}-form-expires_in').val(response.responseData.expires_in);
+                    if (response.responseData.expires && response.responseData.expires_in) {
+                        $('#{{componentId}}-form-expires').val(response.responseData.expires + ' (' + response.responseData.expires_in + ')');
+                    } else {
+                        $('#{{componentId}}-form-expires').val(response.responseData.expires_in);
+                    }
                     $('#{{componentId}}-form-token_type').val(response.responseData.token_type);
                     $('#{{componentId}}-form-access_token').val(response.responseData.access_token);
                     $('#{{componentId}}-form-refresh_token').val('');

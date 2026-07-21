@@ -76,68 +76,72 @@
         </div>
     </div>
     <div id="autho-grant-user" class="col" {{authoCodeUserHidden}}>
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'account_id',
-                'fieldLabel'                            : 'Account ID',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Account ID',
-                'fieldRequired'                         : false,
-                'fieldDisabled'                         : true,
-                'fieldHidden'                           : true,
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : false,
-                'fieldBazPostOnCreate'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldValue'                            : apiAccountId
-            ]
-        )}}
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'account_email',
-                'fieldLabel'                            : 'User Account (Email)',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Enter email to search and select the account',
-                'fieldRequired'                         : true,
-                'fieldDisabled'                         : false,
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : false,
-                'fieldBazPostOnCreate'                  : false,
-                'fieldBazPostOnUpdate'                  : false,
-                'fieldValue'                            : apiAccountEmail
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'email_client_details_to_user',
-                'fieldLabel'                     : 'Email Client details to user?',
-                'fieldType'                      : 'checkbox',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Email generated client id and client secret with urls to the user? NOTE: Only new generated or regenerated client ID and secret can be emailed!',
-                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                'fieldDisabled'                  : true,
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true
-            ]
-        )}}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_id',
+                        'fieldLabel'                            : 'Account ID',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Account ID',
+                        'fieldRequired'                         : false,
+                        'fieldDisabled'                         : true,
+                        'fieldHidden'                           : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : false,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : apiAccountId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_email',
+                        'fieldLabel'                            : 'User Account (Email)',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Enter email to search and select the account',
+                        'fieldRequired'                         : true,
+                        'fieldDisabled'                         : false,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldValue'                            : apiAccountEmail
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'email_client_details_to_user',
+                        'fieldLabel'                     : 'Email Client details to user?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Email generated client id and client secret with urls to the user? NOTE: Only new generated or regenerated client ID and secret can be emailed!',
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldDisabled'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+        </div>
     </div>
 </div>
 <div id="client-credentials-grant" {{clientCredentialsGrantHidden}}>

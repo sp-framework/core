@@ -67,7 +67,7 @@ class ServicesComponent extends BaseComponent
                 $api['client_secret'] = '';
             }
 
-            if ($api['account_id'] && $api['account_id'] != 0) {
+            if (isset($api['account_id']) && $api['account_id'] != 0) {
                 $account = $this->basepackages->accounts->getById($api['account_id']);
 
                 if ($account) {

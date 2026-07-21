@@ -900,6 +900,13 @@ class Api extends BasePackage
 
             $responseData['refresh_url'] = $this->links->url('register/apiClient');
 
+            if ($responseData['expires_in'] && $responseData['expires_in'] > 0) {
+                $now = (\Carbon\Carbon::now('UTC'))->timestamp;
+
+                $responseData['expires_in'] = $now + $responseData['expires_in'];
+                $responseData['expires'] = \Carbon\Carbon::parse($responseData['expires_in'])->toAtomString();
+            }
+
             $this->addResponse('Access token generated!', 0, $responseData);
 
             return true;
@@ -928,6 +935,7 @@ class Api extends BasePackage
 
         try {
             $authoRequest = $this->server->validateAuthorizationRequest(ServerRequest::fromGlobals());
+
             $authoRequest->setUser(new ServiceProviderApiUsers());
 
             $authoRequest->setAuthorizationApproved(true);
@@ -935,14 +943,11 @@ class Api extends BasePackage
             return $this->server->completeAuthorizationRequest($authoRequest, $serverResponse);
         } catch (OAuthServerException $exception) {
             $this->logException($exception);
-            trace([$exception]);
-            // All instances of OAuthServerException can be formatted into a HTTP response
+
             return $exception->generateHttpResponse($serverResponse);
         } catch (\Exception $exception) {
             $this->logException($exception);
-            trace([$exception]);
 
-            // Unknown exception
             $body = new Stream(fopen('php://temp', 'r+'));
 
             $body->write($exception->getMessage());

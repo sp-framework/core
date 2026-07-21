@@ -68,7 +68,7 @@ class Clients extends BasePackage
                     return;
                 }
 
-                $oldClient = $this->checkClientExists($api, $account);
+                $oldClient = $this->checkClientExists($api, $account, $data);
 
                 if ($oldClient && isset($oldClient[0]['id'])){
                     if (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true) {
@@ -98,7 +98,7 @@ class Clients extends BasePackage
                     $account['id'] = 0;
                 }
 
-                if (isset($data['device_id']) && (bool) $data['device_id'] === true) {
+                if (isset($data['device']) && (bool) $data['device'] == true) {
                     //Check the amount of client allowed
                     $clientsCount = $this->checkCCAccountDeviceCount($api, $account);
 
@@ -116,9 +116,9 @@ class Clients extends BasePackage
                         }
                     }
 
-                    $account['device_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
+                    $data['device_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
                 } else {
-                    $oldClient = $this->checkClientExists($api, $account);
+                    $oldClient = $this->checkClientExists($api, $account, $data);
 
                     if ($oldClient && isset($oldClient[0]['id'])){
                         if (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true) {
@@ -198,16 +198,17 @@ class Clients extends BasePackage
             if (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true) {
                 $account = $this->basepackages->accounts->getById($client['account_id']);
 
-                if ($client['device_id']) {
-                    $account['device_id'] = $client['device_id'];
-                }
                 $data['api_id'] = $client['api_id'];
+                $data['client_id'] = $client['client_id'];
+                $data['device_id'] = $client['device_id'];
 
-                $this->generateClientKeys($data, $account);
+                if ($this->generateClientKeys($data, $account)) {
+                    $this->addResponse('Revoked & Regenerated client');
 
-                $this->addResponse('Revoked & Regenerated client');
+                    return true;
+                }
 
-                return true;
+                return false;
             } else if (isset($data['forceRevoke']) && $data['forceRevoke'] == 'true') {
                 if ($client['revoked'] == '1') {
                     $this->addResponse('Client already revoked!', 1);
@@ -243,13 +244,12 @@ class Clients extends BasePackage
                 $account = $this->access->auth->account();
             }
 
-            if (isset($data['forceRevoke']) || isset($data['forceRegen'])) {
+            if ((isset($data['forceRevoke']) && (bool) $data['forceRevoke'] === true) ||
+                (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true)
+            ) {
                 $oldClient = $this->checkClientExists($api, $account, $data);
-                if ($oldClient && isset($oldClient[0]['id']) &&
-                    ((isset($data['forceRevoke']) && (bool) $data['forceRevoke'] === true) ||
-                     (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true)
-                    )
-                ) {
+
+                if ($oldClient && isset($oldClient[0]['id'])) {
                     $data['id'] = $oldClient[0]['id'];
 
                     if (isset($data['forceRegen'])) {
@@ -263,13 +263,25 @@ class Clients extends BasePackage
 
                         return false;
                     }
+
+                    if (isset($data['client_id'])) {
+                        unset($data['client_id']);
+                    }
+                    if (isset($data['client_secret'])) {
+                        unset($data['client_secret']);
+                    }
                 }
             }
 
             try {
                 if (isset($account['id']) &&
                     isset($account['email']) &&
-                    ($api['client_keys_generation_allowed'] == true || $viaApi)
+                    ($api['client_keys_generation_allowed'] == true ||
+                     $viaApi ||
+                     ((isset($data['forceRevoke']) && (bool) $data['forceRevoke'] === true) ||
+                      (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true)
+                     )
+                    )
                 ) {
                     $newClient['api_id'] = $api['id'];
                     $newClient['app_id'] = $api['app_id'];
@@ -283,6 +295,9 @@ class Clients extends BasePackage
                     $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
                     $newClient['revoked'] = '0';
                     $newClient['device_id'] = null;
+                    if (isset($data['device_id'])) {
+                        $newClient['device_id'] = $data['device_id'];
+                    }
                     if (isset($data['redirect_url'])) {
                         $newClient['redirectUri'] = $data['redirect_url'];
                     } else if (isset($api['redirect_uri'])) {
