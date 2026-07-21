@@ -59,7 +59,7 @@ class RegisterComponent extends BaseComponent
 
             if (!$apiArr) {
                 if ($this->isJson()) {
-                    $this->addResponse('Error:', 1, ['Error' => $this->api->packagesData->responseMessage]);
+                    $this->addResponse($this->api->packagesData->responseMessage, 1, []);
 
                     $this->sendJson();
                 }
@@ -305,11 +305,11 @@ class RegisterComponent extends BaseComponent
                 } else {
                     $this->api->setupApi();
                 }
+            } else {
+                $this->addResponse('Incorrect client ID provided or API does not exist!', 1, []);
+
+                return;
             }
-
-            $this->addResponse('Incorrect client ID provided or API does not exist!', 1, []);
-
-            return;
         } else {
             $this->api->init(true)->setupApiViaClientId(true);
 
