@@ -1281,6 +1281,8 @@ class Filters extends BasePackage
 
                 $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
+                $this->setFFValidation(false);
+
                 //Check in default filter store
                 $filter = $this->getFilterByAddressAndType($ip, 'host', true);
 
@@ -1355,6 +1357,8 @@ class Filters extends BasePackage
         }
 
         $filter['updated_at'] = time();
+
+        $this->setFFValidation(false);
 
         if ($this->update($filter)) {
             if ($updateIncorrectAttempts) {
