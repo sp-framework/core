@@ -486,13 +486,14 @@ class Clients extends BasePackage
 
         if (isset($data['request_url']) && isset($data['redirect_url'])) {
             $emailData['body'] .=
-                'Request URL: ' . $data['request_url'] . '<br>' .
+                'API Request URL: ' . $data['request_url'] . '<br>' .
                 'Redirect URI: ' . $data['redirect_url'] . '<br>' .
                 'Web based Registration URL: <a href="' . $data['request_url'] . '">Generate New Token</a>';
         } else {
             $emailData['body'] .=
-                'Request URL: ' . $this->links->url('register/q/client_id/' . $newClient['client_id'] . '/new/true') . '<br>' .
+                'API Request URL: ' . $this->links->url('register/apiClient') . '<br>' .
                 'Web based Registration URL: <a href="' . $this->links->url('register/q/client_id/' . $newClient['client_id'] . '/new/true') . '">Generate New Token</a>';
+
         }
 
         return $this->basepackages->emailqueue->addQueue($emailData);

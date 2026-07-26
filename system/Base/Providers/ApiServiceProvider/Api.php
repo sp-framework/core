@@ -655,7 +655,13 @@ class Api extends BasePackage
         $client = $this->clients->getByParams($params);
 
         if ($client && $client && is_array($client) && isset($client[0]['api_id'])) {
-            $this->account = $this->basepackages->accounts->checkAccount($client[0]['email'], true);
+            if (isset($client[0]['account_id']) && $client[0]['account_id'] > 0) {
+                $this->account = $this->basepackages->accounts->getAccountById($client[0]['account_id']);
+            }
+
+            if (!$this->account) {
+                $this->account = $this->basepackages->accounts->checkAccount($client[0]['email'], true);
+            }
 
             if (!$this->account) {
                 return false;
