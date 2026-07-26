@@ -137,7 +137,6 @@ class Router
 					) {
 
 						$this->registerRoute($this->uri);
-
 					} else if ($this->uri === '' ||
 							   $this->uri === strtolower($this->appDefaults['app']) ||
 							   $this->uri === strtolower($this->appInfo['route'])
