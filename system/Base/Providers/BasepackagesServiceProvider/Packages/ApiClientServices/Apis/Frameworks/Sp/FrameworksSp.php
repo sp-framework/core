@@ -148,10 +148,16 @@ class FrameworksSp extends Frameworks
             }
 
             if ($token->getStatusCode() === 200) {
-                $tokenResponse = json_decode($token->getBody()->getContents(), true);
+                try {
+                    $tokenResponse = $this->helper->decode($token->getBody()->getContents(), true);
 
-                if (!isset($tokenResponse['responseData']['access_token'])) {
-                    $this->addResponse('Did not receive valid access token from the server. ' . $tokenResponse['responseMessage'], 1);
+                    if (!isset($tokenResponse['responseData']['access_token'])) {
+                        $this->addResponse('Did not receive valid access token from the server. ' . $tokenResponse['responseMessage'], 1);
+
+                        return false;
+                    }
+                } catch (\throwable $e) {
+                    $this->addResponse('Did not receive valid access token from the server. ' . $e->getMessage(), 1);
 
                     return false;
                 }
