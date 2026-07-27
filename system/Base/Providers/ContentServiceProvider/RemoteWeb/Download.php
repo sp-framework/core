@@ -32,7 +32,7 @@ class Download
         return $this;
     }
 
-    public function downloadData($url, $sink, $method)
+    public function downloadData($url, $sink, $method = null)
     {
         $this->method = $method;
 
@@ -66,10 +66,8 @@ class Download
 
                     $this->trackCounter = $downloadedBytes;
 
-                    if ($downloadedBytes === $downloadTotal) {
-                        $this->basepackages->progress->updateProgress($this->method, true, false, null, $counters);
-                    } else {
-                        $this->basepackages->progress->updateProgress($this->method, null, false, null, $counters);
+                    if ($this->method) {
+                        $this->basepackages->progress->updateProgress($this->method, ($downloadedBytes === $downloadTotal) ? true : null, false, null, $counters);
                     }
                 },
                 'verify'            => $this->verify,
