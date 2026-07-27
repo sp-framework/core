@@ -67,13 +67,20 @@ class ClientsComponent extends BaseComponent
             $this->apiClients,
             'system/api/server/clients/view',
             $conditions,
-            ['revoked', 'concurrent_calls_count', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
+            ['revoked', 'concurrent_calls_count', 'client_id', 'device_id', 'api_id', 'email', 'last_used', 'per_minute_calls_count', 'per_hour_calls_count', 'per_day_calls_count'],
             true,
             ['revoked', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
             null,
             ['api_id' => 'api', 'concurrent_calls_count' => 'Calls Count'],
             $replaceColumns,
-            'client_id'
+            'client_id',
+            null,
+            false,
+            null,
+            false,
+            true,
+            [],
+            ['per_minute_calls_count', 'per_hour_calls_count', 'per_day_calls_count']
         );
 
         $this->view->pick('clients/list');
@@ -83,6 +90,7 @@ class ClientsComponent extends BaseComponent
     {
         foreach ($dataArr as $dataKey => &$data) {
             $api = $this->api->getById($data['api_id']);
+
             if ($api) {
                 $data['api_id'] = $api['name'];
             }
@@ -125,9 +133,9 @@ class ClientsComponent extends BaseComponent
                     $badge = 'secondary';
                     $data['concurrent_calls_count'] = '-';
                 }
-                $callsCounter = $callsCounter . '<span class="badge badge-' . $badge . ' mr-1">' . $data['concurrent_calls_count'] . '</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Concurrent" class="badge badge-' . $badge . ' mr-1">' . $data['concurrent_calls_count'] . '</span>';
             } else {
-                $callsCounter = $callsCounter . '<span class="badge badge-secondary mr-1">-</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Concurrent" class="badge badge-secondary mr-1">-</span>';
             }
             if ((int) $api['per_minute_calls_limit'] > 0) {
                 $percent = (int) ((int) $data['per_minute_calls_count'] * 100) / (int) $api['per_minute_calls_limit'];
@@ -143,9 +151,9 @@ class ClientsComponent extends BaseComponent
                     $badge = 'secondary';
                     $data['per_minute_calls_count'] = '-';
                 }
-                $callsCounter = $callsCounter . '<span class="badge badge-' . $badge . ' mr-1">' . $data['per_minute_calls_count'] . '</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Minute" class="badge badge-' . $badge . ' mr-1">' . $data['per_minute_calls_count'] . '</span>';
             } else {
-                $callsCounter = $callsCounter . '<span class="badge badge-secondary mr-1">-</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Minute" class="badge badge-secondary mr-1">-</span>';
             }
             if ((int) $api['per_hour_calls_limit'] > 0) {
                 $percent = (int) ((int) $data['per_hour_calls_count'] * 100) / (int) $api['per_hour_calls_limit'];
@@ -161,9 +169,9 @@ class ClientsComponent extends BaseComponent
                     $badge = 'secondary';
                     $data['per_hour_calls_count'] = '-';
                 }
-                $callsCounter = $callsCounter . '<span class="badge badge-' . $badge . ' mr-1">' . $data['per_hour_calls_count'] . '</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Hour" class="badge badge-' . $badge . ' mr-1">' . $data['per_hour_calls_count'] . '</span>';
             } else {
-                $callsCounter = $callsCounter . '<span class="badge badge-secondary mr-1">-</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Hour" class="badge badge-secondary mr-1">-</span>';
             }
             if ((int) $api['per_day_calls_limit'] > 0) {
                 $percent = (int) ((int) $data['per_day_calls_count'] * 100) / (int) $api['per_day_calls_limit'];
@@ -179,9 +187,9 @@ class ClientsComponent extends BaseComponent
                     $badge = 'secondary';
                     $data['per_day_calls_count'] = '-';
                 }
-                $callsCounter = $callsCounter . '<span class="badge badge-' . $badge . ' mr-1">' . $data['per_day_calls_count'] . '</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Day" class="badge badge-' . $badge . ' mr-1">' . $data['per_day_calls_count'] . '</span>';
             } else {
-                $callsCounter = $callsCounter . '<span class="badge badge-secondary mr-1">-</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Day" class="badge badge-secondary mr-1">-</span>';
             }
 
             if (((int) $api['concurrent_calls_limit'] !== 0 ||

@@ -553,25 +553,25 @@ class Clients extends BasePackage
     {
         if (in_array('per_minute_calls_count', $types)) {
             if ($client['per_minute_calls_count'] < (int) $api['per_minute_calls_limit']) {
-                $client['per_minute_calls_count'] = $client['per_minute_calls_count'] + 1;
+                $client['per_minute_calls_count']++;
             }
         }
 
         if (in_array('per_hour_calls_count', $types)) {
             if ($client['per_hour_calls_count'] < (int) $api['per_hour_calls_limit']) {
-                $client['per_hour_calls_count'] = $client['per_hour_calls_count'] + 1;
+                $client['per_hour_calls_count']++;
             }
         }
 
         if (in_array('per_day_calls_count', $types)) {
             if ($client['per_day_calls_count'] < (int) $api['per_day_calls_limit']) {
-                $client['per_day_calls_count'] = $client['per_day_calls_count'] + 1;
+                $client['per_day_calls_count']++;
             }
         }
 
         if (in_array('concurrent_calls_count', $types)) {
             if ((int) $client['concurrent_calls_count'] < (int) $api['concurrent_calls_limit']) {
-                $client['concurrent_calls_count'] = $client['concurrent_calls_count'] + 1;
+                $client['concurrent_calls_count']++;
             }
         }
 

@@ -119,10 +119,12 @@
     {% set apiPkiAlgorithmDisabled = true %}
     {% set apiEncryptionKeySizeDisabled = true %}
 {% endif %}
-{% if apiGrantType == 'client_credentials' %}
+{% if apiGrantType == 'client_credentials' or apiGrantType == 'password' %}
     {% set apiRefreshTokenTimeoutDisabled = true %}
-    {% set clientCredentialsGrantHidden = '' %}
     {% set allowHidden = '' %}
+    {% if apiGrantType == 'client_credentials' %}
+        {% set clientCredentialsGrantHidden = '' %}
+    {% endif %}
 {% endif %}
 {% if apiGrantType == 'authorization_code' %}
     {% set authoCodeGrantHidden = '' %}
