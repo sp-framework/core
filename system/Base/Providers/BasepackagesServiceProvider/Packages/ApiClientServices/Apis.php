@@ -100,7 +100,17 @@ class Apis extends BasePackage
         } else if ($apiConfig['auth_type'] === 'authorization') {//With prefix of Bearer or token or anything that the server wants
             $this->httpOptions['headers']['Authorization'] = $apiConfig['authorization'];
         } else if ($apiConfig['auth_type'] === 'oauth') {
-            if (method_exists($this, 'refreshOAuthClient')) {
+            if ($apiConfig['grant_type'] === 'client_credentials' &&
+                method_exists($this, 'registerOAuthClient')
+            ) {
+                $apiConfig = $this->registerOAuthClient($apiConfig, true, 'true');
+
+                if (!$apiConfig) {
+                    throw new \Exception($this->packagesData->responseMessage);
+                }
+            } else if ($apiConfig['grant_type'] === 'authorization_code' &&
+                       method_exists($this, 'refreshOAuthClient')
+            ) {
                 $apiConfig = $this->refreshOAuthClient($apiConfig);
 
                 if (!$apiConfig) {

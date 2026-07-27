@@ -20,7 +20,7 @@ class FrameworksSp extends Frameworks
         return $this;
     }
 
-    public function registerOAuthClient($data)
+    public function registerOAuthClient($data, $viaCall = false, $force = 'false')
     {
         if ($data['grant_type'] === 'authorization_code') {
             //Flow 1: Get Request to request_url to get state
@@ -130,6 +130,38 @@ class FrameworksSp extends Frameworks
 
             return true;
         } else if ($data['grant_type'] === 'client_credentials') {
+            if ($force == 'false') {
+                $getToken = true;
+
+                if ($viaCall) {
+                    $getToken = false;
+
+                    if ($data['expires'] === '') {
+                        return $data;
+                    }
+
+                    try {
+                        $expiry = \Carbon\Carbon::parse($data['expires'])->setTimezone('UTC');
+
+                        if ($expiry->isPast()) {
+                            $getToken = true;
+                        }
+
+                        if (abs($expiry->diffInMinutes(\Carbon\Carbon::now()->setTimezone('UTC'))) < 5) {
+                            $getToken = true;
+                        }
+                    } catch (\Exception $e) {
+                        throw $e;
+                    }
+                }
+            } else {
+                $getToken = true;
+            }
+
+            if (!$getToken) {
+                return $data;
+            }
+
             try {
                 $token = $this->remoteWebContent->post($data['request_url'], [
                     'headers' => [
@@ -167,7 +199,9 @@ class FrameworksSp extends Frameworks
                 return false;
             }
 
-            if ($tokenResponse['responseData']['expires_in'] && $tokenResponse['responseData']['expires_in'] > 0) {
+            if (!isset($tokenResponse['responseData']['expires']) &&
+                $tokenResponse['responseData']['expires_in'] && $tokenResponse['responseData']['expires_in'] > 0
+            ) {
                 $now = (\Carbon\Carbon::now('UTC'))->timestamp;
 
                 $tokenResponse['responseData']['expires_in'] = $now + $tokenResponse['responseData']['expires_in'];
@@ -179,6 +213,10 @@ class FrameworksSp extends Frameworks
             $data = array_merge($data, $tokenResponse['responseData']);
 
             $this->apiClientServices->updateApi($data);
+
+            if ($viaCall) {
+                return $data;
+            }
 
             return true;
         }
