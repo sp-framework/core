@@ -203,6 +203,15 @@ class Clients extends BasePackage
                 $data['device_id'] = $client['device_id'];
 
                 if ($this->generateClientKeys($data, $account)) {
+                    $client['revoked'] = $client['regen'] = '1';
+                    $client['revoked_by'] = $client['regen_by'] = 0;
+                    if ($this->access->auth->check()) {
+                        $client['revoked_by'] = $client['regen_by'] = $this->access->auth->account()['id'];
+                    }
+                    $client['revoked_at'] = $client['regen_at'] = (\Carbon\Carbon::now())->timestamp;
+
+                    $this->update($client);
+
                     $this->addResponse('Revoked & Regenerated client');
 
                     return true;
@@ -217,6 +226,11 @@ class Clients extends BasePackage
                 }
 
                 $client['revoked'] = '1';
+                $client['revoked_by'] = 0;
+                if ($this->access->auth->check()) {
+                    $client['revoked_by'] = $this->access->auth->account()['id'];
+                }
+                $client['revoked_at'] = (\Carbon\Carbon::now())->timestamp;
 
                 $this->updateClient($client);
 
@@ -298,7 +312,7 @@ class Clients extends BasePackage
                     $newClient['revoked'] = '0';
                     $newClient['device_id'] = null;
                     if (isset($data['device_id'])) {
-                        $newClient['device_id'] = $data['device_id'];
+                        $newClient['device_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
                     }
                     if (isset($data['redirect_url'])) {
                         $newClient['redirectUri'] = $data['redirect_url'];

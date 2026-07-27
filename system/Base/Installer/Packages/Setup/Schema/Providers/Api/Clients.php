@@ -112,6 +112,41 @@ class Clients
                     ]
                 ),
                 new Column(
+                    'revoked_by',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'revoked_at',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'regen',
+                    [
+                        'type'          => Column::TYPE_BOOLEAN,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'regen_by',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'regen_at',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'concurrent_calls_count',
                     [
                         'type'          => Column::TYPE_INTEGER,
