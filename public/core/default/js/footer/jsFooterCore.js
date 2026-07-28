@@ -6949,13 +6949,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                                     dataCollection.env['customConditions'] = customConditions;
 
-                                    $('#' + sectionId + '-filter-quick').attr('disabled', false);
-                                    $('#' + sectionId + '-filter-search').attr('disabled', false);
-                                    $('#' + sectionId + '-filter-clear').attr('disabled', false);
-                                    $('#' + sectionId + '-filter-quick-prepend-dropdown-button span')
-                                        .text($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).text().toUpperCase());
-                                    selectedId = dataCollection.env['customConditions'][0][1];
-                                    $('#' + sectionId + '-filter-quick').val(dataCollection.env['customConditions'][0][3].replace(/%/g, ''));
+                                    if ($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).length > 0) {
+                                        $('#' + sectionId + '-filter-quick').attr('disabled', false);
+                                        $('#' + sectionId + '-filter-search').attr('disabled', false);
+                                        $('#' + sectionId + '-filter-clear').attr('disabled', false);
+                                        $('#' + sectionId + '-filter-quick-prepend-dropdown-button span')
+                                            .text($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).text().toUpperCase());
+                                        selectedId = dataCollection.env['customConditions'][0][1];
+                                        $('#' + sectionId + '-filter-quick').val(dataCollection.env['customConditions'][0][3].replace(/%/g, ''));
+                                    }
                                 }
 
                                 filter = true;
