@@ -600,10 +600,16 @@ abstract class BasePackage extends Controller
 		}
 
 		if (isset($this->postData()['filter'])) {
-			$filter = $this->basepackages->filters->getById((int) $this->postData()['filter']);
+			if ($this->postData()['filter'] !== '') {
+				if (str_starts_with($this->postData()['filter'], '-')) {
+					$params['conditions'] = $this->postData()['filter'];
+				} else if ((int) $this->postData()['filter'] > 0) {
+					$filter = $this->basepackages->filters->getById((int) $this->postData()['filter']);
 
-			if ($filter) {
-				$params['conditions'] = $filter['conditions'];
+					if ($filter) {
+						$params['conditions'] = $filter['conditions'];
+					}
+				}
 			}
 		}
 
