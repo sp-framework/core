@@ -97,7 +97,7 @@ class Apis extends BasePackage
             $credentials = base64_encode($apiConfig['username'] . ':' . $apiConfig['password']);
 
             $this->httpOptions['headers']['Authorization'] = 'Basic ' . $credentials;
-        } else if ($apiConfig['auth_type'] === 'authorization') {//With prefix of Bearer or token or anything that the server wants
+        } else if ($apiConfig['auth_type'] === 'authorization' || $apiConfig['auth_type'] === 'autho') {//With prefix of Bearer or token or anything that the server wants
             $this->httpOptions['headers']['Authorization'] = $apiConfig['authorization'];
         } else if ($apiConfig['auth_type'] === 'oauth') {
             if ($apiConfig['grant_type'] === 'client_credentials' &&
