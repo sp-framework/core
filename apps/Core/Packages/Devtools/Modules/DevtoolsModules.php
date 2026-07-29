@@ -63,6 +63,10 @@ class DevtoolsModules extends BasePackage
                     if (!$this->checkRepo($data)) {
                         $newRepo = $this->createRepo($data);
 
+                        if (!$newRepo) {
+                            return false;
+                        }
+
                         $this->addResponse('Bundle added & created new repo.',
                                            0,
                                            [
@@ -127,6 +131,10 @@ class DevtoolsModules extends BasePackage
                         if (!$this->checkRepo($data)) {
                             if (strtolower($data['app_type']) !== 'core') {
                                 $newRepo['base'] = $this->createRepo($data);
+
+                                if (!$newRepo['base']) {
+                                    return false;
+                                }
                             }
                         }
 
@@ -134,6 +142,10 @@ class DevtoolsModules extends BasePackage
                         if (!$this->checkRepo($data)) {
                             if (strtolower($data['app_type']) !== 'core') {
                                 $newRepo['public'] = $this->createRepo($data);
+
+                                if (!$newRepo['public']) {
+                                    return false;
+                                }
                             }
                         }
 
@@ -151,6 +163,10 @@ class DevtoolsModules extends BasePackage
                         if (!$this->checkRepo($data)) {
                             if (strtolower($data['app_type']) !== 'core') {
                                 $newRepo = $this->createRepo($data);
+                            }
+
+                            if (!$newRepo) {
+                                return false;
                             }
 
                             $this->addResponse('Module added & created new repo.',
@@ -206,6 +222,10 @@ class DevtoolsModules extends BasePackage
                     if (!$this->checkRepo($data)) {
                         if (strtolower($data['app_type']) !== 'core') {
                             $newRepo = $this->createRepo($data);
+                        }
+
+                        if (!$newRepo) {
+                            return false;
                         }
 
                         $this->addResponse('Bundle updated & created new repo.',
@@ -297,6 +317,10 @@ class DevtoolsModules extends BasePackage
                             if (!$this->checkRepo($data)) {
                                 if (strtolower($data['app_type']) !== 'core') {
                                     $newRepo['base'] = $this->createRepo($data);
+
+                                    if (!$newRepo['base']) {
+                                        return false;
+                                    }
                                 }
                             }
 
@@ -304,6 +328,10 @@ class DevtoolsModules extends BasePackage
                             if (!$this->checkRepo($data)) {
                                 if (strtolower($data['app_type']) !== 'core') {
                                     $newRepo['public'] = $this->createRepo($data);
+
+                                    if (!$newRepo['public']) {
+                                        return false;
+                                    }
                                 }
                             }
 
@@ -321,6 +349,10 @@ class DevtoolsModules extends BasePackage
                             if (!$checkedRepo = $this->checkRepo($data)) {
                                 if (strtolower($data['app_type']) !== 'core') {
                                     $newRepo = $this->createRepo($data);
+                                }
+
+                                if (!$newRepo) {
+                                    return false;
                                 }
 
                                 $this->addResponse('Module updated & created new repo.',
@@ -1331,6 +1363,10 @@ class DevtoolsModules extends BasePackage
                 if (!$this->checkRepo($data)) {
                     if (strtolower($data['app_type']) !== 'core') {
                         $newRepo = $this->createRepo($data);
+
+                        if (!$newRepo) {
+                            return false;
+                        }
                     }
 
                     $this->addResponse('Added new app type', 0, ['newRepo' => $newRepo]);
