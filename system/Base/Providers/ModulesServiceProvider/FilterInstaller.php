@@ -33,7 +33,7 @@ class FilterInstaller extends BasePackage
                 $componentClassArr = array_slice(explode('\\', get_class($componentClass)), 1, -2);
                 $componentClass = 'Apps\\' . implode('\\', $componentClassArr) . '\\' . $this->helper->last($componentClassArr) . 'Component';
 
-                $component = $this->modules->components->getComponentByClass($componentClass);
+                $component = $this->modules->components->init(true)->getComponentByClass($componentClass);
 
                 if ($component) {
                     if (isset($installComponentJsonFile['filters'])) {
@@ -48,6 +48,13 @@ class FilterInstaller extends BasePackage
                         $defaultFilter = null;
 
                         foreach ($installComponentJsonFile['filters'] as $filterArr) {
+                            if (!isset($filterArr['is_default'])) {
+                                $filterArr['is_default'] = false;
+                            }
+                            if (!isset($filterArr['archived'])) {
+                                $filterArr['archived'] = false;
+                            }
+
                             if (!isset($filterArr['name']) || !isset($filterArr['conditions'])) {
                                 continue;
                             }
@@ -66,7 +73,7 @@ class FilterInstaller extends BasePackage
                                         'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
                                         'auto_generated'    => 0,
                                         'account_id'        => 0,
-                                        'archived'          => $filterArr['archived'] == 'true' ? 1 : 0,
+                                        'archived'          => $filterArr['archived'] == 'true' ? 1 : 0
                                     ]
                                 );
                             } else {
@@ -80,7 +87,7 @@ class FilterInstaller extends BasePackage
                                         'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
                                         'auto_generated'    => 0,
                                         'account_id'        => 0,
-                                        'archived'          => $filterArr['archived'] == 'true' ? 1 : 0,
+                                        'archived'          => 0
                                     ]
                                 );
 
@@ -138,6 +145,10 @@ class FilterInstaller extends BasePackage
             throw $e;
         }
 
+        if ($this->opCache) {
+            $this->opCache->removeCache('components', 'core');
+        }
+
         return true;
     }
 
@@ -147,7 +158,7 @@ class FilterInstaller extends BasePackage
         $componentClassArr = array_slice(explode('\\', get_class($componentClass)), 1, -2);
         $componentClass = 'Apps\\' . implode('\\', $componentClassArr) . '\\' . $this->helper->last($componentClassArr) . 'Component';
 
-        $component = $this->modules->components->getComponentByClass($componentClass);
+        $component = $this->modules->components->init(true)->getComponentByClass($componentClass);
 
         if ($component) {
             $componentFilters = $this->basepackages->filters->getFiltersForComponent((int) $component['id']);

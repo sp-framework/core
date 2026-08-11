@@ -63,6 +63,10 @@ class DevtoolsModules extends BasePackage
                     if (!$this->checkRepo($data)) {
                         $newRepo = $this->createRepo($data);
 
+                        if (!$newRepo) {
+                            return false;
+                        }
+
                         $this->addResponse('Bundle added & created new repo.',
                                            0,
                                            [
@@ -127,6 +131,10 @@ class DevtoolsModules extends BasePackage
                         if (!$this->checkRepo($data)) {
                             if (strtolower($data['app_type']) !== 'core') {
                                 $newRepo['base'] = $this->createRepo($data);
+
+                                if (!$newRepo['base']) {
+                                    return false;
+                                }
                             }
                         }
 
@@ -134,6 +142,10 @@ class DevtoolsModules extends BasePackage
                         if (!$this->checkRepo($data)) {
                             if (strtolower($data['app_type']) !== 'core') {
                                 $newRepo['public'] = $this->createRepo($data);
+
+                                if (!$newRepo['public']) {
+                                    return false;
+                                }
                             }
                         }
 
@@ -151,6 +163,10 @@ class DevtoolsModules extends BasePackage
                         if (!$this->checkRepo($data)) {
                             if (strtolower($data['app_type']) !== 'core') {
                                 $newRepo = $this->createRepo($data);
+                            }
+
+                            if (!$newRepo) {
+                                return false;
                             }
 
                             $this->addResponse('Module added & created new repo.',
@@ -208,6 +224,10 @@ class DevtoolsModules extends BasePackage
                             $newRepo = $this->createRepo($data);
                         }
 
+                        if (!$newRepo) {
+                            return false;
+                        }
+
                         $this->addResponse('Bundle updated & created new repo.',
                                            0,
                                            [
@@ -262,9 +282,14 @@ class DevtoolsModules extends BasePackage
                         $this->reCalculateFilesHash($this->modules->{$data['module_type']}->packagesData->last);
                     }
 
-                    if ($data['module_type'] === 'components' && strtolower($data['app_type']) === 'core') {
+                    if ($data['module_type'] === 'components') {
+                        $module = $this->modules->{$data['module_type']}->packagesData->last;
                         $this->addUpdateComponentMenu($module);
+                        $module = $this->modules->{$data['module_type']}->packagesData->last;
+                        $module = array_merge($module, $data);
                         $this->addUpdateComponentWidgets($module);
+                        $module = $this->modules->{$data['module_type']}->packagesData->last;
+                        $module = array_merge($module, $data);
                         $this->addUpdateComponentFilters($module);
                     }
 
@@ -292,6 +317,10 @@ class DevtoolsModules extends BasePackage
                             if (!$this->checkRepo($data)) {
                                 if (strtolower($data['app_type']) !== 'core') {
                                     $newRepo['base'] = $this->createRepo($data);
+
+                                    if (!$newRepo['base']) {
+                                        return false;
+                                    }
                                 }
                             }
 
@@ -299,6 +328,10 @@ class DevtoolsModules extends BasePackage
                             if (!$this->checkRepo($data)) {
                                 if (strtolower($data['app_type']) !== 'core') {
                                     $newRepo['public'] = $this->createRepo($data);
+
+                                    if (!$newRepo['public']) {
+                                        return false;
+                                    }
                                 }
                             }
 
@@ -316,6 +349,10 @@ class DevtoolsModules extends BasePackage
                             if (!$checkedRepo = $this->checkRepo($data)) {
                                 if (strtolower($data['app_type']) !== 'core') {
                                     $newRepo = $this->createRepo($data);
+                                }
+
+                                if (!$newRepo) {
+                                    return false;
                                 }
 
                                 $this->addResponse('Module updated & created new repo.',
@@ -407,7 +444,10 @@ class DevtoolsModules extends BasePackage
         }
 
         foreach ($data['bulk_actions'] as $module_type => $moduleList) {
-            if ($module_type === 'bundles') {
+            if ($data['task'] !== 'updatedependencies' && $data['task'] !== 'remove' && $module_type === 'bundles') {
+                continue;
+            }
+            if ($data['task'] === 'updatedependencies' && $data['task'] !== 'remove' && $module_type === 'apptypes') {
                 continue;
             }
             if ($data['task'] === 'truncate' && $module_type !== 'packages') {
@@ -419,6 +459,12 @@ class DevtoolsModules extends BasePackage
 
             if (count($moduleList) > 0) {
                 foreach ($moduleList as $moduleId) {
+                    if ($data['task'] === 'remove') {
+                        $removed = $this->removeModule(['id' => (int) $moduleId, 'module_type' => $module_type, 'remove_files' => 'true']);
+
+                        continue;
+                    }
+
                     $moduleToUpdate = null;
 
                     if ($module_type === 'apptypes') {
@@ -446,13 +492,34 @@ class DevtoolsModules extends BasePackage
                                 $this->runInstallUninstallTruncateTable($moduleToUpdate, false, true);
                             } else if ($data['task'] === 'run_script') {
                                 $this->runInstallUninstallTruncateTable($moduleToUpdate, true, false);
+                            } else if ($data['task'] === 'updatedependencies') {
+                                if (isset($moduleToUpdate['bundle_modules'])) {
+                                    $moduleToUpdate['bundle_modules'] = $this->getLatestModuleVersion(['modules' => $this->helper->encode($moduleToUpdate['bundle_modules'])]);
+                                    $update = true;
+                                } else if (isset($moduleToUpdate['dependencies'])) {
+                                    $moduleToUpdate['dependencies'] = $this->getLatestModuleVersion(['modules' => $this->helper->encode($moduleToUpdate['dependencies'])]);
+                                    $update = true;
+                                }
                             }
 
                             if ($update) {
                                 if ($module_type === 'apptypes') {
                                     $this->apps->types->update($moduleToUpdate);
                                 } else {
-                                    $this->modules->{$module_type}->update($moduleToUpdate);
+                                    if ($data['task'] === 'updatedependencies') {
+                                        $viewPublic = true;
+                                        if ($moduleToUpdate['module_type'] === 'views' && $moduleToUpdate['is_subview'] == true) {
+                                            $viewPublic = false;
+                                        }
+
+                                        if ($moduleToUpdate['module_type'] !== 'bundles') {
+                                            $this->updateModuleJson($moduleToUpdate, false, $viewPublic, true);
+                                        }
+
+                                        $this->modules->{$module_type}->update($moduleToUpdate);
+                                    } else {
+                                        $this->modules->{$module_type}->update($moduleToUpdate);
+                                    }
                                 }
                             }
                         } catch (\throwable $e) {
@@ -462,6 +529,10 @@ class DevtoolsModules extends BasePackage
                         }
                     }
                 }
+            }
+
+            if ($data['task'] === 'remove' && !$removed) {
+                return;
             }
         }
 
@@ -570,6 +641,10 @@ class DevtoolsModules extends BasePackage
                 $module = $this->apps->types->getById($data['id']);
             }
 
+            if ($module['name'] === 'Core') {
+                throw new \Exception('Cannot remove Core!');
+            }
+
             if ($data['module_type'] !== 'bundles') {
                 if ($data['module_type'] !== 'views' &&
                     $data['module_type'] !== 'apptypes'
@@ -627,7 +702,7 @@ class DevtoolsModules extends BasePackage
                 $this->reCalculateFilesHash($module, true);
             }
 
-            $this->addResponse('Removed module from DB & files from the system...');
+            $this->addResponse('Removed module from DB & files from the system... Note: We do not remove core files, remove them manually.');
 
             return true;
         } catch (\throwable $e) {
@@ -1067,78 +1142,82 @@ class DevtoolsModules extends BasePackage
 
     protected function getModuleFilesLocation($module, $viewPublic = false)
     {
-        if (!isset($module['module_type']) &&
-            ($module['app_type'] === strtolower($module['name']))
-        ) {
+        if ($module['app_type'] === 'core') {
+            return true;
+        }
+
+        if (!isset($module['module_type'])) {
             return 'apps/' . ucfirst($module['app_type']) . '/';
-        } else if ($module['module_type'] === 'components') {
-            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Components/';
+        } else {
+            if ($module['module_type'] === 'components') {
+                $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Components/';
 
-            $routeArr = explode('/', $module['route']);
+                $routeArr = explode('/', $module['route']);
 
-            foreach ($routeArr as &$path) {
-                $path = ucfirst($path);
-            }
-
-            $routePath = implode('/', $routeArr) . '/';
-        } else if ($module['module_type'] === 'packages') {
-            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Packages/';
-
-            $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
-
-            $routePath = implode('/', $pathArr) . '/';
-        } else if ($module['module_type'] === 'middlewares') {
-            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Middlewares/';
-
-            $routePath = $module['name'] . '/';
-        } else if ($module['module_type'] === 'views') {
-            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Views/';
-
-            if ($viewPublic) {
-                $moduleLocation = 'public/' . $module['app_type'] . '/' . strtolower($module['name']) . '/';
-
-                return $moduleLocation;
-            }
-
-            if ($module['is_subview'] == 0) {
-                $routePath = $module['name'] . '/';
-            } else {
-                if (is_string($module['dependencies'])) {
-                    $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
-                }
-                if (!isset($module['dependencies']['views']) ||
-                    (isset($module['dependencies']['views']) && count($module['dependencies']['views']) === 0)
-                ) {
-                    throw new \Exception('Base view dependencies for sub view missing in module dependencies.');
+                foreach ($routeArr as &$path) {
+                    $path = ucfirst($path);
                 }
 
-                foreach ($module['dependencies']['views'] as $view) {
-                    $view = $this->modules->views->getViewByRepo($view['repo']);
-
-                    if ($view && $view['is_subview'] == false) {
-                        $baseView = $view;
-
-                        break;
-                    }
-                }
-
-                if (!isset($baseView)) {
-                    throw new \Exception('Base view dependencies for sub view not found on the system.');
-                }
+                $routePath = implode('/', $routeArr) . '/';
+            } else if ($module['module_type'] === 'packages') {
+                $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Packages/';
 
                 $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
 
-                if (count($pathArr) > 1) {
-                    foreach ($pathArr as &$path) {
-                        $path = strtolower($path);
-                    }
-                } else {
-                    $pathArr[0] = strtolower($pathArr[0]);
+                $routePath = implode('/', $pathArr) . '/';
+            } else if ($module['module_type'] === 'middlewares') {
+                $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Middlewares/';
+
+                $routePath = $module['name'] . '/';
+            } else if ($module['module_type'] === 'views') {
+                $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Views/';
+
+                if ($viewPublic) {
+                    $moduleLocation = 'public/' . $module['app_type'] . '/' . strtolower($module['name']) . '/';
+
+                    return $moduleLocation;
                 }
 
-                $module['route'] = implode('/', $pathArr);
+                if ($module['is_subview'] == 0) {
+                    $routePath = $module['name'] . '/';
+                } else {
+                    if (is_string($module['dependencies'])) {
+                        $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
+                    }
+                    if (!isset($module['dependencies']['views']) ||
+                        (isset($module['dependencies']['views']) && count($module['dependencies']['views']) === 0)
+                    ) {
+                        throw new \Exception('Base view dependencies for sub view missing in module dependencies.');
+                    }
 
-                $routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
+                    foreach ($module['dependencies']['views'] as $view) {
+                        $view = $this->modules->views->getViewByRepo($view['repo']);
+
+                        if ($view && $view['is_subview'] == false) {
+                            $baseView = $view;
+
+                            break;
+                        }
+                    }
+
+                    if (!isset($baseView)) {
+                        throw new \Exception('Base view dependencies for sub view not found on the system.');
+                    }
+
+                    $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+                    if (count($pathArr) > 1) {
+                        foreach ($pathArr as &$path) {
+                            $path = strtolower($path);
+                        }
+                    } else {
+                        $pathArr[0] = strtolower($pathArr[0]);
+                    }
+
+                    $module['route'] = implode('/', $pathArr);
+
+                    $routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
+                }
             }
         }
 
@@ -1284,6 +1363,10 @@ class DevtoolsModules extends BasePackage
                 if (!$this->checkRepo($data)) {
                     if (strtolower($data['app_type']) !== 'core') {
                         $newRepo = $this->createRepo($data);
+
+                        if (!$newRepo) {
+                            return false;
+                        }
                     }
 
                     $this->addResponse('Added new app type', 0, ['newRepo' => $newRepo]);
@@ -1338,6 +1421,31 @@ class DevtoolsModules extends BasePackage
             $this->localContent->write($jsonFile, $jsonContent);
         } catch (FilesystemException | UnableToWriteFile $exception) {
             $this->addResponse('Unable to write json content to file: ' . $jsonFile);
+
+            return false;
+        }
+
+        try {
+            if ($this->localContent->fileExists('apps/' . ucfirst($appType['app_type']) . '/Install/Install.php')) {
+                return true;
+            }
+
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ApptypesInstallInstall.txt');
+        } catch (FilesystemException | UnableToReadFile | UnableToCheckExistence $exception) {
+            $this->addResponse('Unable to read module base component file.');
+
+            return false;
+        }
+
+        $apptypeFilesLocation = 'apps/' . ucfirst($appType['app_type']) . '/Install';
+        $fileName = $apptypeFilesLocation . '/Install.php';
+        $apptypeFilesLocationClass = str_replace('/', '\\', ucfirst($apptypeFilesLocation));
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $apptypeFilesLocationClass . ';', $file);
+
+        try {
+            $this->localContent->write($fileName, $file);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write app type install file');
 
             return false;
         }
@@ -1416,7 +1524,7 @@ class DevtoolsModules extends BasePackage
         return $this->helper->encode($defaultFilters);
     }
 
-    public function getDefaultDependencies($type, $isSubView = false)
+    public function getDefaultDependencies($type, $isSubView = false, $returnArr = false)
     {
         // For all - core, apptype
         // For components - packages, middlewares, views (only subview), externals
@@ -1475,10 +1583,87 @@ class DevtoolsModules extends BasePackage
 
         $this->addResponse('Generated default dependencies', 0, ['defaultDependencies' => $defaultDependencies]);
 
+        if ($returnArr) {
+            return $defaultDependencies;
+        }
+
         return $this->helper->encode($defaultDependencies);
     }
 
-    protected function updateModuleJson($data, $viaGenerateRelease = false, $viewPublic = false)
+    public function getLatestModuleVersion($data)
+    {
+        if (!isset($data['modules']) ||
+            (isset($data['modules']) && $data['modules'] === '')
+        ) {
+            $this->addResponse('Please provide modules', 1);
+
+            return false;
+        }
+
+        $data['modules'] = $this->helper->decode($data['modules'], true);
+
+        foreach ($data['modules'] as $moduleType => $modules) {
+            if ($moduleType === 'core') {
+                if (!isset($modules['repo'])) {
+                    continue;
+                }
+
+                $core = $this->modules->packages->getPackageByName('Core');
+
+                if ($core) {
+                    $data['modules'][$moduleType]['version'] = $core['version'];
+                }
+            } else if ($moduleType === 'apptype') {
+                if (!isset($modules['repo'])) {
+                    continue;
+                }
+
+                $appType = $this->apps->types->getAppTypeByRepo($modules['repo']);
+
+                if ($appType) {
+                    $data['modules'][$moduleType]['version'] = $appType['version'];
+                }
+            } else if ($moduleType === 'bundles') {
+                if (count($modules) > 0) {
+                    foreach ($modules as $bundleKey => $bundles) {
+                        if (!isset($bundles['repo'])) {
+                            continue;
+                        }
+
+                        $bundle = $this->modules->bundles->getBundleByRepo($bundles['repo']);
+
+                        if ($bundle) {
+                            $data['modules'][$moduleType][$bundleKey]['version'] = $bundle['version'];
+                        }
+                    }
+                }
+            } else if ($moduleType === 'externals') {
+                continue;
+            } else {
+                $moduleMethod = 'get' . ucfirst(substr($moduleType, 0, -1)) . 'ByRepo';
+
+                if (count($modules) > 0) {
+                    foreach ($modules as $modulesKey => $modulesArr) {
+                        if (!isset($modulesArr['repo'])) {
+                            continue;
+                        }
+
+                        $module = $this->modules->{$moduleType}->{$moduleMethod}($modulesArr['repo']);
+
+                        if ($module) {
+                            $data['modules'][$moduleType][$modulesKey]['version'] = $module['version'];
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->addResponse('Retrieved latest module versions', 0, ['modules' => $data['modules']]);
+
+        return $data['modules'];
+    }
+
+    protected function updateModuleJson($data, $viaGenerateRelease = false, $viewPublic = false, $viaBulkDepenenciesUpdate = false)
     {
         $jsonFile = $this->getModuleJsonFileLocation($data);
 
@@ -1500,6 +1685,16 @@ class DevtoolsModules extends BasePackage
             }
 
             $repo = $jsonContent['repo'];
+        } else if ($viaBulkDepenenciesUpdate) {
+            try {
+                $jsonContent = $this->helper->decode($this->localContent->read($jsonFile), true);
+            } catch (FilesystemException | UnableToWriteFile $exception) {
+                $this->addResponse('Unable to read json content to file: ' . $jsonFile);
+
+                return false;
+            }
+
+            $jsonContent['dependencies'] = $data['dependencies'];
         } else {
             $data = $this->jsonData($data, true);
 
@@ -1775,7 +1970,7 @@ class DevtoolsModules extends BasePackage
                  $data['category'] === 'providers')
             ) {
                 if ($data['category'] === 'basepackagesApis') {
-                    $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Api/Apis/';
+                    $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/ApiClientServices/Apis/';
                 } else if (str_starts_with($data['category'], 'basepackages')) {
                     $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/';
                 } else if ($data['category'] === 'providers') {
@@ -1885,6 +2080,29 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ComponentApi.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module component api file.');
+
+            return false;
+        }
+
+        $dataClass = explode('\\', $data['class']);
+        unset($dataClass[$this->helper->lastKey($dataClass)]);
+        $namespaceClass = implode('\\', $dataClass);
+
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass, $file);
+
+        try {
+            $this->localContent->write($moduleFilesLocation . 'Api.php', $file);
+            array_push($this->newFiles, $moduleFilesLocation . 'Api.php');
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component Api file');
+
+            return false;
+        }
+
         if (isset($data['widgets']) && $data['widgets'] !== '') {
             $dataWidgets = $this->helper->decode($data['widgets'], true);
 
@@ -1895,7 +2113,6 @@ class DevtoolsModules extends BasePackage
 
                 return false;
             }
-
 
             $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass, $file);
 
@@ -2019,14 +2236,18 @@ $file .= '
         }
 
         $data['class'] = explode('\\', $data['class']);
+
         if (!str_starts_with($data['category'], 'basepackages')) {
             unset($data['class'][$this->helper->lastKey($data['class'])]);
+        } else if ($data['category'] === 'basepackagesApis') {
+            unset($data['class'][$this->helper->lastKey($data['class'])]);
         }
+
         $namespaceClass = implode('\\', $data['class']);
 
         $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass . ';', $file);
         if ($data['category'] === 'basepackagesApis') {
-            $file = str_replace('"PACKAGENAME"', 'Apis' . ucfirst($data['name']), $file);
+            $file = str_replace('"PACKAGENAME"', ucfirst($data['name']), $file);
         } else {
             $file = str_replace('"PACKAGENAME"', ucfirst($data['name']), $file);
         }
@@ -2034,7 +2255,7 @@ $file .= '
 
         if (str_starts_with($data['category'], 'basepackages')) {
             if ($data['category'] === 'basepackagesApis') {
-                $fileName = $moduleFilesLocation . 'Apis' . ucfirst($data['name']) . '.php';
+                $fileName = $moduleFilesLocation . ucfirst($data['name']) . '.php';
             } else {
                 $fileName = $moduleFilesLocation . $this->helper->last(preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY)) . '.php';
             }
@@ -2148,12 +2369,12 @@ $file .= '
         if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers') {
             if (str_starts_with($data['category'], 'basepackages')) {
                 if ($data['category'] === 'basepackagesApis') {
-                    $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/Api/Apis/';
+                    $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/ApiClientServices/Apis/';
                     $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
                     unset($pathArr[$this->helper->lastKey($pathArr)]);
 
                     $fileName = $moduleFilesLocation . implode('/', $pathArr) . '/' . '/BasepackagesApiClientServicesApis' . ucfirst($data['name']) . '.php';
-                    $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation) . '/' . implode('/', $pathArr) . '/');
+                    $moduleFilesLocationClass = str_replace('/', '\\', $this->helper->reduceSlashes(ucfirst($moduleFilesLocation) . '/' . implode('/', $pathArr) . '/'));
                     $className = 'BasepackagesApiClientServicesApis' . ucfirst($data['name']);
                 } else {
                     $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/';
@@ -2261,10 +2482,6 @@ $file .= '
 
     protected function addUpdateComponentMenu($data)
     {
-        if (strtolower($data['app_type']) !== 'core') {
-            return true;
-        }
-
         $module = $this->modules->{$data['module_type']}->packagesData->last;
 
         if ($data['menu_id'] != '' && $data['menu_id'] != '0') {
@@ -2300,7 +2517,11 @@ $file .= '
 
                 return;
             } else {
-                $menu = $this->basepackages->menus->addMenu($data, $module);
+                $menu = $this->basepackages->menus->getMenusByComponentIdForAppType((int) $data['id'], $data['app_type']);
+
+                if (!$menu) {
+                    $menu = $this->basepackages->menus->addMenu($data, $module);
+                }
 
                 if ($menu) {
                     $module = $this->modules->{$data['module_type']}->packagesData->last;
@@ -2315,10 +2536,6 @@ $file .= '
 
     protected function addUpdateComponentWidgets($data)
     {
-        if (strtolower($data['app_type']) !== 'core') {
-            return true;
-        }
-
         if (isset($data['widgets'])) {
             if (!is_array($data['widgets']) && $data['widgets'] !== '') {
                 $data['widgets'] = $this->helper->decode($data['widgets'], true);
@@ -2404,10 +2621,6 @@ $file .= '
 
     protected function addUpdateComponentFilters($data)
     {
-        if (strtolower($data['app_type']) !== 'core') {
-            return true;
-        }
-
         if (isset($data['filters'])) {
             if (!is_array($data['filters']) && $data['filters'] !== '') {
                 $data['filters'] = $this->helper->decode($data['filters'], true);
@@ -2420,6 +2633,13 @@ $file .= '
             $defaultFilter = null;
 
             foreach ($data['filters'] as $filterArr) {
+                if (!isset($filterArr['is_default'])) {
+                    $filterArr['is_default'] = false;
+                }
+                if (!isset($filterArr['archived'])) {
+                    $filterArr['archived'] = false;
+                }
+
                 if (!isset($filterArr['name']) || !isset($filterArr['conditions'])) {
                     continue;
                 }
@@ -2437,7 +2657,8 @@ $file .= '
                             'filter_type'       => 0,//System
                             'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
                             'auto_generated'    => 1,
-                            'account_id'        => 0
+                            'account_id'        => 0,
+                            'archived'          => $filterArr['archived'] == 'true' ? 1 : 0
                         ]
                     );
                 } else {
@@ -2450,7 +2671,8 @@ $file .= '
                             'filter_type'       => 0,//System
                             'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
                             'auto_generated'    => 1,
-                            'account_id'        => 0
+                            'account_id'        => 0,
+                            'archived'          => 0
                         ]
                     );
 
@@ -3958,7 +4180,7 @@ $file .= '
                 if ($data['category'] === 'basepackagesApis') {
                     $pathArr = preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY);
 
-                    $routePath = implode('\\', $pathArr) . '\\Apis' . ucfirst($data['name']);
+                    $routePath = implode('\\', $pathArr) . '\\' . ucfirst($data['name']);
 
                     $class .= 'System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\\' . $routePath;
                 } else {

@@ -1,0 +1,238 @@
+<form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        {{adminltetags.useTag('tabs',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'tabsId'                        : 'tabs',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsData'                      :
+                    [
+                        'geo'   :
+                        [
+                            'tabTitle'          : 'Geo',
+                            'tabInclude'        : 'dataextractors/form/geo'
+                        ],
+                        'ip2location'   :
+                        [
+                            'tabTitle'          : 'IP2Location',
+                            'tabInclude'        : 'dataextractors/form/ip2location'
+                        ],
+                        'dictionary'   :
+                        [
+                            'tabTitle'          : 'Dictionary',
+                            'tabInclude'        : 'dataextractors/form/dictionary'
+                        ]
+                    ]
+            ]
+        )}}
+    </fieldset>
+</form>
+<div class="row text-center">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    {
+                        'process' : {
+                            'title'                   : 'Download & Process <span id="button-title">Geo</span>',
+                            'size'                    : 'sm',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'url'                     : links.url('system/tools/dataextractors/process')
+                        }
+                    }
+            ]
+        )}}
+    </div>
+</div>
+<br>
+<div id="download-progress" hidden></div>
+<script>
+/* globals paginatedPNotify Swal BazHelpers BazProgress */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['funcs'] = { };
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-ip2location_countries'                   : {
+            placeholder: "SELECT COUNTRIES"
+        },
+        '{{componentId}}-{{sectionId}}-countries'                               : {
+            placeholder: "SELECT COUNTRIES",
+            afterInit: function() {
+                BazProgress.buildProgressBar($('#download-progress'), false, false, true);
+
+                var processWhat = 'geo';
+                $('#{{componentId}}-{{sectionId}}-tabs-tabLinks a').click(function(e) {
+                    processWhat = $(this).text().toLowerCase();
+                    $('#BUTTON-TITLE').html(processWhat.toUpperCase());
+                });
+
+                $('#{{componentId}}-{{sectionId}}-process').off();
+                $('#{{componentId}}-{{sectionId}}-process').click(function(e) {
+                    e.preventDefault();
+
+                    // $(this).addClass('disabled');
+                    // $('#{{componentId}}-{{sectionId}}-process').children('i').attr('hidden', false);
+
+                    var url = $(this).attr('href');
+                    var postData = { };
+
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['process'] = processWhat;
+
+                    if (processWhat === 'geo') {
+                        postData['countries'] = $('#{{componentId}}-{{sectionId}}-countries').val();
+                        postData['timezone'] = $('#{{componentId}}-{{sectionId}}-timezone')[0].checked;
+                        postData['update_countries_regions'] = $('#{{componentId}}-{{sectionId}}-update_countries_regions')[0].checked;
+                        postData['enabled'] = $('#{{componentId}}-{{sectionId}}-enabled')[0].checked;
+                    } else if (processWhat === 'ip2location') {
+                        postData['csv'] = $('#{{componentId}}-{{sectionId}}-csv')[0].checked;
+                        postData['ip2location_countries'] = $('#{{componentId}}-{{sectionId}}-ip2location_countries').val();
+                        if (postData['csv'] == true && postData['ip2location_countries'].length === 0) {
+                            paginatedPNotify('error', {'title' : 'Please select countries to extract ip2location Geo data from.'});
+
+                            return;
+                        }
+
+                        postData['bin'] = $('#{{componentId}}-{{sectionId}}-bin')[0].checked;
+                        postData['proxy'] = $('#{{componentId}}-{{sectionId}}-proxy')[0].checked;
+                        postData['token'] = $('#{{componentId}}-{{sectionId}}-token').val();
+                        postData['csv_file_code'] = $('#{{componentId}}-{{sectionId}}-csv_file_code').val();
+                        postData['bin_file_code'] = $('#{{componentId}}-{{sectionId}}-bin_file_code').val();
+                        postData['proxy_file_code'] = $('#{{componentId}}-{{sectionId}}-proxy_file_code').val();
+
+                        if ((postData['csv'] == true || postData['bin'] == true || postData['proxy'] == true)) {
+                            var error = false;
+                            if (postData['token'] === '')  {
+                                $('#{{componentId}}-{{sectionId}}-token').addClass('is-invalid');
+                                $('#{{componentId}}-{{sectionId}}-token').focus(function() {
+                                    $(this).removeClass('is-invalid');
+                                });
+                                error = true;
+                            } else if (postData['csv_file_code'] === '')  {
+                                $('#{{componentId}}-{{sectionId}}-csv_file_code').addClass('is-invalid');
+                                $('#{{componentId}}-{{sectionId}}-csv_file_code').focus(function() {
+                                    $(this).removeClass('is-invalid');
+                                });
+                                error = true;
+                            } else if (postData['bin_file_code'] === '')  {
+                                $('#{{componentId}}-{{sectionId}}-bin_file_code').addClass('is-invalid');
+                                $('#{{componentId}}-{{sectionId}}-bin_file_code').focus(function() {
+                                    $(this).removeClass('is-invalid');
+                                });
+                                error = true;
+                            } else if (postData['proxy_file_code'] === '')  {
+                                $('#{{componentId}}-{{sectionId}}-proxy_file_code').addClass('is-invalid');
+                                $('#{{componentId}}-{{sectionId}}-proxy_file_code').focus(function() {
+                                    $(this).removeClass('is-invalid');
+                                });
+                                error = true;
+                            }
+
+                            if (error) {
+                                $(this).removeClass('disabled');
+                                $('#{{componentId}}-{{sectionId}}-process').children('i').attr('hidden', true);
+
+                                return;
+                            }
+                        }
+                    }
+
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode == 0) {
+                            paginatedPNotify('success', {
+                                'title' : response.responseMessage
+                            });
+
+                            if (response.responseData && response.responseData.ip2locationInfo) {
+                                if (response.responseData.ip2locationInfo.downloaded_on) {
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-downloaded_on').data('value', response.responseData.ip2locationInfo.downloaded_on);
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-downloaded_on span').html(response.responseData.ip2locationInfo.downloaded_on);
+                                }
+                                if (response.responseData.ip2locationInfo.bin_file_name) {
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-bin_file_name').data('value', response.responseData.ip2locationInfo.bin_file_name);
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-bin_file_name span').html(response.responseData.ip2locationInfo.bin_file_name);
+                                }
+                                if (response.responseData.ip2locationInfo.bin_file_version) {
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-bin_file_version').data('value', response.responseData.ip2locationInfo.bin_file_version);
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-bin_file_version span').html(response.responseData.ip2locationInfo.bin_file_version);
+                                }
+                                if (response.responseData.ip2locationInfo.proxy_file_name) {
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-proxy_file_name').data('value', response.responseData.ip2locationInfo.proxy_file_name);
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-proxy_file_name span').html(response.responseData.ip2locationInfo.proxy_file_name);
+                                }
+                                if (response.responseData.ip2locationInfo.proxy_file_version) {
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-proxy_file_version').data('value', response.responseData.ip2locationInfo.proxy_file_version);
+                                    $('#{{componentId}}-{{sectionId}}-ip2location_info-proxy_file_version span').html(response.responseData.ip2locationInfo.proxy_file_version);
+                                }
+                            }
+                        } else {
+                            paginatedPNotify('error', {
+                                'title' : response.responseMessage
+                            });
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-process').removeClass('disabled');
+                        $('#{{componentId}}-{{sectionId}}-process').children('i').attr('hidden', true);
+                        BazProgress.resetProgressCounter();
+
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-update_countries_regions'                : { },
+        '{{componentId}}-{{sectionId}}-enabled'                                 : { },
+        '{{componentId}}-{{sectionId}}-timezone'                                : { },
+        '{{componentId}}-{{sectionId}}-csv'                                     : { },
+        '{{componentId}}-{{sectionId}}-bin'                                     : { },
+        '{{componentId}}-{{sectionId}}-proxy'                                   : { },
+        '{{componentId}}-{{sectionId}}-token'                                   : { },
+        '{{componentId}}-{{sectionId}}-csv_file_code'                           : { },
+        '{{componentId}}-{{sectionId}}-bin_file_code'                           : { },
+        '{{componentId}}-{{sectionId}}-proxy_file_code'                         : { },
+        '{{componentId}}-{{sectionId}}-dictionary'                              : { },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+            },
+            messages: {
+            }
+        }
+    });
+</script>

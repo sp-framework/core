@@ -39,6 +39,51 @@
     <div class="col-md-10">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {% set tabsData =
+                    [
+                        'info'   :
+                        [
+                            'tabTitle'          : 'Info',
+                            'tabInclude'        : 'services/form/info'
+                        ],
+                        'bind'   :
+                        [
+                            'tabTitle'          : 'Bind',
+                            'tabInclude'        : 'services/form/bind'
+                        ],
+                        'grant'   :
+                        [
+                            'tabTitle'          : 'Grant',
+                            'tabInclude'        : 'services/form/grant'
+                        ],
+                        'keys'   :
+                        [
+                            'tabTitle'          : 'Keys',
+                            'tabInclude'        : 'services/form/keys'
+                        ],
+                        'calls'   :
+                        [
+                            'tabTitle'          : 'Calls',
+                            'tabInclude'        : 'services/form/calls'
+                        ],
+                        'general'   :
+                        [
+                            'tabTitle'          : 'General',
+                            'tabInclude'        : 'services/form/general'
+                        ]
+                    ]
+                %}
+                {% if api['id'] is defined %}
+                    {% set tabsData = array_merge(tabsData,
+                        [
+                            'openapi'   :
+                            [
+                                'tabTitle'          : 'OpenAPI',
+                                'tabInclude'        : 'services/form/openapi'
+                            ]
+                        ])
+                    %}
+                {% endif %}
                 {{adminltetags.useTag('tabs',
                     [
                         'component'                     : component,
@@ -47,39 +92,7 @@
                         'sectionId'                     : 'main',
                         'tabsId'                        : 'tabs',
                         'tabsStyle'                     : 'card-outline-tabs',
-                        'tabsData'                      :
-                            [
-                                'info'   :
-                                [
-                                    'tabTitle'          : 'Info',
-                                    'tabInclude'        : 'services/form/info'
-                                ],
-                                'bind'   :
-                                [
-                                    'tabTitle'          : 'Bind',
-                                    'tabInclude'        : 'services/form/bind'
-                                ],
-                                'grant'   :
-                                [
-                                    'tabTitle'          : 'Grant',
-                                    'tabInclude'        : 'services/form/grant'
-                                ],
-                                'keys'   :
-                                [
-                                    'tabTitle'          : 'Keys',
-                                    'tabInclude'        : 'services/form/keys'
-                                ],
-                                'calls'   :
-                                [
-                                    'tabTitle'          : 'Calls',
-                                    'tabInclude'        : 'services/form/calls'
-                                ],
-                                'general'   :
-                                [
-                                    'tabTitle'          : 'General',
-                                    'tabInclude'        : 'services/form/general'
-                                ]
-                            ]
+                        'tabsData'                      : tabsData
                     ]
                 )}}
             </fieldset>
@@ -87,7 +100,7 @@
     </div>
 </div>
 <script>
-/* globals paginatedPNotify Swal */
+/* globals paginatedPNotify Swal autoComplete */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -117,10 +130,11 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                                          : { },
         '{{componentId}}-{{sectionId}}-name'                                        : { },
         '{{componentId}}-{{sectionId}}-status'                                      : { },
-        '{{componentId}}-{{sectionId}}-is_public'                                   : {
+        '{{componentId}}-{{sectionId}}-api_type'                                    : {
+            placeholder: "SELECT API TYPE",
             afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-is_public').change(function() {
-                    if ($(this)[0].checked === true) {
+                $('#{{componentId}}-{{sectionId}}-api_type').on('select2:select' , function(e) {
+                    if (e.params.data.id === 'public' || e.params.data.id === 'protected_user_credentials') {
                         $('#{{componentId}}-{{sectionId}}-grant_type').val(0).trigger('change');
                         $('#{{componentId}}-{{sectionId}}-grant_type, ' +
                           '#{{componentId}}-{{sectionId}}-client_keys_generation_allowed, ' +
@@ -186,28 +200,124 @@ dataCollectionSection =
                     }
                     if (data.id === 'authorization_code') {
                         $('#{{componentId}}-{{sectionId}}-client_keys_generation_allowed, ' +
-                          '#{{componentId}}-{{sectionId}}-is_public, ' +
                           '#{{componentId}}-{{sectionId}}-registration_allowed').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-redirect_url').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-request_url').attr('disabled', false);
                         $(['#{{componentId}}-{{sectionId}}-client_keys_generation_allowed',
-                           '#{{componentId}}-{{sectionId}}-is_public',
                            '#{{componentId}}-{{sectionId}}-registration_allowed'])
                         .each(function(i, checkbox) {
                             $(checkbox)[0].checked = false;
                         });
                         $('#autho-code-grant').attr('hidden', false);
+                        $('#autho-grant-user').attr('hidden', false);
+                        $('#grant-allow').attr('hidden', true);
                     } else {
                         $('#{{componentId}}-{{sectionId}}-client_keys_generation_allowed, ' +
-                          '#{{componentId}}-{{sectionId}}-is_public, ' +
                           '#{{componentId}}-{{sectionId}}-registration_allowed').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-redirect_url').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-request_url').attr('disabled', true);
                         $('#autho-code-grant').attr('hidden', true);
+                        $('#autho-grant-user').attr('hidden', true);
+                        $('#grant-allow').attr('hidden', false);
                     }
                 });
             }
         },
+        '{{componentId}}-{{sectionId}}-account_id'                                  : {
+            afterInit: function() {
+                var accounts =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = "{{links.url('system/users/accounts/searchAccounts')}}";
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-account_email").value);
+                                formdata.append($("#security-token").attr("name"), $("#security-token").val());
+
+                                var requestOptions = {
+                                    method: "POST",
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $("#security-token").attr("name", response.tokenKey);
+                                    $("#security-token").val(response.token);
+                                }
+
+                                if (response.responseData.accounts) {
+                                    return response.responseData.accounts;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["email"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-account_email",
+                        threshold : 3,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-account_email_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-account_email",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + " <span>(Email: " + data.value.email + ")</span>";
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-account_email_list")) {
+                                $("#{{componentId}}-{{sectionId}}-account_email_list").empty().append(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-account_email").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-account_email_list" class="autoComplete_results"></div>'
+                                );
+                            }
+                        },
+                        onSelection: feedback => {
+                            $("#{{componentId}}-{{sectionId}}-account_id").val(feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-account_id").attr("value", feedback.selection.value.id);
+                            $("#{{componentId}}-{{sectionId}}-account_email").blur();
+                            $("#{{componentId}}-{{sectionId}}-account_email").val(feedback.selection.value.email);
+                        }
+                });
+                // On delete
+                $("#{{componentId}}-{{sectionId}}-account_email").on("input propertychange", function() {
+                    $("#{{componentId}}-{{sectionId}}-account_id").val(0);
+                });
+
+                $("#{{componentId}}-{{sectionId}}-account_email").focusout(function() {
+                    $("#{{componentId}}-{{sectionId}}-account_email_list").children("li").remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-account_email'                               : { },
+        '{{componentId}}-{{sectionId}}-email_client_details_to_user'                : { },
         '{{componentId}}-{{sectionId}}-cc_max_devices'                              : { },
         '{{componentId}}-{{sectionId}}-client_id'                                   : {
             afterInit: function() {
@@ -244,6 +354,9 @@ dataCollectionSection =
                                 result.value !== ''
                             ) {
                                 generateClientId(true);
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-regenerate-client-id').attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-regenerate-client-id').children('i').attr('hidden', true);
                             }
                         });
                     } else {
@@ -279,11 +392,16 @@ dataCollectionSection =
                     }
 
                     var thisButton = this;
-                    $(this).attr('disabled', true);
-                    $(this).children('i').attr('hidden', false);
 
+                    var urlType;
+
+                    if ($(this)[0].id === '{{componentId}}-{{sectionId}}-generate-redirect-url') {
+                        urlType = 'redirect';
+                    } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-generate-request-url') {
+                        urlType = 'request';
+                    }
                     Swal.fire({
-                        title                       : '<span class="text-danger">Generate URL?</span>',
+                        title                       : '<span class="text-danger">Generate ' + urlType + ' URL?</span>',
                         icon                        : 'question',
                         width                       : '100%',
                         background                  : 'rgba(0,0,0,.8)',
@@ -307,7 +425,7 @@ dataCollectionSection =
                         if (result.isConfirmed === true &&
                             result.value !== ''
                         ) {
-                            generateRedirectUrl($(thisButton)[0].id);
+                            generateUrl($(thisButton)[0].id);
                         }
                     });
                 });
@@ -328,10 +446,30 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-per_minute_calls_limit'                      : { },
         '{{componentId}}-{{sectionId}}-per_hour_calls_limit'                        : { },
         '{{componentId}}-{{sectionId}}-per_day_calls_limit'                         : { },
+        '{{componentId}}-{{sectionId}}-openapi_name'                                : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-openapi-file').off();
+                $('#{{componentId}}-{{sectionId}}-generate-openapi-file').click(function(e) {
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    generateOpenapiFile();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-openapi_description'                         : { },
+        '{{componentId}}-{{sectionId}}-openapi_email'                               : { },
+        '{{componentId}}-{{sectionId}}-openapi_license_name'                        : { },
+        '{{componentId}}-{{sectionId}}-openapi_license_url'                         : { },
+        '{{componentId}}-{{sectionId}}-openapi_server_sandbox_url'                  : { },
+        '{{componentId}}-{{sectionId}}-openapi_server_sandbox_description'          : { },
+        '{{componentId}}-{{sectionId}}-openapi_server_production_url'               : { },
+        '{{componentId}}-{{sectionId}}-openapi_server_production_description'       : { },
         '{{componentId}}-{{sectionId}}-form'                                        : {
             ignore      : ':submit, :reset, :image, :disabled, .ignore, :hidden',
             rules       : {
                 '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-api_type'                        : 'required',
                 '{{componentId}}-{{sectionId}}-client_id_length'                : 'required',
                 '{{componentId}}-{{sectionId}}-client_secret_length'            : 'required',
                 '{{componentId}}-{{sectionId}}-grant_type'                      : 'required',
@@ -347,6 +485,7 @@ dataCollectionSection =
             },
             messages    : {
                 '{{componentId}}-{{sectionId}}-name'                            : 'Please enter api name',
+                '{{componentId}}-{{sectionId}}-api_type'                        : 'Please select api type',
                 '{{componentId}}-{{sectionId}}-client_id_length'                : 'Enter client ID length',
                 '{{componentId}}-{{sectionId}}-client_secret_length'            : 'Enter client Secret Length',
                 '{{componentId}}-{{sectionId}}-grant_type'                      : 'Select Grant Type',
@@ -362,9 +501,19 @@ dataCollectionSection =
             }
         }
     });
+
 function generateClientId(force = false) {
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['account_id'] = $('#{{componentId}}-{{sectionId}}-account_id').val();
+    if (postData['account_id'] == '0') {
+        $('#{{componentId}}-{{sectionId}}-generate-client-id, #{{componentId}}-{{sectionId}}-regenerate-client-id').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-generate-client-id, #{{componentId}}-{{sectionId}}-regenerate-client-id').children('i').attr('hidden', true);
+
+        paginatedPNotify('error', 'Please select account!');
+
+        return;
+    }
     postData['generate_client_id'] = true;
     postData['client_id_length'] = $('#{{componentId}}-{{sectionId}}-client_id_length').val();
     postData['generate_client_secret'] = true;
@@ -376,7 +525,12 @@ function generateClientId(force = false) {
 
             if (response.responseData && response.responseData.client_id) {
                 $('#{{componentId}}-{{sectionId}}-client_id').val(response.responseData.client_id);
-                generateRedirectUrl('{{componentId}}-{{sectionId}}-generate-request-url');
+                generateUrl('{{componentId}}-{{sectionId}}-generate-redirect-url');
+                setTimeout(() => {
+                    generateUrl('{{componentId}}-{{sectionId}}-generate-request-url', true);
+                }, 100);
+
+                $('#{{componentId}}-{{sectionId}}-email_client_details_to_user').attr('disabled', false);
             }
             if (response.responseData && response.responseData.client_secret) {
                 $('#{{componentId}}-{{sectionId}}-client_secret').val(response.responseData.client_secret);
@@ -399,7 +553,7 @@ function generateClientId(force = false) {
     }, 'json');
 }
 
-function generateRedirectUrl(id) {
+function generateUrl(id) {
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
     postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
@@ -407,9 +561,9 @@ function generateRedirectUrl(id) {
         postData['type'] = 'redirect';
     } else if (id === '{{componentId}}-{{sectionId}}-generate-request-url') {
         postData['type'] = 'request';
+        postData['redirect_url'] = $('#{{componentId}}-{{sectionId}}-redirect_url').val();
     }
     postData['client_id'] = $('#{{componentId}}-{{sectionId}}-client_id').val();
-    postData['redirect_url'] = $('#{{componentId}}-{{sectionId}}-redirect_url').val();
     postData['app_id'] = $('#{{componentId}}-{{sectionId}}-app_id').val();
     postData['domain_id'] = $('#{{componentId}}-{{sectionId}}-domain_id').val();
     postData['scope_id'] = $('#{{componentId}}-{{sectionId}}-scope_id').val();
@@ -436,4 +590,38 @@ function generateRedirectUrl(id) {
     }, 'json');
 }
 
+function generateOpenapiFile() {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+
+    $.post('{{links.url("system/api/server/services/generateOpenapiFile")}}', postData, function(response) {
+        $('#{{componentId}}-{{sectionId}}-generate-openapi-file').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-generate-openapi-file').children('i').attr('hidden', true);
+
+        if (response.responseCode == 0) {
+            paginatedPNotify('success', response.responseMessage);
+
+            if (response.responseData.fileContent && response.responseData.fileContent !== '') {
+                try {
+                    var fileContent = JSON.parse(response.responseData.fileContent);
+                } catch (error) {
+                    paginatedPNotify('error', error.message);
+
+                    return;
+                }
+
+                var newWindow = window.open("", "Openapi Specs for API");
+                newWindow.document.write('<pre>' + JSON.stringify(fileContent, null, 4) + '</pre>');
+            }
+        } else {
+            paginatedPNotify('error', response.responseMessage);
+        }
+
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+    }, 'json');
+}
 </script>

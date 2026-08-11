@@ -279,4 +279,29 @@ class AccountsComponent extends BaseComponent
             $this->accounts->packagesData->responseCode
         );
     }
+
+    public function searchAccountsAction()
+    {
+        $this->requestIsPost();
+
+        if ($this->postData()['search']) {
+            $searchQuery = $this->postData()['search'];
+
+            if (strlen($searchQuery) < 3) {
+                return;
+            }
+
+            $accounts = $this->accounts->searchAccounts($searchQuery);
+
+            $accounts = msort($accounts, 'id');
+
+            $this->addResponse(
+                $this->accounts->packagesData->responseMessage,
+                $this->accounts->packagesData->responseCode,
+                ['accounts' => $accounts] ?? []
+            );
+        } else {
+            $this->addResponse('Search Query Missing', 1);
+        }
+    }
 }

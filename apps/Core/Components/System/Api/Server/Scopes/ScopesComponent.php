@@ -9,6 +9,13 @@ class ScopesComponent extends BaseComponent
 {
     use DynamicTable;
 
+    protected $apiScopes;
+
+    public function initialize()
+    {
+        $this->apiScopes = $this->api->init()->scopes;
+    }
+
     /**
      * @acl(name=view)
      */
@@ -16,30 +23,30 @@ class ScopesComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $scope = $this->api->scopes->generateViewData($this->getData()['id']);
+                $scope = $this->apiScopes->generateViewData($this->getData()['id']);
 
                 if (!$scope) {
                     return $this->throwIdNotFound();
                 }
             } else {
-                $scope = $this->api->scopes->generateViewData();
+                $scope = $this->apiScopes->generateViewData();
             }
 
             if ($scope) {
-                $this->view->components = $this->api->scopes->packagesData->components;
+                $this->view->components = $this->apiScopes->packagesData->components;
 
-                $this->view->acls = $this->api->scopes->packagesData->acls;
+                $this->view->acls = $this->apiScopes->packagesData->acls;
 
-                $this->view->scope = $this->api->scopes->packagesData->scope;
+                $this->view->scope = $this->apiScopes->packagesData->scope;
 
-                $this->view->apps = $this->api->scopes->packagesData->apps;
+                $this->view->apps = $this->apiScopes->packagesData->apps;
 
-                $this->view->scopes = $this->api->scopes->packagesData->scopes;
+                $this->view->scopes = $this->apiScopes->packagesData->scopes;
             }
 
             $this->addResponse(
-                $this->api->scopes->packagesData->responseMessage,
-                $this->api->scopes->packagesData->responseCode
+                $this->apiScopes->packagesData->responseMessage,
+                $this->apiScopes->packagesData->responseCode
             );
 
             $this->view->pick('scopes/view');
@@ -58,7 +65,7 @@ class ScopesComponent extends BaseComponent
             ];
 
         $this->generateDTContent(
-            $this->api->scopes,
+            $this->apiScopes,
             'system/api/server/scopes/view',
             null,
             ['name', 'scope_name'],
@@ -80,11 +87,11 @@ class ScopesComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->api->scopes->addScope($this->postData());
+        $this->apiScopes->addScope($this->postData());
 
         $this->addResponse(
-            $this->api->scopes->packagesData->responseMessage,
-            $this->api->scopes->packagesData->responseCode
+            $this->apiScopes->packagesData->responseMessage,
+            $this->apiScopes->packagesData->responseCode
         );
     }
 
@@ -95,11 +102,11 @@ class ScopesComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->api->scopes->updateScope($this->postData());
+        $this->apiScopes->updateScope($this->postData());
 
         $this->addResponse(
-            $this->api->scopes->packagesData->responseMessage,
-            $this->api->scopes->packagesData->responseCode
+            $this->apiScopes->packagesData->responseMessage,
+            $this->apiScopes->packagesData->responseCode
         );
     }
 
@@ -110,11 +117,11 @@ class ScopesComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->api->scopes->removeScope($this->postData());
+        $this->apiScopes->removeScope($this->postData());
 
         $this->addResponse(
-            $this->api->scopes->packagesData->responseMessage,
-            $this->api->scopes->packagesData->responseCode
+            $this->apiScopes->packagesData->responseMessage,
+            $this->apiScopes->packagesData->responseCode
         );
     }
 
@@ -122,12 +129,12 @@ class ScopesComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->api->scopes->extractScopeName($this->postData());
+        $this->apiScopes->extractScopeName($this->postData());
 
         $this->addResponse(
-            $this->api->scopes->packagesData->responseMessage,
-            $this->api->scopes->packagesData->responseCode,
-            $this->api->scopes->packagesData->responseData
+            $this->apiScopes->packagesData->responseMessage,
+            $this->apiScopes->packagesData->responseCode,
+            $this->apiScopes->packagesData->responseData
         );
     }
 }

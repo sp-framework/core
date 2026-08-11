@@ -55,7 +55,15 @@ abstract class BaseModel extends Model
 			$this->config = $this->getDi()->getShared('config');
 
 			if (!isset($this->db) && $this->config->databasetype !== 'ff') {
-				$this->db = $this->getDi()->getShared('db');
+				try {
+					$this->db = $this->getDi()->getShared('db');
+				} catch (\throwable $e) {
+					if (str_contains($e->getMessage(), 'no registered')) {
+						$this->getDi()->register(new \System\Base\Providers\DatabaseServiceProvider());
+
+						$this->db = $this->getDi()->getShared('db');
+					}
+				}
 			}
 
 			if (isset($this->app['use_app_db']) && $this->app['use_app_db'] === true) {
@@ -99,6 +107,13 @@ abstract class BaseModel extends Model
 			return $this->db->query($sql, $data);
 		} catch (\PDOException $e) {
 			throw new \Exception($e->getMessage());
+		}
+	}
+
+	protected function logException($exception)
+	{
+		if ($this->config->logs->exceptions) {
+			$this->logger->logExceptions->critical(json_trace($exception));
 		}
 	}
 }

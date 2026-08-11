@@ -62,30 +62,113 @@
             {% set middlewareIds = json_encode([]) %}
         {% endif %}
     </div>
-    <div class="col">
+    <div class="col-md-8">
         {% if middlewares is defined and middlewares|length > 0 and components|length > 0 %}
             <label>Middleware Sequence (Drag and drop to change sequence)</label>
             <ul class="list-group" id="{{componentId}}-{{sectionId}}-sortable-middlewares">
                 {% for middleware in middlewares %}
+                    {% set middlewareSettings[middleware['id']] = [] %}
+                    {% if middleware['apps'][app['id']]['settings'] is defined %}
+                        {% set middlewareSettings[middleware['id']] = middleware['apps'][app['id']]['settings'] %}
+                    {% else %}
+                        {% set middlewareSettings[middleware['id']] = [] %}
+                    {% endif %}
                     {% if middleware['enabled'] == 1 %}
                         {% set disabled = '' %}
+                        {% set settingsDisabled = false %}
                         {% set area = 'false' %}
                     {% elseif middleware['enabled'] == 0 %}
                         {% set disabled = 'disabled' %}
+                        {% set settingsDisabled = true %}
                         {% set area = 'true' %}
                     {% endif %}
                     <li class="list-group-item list-group-item-secondary {{disabled}}" area-disabled="{{area}}" style="cursor: pointer" data-id="{{middleware['id']}}" data-type="middleware" data-middleware="{{componentId}}-{{sectionId}}-middleware-{{middleware['name']}}">
-                        <i class="fa fa-sort fa-fw handle"></i> {{middleware['display_name']}}
-                        <small class="form-text text-muted">{{middleware['description']}}</small>
+                        <div class="row">
+                            <div class="col-md-10">
+                                <i class="fa fa-sort fa-fw handle"></i> {{middleware['display_name']}}
+                                <small class="form-text text-muted">{{middleware['description']}}</small>
+                            </div>
+                            <div class="col">
+                                {% set buttons = [] %}
+                                {% set buttons['settings-' ~ middleware["id"]] =
+                                    [
+                                        'title'                   : false,
+                                        'size'                    : 'xs',
+                                        'type'                    : 'primary',
+                                        'disabled'                : settingsDisabled,
+                                        'position'                : 'right',
+                                        'icon'                    : 'cog',
+                                        'buttonAdditionalClass'   : 'middlewareSettings',
+                                        'data'                    :
+                                        [
+                                            'id'                  : middleware['id']
+                                        ]
+                                    ]
+                                %}
+                                {{adminltetags.useTag('buttons',
+                                    [
+                                        'componentId'           : componentId,
+                                        'sectionId'             : sectionId,
+                                        'buttonType'            : 'button',
+                                        'buttons'               : buttons
+                                    ]
+                                )}}
+                            </div>
+                        </div>
                     </li>
                 {% endfor %}
+                {% set middlewareSettings = json_encode(middlewareSettings, 16) %}
             </ul>
             <small>Note: Some middlewares sequence is set by system and will reset on submit.</small>
+        {% else %}
+            {% set middlewareSettings = json_encode([]) %}
         {% endif %}
     </div>
 </div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'middlewares-settings-modal',
+            'modalBodyInclude'          : 'apps/wizard/modules/form/middlewaresettings',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-cog"></i> SETTINGS',
+            'modalFooterButtons'        :
+                [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                        [
+                            'reset-middleware-settings' : [
+                                'title'                   : 'Reset Settings',
+                                'type'                    : 'danger',
+                                'position'                : 'right',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
+                            ],
+                            'save-middleware-settings' : [
+                                'title'                   : 'Save Settings',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
+                            ]
+                        ]
+                ]
+        ]
+    )}}
+</div>
 <script>
-/* globals Sortable */
+/* globals Sortable paginatedPNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -112,6 +195,106 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-middleware-settings'             : {
+            afterInit: function() {
+                var middlewareSettings = { };
+                middlewareSettings = JSON.parse('{{middlewareSettings}}');
+
+                if (middlewareSettings.length === 0) {
+                    middlewareSettings = { };
+                }
+
+                $('.middlewareSettings').off();
+                $('.middlewareSettings').on('click', function(e) {
+                    e.preventDefault();
+
+                    var thisButton = this;
+
+                    $('#{{componentId}}-{{sectionId}}-middleware-settings').val(JSON.stringify(middlewareSettings[$(thisButton).data('id')], null, 4));
+
+                    $('#{{componentId}}-{{sectionId}}-middlewares-settings-modal').modal('show');
+
+                    $('#{{componentId}}-{{sectionId}}-middlewares-settings-modal').on('shown.bs.modal', function() {
+                        $('#{{componentId}}-{{sectionId}}-middlewares-settings-modal').off('shown.bs.modal');
+
+                        $('#{{componentId}}-{{sectionId}}-save-middleware-settings,' +
+                          '#{{componentId}}-{{sectionId}}-reset-middleware-settings').off();
+                        $('#{{componentId}}-{{sectionId}}-save-middleware-settings,' +
+                          '#{{componentId}}-{{sectionId}}-reset-middleware-settings').click(function(e) {
+                            e.preventDefault();
+
+                            var resetSaveButton = this;
+
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['id'] = $(thisButton).data('id')
+                            postData['app_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                            if ($(resetSaveButton)[0].id === '{{componentId}}-{{sectionId}}-reset-middleware-settings') {
+                                postData['reset'] = true;
+                                postData['settings'] = JSON.stringify([]);
+                            } else {
+                                postData['settings'] = $('#{{componentId}}-{{sectionId}}-middleware-settings').val();
+                            }
+
+                            if (postData['reset'] === true) {
+                                Swal.fire({
+                                    title                       : '<span class="text-danger"> Reset middleware settings?</span>',
+                                    icon                        : 'question',
+                                    background                  : 'rgba(0,0,0,.8)',
+                                    backdrop                    : 'rgba(0,0,0,.6)',
+                                    buttonsStyling              : false,
+                                    confirmButtonText           : 'Reset',
+                                    customClass                 : {
+                                        'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                                    },
+                                    showCancelButton            : true,
+                                    keydownListenerCapture      : true,
+                                    allowOutsideClick           : true,
+                                    allowEscapeKey              : true,
+                                    didOpen                     : function() {
+                                        window.dataCollection.env.sounds.swalSound.play();
+                                    }
+                                }).then((result) => {
+                                    if (result.value) {
+                                        updateSettings(postData, thisButton, resetSaveButton, middlewareSettings);
+                                    } else {
+                                        return true;
+                                    }
+                                });
+                            } else {
+                                updateSettings(postData, thisButton, resetSaveButton,middlewareSettings);
+                            }
+                        });
+                    });
+                });
+
+                function updateSettings(postData, thisButton, resetSaveButton, middlewareSettings) {
+                    $.post('{{links.url("apps/saveMiddlewareSettings")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.settings) {
+                                middlewareSettings[$(thisButton).data('id')] = response.responseData.settings;
+                            }
+
+                            if ($(resetSaveButton)[0].id === '{{componentId}}-{{sectionId}}-reset-middleware-settings') {
+                                $('#{{componentId}}-{{sectionId}}-middleware-settings').val(JSON.stringify(middlewareSettings[$(thisButton).data('id')], null, 4));
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-middlewares-settings-modal').modal('hide');
+                            }
+
+                            paginatedPNotify('success', {'text': response.responseMessage});
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+                    }, 'json');
+                }
+            }
+        },
         '{{componentId}}-{{sectionId}}-middlewares'                     : {
             afterInit: function() {
                 var sortable;
@@ -161,6 +344,7 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
                             find('[data-middleware="' + middlewareCheckbox + '"]').removeClass('disabled').attr('area-disabled', 'false');
 
+                        $('#{{componentId}}-{{sectionId}}-sortable-middlewares').find('[data-middleware="' + middlewareCheckbox + '"]').find('.middlewareSettings').attr('disabled', false);
                         if (switchMiddleware && middlewareCheckbox.toLowerCase() === '{{componentId}}-{{sectionId}}-middleware-auth') {
                             $('#{{componentId}}-{{sectionId}}-registration_allowed').attr('disabled', false);
                         }
@@ -171,7 +355,8 @@ dataCollectionSection =
                         window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['middlewares'][$('#' + middlewareCheckbox).data('middleware')] = false;
                         $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
                             find('[data-middleware="' + middlewareCheckbox + '"]').addClass('disabled').attr('area-disabled', 'true');
-                            if (switchMiddleware && middlewareCheckbox.toLowerCase() === '{{componentId}}-{{sectionId}}-middleware-auth') {
+                        $('#{{componentId}}-{{sectionId}}-sortable-middlewares').find('[data-middleware="' + middlewareCheckbox + '"]').find('.middlewareSettings').attr('disabled', true);
+                        if (switchMiddleware && middlewareCheckbox.toLowerCase() === '{{componentId}}-{{sectionId}}-middleware-auth') {
                             $('#{{componentId}}-{{sectionId}}-registration_allowed').attr('disabled', true);
                             $('#{{componentId}}-{{sectionId}}-registration_allowed')[0].checked = false;
                             $('#{{componentId}}-{{sectionId}}-approve_accounts_manually').attr('disabled', true);

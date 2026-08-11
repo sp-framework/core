@@ -153,19 +153,17 @@ class Acl extends BaseMiddleware
                 $this->role['permissions'] = $this->helper->decode($this->role['permissions'], true);
             }
 
-            foreach ($this->role['permissions'] as $appKey => $app) {
-                foreach ($app as $componentKey => $permission) {
-                    if ($this->app['id'] == $appKey) {
-                        if (isset($this->components[$componentKey]) &&
-                            $this->components[$componentKey]['route'] === $this->controllerRoute
+            if (isset($this->role['permissions'][$this->app['id']])) {
+                foreach ($this->role['permissions'][$this->app['id']] as $componentKey => $permission) {
+                    if (isset($this->components[$componentKey]) &&
+                        $this->components[$componentKey]['route'] === $this->controllerRoute
+                    ) {
+                        if (($this->isApi && $this->helper->has($this->components[$componentKey]['api_acls'], $this->action)) ||
+                            (!$this->isApi && $this->helper->has($this->components[$componentKey]['acls'], $this->action))
                         ) {
-                            if (($this->isApi && $this->helper->has($this->components[$componentKey]['api_acls'], $this->action)) ||
-                                (!$this->isApi && $this->helper->has($this->components[$componentKey]['acls'], $this->action))
-                            ) {
-                                $this->found = true;
-                                $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
-                                break 2;
-                            }
+                            $this->found = true;
+                            $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
+                            break;
                         }
                     }
                 }
@@ -275,7 +273,7 @@ class Acl extends BaseMiddleware
             !is_dir(
                 base_path(
                     'var/storage/cache/' .
-                    $this->app['app_type'] . '/' .
+                    $this->domains->getDomain()['name'] . '/' .
                     $this->app['route'] . '/acls/'
                 )
             )
@@ -284,7 +282,7 @@ class Acl extends BaseMiddleware
                 !mkdir(
                     base_path(
                         'var/storage/cache/' .
-                        $this->app['app_type'] . '/' .
+                        $this->domains->getDomain()['name'] . '/' .
                         $this->app['route'] . '/acls/'
                     ), 0777, true
                 )
@@ -297,30 +295,71 @@ class Acl extends BaseMiddleware
 
     protected function generateComponentsArr()
     {
-        $componentsArr = $this->modules->components->components;
+        if ($this->opCache) {
+            if ($this->opCache->checkCache('acl_' . $this->app['id'] . '_components', 'core')) {
+                $this->components = $this->opCache->getCache('acl_' . $this->app['id'] . '_components', 'core');
+            }
+
+            if ($this->components && count($this->components) > 0) {
+                return;
+            }
+        }
+
+        $componentsArr = $this->modules->components->getComponentsForAppId($this->app['id']);
 
         foreach ($componentsArr as $component) {
             if ($component['class'] && $component['class'] !== '') {
                 $reflector = $this->annotations->get($component['class']);
                 $methods = $reflector->getMethodsAnnotations();
 
-                if ($methods && count($methods) > 2) {
-                    if (isset($methods['viewAction'])) {
+                if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
+                    $this->components[$component['id']]['name'] = strtolower($component['name']);
+
+                    $this->components[$component['id']]['route'] = strtolower($component['route']);
+
+                    $this->components[$component['id']]['description'] = $component['description'];
+
+                    foreach ($methods as $annotation) {
+                        if ($annotation->getAll('acl')) {
+                            $action = $annotation->getAll('acl')[0]->getArguments();
+
+                            $this->components[$component['id']]['acls'][$action['name']] = $action['name'];
+                        }
+                    }
+                }
+
+                //API
+                try {
+                    $reflector = $this->annotations->get(implode('\\', array_slice(explode('\\', $component['class']), 0, -1)) . '\Api');
+                    $methods = $reflector->getMethodsAnnotations();
+
+                    if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                         $this->components[$component['id']]['name'] = strtolower($component['name']);
+
                         $this->components[$component['id']]['route'] = strtolower($component['route']);
+
                         $this->components[$component['id']]['description'] = $component['description'];
+
                         foreach ($methods as $annotation) {
-                            if ($annotation->getAll('acl')) {
-                                $action = $annotation->getAll('acl')[0]->getArguments();
-                                $this->components[$component['id']]['acls'][$action['name']] = $action['name'];
-                            } else if ($annotation->getAll('api_acl')) {
+                            if ($annotation->getAll('api_acl')) {
                                 $action = $annotation->getAll('api_acl')[0]->getArguments();
+
                                 $this->components[$component['id']]['api_acls'][$action['name']] = $action['name'];
                             }
                         }
                     }
+                } catch (\throwable $e) {
+                    if (str_contains($e->getMessage(), 'does not exist')) {
+                        continue;
+                    }
+
+                    throw $e;
                 }
             }
+        }
+
+        if ($this->opCache) {
+            $this->opCache->setCache('acl_' . $this->app['id'] . '_components', $this->components, 'core');
         }
     }
 }

@@ -69,7 +69,15 @@ class ExceptionHandlers extends BaseComponent
 	public function handleIncorrectCSRFException($exception)
 	{
 		if ($this->request->getBestAccept() === 'application/json') {
+			$this->addResponse($exception->getMessage(), 1);
 
+			return $this->sendJson();
+		}
+	}
+
+	public function handleDatavalidationFailException($exception)
+	{
+		if ($this->request->getBestAccept() === 'application/json') {
 			$this->addResponse($exception->getMessage(), 1);
 
 			return $this->sendJson();

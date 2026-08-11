@@ -137,7 +137,6 @@ class Router
 					) {
 
 						$this->registerRoute($this->uri);
-
 					} else if ($this->uri === '' ||
 							   $this->uri === strtolower($this->appDefaults['app']) ||
 							   $this->uri === strtolower($this->appInfo['route'])
@@ -248,8 +247,8 @@ class Router
 			$routeToMatch = '/' . ':params';
 		}
 
-		if ($this->isApi && isset($givenRouteArr[1])) {//Assign params to dispatcher manually so that BaseComponent can pic them up
-			$params = explode('/', trim($givenRouteArr[1], '/'));
+		if ($this->isApi && $this->getQuery) {//Assign params to dispatcher manually so that BaseComponent can pic them up
+			$params = explode('/', trim($this->getQuery, '/'));
 
 			$this->dispatcher->setParameters($params);
 		}
@@ -283,7 +282,7 @@ class Router
 			foreach ($routeArray as $route) {
 				$this->givenRouteClass .= '\\' . ucfirst($route);
 			}
-		} elseif ($this->request->isPost()) {
+		} elseif ($this->request->isPost() || $this->request->isPut() || $this->request->isPatch() || $this->request->isDelete()) {
 			$this->action = $this->helper->last($routeArray);
 			unset($routeArray[$this->helper->lastKey($routeArray)]);
 			$this->controller = $this->helper->last($routeArray);
@@ -411,10 +410,10 @@ class Router
 
 			$this->appDefaults['errorComponent'] =
 				isset($this->appInfo['errors_component']) && $this->appInfo['errors_component'] != 0 ?
-				$this->components->getComponentById($this->appInfo['errors_component'])['route'] :
+				($this->components->getComponentById($this->appInfo['errors_component'])['route'] ?? null) :
 				null;
 			$this->appDefaults['view'] =
-				$this->views->getViewById($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
+				$this->views->getViewById($this->domain['apps'][$this->appInfo['id']]['view'])['name'] ?? 'Default';
 		}
 
 		return true;

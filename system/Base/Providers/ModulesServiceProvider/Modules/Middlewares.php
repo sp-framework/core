@@ -30,7 +30,7 @@ class Middlewares extends BasePackage
 
 	public function getMiddlewareByNameForAppId($name, $appId)
 	{
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
 			if (isset($middleware['apps'][$appId]) &&
@@ -49,7 +49,7 @@ class Middlewares extends BasePackage
 
 	public function getMiddlewareByNameForAppType($name, $appType)
 	{
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 			if (strtolower($middleware['name']) === strtolower($name) &&
 				strtolower($middleware['app_type']) === strtolower($appType)
 			) {
@@ -62,7 +62,7 @@ class Middlewares extends BasePackage
 
 	public function getMiddlewareById($id)
 	{
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 			if ($middleware['id'] == $id) {
 				return $middleware;
 			}
@@ -73,7 +73,7 @@ class Middlewares extends BasePackage
 
 	public function getMiddlewareByRepo($repo)
 	{
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 			if ($middleware['repo'] == $repo) {
 				return $middleware;
 			}
@@ -92,7 +92,7 @@ class Middlewares extends BasePackage
 			}
 		}
 
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
 			if ($middleware['class'] !== $class) {
@@ -113,7 +113,7 @@ class Middlewares extends BasePackage
 
 	public function getMiddlewareByAppTypeAndRepoAndClass($appType, $repo, $class)
 	{
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 			if ($middleware['app_type'] === $appType &&
 				$middleware['repo'] === $repo &&
 				trim($class, '\\') === trim($middleware['class'], '\\')
@@ -127,7 +127,7 @@ class Middlewares extends BasePackage
 
 	public function getMiddlewareByAppTypeAndClass($appType, $class)
 	{
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 			if ($middleware['app_type'] === $appType &&
 				trim($class, '\\') === trim($middleware['class'], '\\')
 			) {
@@ -142,7 +142,7 @@ class Middlewares extends BasePackage
 	{
 		$middlewares = [];
 
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 			if ($middleware['api_id'] == $apiId) {
 				array_push($middlewares, $middleware);
 			}
@@ -155,7 +155,7 @@ class Middlewares extends BasePackage
 	{
 		$middlewares = [];
 
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
 			if (isset($middleware['apps'][$appId]) &&
@@ -174,7 +174,7 @@ class Middlewares extends BasePackage
 	{
 		$middlewares = [];
 
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 
 			if ($middleware['category'] === $category) {
 				$middlewares[$middleware['id']] = $middleware;
@@ -207,7 +207,7 @@ class Middlewares extends BasePackage
 	{
 		$middlewares = [];
 
-		foreach($this->middlewares as $middleware) {
+		foreach ($this->middlewares as $middleware) {
 			if ($middleware['app_type'] == $appType) {
 				if ($checkInstalled &&
 					$middleware['installed'] != '1'
@@ -310,6 +310,71 @@ class Middlewares extends BasePackage
 		}
 	}
 
+	public function saveMiddlewareSettings($data)
+	{
+		if (!isset($data['id'])) {
+			$this->addResponse('Please provide middleware id', 1);
+
+			return false;
+		}
+
+		if (!isset($data['app_id'])) {
+			$this->addResponse('Please provide app id', 1);
+
+			return false;
+		}
+
+		if (!isset($data['settings'])) {
+			$this->addResponse('Please provide middleware settings', 1);
+
+			return false;
+		}
+
+		$middleware = $this->getById((int) $data['id']);
+
+		if (!isset($middleware['apps'])) {
+			$middleware['apps'] = [];
+		}
+
+		if (is_string($middleware['apps'])) {
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
+		}
+
+		if (is_string($data['settings'])) {
+			if ($data['settings'] !== "") {
+				$data['settings'] = $this->helper->decode($data['settings'], true);
+			} else {
+				$data['settings'] = [];
+			}
+		}
+
+		if (isset($data['reset']) && $data['reset'] == 'true') {
+			$middleware['apps'][$data['app_id']]['settings'] = $middleware['settings'];
+		} else {
+			if (!isset($middleware['apps'][$data['app_id']]['settings']) ||
+				(isset($middleware['apps'][$data['app_id']]['settings']) && $middleware['apps'][$data['app_id']]['settings'] === "")
+			) {
+				$middleware['apps'][$data['app_id']]['settings'] = [];
+			}
+
+			$middleware['apps'][$data['app_id']]['settings'] = array_merge($middleware['apps'][$data['app_id']]['settings'], $data['settings']);
+		}
+
+		if ($this->update($middleware)) {
+			$responseData = ['settings' => $middleware['apps'][$data['app_id']]['settings']];
+
+			if (isset($data['reset']) && $data['reset'] == 'true') {
+				$this->addResponse('Middleware settings reset!', 0, $responseData);
+			} else {
+				$this->addResponse('Middleware settings updated!', 0, $responseData);
+			}
+
+			return true;
+		}
+
+		$this->addResponse('Error updating middleware settings', 1);
+	}
+
 	protected function checkMiddlewareDependencies($data, &$middlewares, &$middleware)
 	{
 		$dependencyArray = [];
@@ -330,7 +395,9 @@ class Middlewares extends BasePackage
 			$dependencyMiddleware = $this->getFirst('name', $dependency['name'], false, true, null, [], true);
 
 			if ($dependencyMiddleware) {
-				$dependencyMiddleware['apps'] = $this->helper->decode($dependencyMiddleware['apps'], true);
+				if (is_string($dependencyMiddleware['apps'])) {
+					$dependencyMiddleware['apps'] = $this->helper->decode($dependencyMiddleware['apps'], true);
+				}
 
 				$dependencyMiddleware['apps'][$data['id']]['enabled'] = true;
 

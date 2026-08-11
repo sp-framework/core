@@ -9,6 +9,13 @@ class ClientsComponent extends BaseComponent
 {
     use DynamicTable;
 
+    protected $apiClients;
+
+    public function initialize()
+    {
+        $this->apiClients = $this->api->init()->clients;
+    }
+
     /**
      * @acl(name=view)
      */
@@ -21,8 +28,10 @@ class ClientsComponent extends BaseComponent
                     $this->api->getEnabledAPIByType('client_credentials')
                 );
 
+            $this->view->emailservices = $this->basepackages->emailservices->emailServices;
+
             if ($this->getData()['id'] != 0) {
-                $client = $this->api->clients->getById($this->getData()['id']);
+                $client = $this->apiClients->getById($this->getData()['id']);
 
                 if (!$client) {
                     return $this->throwIdNotFound();
@@ -55,16 +64,23 @@ class ClientsComponent extends BaseComponent
             ];
 
         $this->generateDTContent(
-            $this->api->clients,
+            $this->apiClients,
             'system/api/server/clients/view',
             $conditions,
-            ['revoked', 'concurrent_calls_count', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
+            ['revoked', 'concurrent_calls_count', 'client_id', 'device_id', 'api_id', 'email', 'last_used', 'per_minute_calls_count', 'per_hour_calls_count', 'per_day_calls_count'],
             true,
-            ['revoked', 'concurrent_calls_count', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
+            ['revoked', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
             null,
             ['api_id' => 'api', 'concurrent_calls_count' => 'Calls Count'],
             $replaceColumns,
-            'client_id'
+            'client_id',
+            null,
+            false,
+            null,
+            false,
+            true,
+            [],
+            ['per_minute_calls_count', 'per_hour_calls_count', 'per_day_calls_count']
         );
 
         $this->view->pick('clients/list');
@@ -74,6 +90,7 @@ class ClientsComponent extends BaseComponent
     {
         foreach ($dataArr as $dataKey => &$data) {
             $api = $this->api->getById($data['api_id']);
+
             if ($api) {
                 $data['api_id'] = $api['name'];
             }
@@ -82,7 +99,7 @@ class ClientsComponent extends BaseComponent
                 $data['device_id'] = '-';
             }
 
-            if ($api['is_public'] == true) {
+            if ($api['api_type'] === 'public' || $api['api_type'] === 'protected_user_credentials') {
                 $data['revoked'] = '-';
                 $dataRevoked = false;
             } else {
@@ -116,9 +133,9 @@ class ClientsComponent extends BaseComponent
                     $badge = 'secondary';
                     $data['concurrent_calls_count'] = '-';
                 }
-                $callsCounter = $callsCounter . '<span class="badge badge-' . $badge . ' mr-1">' . $data['concurrent_calls_count'] . '</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Concurrent" class="badge badge-' . $badge . ' mr-1">' . $data['concurrent_calls_count'] . '</span>';
             } else {
-                $callsCounter = $callsCounter . '<span class="badge badge-secondary mr-1">-</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Concurrent" class="badge badge-secondary mr-1">-</span>';
             }
             if ((int) $api['per_minute_calls_limit'] > 0) {
                 $percent = (int) ((int) $data['per_minute_calls_count'] * 100) / (int) $api['per_minute_calls_limit'];
@@ -134,9 +151,9 @@ class ClientsComponent extends BaseComponent
                     $badge = 'secondary';
                     $data['per_minute_calls_count'] = '-';
                 }
-                $callsCounter = $callsCounter . '<span class="badge badge-' . $badge . ' mr-1">' . $data['per_minute_calls_count'] . '</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Minute" class="badge badge-' . $badge . ' mr-1">' . $data['per_minute_calls_count'] . '</span>';
             } else {
-                $callsCounter = $callsCounter . '<span class="badge badge-secondary mr-1">-</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Minute" class="badge badge-secondary mr-1">-</span>';
             }
             if ((int) $api['per_hour_calls_limit'] > 0) {
                 $percent = (int) ((int) $data['per_hour_calls_count'] * 100) / (int) $api['per_hour_calls_limit'];
@@ -152,9 +169,9 @@ class ClientsComponent extends BaseComponent
                     $badge = 'secondary';
                     $data['per_hour_calls_count'] = '-';
                 }
-                $callsCounter = $callsCounter . '<span class="badge badge-' . $badge . ' mr-1">' . $data['per_hour_calls_count'] . '</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Hour" class="badge badge-' . $badge . ' mr-1">' . $data['per_hour_calls_count'] . '</span>';
             } else {
-                $callsCounter = $callsCounter . '<span class="badge badge-secondary mr-1">-</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Hour" class="badge badge-secondary mr-1">-</span>';
             }
             if ((int) $api['per_day_calls_limit'] > 0) {
                 $percent = (int) ((int) $data['per_day_calls_count'] * 100) / (int) $api['per_day_calls_limit'];
@@ -170,9 +187,9 @@ class ClientsComponent extends BaseComponent
                     $badge = 'secondary';
                     $data['per_day_calls_count'] = '-';
                 }
-                $callsCounter = $callsCounter . '<span class="badge badge-' . $badge . ' mr-1">' . $data['per_day_calls_count'] . '</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Day" class="badge badge-' . $badge . ' mr-1">' . $data['per_day_calls_count'] . '</span>';
             } else {
-                $callsCounter = $callsCounter . '<span class="badge badge-secondary mr-1">-</span>';
+                $callsCounter = $callsCounter . '<span data-toggle="tooltip" data-placement="auto" title="Per Day" class="badge badge-secondary mr-1">-</span>';
             }
 
             if (((int) $api['concurrent_calls_limit'] !== 0 ||
@@ -194,22 +211,22 @@ class ClientsComponent extends BaseComponent
     }
 
     /**
-     *
+     * @acl(name=add)
      */
     public function addAction()
     {
         $this->requestIsPost();
 
-        $this->api->clients->addClient($this->postData());
+        $this->apiClients->addClient($this->postData());
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode
+            $this->apiClients->packagesData->responseMessage,
+            $this->apiClients->packagesData->responseCode
         );
     }
 
     /**
-     *
+     * @acl(name=update)
      */
     public function updateAction()
     {
@@ -225,11 +242,11 @@ class ClientsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->api->clients->forceRevoke($this->postData());
+        $this->apiClients->forceRevoke($this->postData());
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode
+            $this->apiClients->packagesData->responseMessage,
+            $this->apiClients->packagesData->responseCode
         );
     }
 
@@ -243,12 +260,12 @@ class ClientsComponent extends BaseComponent
 
         $this->requestIsPost();
 
-        $this->api->clients->generateClientKeys($this->postData());
+        $this->apiClients->generateClientKeys($this->postData());
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode,
-            $this->api->clients->packagesData->responseData
+            $this->apiClients->packagesData->responseMessage,
+            $this->apiClients->packagesData->responseCode,
+            $this->apiClients->packagesData->responseData
         );
     }
 
@@ -256,12 +273,12 @@ class ClientsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->api->clients->generateClientIdAndSecret($this->postData());
+        $this->apiClients->generateClientIdAndSecret($this->postData());
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode,
-            $this->api->clients->packagesData->responseData
+            $this->apiClients->packagesData->responseMessage,
+            $this->apiClients->packagesData->responseCode,
+            $this->apiClients->packagesData->responseData
         );
     }
 
@@ -270,11 +287,11 @@ class ClientsComponent extends BaseComponent
         $this->requestIsPost();
 
         $client = null;
-        $this->api->clients->resetCallsCount([], $client, $this->postData()['id']);
+        $this->apiClients->resetCallsCount([], $client, $this->postData()['id']);
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode
+            $this->apiClients->packagesData->responseMessage,
+            $this->apiClients->packagesData->responseCode
         );
     }
 }

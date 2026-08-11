@@ -13,49 +13,114 @@ class RegisterComponent extends BaseComponent
         $this->accounts = $this->basepackages->accounts;
     }
 
+    /**
+     * View action for user account or API registration for the user.
+     *
+     * - Users can register for a regular user account if the app permits. The App settings allow registration should be enabled.
+     * - For API registration: API services should allow registration else they will get 404
+     *
+     */
     public function viewAction()
     {
+        if ($this->isJson()) {//For registering clients via Json (SP APIClientServices)
+            $this->buildGetQueryParamsArr();
+        }
+
+        //Authorize Flow 1, test authorization redirect url
+        if (isset($this->getData()['authorized']) &&
+            !isset($this->getData()['response_type']) &&
+            !isset($this->request->getQuery()['code'])
+        ) {
+            $this->view->refresh = false;
+            $this->view->newToken = false;
+
+            if (isset($this->getData()['test_authorized'])) {
+                return true;
+            }
+
+            $this->view->setLayout('auth');
+
+            $this->view->pick('register/authorization');
+
+            return;
+        }
+
         if (isset($this->getData()['response_type']) &&
             $this->getData()['response_type'] === 'code' &&
             isset($this->getData()['client_id']) &&
             isset($this->getData()['redirect_uri']) &&
             isset($this->getData()['scope'])
-        ) {//Authorize Flow 1
+        ) {//Authorize Flow 1, state is not set
             $this->view->setLayout('auth');
 
             $this->view->pick('register/authorization');
 
-            $api = $this->api->checkAuthorizationLinkData($this->getData());
+            $apiArr = $this->api->checkAuthorizationLinkData($this->getData());
 
-            if (!$api) {
+            if (!$apiArr) {
+                if ($this->isJson()) {
+                    $this->addResponse($this->api->packagesData->responseMessage, 1, []);
+
+                    $this->sendJson();
+                }
+
                 $this->view->error = $this->api->packagesData->responseMessage;
+
+                $this->view->refresh = false;
+                $this->view->newToken = false;
 
                 return;
             }
 
-            $this->view->authorizationTosPp = null;
-            if (isset($api['authorization_tos_pp']) && $api['authorization_tos_pp'] !== '') {
-                $this->view->authorizationTosPp = html_entity_decode($api['authorization_tos_pp']);
-                unset($api['authorization_tos_pp']);
+            $apiArr = $this->removeApiKeysInfo($apiArr);
+
+            //Send Json to APIClientServices with authorization_url.
+            if ($this->isJson()) {
+                $this->addResponse('URL with state', 0, ['authorization_url' => $apiArr['authorization_url']]);
+
+                $this->sendJson();
             }
 
-            $this->view->api = $api;
+            $this->view->authorizationTosPp = null;
+            if (isset($apiArr['authorization_tos_pp']) && $apiArr['authorization_tos_pp'] !== '') {
+                $this->view->authorizationTosPp = html_entity_decode($apiArr['authorization_tos_pp']);
+                unset($apiArr['authorization_tos_pp']);
+            }
+
+            $this->view->api = $apiArr;
 
             if (isset($this->getData()['state'])) {
                 $this->view->state = $this->getData()['state'];
             }
 
+            $this->view->refresh = false;
+            $this->view->newToken = false;
+
             return;
-        } else if (isset($this->getData()['csrf'])) {//Authorize Flow 2
+        } else if (isset($this->getData()['state'])) {//Authorize Flow 2
             $response = $this->api->checkAuthorizationLinkData($this->getData());
 
             if ($response && $response->getStatusCode() === 302) {
                 $location = $response->getHeader('Location');
 
                 if ($location && count($location) === 1) {
+                    //Send Json to APIClientServices with authorization_url.
+                    if ($this->isJson()) {
+                        $responseData['registration_url'] = $this->links->url('register/apiClient');
+                        $responseData['method'] = 'POST';
+                        $responseData['code'] = explode('code=', $location[0])[1];
+
+                        $this->addResponse('Code & authorization URL attached. Make call to registration_url with defined method to get access token.', 0, $responseData);
+
+                        $this->sendJson();
+                    }
+
                     if ($this->api->clientRedirectUri === 'local') {
                         $location[0] = $location[0] . '&api_id=' . $this->api->api['id'];
                     }
+
+                    $this->view->refresh = false;
+                    $this->view->newToken = false;
 
                     return $this->response->redirect($location[0]);
                 }
@@ -67,60 +132,72 @@ class RegisterComponent extends BaseComponent
 
             $this->view->pick('register/authorization');
 
-            $api = $this->api->checkAuthorizationLinkData($this->request->getQuery());
+            $apiArr = $this->api->checkAuthorizationLinkData($this->request->getQuery());
 
-            if (!$api) {
+            if (!$apiArr) {
                 $this->view->error = $this->api->packagesData->responseMessage;
 
                 return;
             }
 
             $this->view->authorizationTosPp = null;
-            if (isset($api['authorization_tos_pp']) && $api['authorization_tos_pp'] !== '') {
-                unset($api['authorization_tos_pp']);
+            if (isset($apiArr['authorization_tos_pp']) && $apiArr['authorization_tos_pp'] !== '') {
+                unset($apiArr['authorization_tos_pp']);
             }
 
-            $this->view->api = $api;
+            $this->view->api = $this->removeApiKeysInfo($apiArr);
             $this->view->client = $this->api->client;
             $this->view->code = $this->request->getQuery()['code'];
-            if ($this->request->getQuery()['state']) {
+
+            if (isset($this->request->getQuery()['state'])) {
                 $this->view->state = $this->request->getQuery()['state'];
             }
 
+            $this->view->refresh = false;
+            $this->view->newToken = false;
+
             return;
         } else if (isset($this->getData()['client_id']) &&
-                   (isset($this->getData()['refresh']) && $this->getData()['refresh'] == true)
-        ) {
+                   ((isset($this->getData()['refresh']) && $this->getData()['refresh'] == true) ||
+                    (isset($this->getData()['new']) && $this->getData()['new'] == true))
+        ) {//Token Generator using client and secret & Refresh token
             $this->view->setLayout('auth');
 
             $this->view->pick('register/authorization');
 
-            $api = $this->api->checkAuthorizationLinkData($this->getData());
+            $apiArr = $this->api->init(true)->checkAuthorizationLinkData($this->getData());
 
-            if (!$api) {
+            if (!$apiArr) {
                 $this->view->error = $this->api->packagesData->responseMessage;
 
                 return;
             }
 
-            if (isset($api['authorization_tos_pp']) && $api['authorization_tos_pp'] !== '') {
-                unset($api['authorization_tos_pp']);
+            if (isset($apiArr['authorization_tos_pp']) && $apiArr['authorization_tos_pp'] !== '') {
+                unset($apiArr['authorization_tos_pp']);
             }
 
-            $this->view->api = $api;
+            $this->view->api = $this->removeApiKeysInfo($apiArr);
 
-            $this->view->refresh = true;
+            $this->view->refresh = false;
+            $this->view->newToken = false;
+            if (isset($this->getData()['refresh']) && $this->getData()['refresh'] == true) {
+                $this->view->refresh = true;
+            }
+            if (isset($this->getData()['new']) && $this->getData()['new'] == true) {
+                $this->view->newToken = true;
+            }
+
+            $this->view->clientId =$this->getData()['client_id'];
 
             return;
         }
 
-        $this->view->refresh = false;
-
         if (isset($this->getData()['api'])) {
-            $api = $this->api->getById($this->getData()['api']);
+            $apiArr = $this->api->getById($this->getData()['api']);
 
-            if (!$api ||
-                ($api && ($api['status'] == false || $api && $api['client_keys_generation_allowed'] == false))
+            if (!$apiArr ||
+                ($apiArr && ($apiArr['status'] == false || $apiArr && $apiArr['registration_allowed'] == false))
             ) {
                 $this->response->setStatusCode(404);
 
@@ -131,7 +208,7 @@ class RegisterComponent extends BaseComponent
 
             $this->view->setLayout('auth');
 
-            $this->view->api = $api;
+            $this->view->api = $this->removeApiKeysInfo($apiArr);
 
             $this->view->pick('register/view');
 
@@ -159,6 +236,15 @@ class RegisterComponent extends BaseComponent
         }
     }
 
+    protected function removeApiKeysInfo($apiArr)
+    {
+        unset($apiArr['private_key_passphrase']);
+        unset($apiArr['private_key']);
+        unset($apiArr['private_key_location']);
+
+        return $apiArr;
+    }
+
     public function registerNewAccountAction()
     {
         $this->requestIsPost();
@@ -173,78 +259,69 @@ class RegisterComponent extends BaseComponent
         );
     }
 
+    /**
+     * Register client using web form.
+     *
+     * - Users enter their email address and select if they are registering for device API or user API.
+     * ```
+     * postData() params:
+     * string  email           email address of the user
+     * bool    device_id       true|false
+     * ```
+     */
     public function apiAddNewClientAction()
     {
         $this->requestIsPost();
 
-        $this->api->clients->addClient($this->postData(), true);
+        $clients = $this->api->init(true)->clients;
+
+        $clients->addClient($this->postData(), true);
 
         $this->addResponse(
-            $this->api->clients->packagesData->responseMessage,
-            $this->api->clients->packagesData->responseCode
+            $clients->packagesData->responseMessage,
+            $clients->packagesData->responseCode,
+            $clients->packagesData->responseData ?? []
         );
     }
 
     public function apiClientAction()
     {
-        if (!isset($this->postData()['grant_type']) ||
-            isset($this->postData()['grant_type']) && $this->postData()['grant_type'] === ''
-        ) {
-            $this->addResponse('Grant type not set.', 1);
-
-            return;
-        }
-
-        if (!isset($this->postData()['client_id']) ||
-            isset($this->postData()['client_id']) && $this->postData()['client_id'] === ''
-        ) {
-            $this->addResponse('Client ID not set.', 1);
-
-            return;
-        }
-
-        if (!isset($this->postData()['client_secret']) ||
-            isset($this->postData()['client_secret']) && $this->postData()['client_secret'] === ''
-        ) {
-            $this->addResponse('Client secret not set.', 1);
-
-            return;
-        }
+        $this->validateData(data: $this->postData(), checkFields: ['grant_type', 'client_id', 'client_secret']);
 
         if ($this->postData()['grant_type'] === 'authorization_code' || $this->postData()['grant_type'] === 'refresh_token') {
-            $apis = $this->api->getApiInfo(false, true);
+            $apis = $this->api->init(true)->getApiInfo(false, true);
 
-            if (isset($apis['id'])) {
-                if ($this->postData()['client_id'] === $apis['client_id']) {
-                    $this->api->api = $apis;
-                }
-            } else {
-                foreach ($apis as $api) {
-                    if ($this->postData()['client_id'] === $api['client_id']) {
-                        $this->api->api = $api;
-                    }
+            foreach ($apis as $api) {
+                if ($this->postData()['client_id'] === $api['client_id']) {
+                    $this->api->api = $api;
                 }
             }
 
             if ($this->api->api) {
+                $this->api->init(true)->setupApiViaClientId(true);
+
                 if ($this->postData()['grant_type'] === 'refresh_token') {
                     $this->api->setupApi(true);
                 } else {
                     $this->api->setupApi();
                 }
+            } else {
+                $this->addResponse('Incorrect client ID provided or API does not exist!', 1, []);
+
+                return;
             }
+        } else {
+            $this->api->init(true)->setupApiViaClientId(true);
 
-            $this->api->registerClient();
-
-            $this->addResponse(
-                $this->api->packagesData->responseMessage,
-                $this->api->packagesData->responseCode,
-                $this->api->packagesData->responseData,
-            );
-
-            return true;
+            $this->api->setupApi();
         }
 
-        return $this->api->registerClient();
+        $this->api->registerClient();
+
+        $this->addResponse(
+            $this->api->packagesData->responseMessage,
+            $this->api->packagesData->responseCode,
+            $this->api->packagesData->responseData,
+        );
     }
 }

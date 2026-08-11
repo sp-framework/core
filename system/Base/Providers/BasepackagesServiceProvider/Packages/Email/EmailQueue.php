@@ -27,8 +27,6 @@ class EmailQueue extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        // $this->getAll($resetCache);
-
         return $this;
     }
 
@@ -74,7 +72,6 @@ class EmailQueue extends BasePackage
         }
     }
 
-
     public function updateQueue(array $data)
     {
         $email = $this->getById($data['id']);
@@ -111,6 +108,7 @@ class EmailQueue extends BasePackage
 
             return;
         }
+
         if ($this->queueLock === true && $processPriority === $this->priorityToProcess) {
             $this->addResponse('Another process is clearing the queue, please wait...', 1);
 

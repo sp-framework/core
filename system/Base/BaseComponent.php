@@ -7,6 +7,7 @@ use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\View;
 use System\Base\Exceptions\ControllerNotFoundException;
 use System\Base\Exceptions\IdNotFoundException;
+use System\Base\Providers\ErrorServiceProvider\Exceptions\DataValidationFailException;
 use System\Base\Providers\ErrorServiceProvider\Exceptions\IncorrectCSRFException;
 use System\Base\Providers\ErrorServiceProvider\Exceptions\IncorrectRequestTypeException;
 
@@ -871,7 +872,11 @@ abstract class BaseComponent extends Controller
 			$this->view->parent = strtolower($this->helper->last($parents));
 		}
 
-		$this->view->viewName = $this->views['name'];
+		if ($this->views) {
+			$this->view->viewName = $this->views['name'];
+		} else {
+			$this->view->viewName = 'Default';
+		}
 
 		$this->view->activeLayout = $this->modules->views->getActiveLayout();
 
@@ -926,7 +931,10 @@ abstract class BaseComponent extends Controller
 			$this->response->setHeader('token', $this->token);
 		}
 
-		if ($this->app && $this->view->componentName !== 'auth') {
+		if ($this->app &&
+			$this->view->componentName &&
+			($this->view->componentName !== 'auth' && $this->view->componentName !== 'register')
+		) {
 			if (!$this->app['menu_structure']) {
 				$menus =
 					$this->basepackages->menus->buildMenusForApp($this->app);
@@ -1110,7 +1118,10 @@ abstract class BaseComponent extends Controller
 			$this->componentRoute = 'Errors';
 		}
 
-		if ($this->app && isset($this->componentRoute)) {
+		if ($this->app &&
+			isset($this->componentRoute) &&
+			($this->componentRoute !== 'auth' && $this->componentRoute !== 'register')
+		) {
 			if ($this->componentRoute === '') {
 				$this->view->breadcrumb = 'home';
 			} else {
@@ -1664,5 +1675,118 @@ abstract class BaseComponent extends Controller
 				}
 			}
 		}
+	}
+
+	protected function logException($exception)
+	{
+		if ($this->config->logs->exceptions) {
+			$this->logger->logExceptions->critical(json_trace($exception));
+		}
+	}
+
+	/**
+	 * Validate data with provided or default parameter of PresenseOf to check if the data is not empty if the field is required as per metadata.
+	 *
+	 * @param array 	$data 					Array of data
+	 * @param array		$checkFields			Provide an array of fields that you want to check
+	 * @param array		$customMessages			Custom Messages can be provided for each field if the validation fails
+	 * @param array		$fieldsCustomCheck 		If provided, it will override the default PresenseOf check for the column.
+	 * 											For a single check set $fieldsCustomCheck[$checkField]['class'] & $fieldsCustomCheck[$checkField]['check']
+	 * 											For multiple checks set $fieldsCustomCheck[$checkField][0]['class'] & $fieldsCustomCheck[$checkField][0]['check'] & so on.
+	 * @param array		$callbacks				Like fieldsCustomCheck, but you can provide a callback for the fields. must have array keys callback and message set.
+	 * @param array		$replaceColumnNames		Provide an array field names to change in the response message.
+	 * 											Example app_id can be changed to "App" so the message will be Invalid App instead of Invalid app_id
+	 * @param array		$throwException			We can either throw exception or return a list of messages that we can process.
+	 * 											Exception is caught by Error ExceptionHandlers, which respond with JSON data with validation messages.
+	 * ```
+	 *  $data['email'] = null;
+	 *	$validated = $this->validateData(
+	 * 		data: $data,
+	 * 		fieldsCustomCheck:
+	 *			['email' =>
+	 *				[
+	 *					[
+	 *						'class' => \Phalcon\Filter\Validation\Validator\PresenceOf::class,
+	 *						'check' => [
+	 *							'message' => 'Enter Email!'
+	 *						]
+	 *					],
+	 *					[
+	 *						'class' => \Phalcon\Filter\Validation\Validator\Email::class,
+	 *						'check' => [
+	 *							'message' => 'Enter Correct Email!'
+	 *						]
+	 *					]
+	 *				]
+	 *			]
+	 *	);
+	 * ```
+	 */
+	public function validateData(
+		array $data, array $checkFields, $customMessages = [],
+		$fieldsCustomCheck = [], $ignoreFields = [], $nonZeroFields = [], $callbacks = [],
+		$replaceColumnNames = [], $throwException = true
+	) {
+		$this->validation->init();
+
+		foreach ($checkFields as $checkField) {
+			if (count($replaceColumnNames) === 0) {
+				$replaceColumnNames[$checkField] = $checkField;
+			} else {
+				if (!isset($replaceColumnNames[$checkField])) {
+					$replaceColumnNames[$checkField] = $checkField;
+				}
+			}
+
+			if (isset($fieldsCustomCheck[$checkField])) {
+				if (isset($fieldsCustomCheck[$checkField]['class']) && isset($fieldsCustomCheck[$checkField]['check'])) {
+					$this->validation->add($checkField, $fieldsCustomCheck[$checkField]['class'], $fieldsCustomCheck[$checkField]['check']);
+				} else if (isset($fieldsCustomCheck[$checkField][0])) {//Multiple Checks
+					foreach ($fieldsCustomCheck[$checkField] as $key => $checks) {
+						$this->validation->add($checkField, $checks['class'], $checks['check']);
+					}
+				}
+
+				continue;
+			}
+
+			$this->validation->add($checkField,
+								   \Phalcon\Filter\Validation\Validator\PresenceOf::class,
+								   [
+									   'message' => isset($customMessages[$checkField]) ? $customMessages[$checkField] : 'Enter valid ' . $replaceColumnNames[$checkField]
+								   ]
+			);
+
+			if (count($callbacks) > 0) {
+				if (isset($metadata['dataTypes'][$checkField]) &&
+					isset($callbacks[$checkField]['callback']) &&
+					is_callable($callbacks[$checkField]['callback']) &&
+					isset($callbacks[$checkField]['message'])
+				) {
+					$this->validation->add($checkField,
+										   \Phalcon\Filter\Validation\Validator\Callback::class,
+										   $callbacks[$checkField]
+					);
+				}
+			}
+		}
+
+		$validated = $this->validation->validate($data)->jsonSerialize();
+
+		if (count($validated) > 0) {
+			$messages = 'Error: ';
+
+			foreach ($validated as $key => $value) {
+				$messages .= $value['message'] . ' ';
+			}
+
+			if ($throwException) {
+				throw new DataValidationFailException(trim($messages));
+			}
+
+			return trim($messages);
+		}
+
+		return true;
 	}
 }

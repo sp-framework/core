@@ -43,6 +43,10 @@ class MiddlewaresServiceProvider extends Injectable
                     if ($this->checkRoute($middleware)) {
                         return true;
                     };
+                } else if ($middleware['name'] === 'IpFilter') {
+                    if ($this->checkRoute($middleware, true)) {
+                        return true;
+                    };
                 }
 
                 if ($middleware['enabled'] == true) {
@@ -55,10 +59,17 @@ class MiddlewaresServiceProvider extends Injectable
 
                         throw $e;
                     }
+
                     //If there is a redirect or null returned from process
                     if ($mw && $mw instanceof \Phalcon\Http\Response) {
                         if ($mw->getHeaders()->toArray()['Status'] === '302 Found') {
                             $notFound = true;
+
+                            //If we are requesting via API/Json, we send 404 instead of redirect
+                            if ($this->request->getBestAccept() === 'application/json') {
+                                $this->response->setStatusCode(404);
+                            }
+
                             break;
                         }
                     }
@@ -109,7 +120,7 @@ class MiddlewaresServiceProvider extends Injectable
         }
     }
 
-    protected function checkRoute($middleware)
+    protected function checkRoute($middleware, $ipFilter = false)
     {
         $this->data['domain'] = $this->domains->getDomain();
 
@@ -143,30 +154,41 @@ class MiddlewaresServiceProvider extends Injectable
             $this->data['givenRoute'] = $this->data['appRoute'] . '/home';
         }
 
-        if ($this->request->isGet()) {
-            $this->data['guestAccess'] =
-            [
-                $this->data['appRoute'] . '/auth',
-                $this->data['appRoute'] . '/register',
-            ];
-        } else if ($this->request->isPost()) {
-            $this->data['guestAccess'] =
-            [
-                $this->data['appRoute'] . '/auth/login',
-                $this->data['appRoute'] . '/auth/forgot',
-                $this->data['appRoute'] . '/auth/pwreset',
-                $this->data['appRoute'] . '/auth/checkpwstrength',
-                $this->data['appRoute'] . '/auth/generatepw',
-                $this->data['appRoute'] . '/auth/enabletwofaotp',
-                $this->data['appRoute'] . '/auth/verifytwofaotp',
-                $this->data['appRoute'] . '/auth/logout',
-                $this->data['appRoute'] . '/auth/sendverification',
-                $this->data['appRoute'] . '/auth/verify',
-                $this->data['appRoute'] . '/auth/sendtwofaemail',
-                $this->data['appRoute'] . '/register/registernewaccount',
-                $this->data['appRoute'] . '/register/apiaddnewclient',
-                $this->data['appRoute'] . '/register/apiclient',
-            ];
+        if ($ipFilter) {
+            if ($this->request->isGet()) {
+                $this->data['guestAccess'] = [];
+            } else if ($this->request->isPost()) {
+                $this->data['guestAccess'] =
+                [
+                    $this->data['appRoute'] . '/apps/checkip',
+                ];
+            }
+        } else {
+            if ($this->request->isGet()) {
+                $this->data['guestAccess'] =
+                [
+                    $this->data['appRoute'] . '/auth',
+                    $this->data['appRoute'] . '/register',
+                ];
+            } else if ($this->request->isPost()) {
+                $this->data['guestAccess'] =
+                [
+                    $this->data['appRoute'] . '/auth/login',
+                    $this->data['appRoute'] . '/auth/forgot',
+                    $this->data['appRoute'] . '/auth/pwreset',
+                    $this->data['appRoute'] . '/auth/checkpwstrength',
+                    $this->data['appRoute'] . '/auth/generatepw',
+                    $this->data['appRoute'] . '/auth/enabletwofaotp',
+                    $this->data['appRoute'] . '/auth/verifytwofaotp',
+                    $this->data['appRoute'] . '/auth/logout',
+                    $this->data['appRoute'] . '/auth/sendverification',
+                    $this->data['appRoute'] . '/auth/verify',
+                    $this->data['appRoute'] . '/auth/sendtwofaemail',
+                    $this->data['appRoute'] . '/register/registernewaccount',
+                    $this->data['appRoute'] . '/register/apiaddnewclient',
+                    $this->data['appRoute'] . '/register/apiclient',
+                ];
+            }
         }
 
         if (in_array($this->data['givenRoute'], $this->data['guestAccess'])) {

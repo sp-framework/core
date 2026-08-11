@@ -46,6 +46,18 @@ class ServicesComponent extends BaseComponent
                 } else if (isset($api['used_by']) && $api['used_by'] === '') {
                     $api['used_by'] = '-';
                 }
+
+                if (!$categoryProviderClass = $this->apiPackage->useApi([
+                        'config' =>
+                            [
+                                'category'     => $api['category'],
+                                'provider'     => $api['provider'],
+                                'checkOnly'    => true//Set this to check if the API exists and can be instantiated.
+                            ]
+                    ])
+                ) {
+                    throw new ControllerNotFoundException;
+                }
             } else {
                 $api = [];
                 $api['setup'] = 0;
@@ -61,7 +73,7 @@ class ServicesComponent extends BaseComponent
                     $api['provider'] = $this->getData()['provider'];
 
                     //Check if provider class exists
-                    if (!$this->apiPackage->useApi([
+                    if (!$categoryProviderClass = $this->apiPackage->useApi([
                             'config' =>
                                 [
                                     'category'     => $this->getData()['category'],
@@ -75,6 +87,20 @@ class ServicesComponent extends BaseComponent
 
                     $api['location'] = $this->apiPackage->apiLocation;
                 }
+            }
+
+            $this->view->availableAPIGrantTypes = [];
+            if (method_exists($categoryProviderClass, 'getAvailableAPIGrantTypes')) {
+                $this->view->availableAPIGrantTypes = $this->api->getAvailableAPIGrantTypes();
+            }
+
+            $this->view->canRegister = false;
+            if (method_exists($categoryProviderClass, 'registerOAuthClient')) {
+                $this->view->canRegister = true;
+            }
+            $this->view->canRefresh = false;
+            if (method_exists($categoryProviderClass, 'refreshOAuthClient')) {
+                $this->view->canRefresh = true;
             }
 
             $this->view->api = $api;
@@ -212,5 +238,37 @@ class ServicesComponent extends BaseComponent
             $this->apiPackage->packagesData->responseMessage,
             $this->apiPackage->packagesData->responseCode
         );
+    }
+
+    public function registerOAuthClientAction()
+    {
+        $this->requestIsPost();
+
+        $checkFields = ['id', 'grant_type', 'client_id', 'request_url'];
+
+        if (isset($this->postData()['grant_type']) && $this->postData()['grant_type'] === 'authorization_code') {
+            $checkFields = array_merge($checkFields, ['redirect_uri']);
+        }
+
+        $this->validateData($this->postData(), $checkFields);
+
+        $api = $this->apiPackage->useApi((int) $this->postData()['id']);
+
+        $api->registerOAuthClient($this->apiPackage->getApiById($this->postData()['id']));
+
+        $this->addResponse($api->packagesData->responseMessage, $api->packagesData->responseCode, $api->packagesData->responseData);
+    }
+
+    public function refreshOAuthClientAction()
+    {
+        $this->requestIsPost();
+
+        $this->validateData($this->postData(), ['id', 'grant_type', 'client_id', 'client_secret', 'refresh_token', 'force']);
+
+        $api = $this->apiPackage->useApi((int) $this->postData()['id']);
+
+        $api->refreshOAuthClient($this->apiPackage->getApiById($this->postData()['id']), $this->postData()['force']);
+
+        $this->addResponse($api->packagesData->responseMessage, $api->packagesData->responseCode, $api->packagesData->responseData);
     }
 }

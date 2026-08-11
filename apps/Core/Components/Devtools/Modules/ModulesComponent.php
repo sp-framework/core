@@ -956,6 +956,19 @@ class ModulesComponent extends BaseComponent
 		}
 	}
 
+	public function getLatestModuleVersionAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->getLatestModuleVersion($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode,
+			$this->modulesPackage->packagesData->responseData ?? []
+		);
+	}
+
 	public function checkVersionAction()
 	{
 		$this->requestIsPost();

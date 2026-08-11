@@ -492,8 +492,6 @@ class Accounts extends BasePackage
 
         if ($validation === true) {
             if ($this->addAccount($data)) {
-                $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
-
                 $this->packagesData->redirectUrl = $this->links->url('auth');
             }
 
@@ -1098,9 +1096,17 @@ class Accounts extends BasePackage
         if ($this->app) {
             $account = $this->checkAccountBy($username, $getSecurity);
 
-            if ($this->app['acceptable_usernames'] && $this->app['acceptable_usernames'] !== '') {
+            if (!$account &&
+                $this->app['acceptable_usernames'] && $this->app['acceptable_usernames'] !== ''
+            ) {
                 if (is_string($this->app['acceptable_usernames'])) {
                     $this->app['acceptable_usernames'] = $this->helper->decode($this->app['acceptable_usernames'], true);
+                }
+
+                if (count($this->app['acceptable_usernames']) === 0) {
+                    $this->logger->log->debug('App does not have any acceptable usernames set');
+
+                    return false;
                 }
 
                 foreach ($this->app['acceptable_usernames'] as $acceptableUsername) {
@@ -1405,6 +1411,8 @@ class Accounts extends BasePackage
                         } else {
                             $this->addResponse('Error removing', 1);
                         }
+                    } else {
+                        $agentStore->deleteById($agent['id'], false);
                     }
 
                     return;
@@ -1496,6 +1504,8 @@ class Accounts extends BasePackage
                                 if (!$sessionStore->deleteById($session['id'])) {
                                     $removed = false;
                                 }
+                            } else {
+                                $agentStore->deleteById($agent['id'], false);
                             }
                         }
                     }
@@ -1534,10 +1544,12 @@ class Accounts extends BasePackage
 
                 foreach ($componentsArr as $key => $component) {
                     $reflector = $this->annotations->get($component['class']);
+
                     $methods = $reflector->getMethodsAnnotations();
 
-                    if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                    if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                         $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
+
                         $components[strtolower($app['id'])]['childs'][$key]['title'] = strtoupper($component['name']);
                     }
                 }
@@ -1572,6 +1584,7 @@ class Accounts extends BasePackage
 
                 if ($account['security']['permissions'] && $account['security']['permissions'] !== '') {
                     $permissionsArr = $account['security']['permissions'];
+
                     if (is_string($permissionsArr)) {
                         $permissionsArr = $this->helper->decode($permissionsArr, true);
                     }
@@ -1587,18 +1600,22 @@ class Accounts extends BasePackage
                     foreach ($componentsArr as $key => $component) {
                         if ($component['class'] && $component['class'] !== '') {
                             $reflector = $this->annotations->get($component['class']);
+
                             $methods = $reflector->getMethodsAnnotations();
 
-                            if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                            if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                                 foreach ($methods as $annotation) {
                                     if ($annotation->getAll('acl')) {
                                         $action = $annotation->getAll('acl')[0]->getArguments();
+
                                         if (isset($account['security']['role_id']) && $account['security']['role_id'] != 1 &&
                                             ($action['name'] === 'msview' || $action['name'] === 'msupdate')
                                         ) {
                                             continue;
                                         }
+
                                         $acls[$action['name']] = $action['name'];
+
                                         if (isset($permissionsArr[$app['id']][$component['id']])) {
                                             $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
                                         } else {
@@ -1614,6 +1631,7 @@ class Accounts extends BasePackage
                 $this->packagesData->acls = $this->helper->encode($acls);
 
                 $account['security']['permissions'] = $this->helper->encode($permissions);
+
                 $account['profile'] = $this->basepackages->profiles->getProfile($account['id']);
 
                 $this->packagesData->account = $account;
@@ -1636,13 +1654,16 @@ class Accounts extends BasePackage
                     //Build ACL Columns
                     if ($component['class'] && $component['class'] !== '') {
                         $reflector = $this->annotations->get($component['class']);
+
                         $methods = $reflector->getMethodsAnnotations();
 
-                        if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
+                        if ($methods && count($methods) > 0 && isset($methods['viewAction'])) {
                             foreach ($methods as $annotation) {
                                 if ($annotation->getAll('acl')) {
                                     $action = $annotation->getAll('acl')[0]->getArguments();
+
                                     $acls[$action['name']] = $action['name'];
+
                                     $permissions[$app['id']][$component['id']][$action['name']] = 0;
                                 }
                             }
@@ -1652,7 +1673,9 @@ class Accounts extends BasePackage
             }
 
             $this->packagesData->acls = $this->helper->encode($acls);
+
             $account['security']['permissions'] = $this->helper->encode($permissions);
+
             $this->packagesData->account = $account;
         }
 
@@ -1661,5 +1684,34 @@ class Accounts extends BasePackage
         $this->packagesData->roles = $roles;
 
         return true;
+    }
+
+    public function searchAccounts(string $accountQueryString)
+    {
+        if ($this->config->databasetype === 'db') {
+            $searchAccounts = $this->getByParams(
+                [
+                    'conditions'    => 'email LIKE :cEmail:',
+                    'bind'          => [
+                        'cEmail'     => '%' . $accountQueryString . '%'
+                    ]
+                ]
+            );
+        } else {
+            $searchAccounts = $this->getByParams(['conditions' => ['email', 'LIKE', '%' . $accountQueryString . '%']]);
+        }
+
+        $accounts = [];
+
+        if ($searchAccounts) {
+            foreach ($searchAccounts as $accountKey => $accountValue) {
+                $accounts[$accountKey]['id'] = $accountValue['id'];
+                $accounts[$accountKey]['email'] = $accountValue['email'];
+            }
+        }
+
+        $this->addResponse('Ok', 0, ['accounts' => $accounts]);
+
+        return $accounts;
     }
 }

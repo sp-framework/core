@@ -289,7 +289,7 @@ class TwoFa extends BasePackage
         }
 
         if ($data && !$this->access->auth->checkAccount($data)) {
-            $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
+            $this->access->ipFilter->filters->bumpFilterHitCounter(true);
 
             return false;
         }
@@ -380,7 +380,7 @@ class TwoFa extends BasePackage
         }
 
         if (isset($data['user']) && isset($data['pass']) && !$this->access->auth->checkAccount($data)) {
-            $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
+            $this->access->ipFilter->filters->bumpFilterHitCounter(true);
 
             return false;
         }

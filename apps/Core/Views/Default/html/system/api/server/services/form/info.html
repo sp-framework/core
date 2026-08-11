@@ -1,5 +1,7 @@
 {% set authoCodeGrantHidden = 'hidden' %}
+{% set authoCodeUserHidden = 'hidden' %}
 {% set clientCredentialsGrantHidden = 'hidden' %}
+{% set allowHidden = 'hidden' %}
 {% set reGenerateHidden = true %}
 {% set generateHidden = false %}
 {% set apiRefreshTokenTimeoutDisabled = false %}
@@ -7,7 +9,7 @@
     {% set apiId = api['id'] %}
     {% set apiName = api['name'] %}
     {% set apiStatus = api['status'] %}
-    {% set apiIsPublic = api['is_public'] %}
+    {% set apiType = api['api_type'] %}
     {% set apiClientKeysGenerationAllowed = api['client_keys_generation_allowed'] %}
     {% set apiRegistrationAllowed = api['registration_allowed'] %}
     {% set apiDescription = api['description'] %}
@@ -16,6 +18,8 @@
     {% set apiGrantType = api['grant_type'] %}
     {% set apiCCMaxDevices = api['cc_max_devices'] %}
     {% set apiAuthorizationTosPp = api['authorization_tos_pp'] %}
+    {% set apiAccountId = api['account_id'] %}
+    {% set apiAccountEmail = api['account_email'] %}
     {% set apiClientId = api['client_id'] %}
     {% set apiClientSecret = api['client_secret'] %}
     {% set apiRedirectUrl = api['redirect_url'] %}
@@ -30,11 +34,20 @@
     {% set apiPerMinuteCallsLimit = api['per_minute_calls_limit'] %}
     {% set apiPerHourCallsLimit = api['per_hour_calls_limit'] %}
     {% set apiPerDayCallsLimit = api['per_day_calls_limit'] %}
+    {% set openapiTitle = api['openapi_name'] %}
+    {% set openapiDescription = api['openapi_description'] %}
+    {% set openapiEmail = api['openapi_email'] %}
+    {% set openapiLicenseName = api['openapi_license_name'] %}
+    {% set openapiLicenseUrl = api['openapi_license_url'] %}
+    {% set openapiServerSandboxUrl = api['openapi_server_sandbox_url'] %}
+    {% set openapiServerSandboxDescription = api['openapi_server_sandbox_description'] %}
+    {% set openapiServerProductionUrl = api['openapi_server_production_url'] %}
+    {% set openapiServerProductionDescription = api['openapi_server_production_description'] %}
 {% else %}
     {% set apiId = '' %}
     {% set apiName = '' %}
     {% set apiStatus = '' %}
-    {% set apiIsPublic = '' %}
+    {% set apiType = '' %}
     {% set apiClientKeysGenerationAllowed = '' %}
     {% set apiRegistrationAllowed = '' %}
     {% set apiDescription = '' %}
@@ -44,6 +57,8 @@
     {% set apiCCMaxDevices = '' %}
     {% set apiAuthorizationTosPp = '' %}
     {% set apiClientId = '' %}
+    {% set apiAccountId = '' %}
+    {% set apiAccountEmail = '' %}
     {% set apiClientSecret = '' %}
     {% set apiRedirectUrl = '' %}
     {% set apiRequestUrl = '' %}
@@ -57,9 +72,17 @@
     {% set apiPerMinuteCallsLimit = '' %}
     {% set apiPerHourCallsLimit = '' %}
     {% set apiPerDayCallsLimit = '' %}
+    {% set openapiTitle = '' %}
+    {% set openapiDescription = '' %}
+    {% set openapiEmail = '' %}
+    {% set openapiLicenseName = '' %}
+    {% set openapiLicenseUrl = '' %}
+    {% set openapiServerSandboxUrl = '' %}
+    {% set openapiServerSandboxDescription = '' %}
+    {% set openapiServerProductionUrl = '' %}
+    {% set openapiServerProductionDescription = '' %}
 {% endif %}
 {% set apiStatusChecked = false %}
-{% set apiIsPublicChecked = false %}
 {% set apiRegistrationAllowedChecked = false %}
 {% set apiClientKeysGenerationAllowedChecked = false %}
 {% set apiRegistrationAllowedDisabled = false %}
@@ -81,8 +104,7 @@
 {% if apiRegistrationAllowed == '1' %}
     {% set apiRegistrationAllowedChecked = true %}
 {% endif %}
-{% if apiIsPublic == '1' %}
-    {% set apiIsPublicChecked = true %}
+{% if apiType == 'public' or apiType == 'protected_user_credentials' %}
     {% set apiClientKeysGenerationAllowedChecked = false %}
     {% set apiClientKeysGenerationAllowedDisabled = true %}
     {% set apiRegistrationAllowedChecked = false %}
@@ -97,14 +119,22 @@
     {% set apiPkiAlgorithmDisabled = true %}
     {% set apiEncryptionKeySizeDisabled = true %}
 {% endif %}
-{% if apiGrantType === 'client_credentials' %}
+{% if apiGrantType == 'client_credentials' or apiGrantType == 'password' %}
     {% set apiRefreshTokenTimeoutDisabled = true %}
-    {% set clientCredentialsGrantHidden = '' %}
+    {% set allowHidden = '' %}
+    {% if apiGrantType == 'client_credentials' %}
+        {% set clientCredentialsGrantHidden = '' %}
+    {% endif %}
 {% endif %}
-{% if apiGrantType === 'authorization_code' %}
+{% if apiGrantType == 'authorization_code' %}
     {% set authoCodeGrantHidden = '' %}
+    {% set authoCodeUserHidden = '' %}
     {% set reGenerateHidden = false %}
     {% set generateHidden = true %}
+    {% set apiClientKeysGenerationAllowedChecked = false %}
+    {% set apiClientKeysGenerationAllowedDisabled = true %}
+    {% set apiRegistrationAllowedChecked = false %}
+    {% set apiRegistrationAllowedDisabled = true %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -156,68 +186,25 @@
     <div class="col">
         {{adminltetags.useTag('fields',
             [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'is_public',
-                'fieldLabel'                     : 'Is Public API?',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Check if api is public api.',
-                'fieldType'                      : 'checkbox',
-                'fieldCheckboxType'              : 'success',
-                'fieldCheckboxChecked'           : apiIsPublicChecked,
-                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'client_keys_generation_allowed',
-                'fieldLabel'                     : 'Allow Client Keys Generation?',
-                'fieldType'                      : 'checkbox',
-                'fieldHelp'                      : true,
-                'fieldDisabled'                  : apiClientKeysGenerationAllowedDisabled,
-                'fieldHelpTooltipContent'        : 'Allow users to register for API on this App.',
-                'fieldCheckboxType'              : 'success',
-                'fieldCheckboxChecked'           : apiClientKeysGenerationAllowedChecked,
-                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'registration_allowed',
-                'fieldLabel'                     : 'Allow API Registration?',
-                'fieldType'                      : 'checkbox',
-                'fieldHelp'                      : true,
-                'fieldDisabled'                  : apiRegistrationAllowedDisabled,
-                'fieldHelpTooltipContent'        : 'Allow users to register for API on this App.',
-                'fieldCheckboxType'              : 'success',
-                'fieldCheckboxChecked'           : apiRegistrationAllowed,
-                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'api_type',
+                'fieldLabel'                            : 'API Type',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select API type.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : availableAPITypes,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : apiType
             ]
         )}}
     </div>

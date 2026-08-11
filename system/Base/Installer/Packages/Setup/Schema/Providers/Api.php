@@ -29,9 +29,10 @@ class Api
                     ]
                 ),
                 new Column(
-                    'is_public',
+                    'api_type',
                     [
-                        'type'          => Column::TYPE_BOOLEAN,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
                         'notNull'       => true,
                     ]
                 ),
@@ -58,6 +59,14 @@ class Api
                     ]
                 ),
                 new Column(
+                    'description',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
                     'app_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
@@ -76,14 +85,6 @@ class Api
                     [
                         'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true,
-                    ]
-                ),
-                new Column(
-                    'description',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 2048,
-                        'notNull'       => false,
                     ]
                 ),
                 new Column(
@@ -124,14 +125,6 @@ class Api
                     ]
                 ),
                 new Column(
-                    'csrf',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false
-                    ]
-                ),
-                new Column(
                     'authorization_tos_pp',
                     [
                         'type'          => Column::TYPE_TEXT,
@@ -142,7 +135,7 @@ class Api
                     'state',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 512,
+                        'size'          => 100,
                         'notNull'       => false
                     ]
                 ),
@@ -242,11 +235,84 @@ class Api
                         'notNull'       => false,
                     ]
                 ),
+                new Column(
+                    'openapi_name',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_description',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_email',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_license_name',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_license_url',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_server_sandbox_url',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_server_sandbox_description',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_server_production_url',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'openapi_server_production_description',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
+                    ]
+                ),
              ],
             'indexes' => [
                 new Index(
                     'column_UNIQUE',
                     [
+                        'api_type',
                         'app_id',
                         'domain_id',
                         'grant_type',

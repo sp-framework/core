@@ -1,24 +1,30 @@
 {
-    "name"          : "ReposGithub",
-    "display_name"  : "Github repositories API",
-    "description"   : "Package for connecting to Repository Github using API",
-    "module_type"   : "packages",
-    "app_type"      : "core",
-    "category"      : "basepackagesApis",
-    "version"       : "0.0.0",
-    "repo"          : "https://.../",
-    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\Repos\\Github\\ApisReposGithub",
-    "dependencies"  : {
-        "core"          : {
-            "name"      : "Core",
-            "version"   : "0.0.0",
-            "repo"      : "https://.../"
-        },
-        "components"    : [],
-        "packages"      : [],
-        "middlewares"   : [],
-        "views"         : [],
-        "external"      : []
-    },
-    "settings"      : {"componentRoute":"system/api/clients/services"}
+	"name" : "ReposGithub",
+	"display_name" : "Github repositories API",
+	"description" : "Package for connecting to Repository Github using API",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "basepackagesApis",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\Repos\\Github\\ReposGithub",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : [],
+		"externals" : []
+	},
+	"settings" : 
+	{
+		"componentRoute" : "system/api/clients/services"
+	}
 }

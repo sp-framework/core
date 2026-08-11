@@ -14,7 +14,7 @@
 		{
 			"require" : 
 			{
-				"composer/composer" : "^2.7",
+				"composer/composer" : "^2.10@dev",
 				"cweagans/composer-patches" : "^1.7",
 				"league/flysystem" : "^3.24",
 				"phpmailer/phpmailer" : "^6.9",
@@ -48,7 +48,7 @@
 				"spatie/flysystem-dropbox" : "^3.0",
 				"bjeavons/zxcvbn-php" : "^1.3",
 				"bluelibraries/dns" : "^1.1",
-				"league/oauth2-server" : "^8.5",
+				"league/oauth2-server" : "^9",
 				"league/oauth2-github" : "^3.1",
 				"league/oauth2-client" : "^2.7",
 				"z4kn4fein/php-semver" : "^3.0",
@@ -60,7 +60,11 @@
 				"mattiasgeniar/php-percentages" : "^1.3",
 				"spatie/server-side-rendering" : "^0.3.2",
 				"xobotyi/rsync" : "^1.0",
-				"mistic100/randomcolor" : "^1.1"
+				"mistic100/randomcolor" : "^1.1",
+				"ip2location/ip2location-php" : "^9.7",
+				"ip2location/ip2location-io-php" : "^1.0",
+				"ip2location/ip2proxy-php" : "^4.1",
+				"zircote/swagger-php" : "^6.4"
 			},
 			"config" : 
 			{

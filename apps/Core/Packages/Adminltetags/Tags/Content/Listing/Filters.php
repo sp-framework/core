@@ -208,49 +208,47 @@ class Filters extends Adminltetags
             }
 
             $this->content .=
-                '<div class="col" id="listing-filters-quick">
-                    <form autocomplete="off">' .
-                        $this->useTag(
-                            'fields',
-                            [
-                                'componentId'                                   => $this->params['componentId'],
-                                'sectionId'                                     => $this->params['sectionId'] . '-filter',
-                                'fieldId'                                       => 'quick',
-                                'fieldLabel'                                    => false,
-                                'fieldType'                                     => 'input',
-                                'fieldInputType'                                => 'text',
-                                'fieldAdditionalClass'                          => 'mb-1',
-                                'fieldPlaceholder'                              => 'Quick Search...',
-                                'fieldDisabled'                                 => true,
-                                'fieldGroupPreAddonDropdown'                    => true,
-                                'fieldGroupPreAddonDropdownButtonTitle'         => 'SELECT FIELD',
-                                'fieldGroupPreAddonDropdownButtonListTitle'     => $fieldGroupPreAddonDropdownButtonListTitle,
-                                'fieldHelp'                                     => false,
-                                'fieldGroupPostAddonButtons'                    =>
-                                    [
-                                        'search'        => [
-                                            'title'                   => false,
-                                            'type'                    => 'primary',
-                                            'icon'                    => 'search',
-                                            'noMargin'                => true,
-                                            'disabled'                => true,
-                                            'buttonAdditionalClass'   => 'rounded-0 text-white',
-                                            'position'                => 'right'
-                                        ],
-                                        'clear'        => [
-                                            'title'                   => false,
-                                            'type'                    => 'secondary',
-                                            'icon'                    => 'times',
-                                            'noMargin'                => true,
-                                            'disabled'                => true,
-                                            'buttonAdditionalClass'   => 'rounded-0 text-white',
-                                            'position'                => 'right'
-                                        ]
+                '<div class="col" id="listing-filters-quick">' .
+                    $this->useTag(
+                        'fields',
+                        [
+                            'componentId'                                   => $this->params['componentId'],
+                            'sectionId'                                     => $this->params['sectionId'] . '-filter',
+                            'fieldId'                                       => 'quick',
+                            'fieldLabel'                                    => false,
+                            'fieldType'                                     => 'input',
+                            'fieldInputType'                                => 'text',
+                            'fieldAdditionalClass'                          => 'mb-1',
+                            'fieldPlaceholder'                              => 'Quick Search...',
+                            'fieldDisabled'                                 => true,
+                            'fieldGroupPreAddonDropdown'                    => true,
+                            'fieldGroupPreAddonDropdownButtonTitle'         => 'SELECT FIELD',
+                            'fieldGroupPreAddonDropdownButtonListTitle'     => $fieldGroupPreAddonDropdownButtonListTitle,
+                            'fieldHelp'                                     => false,
+                            'fieldGroupPostAddonButtons'                    =>
+                                [
+                                    'search'        => [
+                                        'title'                   => false,
+                                        'type'                    => 'primary',
+                                        'icon'                    => 'search',
+                                        'noMargin'                => true,
+                                        'disabled'                => true,
+                                        'buttonAdditionalClass'   => 'rounded-0 text-white',
+                                        'position'                => 'right'
+                                    ],
+                                    'clear'        => [
+                                        'title'                   => false,
+                                        'type'                    => 'secondary',
+                                        'icon'                    => 'times',
+                                        'noMargin'                => true,
+                                        'disabled'                => true,
+                                        'buttonAdditionalClass'   => 'rounded-0 text-white',
+                                        'position'                => 'right'
                                     ]
-                            ]
-                        ) .
-                    '</form>
-                </div>';
+                                ]
+                        ]
+                    ) .
+                '</div>';
         }
 
         $this->content .= $this->getFilterModalContent();

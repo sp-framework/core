@@ -37,6 +37,28 @@ class Clients extends BasePackage
                 return;
             }
 
+            $account = $this->basepackages->accounts->checkAccountBy($data['email'], false);
+
+            //if account does not exist, we use IpFilter middleware to block them
+            if (!$account && $viaRegister) {
+                $isAllowed = $this->access->ipFilter->filters->bumpFilterHitCounter(true);
+
+                if (is_object($isAllowed))  {
+                    $this->response->send();
+
+                    exit;
+                }
+
+                //Fake message that keys are generated.
+                $this->addResponse('Keys generated & emailed successfully.', 0);
+
+                return true;
+            } else if (!$account) {
+                $this->addResponse('Account with email id does not exist.', 1);
+
+                return false;
+            }
+
             if ($api['grant_type'] === 'password' && !$viaRegister) {
                 $account = $this->basepackages->accounts->checkAccountBy($data['email']);
 
@@ -46,7 +68,7 @@ class Clients extends BasePackage
                     return;
                 }
 
-                $oldClient = $this->checkClientExists($api, $account);
+                $oldClient = $this->checkClientExists($api, $account, $data);
 
                 if ($oldClient && isset($oldClient[0]['id'])){
                     if (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true) {
@@ -76,7 +98,7 @@ class Clients extends BasePackage
                     $account['id'] = 0;
                 }
 
-                if (isset($data['device_id']) && (bool) $data['device_id'] === true) {
+                if (isset($data['device']) && (bool) $data['device'] == true) {
                     //Check the amount of client allowed
                     $clientsCount = $this->checkCCAccountDeviceCount($api, $account);
 
@@ -93,9 +115,10 @@ class Clients extends BasePackage
                             return false;
                         }
                     }
-                    $account['device_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
+
+                    $data['device_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
                 } else {
-                    $oldClient = $this->checkClientExists($api, $account);
+                    $oldClient = $this->checkClientExists($api, $account, $data);
 
                     if ($oldClient && isset($oldClient[0]['id'])){
                         if (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true) {
@@ -121,9 +144,7 @@ class Clients extends BasePackage
                 }
             }
 
-            $this->generateClientKeys($data, $account);
-
-            return true;
+            return $this->generateClientKeys($data, $account, null, true, $viaRegister);
         }
 
         $this->resetCallsCount([], $data);
@@ -148,9 +169,6 @@ class Clients extends BasePackage
         }
     }
 
-    /**
-     *
-     */
     protected function removeClient(array $data)
     {
         //
@@ -171,7 +189,7 @@ class Clients extends BasePackage
         if ($client) {
             $api = $this->api->getById($client['api_id']);
 
-            if ($api['is_public'] == true) {
+            if ($api['api_type'] === 'public') {
                 $this->addResponse('Cannot revoke or generate key for public client.', 1);
 
                 return false;
@@ -180,16 +198,26 @@ class Clients extends BasePackage
             if (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true) {
                 $account = $this->basepackages->accounts->getById($client['account_id']);
 
-                if ($client['device_id']) {
-                    $account['device_id'] = $client['device_id'];
-                }
                 $data['api_id'] = $client['api_id'];
+                $data['client_id'] = $client['client_id'];
+                $data['device_id'] = $client['device_id'];
 
-                $this->generateClientKeys($data, $account);
+                if ($this->generateClientKeys($data, $account)) {
+                    $client['revoked'] = $client['regen'] = '1';
+                    $client['revoked_by'] = $client['regen_by'] = 0;
+                    if ($this->access->auth->check()) {
+                        $client['revoked_by'] = $client['regen_by'] = $this->access->auth->account()['id'];
+                    }
+                    $client['revoked_at'] = $client['regen_at'] = (\Carbon\Carbon::now())->timestamp;
 
-                $this->addResponse('Revoked & Regenerated client');
+                    $this->update($client);
 
-                return true;
+                    $this->addResponse('Revoked & Regenerated client');
+
+                    return true;
+                }
+
+                return false;
             } else if (isset($data['forceRevoke']) && $data['forceRevoke'] == 'true') {
                 if ($client['revoked'] == '1') {
                     $this->addResponse('Client already revoked!', 1);
@@ -198,6 +226,11 @@ class Clients extends BasePackage
                 }
 
                 $client['revoked'] = '1';
+                $client['revoked_by'] = 0;
+                if ($this->access->auth->check()) {
+                    $client['revoked_by'] = $this->access->auth->account()['id'];
+                }
+                $client['revoked_at'] = (\Carbon\Carbon::now())->timestamp;
 
                 $this->updateClient($client);
 
@@ -216,64 +249,103 @@ class Clients extends BasePackage
         return false;
     }
 
-    public function generateClientKeys($data, $account = null, $newClient = null, $emailNewClientDetails = true)
+    public function generateClientKeys($data, $account = null, $newClient = null, $emailNewClientDetails = true, $viaRegister = false, $viaApi = false)
     {
         $api = $this->api->getById($data['api_id']);
 
         if ($api) {
-            if (isset($data['forceRevoke']) || isset($data['forceRegen'])) {
-                $oldClient = $this->checkClientExists($api, $account);
+            if (!$account) {
+                $account = $this->access->auth->account();
+            }
 
-                if ($oldClient && isset($oldClient[0]['id']) && isset($data['forceRegen']) && (bool) $data['forceRegen'] === true) {
+            if ((isset($data['forceRevoke']) && (bool) $data['forceRevoke'] === true) ||
+                (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true)
+            ) {
+                $oldClient = $this->checkClientExists($api, $account, $data);
+
+                if ($oldClient && isset($oldClient[0]['id'])) {
                     $data['id'] = $oldClient[0]['id'];
+
                     if (isset($data['forceRegen'])) {
                         unset($data['forceRegen']);//We unset to avoid loop
                     }
+
                     $data['forceRevoke'] = true;//We set to avoid loop
+
                     if (!$this->forceRevoke($data, $oldClient[0])) {
                         $this->addResponse('Error revoking old keys. Please contact administrator.', 1);
 
                         return false;
                     }
-                }
-            }
 
-            $apiName = $api['id'] . '_' . $api['app_id'] . '_' . $api['domain_id'] . '_' . ($account['id'] ?? $this->access->auth->account()['id']);
-            if ($account || $api['client_keys_generation_allowed'] == true) {
-                $newClient['api_id'] = $api['id'];
-                $newClient['app_id'] = $api['app_id'];
-                $newClient['domain_id'] = $api['domain_id'];
-                $newClient['account_id'] = $account['id'] ?? $this->access->auth->account()['id'];
-                $newClient['email'] = $account['email'] ?? $this->access->auth->account()['email'];
-                $newClient['name'] = $apiName;
-                $newClient['client_id'] = $data['client_id'] ?? $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
-                $client_secret = $data['client_secret'] ?? $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
-                $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
-                $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
-                $newClient['revoked'] = '0';
-                $newClient['redirectUri'] = $data['redirect_url'] ?? 'https://';
-                $newClient['device_id'] = null;
-                if (isset($account['device_id'])) {
-                    $newClient['device_id'] = $account['device_id'];
-                }
-                if (isset($api['redirect_uri'])) {
-                    $newClient['redirectUri'] = $api['redirect_uri'];
+                    if (!$viaRegister && !$viaApi) {
+                        if (isset($data['client_id'])) {
+                            unset($data['client_id']);
+                        }
+                        if (isset($data['client_secret'])) {
+                            unset($data['client_secret']);
+                        }
+                    }
                 }
             }
 
             try {
+                if (isset($account['id']) &&
+                    isset($account['email']) &&
+                    ($api['client_keys_generation_allowed'] == true ||
+                     $viaApi ||
+                     ((isset($data['forceRevoke']) && (bool) $data['forceRevoke'] === true) ||
+                      (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true)
+                     )
+                    )
+                ) {
+                    $newClient['api_id'] = $api['id'];
+                    $newClient['app_id'] = $api['app_id'];
+                    $newClient['domain_id'] = $api['domain_id'];
+                    $newClient['account_id'] = $account['id'];
+                    $newClient['email'] = $account['email'];
+                    $newClient['name'] = $api['id'] . '_' . $api['app_id'] . '_' . $api['domain_id'] . '_' . $account['id'];
+                    $newClient['client_id'] = $data['client_id'] ?? $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
+                    $client_secret = $data['client_secret'] ?? $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
+                    $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
+                    $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+                    $newClient['revoked'] = '0';
+                    $newClient['device_id'] = null;
+                    if (isset($data['device_id'])) {
+                        $newClient['device_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
+                    }
+                    if (isset($data['redirect_url'])) {
+                        $newClient['redirectUri'] = $data['redirect_url'];
+                    } else if (isset($api['redirect_uri'])) {
+                        $newClient['redirectUri'] = $api['redirect_uri'];
+                    } else {
+                        $newClient['redirectUri'] = 'https://';
+                    }
+                }
+
                 if (isset($newClient) && $this->addClient($newClient)) {
-                    $this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
+                    $responseMessage = 'Keys generated successfully';
+                    $responseData = [];
 
                     if ($emailNewClientDetails) {
-                        $this->emailNewClientDetails($api, $newClient, $client_secret);
+                        $responseMessage = 'Keys generated & emailed successfully.';
+
+                        $this->emailNewClientDetails($api, $newClient, $client_secret, $data);
                     }
+
+                    if (!$viaRegister) {
+                        $responseData = ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret];
+                    }
+
+                    $this->addResponse($responseMessage, 0, $responseData);
 
                     return $newClient;
                 } else {
                     $this->addResponse('Error API does not allow client keys generation. Please contact administrator.', 1);
                 }
             } catch (\Exception $e) {
+                $this->logException($e);
+
                 $this->addResponse('Error generating/updating keys. Please contact administrator.', 1);
             }
 
@@ -285,33 +357,57 @@ class Clients extends BasePackage
         return false;
     }
 
-    protected function checkClientExists($api, $account)
+    protected function checkClientExists($api, $account, $data)
     {
         if ($this->config->databasetype === 'db') {
-            return $this->getByParams(
-                [
-                    'conditions'    => 'email = :email: AND revoked = :revoked: AND device = :device: AND api_id = :api_id:',
-                    'bind'          =>
-                        [
-                            'email'         => ($account['email'] ?? $this->access->auth->account()['email']),
-                            'revoked'       => '0',
-                            'device_id'     => ($account['device_id'] ?? null),
-                            'api_id'        => $api['id']
-                        ]
-                ]
-            );
+            if ($api['grant_type'] === 'authorization_code') {
+                $conditions['conditions'] = 'email = :email: AND revoked = :revoked: AND api_id = :api_id:';
+                $conditions['bind'] =
+                    [
+                        'email'         => $account['email'],
+                        'revoked'       => '0',
+                        'api_id'        => $api['id']
+                    ];
+            } else {
+                $conditions['conditions'] = 'email = :email: AND revoked = :revoked: AND client_id = :client_id: AND api_id = :api_id:';
+                $conditions['bind'] =
+                    [
+                        'email'         => $account['email'],
+                        'revoked'       => '0',
+                        'client_id'     => $data['client_id'],
+                        'api_id'        => $api['id']
+                    ];
+
+                if (isset($data['device_id'])) {
+                    $conditions['conditions'] = 'email = :email: AND revoked = :revoked: AND client_id = :client_id: AND device_id = :device_id: AND api_id = :api_id:';
+                    $conditions['bind']['device_id'] = $data['device_id'];
+                }
+            }
+
+            return $this->getByParams($conditions);
         } else {
-            return $this->getByParams(
-                [
-                    'conditions' =>
-                        [
-                            ['email', '=', ($account['email'] ?? $this->access->auth->account()['email'])],
-                            ['revoked', '=', false],
-                            ['device_id', '=', ($account['device_id'] ?? null)],
-                            ['api_id', '=', $api['id']]
-                        ]
-                ]
-            );
+            if ($api['grant_type'] === 'authorization_code') {
+                $conditions['conditions'] =
+                    [
+                        ['email', '=', $account['email']],
+                        ['revoked', '=', false],
+                        ['api_id', '=', $api['id']]
+                    ];
+            } else {
+                $conditions['conditions'] =
+                    [
+                        ['email', '=', $account['email']],
+                        ['revoked', '=', false],
+                        ['client_id', '=', $data['client_id']],
+                        ['api_id', '=', $api['id']]
+                    ];
+
+                if (isset($data['device_id'])) {
+                    array_push($conditions['conditions'], ['device_id', '=', $data['device_id']]);
+                }
+            }
+
+            return $this->getByParams($conditions);
         }
 
         return false;
@@ -377,8 +473,13 @@ class Clients extends BasePackage
         return $responseArr;
     }
 
-    protected function emailNewClientDetails($api, $newClient, $clientSecret)
+    protected function emailNewClientDetails($api, $newClient, $clientSecret, $data)
     {
+        //If Email is not configured, we cannot send code.
+        if (!$this->basepackages->email->setup()) {
+            return true;
+        }
+
         $domain = $this->domains->getById($api['domain_id']);
 
         $emailData['app_id'] = $api['app_id'];
@@ -392,7 +493,22 @@ class Clients extends BasePackage
         if ($newClient['device_id']) {
             $emailData['body'] = 'Device ID: ' . $newClient['device_id'] . '<br>';
         }
-        $emailData['body'] = $emailData['body'] . 'Client ID: ' . $newClient['client_id'] . '<br>' . 'Client Secret: ' . $clientSecret;
+
+        $emailData['body'] .=
+            'Client ID: ' . $newClient['client_id'] . '<br>' .
+            'Client Secret: ' . $clientSecret . '<br>';
+
+        if (isset($data['request_url']) && isset($data['redirect_url'])) {
+            $emailData['body'] .=
+                'API Request URL: ' . $data['request_url'] . '<br>' .
+                'Redirect URI: ' . $data['redirect_url'] . '<br>' .
+                'Web based Registration URL: <a href="' . $data['request_url'] . '">Generate New Token</a>';
+        } else {
+            $emailData['body'] .=
+                'API Request URL: ' . $this->links->url('register/apiClient') . '<br>' .
+                'Web based Registration URL: <a href="' . $this->links->url('register/q/client_id/' . $newClient['client_id'] . '/new/true') . '">Generate New Token</a>';
+
+        }
 
         return $this->basepackages->emailqueue->addQueue($emailData);
     }
@@ -437,25 +553,25 @@ class Clients extends BasePackage
     {
         if (in_array('per_minute_calls_count', $types)) {
             if ($client['per_minute_calls_count'] < (int) $api['per_minute_calls_limit']) {
-                $client['per_minute_calls_count'] = $client['per_minute_calls_count'] + 1;
+                $client['per_minute_calls_count']++;
             }
         }
 
         if (in_array('per_hour_calls_count', $types)) {
             if ($client['per_hour_calls_count'] < (int) $api['per_hour_calls_limit']) {
-                $client['per_hour_calls_count'] = $client['per_hour_calls_count'] + 1;
+                $client['per_hour_calls_count']++;
             }
         }
 
         if (in_array('per_day_calls_count', $types)) {
             if ($client['per_day_calls_count'] < (int) $api['per_day_calls_limit']) {
-                $client['per_day_calls_count'] = $client['per_day_calls_count'] + 1;
+                $client['per_day_calls_count']++;
             }
         }
 
         if (in_array('concurrent_calls_count', $types)) {
             if ((int) $client['concurrent_calls_count'] < (int) $api['concurrent_calls_limit']) {
-                $client['concurrent_calls_count'] = $client['concurrent_calls_count'] + 1;
+                $client['concurrent_calls_count']++;
             }
         }
 
@@ -532,6 +648,9 @@ class Clients extends BasePackage
         if ($this->caching->enabled) {
             $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client);
         }
+
+        $this->ffStore->setIndexing(false);//Disable index as we dont need to update for calls count
+        $this->setFFValidation(false);
 
         $this->update($client);
     }

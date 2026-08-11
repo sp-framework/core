@@ -207,7 +207,15 @@ class DbInstaller extends BasePackage
                 if ($tableClass['model'] && $tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
 
-                    $this->ff->store($tableName)->deleteStore();
+                    try {
+                        $this->ff->store($tableName)->deleteStore();
+                    } catch (\throwable $e) {
+                        if (str_contains($e->getMessage(), 'does not exist')) {
+                            return true;
+                        }
+
+                        throw $e;
+                    }
                 }
             }
         }

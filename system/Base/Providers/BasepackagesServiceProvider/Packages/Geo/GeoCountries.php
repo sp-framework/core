@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Geo;
 
+use Apps\Core\Components\System\Tools\Dataextractors\DataextractorsComponent;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries as GeoCountriesModel;
 
@@ -13,7 +14,7 @@ class GeoCountries extends BasePackage
 
     public $geoCountries;
 
-    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
+    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/';
 
     public function init(bool $resetCache = false)
     {
@@ -86,51 +87,21 @@ class GeoCountries extends BasePackage
 
     public function installCountry(array $data)
     {
-        // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
-        // Timeout 3600
-
-        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
-        if ((int) ini_get('max_execution_time') < 3600) {
-            set_time_limit(3600);
-        }
-
-        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
-        if ((int) ini_get('memory_limit') < 2048) {
-            ini_set('memory_limit', '2048M');
-        }
-
         if (!isset($data['country_iso2'])) {
             $this->addResponse('Please provide country in iso2 format', 1);
 
             return false;
         }
 
-        if (!$this->downloadCountryData($data['country_iso2'])) {
-            return false;
-        }
+        $dataExtractorComponent = (new DataextractorsComponent)->initialize();
 
-        if (!$this->extractCountryData($data['country_iso2'])) {
-            return false;
-        }
+        $dataExtractorComponent->processAction(['process' => 'geo', 'countries' => [$data['country_iso2']]]);
 
-        $countryData = $this->helper->decode($this->localContent->read($this->sourceDir . $data['country_iso2'] . '.json'), true);
-
-        //Increase Exectimeout to 10 mins as this process takes time to extract and merge data.
-        if ((int) ini_get('max_execution_time') < 360) {
-            set_time_limit(360);
-        }
-
-        $this->registerStates($countryData['states'], $countryData['id']);
-
-        $country = $this->getById($data['country_id']);
-
-        $country['installed'] = 1;
-
-        if ($this->update($country)) {
-            $this->addResponse('Installed country ' . $country['name']);
-        } else {
-            $this->addResponse('Error installing country ' . $country['name'], 1);
-        }
+        $this->addResponse(
+            $dataExtractorComponent->dataExtractors->packagesData->responseMessage,
+            $dataExtractorComponent->dataExtractors->packagesData->responseCode,
+            $dataExtractorComponent->dataExtractors->packagesData->responseData ?? []
+        );
     }
 
     public function uninstallCountry($data)
@@ -187,9 +158,6 @@ class GeoCountries extends BasePackage
         if ($this->localContent->fileExists($this->sourceDir . $country['iso2'] . '.json')) {
             $this->localContent->delete($this->sourceDir . $country['iso2'] . '.json');
         }
-        if ($this->localContent->fileExists($this->sourceDir . $country['iso2'] . '.zip')) {
-            $this->localContent->delete($this->sourceDir . $country['iso2'] . '.zip');
-        }
 
         $country['installed'] = 0;
         $country['enabled'] = 0;
@@ -200,121 +168,6 @@ class GeoCountries extends BasePackage
         } else {
             $this->addResponse('Error uninstalling country ' . $country['name'], 1);
         }
-    }
-
-    protected function downloadCountryData($country)
-    {
-        try {
-            $this->localContent->write(
-                $this->sourceDir . $country . '.zip',
-                $this->remoteWebContent
-                    ->request(
-                        'GET',
-                        'https://github.com/sp-framework/geodata/raw/main/' . $country . '.zip',
-                        ['verify' => false]
-                    )->getBody()->getContents()
-                );
-
-            return true;
-        } catch (\Exception $e) {
-            $this->addResponse($e->getMessage(), 1);
-
-            return false;
-        }
-
-        return false;
-    }
-
-    protected function extractCountryData($country)
-    {
-        $zip = new \ZipArchive;
-
-        try {
-            if ($zip->open(base_path($this->sourceDir . $country . '.zip'))) {
-                if (!$zip->extractTo(base_path($this->sourceDir))) {
-                    $this->addResponse('Country zip file corrupt.', 1);
-
-                    return false;
-                }
-            } else {
-                $this->addResponse('Country zip file corrupt.', 1);
-
-                return false;
-            }
-
-            $zip->close();
-
-            return true;
-        } catch (\Exception $e) {
-            $this->addResponse($e->getMessage(), 1);
-
-            return false;
-        }
-    }
-
-    protected function registerStates($statesData, $country_id)
-    {
-        foreach ($statesData as $key => $state) {
-            $state['country_id'] = $country_id;
-
-            if (isset($state['cities'])) {
-                $cities = $state['cities'];
-                unset($state['cities']);
-            }
-
-            if (isset($state['postcodes'])) {
-                $postcodes = $state['postcodes'];
-                unset($state['postcodes']);
-            }
-
-            if (isset($state['id'])) {
-                $this->basepackages->geoStates->setFFAddUsingUpdateOrInsert(true);
-
-                $this->basepackages->geoStates->add($state);
-            }
-
-            if (isset($cities)) {
-                $this->registerCities($cities, $country_id, $state['id']);
-            }
-
-            if (isset($postcodes)) {
-                $this->registerPostcodes($postcodes, $country_id, $state['id']);
-            }
-        }
-
-        $this->basepackages->geoStates->ffStore->count(true);
-    }
-
-    protected function registerCities($citiesData, $country_id, $state_id)
-    {
-        foreach ($citiesData as $key => $city) {
-            $city['state_id'] = $state_id;
-            $city['country_id'] = $country_id;
-
-            if (isset($city['id'])) {
-                $this->basepackages->geoCities->setFFAddUsingUpdateOrInsert(true);
-
-                $this->basepackages->geoCities->add($city);
-            }
-        }
-
-        $this->basepackages->geoCities->ffStore->count(true);
-    }
-
-    protected function registerPostcodes($postcodesData, $country_id, $state_id)
-    {
-        foreach ($postcodesData as $key => $postcode) {
-            $postcode['state_id'] = $state_id;
-            $postcode['country_id'] = $country_id;
-
-            if (isset($postcode['id'])) {
-                $this->basepackages->geoPostcodes->setFFAddUsingUpdateOrInsert(true);
-
-                $this->basepackages->geoPostcodes->add($postcode);
-            }
-        }
-
-        $this->basepackages->geoPostcodes->ffStore->count(true);
     }
 
     public function isEnabled($countryId = null, $returnData = false)

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor
+        configVersion="3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://www.phpdoc.org"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/phpDocumentor/phpDocumentor/master/data/xsd/phpdoc.xsd"
+>
+    <paths>
+        <output>devdocs</output>
+        <cache>devdocs/cache</cache>
+    </paths>
+    <version number="3.0.0">
+        <api>
+            <source>
+                <path>apps/Core/**/*</path>
+                <path>system/**/*</path>
+            </source>
+            <ignore>
+                <path>apps/Core/Views/Html_compiled/**/*</path>
+                <path>system/Base/Providers/ErrorServiceProvider/View/Html_compiled/**/*</path>
+                <path>system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/vendor/Simplehtmldom.php</path>
+                <path>system/Base/Providers/BasepackagesServiceProvider/Packages/ApiClientServices/Apis/Repos/Github/**/*</path>
+                <path>system/Base/Providers/BasepackagesServiceProvider/Packages/ApiClientServices/Apis/Repos/Gitea/**/*</path>
+            </ignore>
+        </api>
+    </version>
+</phpdocumentor>

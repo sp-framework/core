@@ -657,11 +657,11 @@ var BazProgress = function() {
         BazProgress.buildProgressBar = function(el, mSH = false, child = false, hasSubProcess = false, hasCancelButton = true, hasDetails = true) {
             buildProgressBar(el, mSH, child, hasSubProcess, hasCancelButton, hasDetails);
         }
-        BazProgress.switchProgressBarColor = function(el, color) {
+        BazProgress.switchProgressBarColor = function(el = null, color = 'info') {
             switchProgressBarColor(el, color);
         }
-        BazProgress.resetProgressCounter = function() {
-            resetProgressCounter();
+        BazProgress.resetProgressCounter = function(hideDiv = true) {
+            resetProgressCounter(hideDiv);
         }
         BazProgress.setCallable = function(callable) {
             setCallable(callable);

@@ -103,7 +103,6 @@
                         $('#' + sectionId + '-delete').addClass('disabled');
                     }
                 }
-                        // $('#' + sectionId + '-filters option:selected').data()['filter_type'] === 1    //User
 
                 toggleFilterButtons(sectionId);
 
@@ -685,7 +684,6 @@
                 $('body').on('formToDatatableTableRowDelete', function(e) {
                     onFormToDatatableTableUpdate(e);
                 });
-
                 function onFormToDatatableTableUpdate(e) {
                     //Remove numeric from edit data
                     $('#' + sectionId + '-filter-table-data tbody tr').each(function(index, tr) {
@@ -900,19 +898,7 @@
                     $('#' + sectionId + '-search').click(function(e) {
                         e.preventDefault();
 
-                        if (dataType == 0) {
-                            query['conditions'] = '-|' + selectedId + '|equals|' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
-                        } else {
-                            query['conditions'] = '-|' + selectedId + '|like|%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
-                        }
-
-                        query['quick_filter'] = true;
-
-                        that._filterRunAjax(
-                            1,
-                            datatableOptions.paginationCounters.limit,
-                            query
-                        );
+                        that._performQuickSearch(dataType);
                     });
 
                     $('#' + sectionId + '-clear').click(function(e) {
@@ -920,7 +906,33 @@
 
                         resetFilters(true);
                     });
+
+                    $(document).on('keydown', function(e) {
+                        if (e.which === 13) {
+                            var activeField = $(document.activeElement);
+
+                            if ($(activeField)[0].id === sectionId + '-filter-quick') {
+                                that._performQuickSearch(dataType);
+                            }
+                        }
+                    });
                 }
+            }
+
+            _proto._performQuickSearch = function(dataType) {
+                if (dataType == 0) {
+                    query['conditions'] = '-|' + selectedId + '|equals|' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
+                } else {
+                    query['conditions'] = '-|' + selectedId + '|like|%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
+                }
+
+                query['quick_filter'] = true;
+
+                that._filterRunAjax(
+                    1,
+                    datatableOptions.paginationCounters.limit,
+                    query
+                );
             }
 
             //Build listing datatable
@@ -1226,7 +1238,13 @@
                         $('#listing-secondary-buttons').attr('hidden', false);
                         $('#listing-additional-fields').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
-                        $.extend(thisOptions.listOptions.datatable, JSON.parse(response.rows));
+                        if (response.rows) {
+                            if (typeof response.rows === 'string') {
+                                response.rows = JSON.parse(response.rows);
+                            }
+
+                            $.extend(thisOptions.listOptions.datatable, response.rows);
+                        }
 
                         if (response.routeEnv && response.routeEnv.pageParams) {
                             if (response.routeEnv.pageParams.limit) {
@@ -1250,13 +1268,15 @@
 
                                     dataCollection.env['customConditions'] = customConditions;
 
-                                    $('#' + sectionId + '-filter-quick').attr('disabled', false);
-                                    $('#' + sectionId + '-filter-search').attr('disabled', false);
-                                    $('#' + sectionId + '-filter-clear').attr('disabled', false);
-                                    $('#' + sectionId + '-filter-quick-prepend-dropdown-button span')
-                                        .text($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).text().toUpperCase());
-                                    selectedId = dataCollection.env['customConditions'][0][1];
-                                    $('#' + sectionId + '-filter-quick').val(dataCollection.env['customConditions'][0][3].replace(/%/g, ''));
+                                    if ($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).length > 0) {
+                                        $('#' + sectionId + '-filter-quick').attr('disabled', false);
+                                        $('#' + sectionId + '-filter-search').attr('disabled', false);
+                                        $('#' + sectionId + '-filter-clear').attr('disabled', false);
+                                        $('#' + sectionId + '-filter-quick-prepend-dropdown-button span')
+                                            .text($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).text().toUpperCase());
+                                        selectedId = dataCollection.env['customConditions'][0][1];
+                                        $('#' + sectionId + '-filter-quick').val(dataCollection.env['customConditions'][0][3].replace(/%/g, ''));
+                                    }
                                 }
 
                                 filter = true;
@@ -1575,8 +1595,16 @@
                     filterQuery = query;
                 }
 
-                if (filterQuery['filter']) {
+                if (typeof filterQuery['filter'] !== 'object') {
                     filter = true;
+
+                    if (Array.isArray(filterQuery)) {
+                        filterQuery = Object.assign({}, filterQuery);
+
+                        if (typeof filterQuery['filter'] === 'object') {
+                            delete(filterQuery['filter']);
+                        }
+                    }
                 }
 
                 thisOptions['datatable'].rows().clear().draw();
@@ -1586,14 +1614,18 @@
                 postData['page'] = page;
                 postData['limit'] = limit;
 
-                if (filterQuery.filter || filterQuery.order) {
-                    postData['filter'] = filterQuery.filter;
-                    postData['order'] = filterQuery.order;
+                if (filter && (filterQuery['filter'] || filterQuery['order'])) {
+                    if (filterQuery['filter']) {
+                        postData['filter'] = filterQuery['filter'];
+                    }
+                    if (filterQuery['order']) {
+                        postData['order'] = filterQuery['order'];
+                    }
                 } else {
                     postData['filter'] = filterQuery;
                 }
 
-                if (filterQuery.quick_filter) {
+                if (filterQuery['quick_filter']) {
                     postData['conditions'] = filterQuery['conditions'];
                     postData['quick_filter'] = true;
                     if (postData['filter']) {
@@ -1606,6 +1638,8 @@
                 }
 
                 that._runDatatableAjax(postData, true);
+
+                filter = false;
             }
 
             _proto._drawCallback = function() {

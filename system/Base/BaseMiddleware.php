@@ -12,4 +12,11 @@ abstract class BaseMiddleware extends Controller
     {
         $this->app = $this->apps->getAppInfo();
     }
+
+    protected function logException($exception)
+    {
+        if ($this->config->logs->exceptions) {
+            $this->logger->logExceptions->critical(json_trace($exception));
+        }
+    }
 }

@@ -1,0 +1,30 @@
+{
+	"name" : "FrameworksSp",
+	"display_name" : "Sp Framework API",
+	"description" : "<p>Package for connecting to other SP frameworks using API</p>",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "basepackagesApis",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\Frameworks\\Sp\\FrameworksSp",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : [],
+		"externals" : []
+	},
+	"settings" : 
+	{
+		"componentRoute" : "system/api/clients/services"
+	}
+}

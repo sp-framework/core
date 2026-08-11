@@ -1,0 +1,71 @@
+<?php
+
+"NAMESPACE";
+
+use System\Base\BaseApi;
+
+class Api extends BaseApi
+{
+    protected $package;
+
+    public function initialize()
+    {
+        $this->package = $this->package->init();
+    }
+
+    /**
+     * @api_acl(name=view)
+     */
+    public function viewAction()
+    {
+        $this->initialize();
+
+        if (isset($this->getData()['id'])) {
+            //
+        }
+
+        //Get All Rows
+        //Get body request can include columns, page, limit and conditions
+        //Example:
+        //Content-Disposition: form-data
+        //name: columns
+        //value: id,name,capital
+        //Content-Disposition: form-data
+        //name: conditions
+        //value: -|name|like|%In%|&
+        //Content-Disposition: form-data
+        //name: limit
+        //value: 5
+        //Content-Disposition: form-data
+        //name: page
+        //value: 1
+
+        $data = $this->getRows($this->package, ['id', 'name']);
+
+        $this->addResponse('Ok', 0, ['data' => $data ?? []]);
+    }
+
+    /**
+     * @api_acl(name=add)
+     */
+    public function addAction()
+    {
+        return;
+    }
+
+    /**
+     * @api_acl(name=update)
+     */
+    public function updateAction()
+    {
+        return;
+    }
+
+    /**
+     * @api_acl(name=remove)
+     */
+    public function removeAction()
+    {
+        return;
+    }
+}

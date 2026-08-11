@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col">
+    <div class="col-md-3">
         {{adminltetags.useTag('fields',
             [
                 'component'                             : component,
@@ -24,6 +24,124 @@
                 'fieldDataSelect2OptionsSelected'       : apiGrantType
             ]
         )}}
+    </div>
+    <div id="grant-allow" class="col" {{allowHidden}}>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'client_keys_generation_allowed',
+                        'fieldLabel'                     : 'Allow Client Keys Generation?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldHelp'                      : true,
+                        'fieldDisabled'                  : apiClientKeysGenerationAllowedDisabled,
+                        'fieldHelpTooltipContent'        : 'Allow users to generate/regenerate key via profile page.',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : apiClientKeysGenerationAllowedChecked,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'registration_allowed',
+                        'fieldLabel'                     : 'Allow API Registration?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldHelp'                      : true,
+                        'fieldDisabled'                  : apiRegistrationAllowedDisabled,
+                        'fieldHelpTooltipContent'        : 'Allow users to register for API on this App.',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : apiRegistrationAllowed,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+    <div id="autho-grant-user" class="col" {{authoCodeUserHidden}}>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_id',
+                        'fieldLabel'                            : 'Account ID',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Account ID',
+                        'fieldRequired'                         : false,
+                        'fieldDisabled'                         : true,
+                        'fieldHidden'                           : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : false,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : apiAccountId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_email',
+                        'fieldLabel'                            : 'User Account (Email)',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Enter email to search and select the account',
+                        'fieldRequired'                         : true,
+                        'fieldDisabled'                         : false,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldValue'                            : apiAccountEmail
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'email_client_details_to_user',
+                        'fieldLabel'                     : 'Email Client details to user?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Email generated client id and client secret with urls to the user? NOTE: Only new generated or regenerated client ID and secret can be emailed!',
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldDisabled'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+        </div>
     </div>
 </div>
 <div id="client-credentials-grant" {{clientCredentialsGrantHidden}}>
@@ -55,6 +173,10 @@
     <small class="text-danger">Note: Client secret is only shown at the time of key generation. Please copy and save it somewhere safe.</small><br><br>
     <div class="row">
         <div class="col">
+            {% if apiClientId == '' or apiClientSecret == '' %}
+                {% set reGenerateHidden = true %}
+                {% set generateHidden = false %}
+            {% endif %}
             {{adminltetags.useTag('buttons',
                 [
                     'component'                 : component,
@@ -147,7 +269,7 @@
                     'fieldLabel'                            : 'Redirect Url',
                     'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Redirect Url for API authentication.',
+                    'fieldHelpTooltipContent'               : 'Redirect Url for API authentication at the end of OAuth process.',
                     'fieldGroupPostAddonButtons'          :
                         [
                             'generate-redirect-url'   : [
@@ -180,7 +302,7 @@
                     'fieldLabel'                            : 'Request Url',
                     'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Request Url for API authentication. This will be overwritten when the user makes a connection with their state parameter set.',
+                    'fieldHelpTooltipContent'               : 'Request Url for API authentication. This is the starting point.',
                     'fieldGroupPostAddonButtons'          :
                         [
                             'generate-request-url'   : [
@@ -191,7 +313,7 @@
                                 'position'                : 'right'
                             ]
                         ],
-                    'fieldRequired'                         : false,
+                    'fieldRequired'                         : true,
                     'fieldDisabled'                         : true,
                     'fieldBazScan'                          : true,
                     'fieldBazJstreeSearch'                  : true,

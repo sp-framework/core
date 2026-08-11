@@ -16,7 +16,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
     protected function init()
     {
-        $this->data['api'] = $this->api->getApiInfo(true);
+        $this->data['api'] = $this->api->init()->getApiInfo(true);
         $this->data['app'] = $this->apps->getAppInfo();
         $this->data['domain'] = $this->domains->getDomain();
 
@@ -117,7 +117,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
             }
 
             if ($middleware['enabled'] == true) {
-                if ($middleware['name'] === 'Auth' && $this->data['api']['is_public'] == true) {
+                if ($middleware['name'] === 'Auth' && $this->data['api']['api_type'] === 'public') {
                     continue;
                 }
 
@@ -128,7 +128,10 @@ class MicroMiddlewaresServiceProvider extends Injectable
                         $this->logger->logExceptions->critical(json_trace($e));
                     }
 
-                    if (str_contains(strtolower($e->getMessage()), 'denied') || str_contains(strtolower($e->getMessage()), 'expired')) {
+                    if (str_contains(strtolower($e->getMessage()), 'denied') ||
+                        str_contains(strtolower($e->getMessage()), 'expired') ||
+                        str_contains(strtolower($e->getMessage()), 'incorrect')
+                    ) {
                         return 'auth';
                     }
 
@@ -160,13 +163,13 @@ class MicroMiddlewaresServiceProvider extends Injectable
         if (isset($this->data['domain']['exclusive_for_api']) &&
             $this->data['domain']['exclusive_for_api'] == 1
         ) {
-            if ($this->data['api']['is_public'] == true) {
+            if ($this->data['api']['api_type'] === 'public') {
                 $this->data['appRoute'] = '/pub';
             } else {
                 $this->data['appRoute'] = '';
             }
         } else {
-            if ($this->data['api']['is_public'] == true) {
+            if ($this->data['api']['api_type'] === 'public') {
                 $this->data['appRoute'] = '/api/pub';
             } else {
                 $this->data['appRoute'] = '/api';
@@ -188,13 +191,13 @@ class MicroMiddlewaresServiceProvider extends Injectable
         }
         $this->data['guestAccess'] =
         [
-            $this->data['appRoute'] . '/register/client',
+            $this->data['appRoute'] . '/register/apiclient',
         ];
 
         if (in_array($this->data['givenRoute'], $this->data['guestAccess'])) {
             return true;
         } else if ($middleware['name'] === 'Auth' &&
-                   $this->data['api']['is_public'] == false &&
+                   $this->data['api']['api_type'] !== 'public' &&
                    !$this->componentsNeedsAuth()
         ) {
             return true;
@@ -213,7 +216,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
             $methods = (new \ReflectionClass($componentValue['class']))->getMethods();
 
             foreach ($methods as $key => $method) {
-                if ((strtolower($method->class) === strtolower($componentValue['class']) && str_contains($method->name, 'api') && str_contains($method->name, 'Action'))) {
+                if ((strtolower($method->class) === strtolower($componentValue['class']) && str_contains($method->name, 'Action'))) {
                     if (strtolower($this->data['givenRoute']) ===
                         strtolower(
                             $this->data['appRoute'] . '/' . $componentValue['route'] . '/' . str_replace('Action', '', $method->name)
@@ -255,7 +258,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
         $this->response->setContentType('application/json', 'UTF-8');
         $this->response->setHeader('Cache-Control', 'no-store');
 
-        if ($responseCode !== 0 || $responseCode !== 1) {
+        if ($responseCode >= 100) {
             $this->response->setStatusCode($responseCode);
         }
     }
@@ -264,10 +267,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
     {
         $this->apiResponse['responseMessage'] = $responseMessage;
         $this->apiResponse['responseCode'] = $responseCode;
-
-        if ($responseData) {
-            $this->apiResponse['responseData'] = $responseData;
-        }
+        $this->apiResponse['responseData'] = $responseData;
 
         $this->sendJson($responseCode);
     }
@@ -300,7 +300,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
                 return false;
             }
 
-            $this->addResponse('API not available or Incorrect client ID or No Authorization Code set.', 404);
+            $this->addResponse('API not available or Incorrect client credentials.', 404);
 
             return false;
         }
@@ -309,7 +309,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
         if (isset($this->data['api']['registration_allowed']) &&
             $this->data['api']['registration_allowed'] == false &&
-            str_contains($url, 'register/client') &&
+            str_contains($url, 'register/apiclient') &&
             isset($this->request->getPost()['grant_type']) &&
             $this->request->getPost()['grant_type'] !== 'refresh_token'
         ) {

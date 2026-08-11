@@ -34,6 +34,8 @@ class Auth extends BasePackage
 
     protected $otp;
 
+    private $loggedOut = false;
+
     public function init()
     {
         $this->app = $this->apps->getAppInfo();
@@ -66,7 +68,13 @@ class Auth extends BasePackage
         }
 
         if (!$this->checkAccount($data)) {//Set $this->account here
-            $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
+            $isAllowed = $this->access->ipFilter->filters->bumpFilterHitCounter(true);
+
+            if (is_object($isAllowed))  {
+                $this->response->send();
+
+                exit;
+            }
 
             return false;
         }
@@ -95,7 +103,8 @@ class Auth extends BasePackage
             return false;
         }
 
-        $this->access->ipFilter->removeFromMonitoring();
+        $filter = null;
+        $this->access->ipFilter->filters->bumpFilterHitCounter(false, null, $filter, false, true);
 
         $security = $this->getAccountSecurityObject();
 
@@ -182,7 +191,7 @@ class Auth extends BasePackage
 
     public function logout($forced = false)
     {
-        if (!$this->account) {
+        if ($forced && !$this->account) {
             try {
                 $this->setUserFromSession();
             } catch (\Exception $e) {
@@ -196,7 +205,7 @@ class Auth extends BasePackage
 
         $this->clearAccountSessionId();
 
-        $this->cookies->reset();
+        $this->resetCookies();
 
         if ($this->opCache && $this->opCache->checkCache('account_' . $this->account['id'], 'core')) {
             $this->opCache->removeCache('account_' . $this->account['id'], 'core');
@@ -217,6 +226,8 @@ class Auth extends BasePackage
 
             $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->apps->getAppInfo()['name']);
         }
+
+        $this->loggedOut = true;
 
         return true;
     }
@@ -253,6 +264,16 @@ class Auth extends BasePackage
 
     protected function clearAccountSessionId()
     {
+        if (!$this->account) {
+            try {
+                $this->setUserFromSession();
+            } catch (\Exception $e) {
+                $this->sessionTools->clearSession($this->session->getId());
+
+                return;
+            }
+        }
+
         $sessionModel = new BasepackagesUsersAccountsSessions;
         $sessionStore = $this->ff->store($sessionModel->getSource());
 
@@ -284,6 +305,24 @@ class Auth extends BasePackage
         }
 
         $this->sessionTools->removeSessionKey($this->getKey());
+    }
+
+    protected function resetCookies()
+    {
+        if (isset($_COOKIE)) {
+            foreach ($_COOKIE as $name => $value) {
+                if ($name === 'SP') {//We leave this for agent check.
+                    continue;
+                }
+
+                setcookie($name, '', time() - 3600, '/');
+                setcookie($name, '', time() - 3600, '/', $_SERVER['HTTP_HOST']);
+
+                unset($_COOKIE[$name]);
+            }
+        }
+
+        $this->cookies->reset();
     }
 
     public function checkAccount(array $data, $viaProfile = null)
@@ -751,6 +790,10 @@ class Auth extends BasePackage
 
     public function check($resetCache = false)
     {
+        if ($this->loggedOut) {
+            return false;
+        }
+
         if (!$resetCache && $this->account) {
             return true;
         }
@@ -967,9 +1010,9 @@ class Auth extends BasePackage
 
     public function getAccountSecurityObject()
     {
-        if ($this->config->databasetype === 'db') {
-            $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
+        $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
 
+        if ($this->config->databasetype === 'db') {
             return $accountsObj->getSecurity();
         } else {
             if (isset($this->account()['security'])) {

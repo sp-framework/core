@@ -133,28 +133,6 @@ class Apps
 					]
 				),
 				new Column(
-					'ip_filter_default_action',
-					[
-						'type'    => Column::TYPE_VARCHAR,
-						'size'    => 10,
-						'notNull' => true,
-					]
-				),
-				new Column(
-					'auto_unblock_ip_minutes',
-					[
-						'type'    => Column::TYPE_INTEGER,
-						'notNull' => false,
-					]
-				),
-				new Column(
-					'incorrect_login_attempt_block_ip',
-					[
-						'type'    => Column::TYPE_TINYINTEGER,
-						'notNull' => false,
-					]
-				),
-				new Column(
 					'menu_structure',
 					[
 						'type'    => Column::TYPE_JSON,

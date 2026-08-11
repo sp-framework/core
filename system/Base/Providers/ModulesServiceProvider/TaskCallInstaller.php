@@ -24,7 +24,7 @@ class TaskCallInstaller extends BasePackage
                 if ($this->localContent->fileExists($packageFile)) {
                     $installPackageJsonFile = $this->helper->decode($this->localContent->read($packageFile), true);
 
-                    $package = $this->modules->packages->getPackageByClass($installPackageJsonFile['class']);
+                    $package = $this->modules->packages->init(true)->getPackageByClass($installPackageJsonFile['class']);
 
                     if ($package) {
                         $packageFolder = 'apps/' . implode('/', array_slice(explode('\\', get_class($packageClass)), 1, -2)) . '/TaskCalls/';
@@ -66,7 +66,7 @@ class TaskCallInstaller extends BasePackage
                     }
                     $callDetails['package_id'] = $package['id'];
 
-                    $dbCall = $this->basepackages->workers->calls->getByCallName($callReflection->getShortName());
+                    $dbCall = $this->basepackages->workers->calls->init(true)->getByCallName($callReflection->getShortName());
 
                     if (!$dbCall) {
                         $this->basepackages->workers->calls->addCall($callDetails);
@@ -79,6 +79,10 @@ class TaskCallInstaller extends BasePackage
             }
         } catch (FilesystemException | UnableToCheckExistence | UnableToReadFile | \throwable $e) {
             throw $e;
+        }
+
+        if ($this->opCache) {
+            $this->opCache->removeCache('packages', 'core');
         }
 
         return true;

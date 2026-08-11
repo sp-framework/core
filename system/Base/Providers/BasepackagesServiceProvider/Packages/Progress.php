@@ -345,7 +345,7 @@ class Progress extends BasePackage
 
     protected function checkNotificationTunnel()
     {
-        if (!$this->notificationsTunnel && isset($this->apps) && $this->apps->getAppInfo()) {
+        if (!$this->notificationsTunnel && isset($this->apps) && $this->apps->getAppInfo() && $this->access->auth->check()) {
             $account = $this->basepackages->accounts->getAccountById($this->access->auth->account()['id']);
 
             if ($account && isset($account['tunnels']['notifications_tunnel'])) {

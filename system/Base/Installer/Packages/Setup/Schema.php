@@ -6,6 +6,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\ApiClientServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\ApiClientServicesCalls;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis\Frameworks;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis\Repos;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ContactBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
@@ -59,7 +60,12 @@ use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Queues;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views\Settings;
-use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFilter;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFilters;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersDefault;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersIp2location;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersIp2locationCities;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersIp2locationCountries;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFiltersIp2locationStates;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api as SPApi;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AccessTokens;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AuthorizationCodes;
@@ -72,7 +78,12 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Core;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
-use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilter;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilters;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersDefault;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2location;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2locationCities;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2locationCountries;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2locationStates;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessTokens;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizationCodes;
@@ -103,8 +114,6 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Dashboards\
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Email\BasepackagesEmailQueue;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Email\BasepackagesEmailServices;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCities;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv4;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv6;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoHolidays;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoPostcodes;
@@ -158,9 +167,29 @@ class Schema
                         'schema'    => new Types,
                         'model'     => new ServiceProviderAppsTypes,
                     ],
-                'service_provider_access_ip_filter'         => [
-                        'schema'    => new IpFilter,
-                        'model'     => new ServiceProviderAccessIpFilter,
+                'service_provider_access_ip_filters'        => [
+                        'schema'    => new IpFilters,
+                        'model'     => new ServiceProviderAccessIpFilters,
+                    ],
+                'service_provider_access_ip_filters_default'=> [
+                        'schema'    => new IpFiltersDefault,
+                        'model'     => new ServiceProviderAccessIpFiltersDefault,
+                    ],
+                'service_provider_access_ip_filters_ip2location'=> [
+                        'schema'    => new IpFiltersIp2location,
+                        'model'     => new ServiceProviderAccessIpFiltersIp2location,
+                    ],
+                'service_provider_access_ip_filters_ip2location_countries'=> [
+                        'schema'    => new IpFiltersIp2locationCountries,
+                        'model'     => new ServiceProviderAccessIpFiltersIp2locationCountries,
+                    ],
+                'service_provider_access_ip_filters_ip2location_states'=> [
+                        'schema'    => new IpFiltersIp2locationStates,
+                        'model'     => new ServiceProviderAccessIpFiltersIp2locationStates,
+                    ],
+                'service_provider_access_ip_filters_ip2location_cities'=> [
+                        'schema'    => new IpFiltersIp2locationCities,
+                        'model'     => new ServiceProviderAccessIpFiltersIp2locationCities,
                     ],
                 'service_provider_domains'                  => [
                         'schema'    => new Domains,
@@ -298,14 +327,6 @@ class Schema
                         'schema'    => new Postcodes,
                         'model'     => new BasepackagesGeoPostcodes,
                     ],
-                'basepackages_geo_cities_ip2locationv4'     => [
-                        'schema'    => new CitiesIp2LocationV4,
-                        'model'     => new BasepackagesGeoCitiesIp2locationv4,
-                    ],
-                'basepackages_geo_cities_ip2locationv6'     => [
-                        'schema'    => new CitiesIp2LocationV6,
-                        'model'     => new BasepackagesGeoCitiesIp2locationv6,
-                    ],
                 'basepackages_geo_timezones'                => [
                         'schema'    => new Timezones,
                         'model'     => new BasepackagesGeoTimezones,
@@ -392,6 +413,10 @@ class Schema
                     ],
                 'basepackages_api_client_services_apis_repos'=> [
                         'schema'    => new Repos,
+                        'model'     => null
+                    ],
+                'basepackages_api_client_services_apis_frameworks'=> [
+                        'schema'    => new Frameworks,
                         'model'     => null
                     ],
                 'service_provider_api'                       => [

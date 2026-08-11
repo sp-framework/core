@@ -245,9 +245,6 @@ class Apps extends BasePackage
 		$data['default_component_guests'] = 0;
 		$data['default_component_users'] = 0;
 		$data['errors_component'] = 0;
-		$data['incorrect_login_attempt_block_ip'] = 0;
-		$data['auto_unblock_ip_minutes'] = 0;
-		$data['ip_filter_default_action'] = 'allow';
 		$data['can_login_role_ids'] = $this->helper->encode(['1']);
 		$data['acceptable_usernames'] = $this->helper->encode(['email']);
 

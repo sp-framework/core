@@ -8,6 +8,7 @@ use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Utils;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
@@ -33,6 +34,7 @@ use System\Base\Providers\ApiServiceProvider\Repositories\RefreshTokenRepository
 use System\Base\Providers\ApiServiceProvider\Repositories\ScopeRepository;
 use System\Base\Providers\ApiServiceProvider\Repositories\UserRepository;
 use System\Base\Providers\ApiServiceProvider\Scopes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 
 class Api extends BasePackage
 {
@@ -72,29 +74,27 @@ class Api extends BasePackage
 
     protected $resource;
 
-    protected $accessTokenRepository;
-
-    protected $authCodeRepository;
-
-    protected $clientRepository;
+    protected $headerAttributes;
 
     protected $refreshTokenRepository;
 
-    protected $scopeRepository;
-
-    protected $userRepository;
-
-    protected $headerAttributes;
-
     public $apiCallsLimitReached = false;
+
+    protected $encClientId;
+
+    protected $encDeviceId;
+
+    protected $account = null;
+
+    protected $authenticated = false;
 
     public function init(bool $resetCache = false)
     {
-        $this->scopes = new Scopes;
-
-        $this->clients = new Clients;
-
         if ($this->container) {
+            $this->scopes = new Scopes;
+
+            $this->clients = new Clients;
+
             if ($this->opCache) {
                 if (!$resetCache && $this->opCache->checkCache('apiServices', 'core')) {
                     $this->apiServices = $this->opCache->getCache('apiServices', 'core');
@@ -113,94 +113,57 @@ class Api extends BasePackage
 
     public function addApi(array $data)
     {
-        $data['account_id'] = 0;
-
-        if ($this->access->auth->account()) {
-            $data['account_id'] = $this->access->auth->account()['id'];
+        if (!isset($data['account_id'])) {
+            $data['account_id'] = 0;
         }
 
         $data['private_key_passphrase'] = '0';
         $data['private_key'] = '0';
         $data['private_key_location'] = '0';
 
-        if (($data = $this->checkTimeouts($data)) === false) {
+        if (($data = $this->preCheck($data)) === false) {
             return false;
         }
 
-        if (isset($data['authorization_tos_pp']) && $data['authorization_tos_pp'] !== '') {
-            $data['authorization_tos_pp'] = $this->escaper->html($data['authorization_tos_pp']);
+        if ($data['grant_type'] === 'authorization_code') {
+            if (isset($data['account_id'])) {
+                $account = $this->basepackages->accounts->getById($data['account_id']);
+
+                if (!$account) {
+                    $this->addResponse('Account with ID not found.', 1);
+
+                    return false;
+                }
+            }
         }
 
         if ($this->add($data)) {
             $newApi = $this->packagesData->last;
 
-            if ($data['is_public'] == false) {
+            if ($newApi && $newApi['api_type'] === 'protected_grant') {
                 $newApi = $this->generatePKIKeys($newApi);
 
-                if ($newApi) {
-                    $this->updateApi($newApi);
-
-                    $this->addResponse('Added ' . $data['name'] . ' api');
-                } else {
+                if (!$newApi) {
                     $this->removeApi($newApi);
+
+                    $this->addResponse('Error generating Pki keys for ' . $newApi['name'] . ' api', 1);
 
                     return false;
                 }
-            }
 
-            if ($newApi['grant_type'] === 'authorization_code') {
-                if ((isset($newApi['client_id']) && $newApi['client_id'] === '') ||
-                    !isset($newApi['client_id'])
-                ) {
-                    $client = $this->clients->generateClientKeys(
-                        [
-                            'api_id'        => $data['id'],
-                            'client_id'     => $data['client_id'],
-                            'client_secret' => $data['client_secret'],
-                            'redirect_url'  => $data['redirect_url']
-                        ],
-                        $this->access->auth->account(),
-                        null,
-                        false
-                    );
-
+                if ($newApi['grant_type'] === 'authorization_code') {
                     $newApi['client_id'] = $client['client_id'];
 
-                    $this->updateApi($newApi);
-                } else {
-                    $client = $this->clients->getFirst('client_id', $newApi['client_id']);
-
-                    if (!$client && ($newApi['client_id'] !== $data['client_id'])) {
-                        $client = $this->clients->generateClientKeys(
-                            [
-                                'api_id'        => $data['id'],
-                                'client_id'     => $data['client_id'],
-                                'client_secret' => $data['client_secret'],
-                                'redirect_url'  => $data['redirect_url'],
-                                'forceRegen'    => true
-                            ],
-                            $this->access->auth->account(),
-                            null,
-                            false,
-                            $data['client_id'],
-                            $data['client_secret'],
-                        );
-
-                        $newApi['client_id'] = $client['client_id'];
-
-                        $this->updateApi($newApi);
-                    } else {
-                        $client = $client->toArray();
-
-                        $client['redirectUri'] = $data['redirect_url'];
-
-                        $this->clients->updateClient($client);
-                    }
+                    $this->update($newApi);
                 }
             }
-        } else {
-            $this->addResponse('Error adding new api.', 1);
+
+            $this->addResponse('Added ' . $newApi['name'] . ' api');
+
+            return true;
         }
+
+        $this->addResponse('Error adding new api.', 1);
     }
 
     public function updateApi(array $data)
@@ -213,69 +176,59 @@ class Api extends BasePackage
             return false;
         }
 
-        if (($data = $this->checkTimeouts($data)) === false) {
+        $data = array_merge($api, $data);
+
+        if (($data = $this->preCheck($data)) === false) {
             return false;
         }
 
-        $data = array_merge($api, $data);
-
-        if (isset($data['regenerate_pki_keys']) && $data['regenerate_pki_keys'] == 1) {
-            $data = $this->generatePKIKeys($data);
-        }
-
-        if ($data['grant_type'] === 'client_credentials') {
-            $data['refresh_token_timeout'] = 'P1M';
-        }
-
         if ($data['grant_type'] === 'authorization_code') {
-            if ((isset($data['client_id']) && $data['client_id'] === '') ||
-                !isset($data['client_id'])
-            ) {
-                $client = $this->clients->generateClientKeys(
-                    [
-                        'api_id'        => $data['id'],
-                        'client_id'     => $data['client_id'],
-                        'client_secret' => $data['client_secret'],
-                        'redirect_url'  => $data['redirect_url']
-                    ],
-                    $this->access->auth->account(),
-                    null,
-                    false
-                );
+            if (isset($data['account_id'])) {
+                $account = $this->basepackages->accounts->getById($data['account_id']);
 
-                $data['client_id'] = $client['client_id'];
-            } else {
-                $client = $this->clients->getFirst('client_id', $data['client_id']);
+                if (!$account) {
+                    $this->addResponse('Account with ID not found.', 1);
 
-                if (!$client && ($api['client_id'] !== $data['client_id'])) {
-                    $client = $this->clients->generateClientKeys(
-                        [
-                            'api_id'        => $data['id'],
-                            'client_id'     => $data['client_id'],
-                            'client_secret' => $data['client_secret'],
-                            'redirect_url'  => $data['redirect_url'],
-                            'forceRegen'    => true
-                        ],
-                        $this->access->auth->account(),
-                        null,
-                        false,
-                        $data['client_id'],
-                        $data['client_secret']
-                    );
-
-                    $data['client_id'] = $client['client_id'];
-                } else {
-                    $client = $client->toArray();
-
-                    $client['redirectUri'] = $data['redirect_url'];
-
-                    $this->clients->updateClient($client);
+                    return false;
                 }
             }
         }
 
-        if (isset($data['authorization_tos_pp']) && $data['authorization_tos_pp'] !== '') {
-            $data['authorization_tos_pp'] = $this->escaper->html($data['authorization_tos_pp']);
+        if ($data['api_type'] === 'protected_grant') {
+            if (isset($data['regenerate_pki_keys']) && $data['regenerate_pki_keys'] == 1) {
+                $data = $this->generatePKIKeys($data);
+            }
+
+            if ($data['grant_type'] === 'client_credentials' && !isset($data['refresh_token_timeout'])) {
+                $data['refresh_token_timeout'] = 'P1M';
+            }
+
+            if ($data['grant_type'] === 'authorization_code') {
+                $client = $this->clients->getFirst('client_id', $data['client_id']);
+
+                if (!$client) {
+                    $client = $this->clients->generateClientKeys(
+                        data:
+                        [
+                            'api_id'        => $api['id'],
+                            'client_id'     => $data['client_id'],
+                            'client_secret' => $data['client_secret'],
+                            'redirect_url'  => $data['redirect_url'],
+                            'request_url'   => $data['request_url'],
+                            'forceRevoke'   => true
+                        ],
+                        emailNewClientDetails: ($data['email_client_details_to_user'] == '1') ? true : false,
+                        account: $account,
+                        viaApi: true
+                    );
+
+                    $data['client_id'] = $client['client_id'];
+                }
+            }
+
+            if (isset($data['authorization_tos_pp']) && $data['authorization_tos_pp'] !== '') {
+                $data['authorization_tos_pp'] = $this->escaper->html($data['authorization_tos_pp']);
+            }
         }
 
         if ($this->update($data)) {
@@ -283,6 +236,32 @@ class Api extends BasePackage
         } else {
             $this->addResponse('Error updating api.', 1);
         }
+    }
+
+    protected function preCheck($data)
+    {
+        if (($data = $this->checkTimeouts($data)) === false) {
+            return false;
+        }
+
+        $nonZeroFields = ['app_id', 'domain_id', 'scope_id'];
+        $forceFieldRequired = [];
+        $checkFields = [];
+        $checkFieldsReplace = true;
+
+        if ($data['grant_type'] === 'authorization_code') {
+            array_push($nonZeroFields, 'account_id');
+
+            $forceFieldRequired = ['client_id', 'client_secret', 'redirect_url', 'request_url'];
+            $checkFields = ['client_id', 'client_secret', 'redirect_url', 'request_url'];
+            $checkFieldsReplace = false;
+        }
+
+        $this->validateDataWithMetaData(data: $data, ignoreFields: ['id'],
+                                        nonZeroFields: $nonZeroFields, forceFieldRequired: $forceFieldRequired,
+                                        checkFields: $checkFields, checkFieldsReplace: $checkFieldsReplace);
+
+        return $data;
     }
 
     protected function checkTimeouts($data)
@@ -316,10 +295,22 @@ class Api extends BasePackage
 
     public function removeApi(array $data)
     {
+        $this->validateDataWithMetaData(data: $data, checkFields: ['id']);
+
+        $api = $this->getById($data['id']);
+
+        if (!$api) {
+            $this->addResponse('Api with ID not found.', 1);
+
+            return false;
+        }
+
+        trace([$api]);
         if (isset($data['id'])) {
             if ($this->remove($data['id'], true, false)) {
-
                 $this->deleteAPIKeys($data['id']);
+
+                //Revoke all clients
 
                 $this->addResponse('Removed api');
             } else {
@@ -330,6 +321,14 @@ class Api extends BasePackage
         }
     }
 
+    /**
+     * Check whether the connection received is API or not.
+     *
+     * - For public access of api (without authentication). ***pub*** is a reserved keyword in apps
+     * - Public URL: {domain}/api(if not exclusive for api)/pub/app_route(if not exclusive to app)/component/method
+     * - Setting client_id with Authorization header is important for our setup as we rely on the client ID to find which API needs to be instantiated
+     * - Post parameter refresh is important if you are grabbing refresh token using web browser
+     */
     public function isApi()
     {
         if (isset($this->isApi)) {
@@ -341,30 +340,28 @@ class Api extends BasePackage
 
         if ($this->request->getBestAccept() === 'application/json') {
             $url = $this->request->getURI();
+
             $urlParts = explode("/", trim($url, '/'));
+
             if (isset($urlParts[0]) && $urlParts[0] === 'api') {
                 $this->isApi = true;
             }
-            //For public access of api (without authentication). pub is a reserved keyword in apps.
-            //URL: {domain}/api(if not exclusive for api)/pub/app_route(if not exclusive to app)/component/method
+
             if ((isset($urlParts[0]) && $urlParts[0] === 'pub') ||
                 (isset($urlParts[1]) && $urlParts[1] === 'pub')
             ) {
                 $this->isApi = true;
+
                 $this->isApiCheckVia = 'pub';
-            } else if ($this->request->getHeader('Authorization') !== '') {//Setting client-id with Authorization header is important for our setup as we rely on the client ID to find which API needs to be instantiated
+            } else if ($this->request->getHeader('Authorization') !== '') {
                 $this->isApi = true;
-                $this->isApiCheckVia = 'authorization';
-            } else if ($this->request->get('client_id') &&
-                       !$this->request->get('id') &&
-                       !isset($this->request->getPost()['redirect_uri']) &&
-                       !isset($this->request->getPost()['refresh'])//This is important if you are grabbing refresh token using web browser
-            ) {
-                $this->isApi = true;
-                $this->isApiCheckVia = 'client_id';
-                $this->clientId = $this->request->get('client_id');
-                if ($this->request->get('device_id')) {
-                    $this->deviceId = $this->request->get('device_id');
+
+                if (str_contains($this->request->getHeader('Authorization'), 'Bearer')) {
+                    $this->isApiCheckVia = 'authorization';
+                } else if (str_contains($this->request->getHeader('Authorization'), 'Basic') &&
+                           $this->request->getBasicAuth()
+                ) {
+                    $this->isApiCheckVia = 'basic';
                 }
             }
         }
@@ -374,38 +371,117 @@ class Api extends BasePackage
 
     public function getApiInfo($usingIsApiCheckVia = false, $usingDomainApp = false)
     {
+        if ($usingDomainApp) {
+            if (!$this->apiServices) {
+                $this->init();
+            }
+
+            $enabledApis = [];
+
+            foreach ($this->apiServices as $apiService) {
+                if (($apiService['status'] == '1' || $apiService['status'] === true) &&
+                    $apiService['app_id'] === $this->apps->getAppInfo()['id'] &&
+                    $apiService['domain_id'] === $this->domains->domain['id']
+                ) {
+                    $enabledApis[$apiService['id']] = $apiService;
+                }
+            }
+
+            return $enabledApis;
+        }
+
         if ($this->api) {
             return $this->api;
         }
 
         if ($usingIsApiCheckVia) {
-            if ($this->isApiCheckVia === 'pub') {//Public access API
-                if ($this->config->databasetype === 'db') {
-                    $params =
-                        [
-                            'conditions'    => 'is_public = :is_public: AND app_id = :app_id: AND domain_id = :domain_id:',
-                            'bind'          =>
-                                [
-                                    'is_public'     => '1',
-                                    'app_id'        => $this->apps->getAppInfo()['id'],
-                                    'domain_id'     => $this->domains->domain['id']
-                                ]
-                        ];
+            if ($this->isApiCheckVia === 'pub' || $this->isApiCheckVia === 'basic') {//Public access API or user authentication
+                if ($this->isApiCheckVia === 'basic') {
+                    if (!$this->app) {
+                        $this->app = $this->apps->getAppInfo();
+                    }
+
+                    $this->account = $this->basepackages->accounts->checkAccount($this->request->getBasicAuth()['username'], true);
+
+                    if (!$this->account) {
+                        return false;
+                    }
+
+                    //Check if user is allowed to login onto the app. Allowed value is 1 or 2.
+                    $canLogin = $this->basepackages->accounts->canLogin($this->account['id'], $this->app['id']);
+
+                    if ($canLogin === false ||
+                        ($canLogin && is_array($canLogin) && $canLogin['allowed'] == '2')
+                    ) {
+                        if ($this->app['can_login_role_ids']) {
+                            if (is_string($this->app['can_login_role_ids'])) {
+                                $this->app['can_login_role_ids'] = $this->helper->decode($this->app['can_login_role_ids'], true);
+                            }
+
+                            if (in_array($this->account['security']['role_id'], $this->app['can_login_role_ids'])) {
+                                if ($canLogin === false) {
+                                    if ($this->config->databasetype === 'db') {
+                                        $canloginModel = new BasepackagesUsersAccountsCanlogin;
+
+                                        $newLogin['account_id'] = $this->account['id'];
+                                        $newLogin['app_id'] = $this->app['id'];
+                                        $newLogin['allowed'] = '2';
+
+                                        $canloginModel->assign($newLogin);
+
+                                        $canloginModel->create();
+                                    } else {
+                                        $canloginStore = $this->ff->store('basepackages_users_accounts_canlogin');
+
+                                        $canloginStore->insert(
+                                            [
+                                                'account_id'    => $this->account['id'],
+                                                'app_id'        => $this->app['id'],
+                                                'allowed'       => 2
+                                            ]
+                                        );
+                                    }
+                                }
+                            } else {
+                                $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to app ' . $this->app['name']);
+
+                                return false;
+                            }
+                        } else {
+                            $this->logger->log->debug('App\'s can_login_role_ids not set for app ' . $this->app['name']);
+
+                            return false;
+                        }
+                    } else if ($canLogin && is_array($canLogin) && $canLogin['allowed'] == '0') {
+                        $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to api ' . $this->app['name']);
+
+                        return false;
+                    }
+
+                    foreach ($this->apiServices as $apiService) {
+                        if (($apiService['api_type'] === 'protected_user_credentials') &&
+                            $apiService['app_id'] === $this->app['id'] &&
+                            $apiService['domain_id'] === $this->domains->domain['id']
+                        ) {
+                            $api[0] = $apiService;
+
+                            break;
+                        }
+                    }
                 } else {
-                    $params = [
-                        'conditions' => [
-                            ['is_public', '=', (bool) '1'],
-                            ['app_id', '=', $this->apps->getAppInfo()['id']],
-                            ['domain_id', '=', $this->domains->domain['id']]
-                        ]
-                    ];
+                    foreach ($this->apiServices as $apiService) {
+                        if (($apiService['api_type'] === 'public') &&
+                            $apiService['app_id'] === $this->apps->getAppInfo()['id'] &&
+                            $apiService['domain_id'] === $this->domains->domain['id']
+                        ) {
+                            $api[0] = $apiService;
+
+                            break;
+                        }
+                    }
                 }
 
-                $api = $this->getByParams($params);
-
-
-                if ($api && isset($api[0]) && $api[0]['status'] == true) {
-
+                if (isset($api[0]) && $api[0]['status'] == true) {
                     $this->caching->init('apcuCache', 7200);
 
                     if ($this->caching->enabled) {
@@ -443,12 +519,12 @@ class Api extends BasePackage
                             );
                         }
 
-                        if ($this->caching->enabled) {
+                        if (isset($client[0]) && $this->caching->enabled) {
                             $client[0] = $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client[0]);
                         }
                     }
 
-                    if (isset($client) && $client) {
+                    if (isset($client[0])) {
                         if ($this->checkCallLimits($client[0], $api[0])) {
                             $this->client = $client[0];
                             $this->apiCallsLimitReached = true;
@@ -457,9 +533,9 @@ class Api extends BasePackage
                             $this->client = $client[0];
                         }
                     } else {
-                        $newClient["api_id"] = $api[0]['id'];
-                        $newClient["app_id"] = $this->apps->getAppInfo()['id'];
-                        $newClient["domain_id"] = $this->domains->domain['id'];
+                        $newClient["api_id"] = (int) $api[0]['id'];
+                        $newClient["app_id"] = (int) $this->apps->getAppInfo()['id'];
+                        $newClient["domain_id"] = (int) $this->domains->domain['id'];
                         $newClient["account_id"] = 0;
                         $newClient["email"] = 'pubapi@' . $this->domains->domain['name'];
                         $newClient["client_id"] = $this->request->getClientAddress();
@@ -475,123 +551,151 @@ class Api extends BasePackage
                         $this->client = $this->clients->packagesData->last;
                     }
                 }
-            } else if ($this->isApiCheckVia === 'authorization' ||
-                       $this->isApiCheckVia === 'client_id'
-            ) {
-                if ($this->isApiCheckVia === 'authorization') {
-                    $authorization = \trim((string) \preg_replace('/^\s*Bearer\s/', '', $this->request->getHeader('Authorization')));
-                    $authorization = explode('||', $authorization);
+            } else if ($this->isApiCheckVia === 'authorization') {
+                $authorization = \trim((string) \preg_replace('/^\s*Bearer\s/', '', $this->request->getHeader('Authorization')));
+                $authorization = explode('||', $authorization);
 
-                    if (count($authorization) === 2) {
-                        $this->clientId = $this->secTools->decryptBase64($authorization[1]);
-                    } else if (count($authorization) === 3) {
-                        $this->clientId = $this->secTools->decryptBase64($authorization[1]);
-                        $this->deviceId = $this->secTools->decryptBase64($authorization[2]);
-                    }
+                if (count($authorization) === 2) {
+                    $this->clientId = $this->secTools->decryptBase64($authorization[1]);
+                } else if (count($authorization) === 3) {
+                    $this->clientId = $this->secTools->decryptBase64($authorization[1]);
+                    $this->deviceId = $this->secTools->decryptBase64($authorization[2]);
                 }
 
-                if ($this->clientId) {
-                    $client = null;
-
-                    $this->caching->init('apcuCache', 7200);
-
-                    if ($this->caching->enabled) {
-                        $apcuClient = $this->caching->getCache('api-clients-' . $this->request->getClientAddress());
-
-                        if ($apcuClient) {
-                            $client[0] = $apcuClient;
-                        }
-                    }
-
-                    if ($this->config->databasetype === 'db') {
-                        if ($this->deviceId) {
-                            $params =
-                                [
-                                    'conditions'    => 'client_id = :client_id: AND device_id = :device_id:',
-                                    'bind'          =>
-                                        [
-                                            'client_id'    => $this->clientId,
-                                            'device_id'    => $this->deviceId
-                                        ]
-                                ];
-                        } else {
-                            $params =
-                                [
-                                    'conditions'    => 'client_id = :client_id:',
-                                    'bind'          =>
-                                        [
-                                            'client_id'    => $this->clientId
-                                        ]
-                                ];
-                        }
-                    } else {
-                        if ($this->deviceId) {
-                            $params = [
-                                'conditions' => [
-                                    ['client_id', '=', $this->clientId],
-                                    ['device_id', '=', $this->deviceId]
-                                ]
-                            ];
-                        } else {
-                            $params = [
-                                'conditions' => [
-                                    ['client_id', '=', $this->clientId]
-                                ]
-                            ];
-
-                        }
-                    }
-
-                    $client = $this->clients->getByParams($params);
-
-                    if ($client && $client && is_array($client) && isset($client[0]['api_id'])) {
-                        if ($this->caching->enabled) {
-                            $client[0] = $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client[0]);
-                        }
-
-                        $api = $this->getById($client[0]['api_id']);
-
-                        if ($api['status'] == true) {
-                            if ($this->checkCallLimits($client[0], $api)) {
-                                $this->apiCallsLimitReached = true;
-                                $this->client = $client[0];
-                            } else {
-                                $this->api = $api;
-                                $this->client = $client[0];
-                            }
-                        }
-                    }
+                if (!$this->clientId) {
+                    return false;
                 }
-            }
-        }
 
-        if ($usingDomainApp) {
-            if ($this->config->databasetype === 'db') {
-                $this->api =
-                    $this->getByParams(
-                        [
-                            'conditions'    => 'domain_id = :did: AND app_id = :aid: AND status = :status:',
-                            'bind'          => [
-                                'did'       => (int) $this->domains->domain['id'],
-                                'aid'       => (int) $this->apps->getAppInfo()['id'],
-                                'status'    => 1
-                            ]
-                        ], true
-                    );
-            } else {
-                $this->api = $this->getByParams(
-                    [
-                        'conditions' => [
-                            ['domain_id', '=', (int) $this->domains->domain['id']],
-                            ['app_id', '=', (int) $this->apps->getAppInfo()['id']],
-                            ['status', '=', (bool) true],
-                        ]
-                    ]
-                );
+                $this->setupApiViaClientId();
             }
         }
 
         return $this->api;
+    }
+
+    public function setupApiViaClientId($getEncIds = false)
+    {
+        if (!$this->clientId) {
+            if ($this->request->get('client_id')) {
+                $this->clientId = $this->request->get('client_id');
+                if ($getEncIds) {
+                    $this->encClientId = $this->secTools->encryptBase64($this->clientId);
+                }
+            } else if ($this->request->getPost()['client_id']) {
+                $this->clientId = $this->request->getPost()['client_id'];
+                if ($getEncIds) {
+                    $this->encClientId = $this->secTools->encryptBase64($this->clientId);
+                }
+            }
+
+            if ($this->request->get('device_id')) {
+                $this->deviceId = $this->request->get('device_id');
+                if ($getEncIds) {
+                    $this->encDeviceId = $this->secTools->encryptBase64($this->deviceId);
+                }
+            } else if (isset($this->request->getPost()['device_id'])) {
+                $this->deviceId = $this->request->getPost()['device_id'];
+                if ($getEncIds) {
+                    $this->encDeviceId = $this->secTools->encryptBase64($this->deviceId);
+                }
+            }
+        }
+
+        $client = null;
+
+        $this->caching->init('apcuCache', 7200);
+
+        if ($this->caching->enabled) {
+            $apcuClient = $this->caching->getCache('api-clients-' . $this->request->getClientAddress());
+
+            if ($apcuClient) {
+                $client[0] = $apcuClient;
+            }
+        }
+
+        if ($this->config->databasetype === 'db') {
+            if ($this->deviceId) {
+                $params =
+                    [
+                        'conditions'    => 'client_id = :client_id: AND device_id = :device_id:',
+                        'bind'          =>
+                            [
+                                'client_id'    => $this->clientId,
+                                'device_id'    => $this->deviceId
+                            ]
+                    ];
+            } else {
+                $params =
+                    [
+                        'conditions'    => 'client_id = :client_id:',
+                        'bind'          =>
+                            [
+                                'client_id'    => $this->clientId
+                            ]
+                    ];
+            }
+        } else {
+            if ($this->deviceId) {
+                $params = [
+                    'conditions' => [
+                        ['client_id', '=', $this->clientId],
+                        ['device_id', '=', $this->deviceId]
+                    ]
+                ];
+            } else {
+                $params = [
+                    'conditions' => [
+                        ['client_id', '=', $this->clientId]
+                    ]
+                ];
+
+            }
+        }
+
+        $client = $this->clients->getByParams($params);
+
+        if ($client && $client && is_array($client) && isset($client[0]['api_id'])) {
+            if (isset($client[0]['account_id']) && $client[0]['account_id'] > 0) {
+                $this->account = $this->basepackages->accounts->getAccountById($client[0]['account_id']);
+            }
+
+            if (!$this->account) {
+                $this->account = $this->basepackages->accounts->checkAccount($client[0]['email'], true);
+            }
+
+            if (!$this->account) {
+                return false;
+            }
+
+            if ($this->caching->enabled) {
+                $client[0] = $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client[0]);
+            }
+
+            $api = $this->getById($client[0]['api_id']);
+
+            if ($api['status'] == true) {
+                if ($this->checkCallLimits($client[0], $api)) {
+                    $this->apiCallsLimitReached = true;
+                    $this->client = $client[0];
+                } else {
+                    $this->api = $api;
+                    $this->client = $client[0];
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function account()
+    {
+        if ($this->authenticated) {
+            return $this->account;
+        }
+
+        return false;
     }
 
     public function checkCallLimits(&$client, $api)
@@ -683,8 +787,8 @@ class Api extends BasePackage
     public function setupApi($refreshTokenSet = false)
     {
         if ($this->api['grant_type']) {
-            if (!isset($this->{$this->api['grant_type']})) {
-                if (method_exists($this, $grant = "init" . ucfirst("{$this->api['grant_type']}"))) {
+            if (method_exists($this, $grant = "init" . ucfirst("{$this->api['grant_type']}"))) {
+                try {
                     $this->initApiServer();
 
                     if ($refreshTokenSet) {
@@ -694,6 +798,10 @@ class Api extends BasePackage
                     }
 
                     $this->{$grant}();
+                } catch (\throwable $e) {
+                    $this->logException($e);
+
+                    throw new \Exception($e->getMessage());
                 }
             }
         }
@@ -701,75 +809,83 @@ class Api extends BasePackage
 
     protected function initApiServer()
     {
-        $this->accessTokenRepository = new AccessTokenRepository();
-        $this->authCodeRepository = new AuthCodeRepository();
-        $this->clientRepository = new ClientRepository();
-        $this->refreshTokenRepository = new RefreshTokenRepository();
-        $this->scopeRepository = new ScopeRepository();
-        $this->userRepository = new UserRepository();
-
         $this->keys = $this->getAPIKeys();
 
+        $this->refreshTokenRepository = new RefreshTokenRepository();
+
         $this->server = new AuthorizationServer(
-            $this->clientRepository,
-            $this->accessTokenRepository,
-            $this->scopeRepository,
+            new ClientRepository(),
+            new AccessTokenRepository(),
+            new ScopeRepository(),
             new CryptKey($this->keys['private_location'], $this->keys['pki_passphrase']),
             $this->keys['enc']
         );
+
+        $this->api['access_token_timeout'] = $this->api['access_token_timeout'] ?? 'PT1H';//1 Hour
+        $this->api['refresh_token_timeout'] = $this->api['refresh_token_timeout'] ?? 'P1M';//1 Month
+        $this->api['authorization_code_timeout'] = $this->api['authorization_code_timeout'] ?? 'PT10M';//10 Minutes
     }
 
-    protected function initPassword()//Password Grant
+    //Password Grant
+    protected function initPassword()
     {
         $grant = new PasswordGrant(
-            $this->userRepository,
+            new UserRepository(),
             $this->refreshTokenRepository
         );
 
-        $grant->setRefreshTokenTTL(new DateInterval($this->api['refresh_token_timeout'] ?? 'P1M'));// refresh tokens will expire after 1 month
+        //Refresh tokens will expire after 1 month
+        $grant->setRefreshTokenTTL(new DateInterval($this->api['refresh_token_timeout']));
 
         // Enable the password grant on the server with a token TTL of 1 hour
         $this->server->enableGrantType(
             $grant,
-            new DateInterval($this->api['access_token_timeout'] ?? 'PT1H')// access tokens will expire after 1 hour
+            new DateInterval($this->api['access_token_timeout'])
         );
     }
 
-    protected function initClient_credentials()//Client Credentials Grant
+    //Client Credentials Grant
+    protected function initClient_credentials()
     {
-        // Enable the client credentials grant on the server
+        // Enable the client credentials grant on the server token TTL of 1 hour
         $this->server->enableGrantType(
             new ClientCredentialsGrant(),
-            new DateInterval($this->api['access_token_timeout'] ?? 'PT1H') // access tokens will expire after 1 hour
+            new DateInterval($this->api['access_token_timeout'])
         );
     }
 
-    protected function initAuthorization_code()//Authorization Code Grant
+    //Authorization Code Grant
+    protected function initAuthorization_code()
     {
+        // authorization codes will expire after 10 minutes
         $grant = new AuthCodeGrant(
-             $this->authCodeRepository,
+             new AuthCodeRepository(),
              $this->refreshTokenRepository,
-             new \DateInterval('PT10M') // authorization codes will expire after 10 minutes
+             new \DateInterval($this->api['authorization_code_timeout'])
          );
 
-        $grant->setRefreshTokenTTL(new \DateInterval($this->api['refresh_token_timeout'] ?? 'P1M')); // refresh tokens will expire after 1 month
+        //Refresh tokens will expire after 1 month
+        $grant->setRefreshTokenTTL(new \DateInterval($this->api['refresh_token_timeout']));
 
-        // Enable the authentication code grant on the server
+        // Enable the authentication code grant on the server token TTL of 1 hour
         $this->server->enableGrantType(
             $grant,
-            new \DateInterval($this->api['access_token_timeout'] ?? 'PT1H') // access tokens will expire after 1 hour
+            new \DateInterval($this->api['access_token_timeout'])
         );
     }
 
-    protected function initRefresh_token()//Refresh Token Grant
+    //Refresh Token Grant
+    protected function initRefresh_token()
     {
         $grant = new RefreshTokenGrant($this->refreshTokenRepository);
-        $grant->setRefreshTokenTTL(new \DateInterval($this->api['refresh_token_timeout'] ?? 'P1M')); // new refresh tokens will expire after 1 month
 
-        // Enable the refresh token grant on the server
+        // Refresh tokens will expire after 1 month
+        $grant->setRefreshTokenTTL(new \DateInterval($this->api['refresh_token_timeout']));
+
+        // Enable the refresh token grant on the server token TTL of 1 hour
         $this->server->enableGrantType(
             $grant,
-            new \DateInterval($this->api['access_token_timeout'] ?? 'PT1H') // new access tokens will expire after an hour
+            new \DateInterval($this->api['access_token_timeout'])
         );
     }
 
@@ -780,51 +896,41 @@ class Api extends BasePackage
         try {
             $tokenResponse = $this->server->respondToAccessTokenRequest(ServerRequest::fromGlobals(), $serverResponse);
 
-            $token = $this->helper->decode((string) $tokenResponse->getBody(), true);
+            $responseData = $this->helper->decode((string) $tokenResponse->getBody(), true);
 
-            if ($this->request->get('client_id')) {
-                $clientId = $this->request->get('client_id');
-                $encClientId = $this->secTools->encryptBase64($clientId);
-            } else if ($this->request->getPost()['client_id']) {
-                $clientId = $this->request->getPost()['client_id'];
-                $encClientId = $this->secTools->encryptBase64($clientId);
+            $responseData['access_token'] .= '||' . $this->encClientId;
+
+            if ($this->encDeviceId) {
+                $responseData['access_token'] .= '||' . $this->encDeviceId;
             }
 
-            if ($this->request->get('device_id')) {
-                $deviceId = $this->request->get('device_id');
-                $encDeviceId = $this->secTools->encryptBase64($deviceId);
-            } else if (isset($this->request->getPost()['device_id'])) {
-                $deviceId = $this->request->getPost()['device_id'];
-                $encDeviceId = $this->secTools->encryptBase64($deviceId);
+            if (isset($responseData['refresh_token'])) {
+                $responseData['refresh_url'] = $this->links->url('register/apiClient');
             }
 
-            $token['access_token'] = $token['access_token'] . '||' . $encClientId;
+            if ($responseData['expires_in'] && $responseData['expires_in'] > 0) {
+                $now = (\Carbon\Carbon::now('UTC'))->timestamp;
 
-            if (isset($encDeviceId)) {
-                $token['access_token'] = $token['access_token'] . '||' . $encDeviceId;
+                $responseData['expires_in'] = $now + $responseData['expires_in'];
+                $responseData['expires'] = \Carbon\Carbon::parse($responseData['expires_in'])->toAtomString();
             }
 
-            if ($this->request->getPost()['grant_type'] === 'authorization_code' || $this->request->get('refresh_token')) {
-                $this->addResponse('Access token generated!', 0, $token);
+            $this->addResponse('Access token generated!', 0, $responseData);
 
-                return true;
-            }
-
-            $body = Utils::streamFor($this->helper->encode($token));
-
-            return $tokenResponse->withBody($body);
+            return true;
         } catch (OAuthServerException $exception) {
-            $this->logger->logExceptions->critical(json_trace($exception));
+            $this->logException($exception);
+
             $this->addResponse($exception->getMessage(), 1, []);
-            var_dump($exception);die();
-            // All instances of OAuthServerException can be converted to a PSR-7 response
+
             return $exception->generateHttpResponse($serverResponse);
         } catch (\Exception $exception) {
-            $this->logger->logExceptions->critical(json_trace($exception));
+            $this->logException($exception);
+
             $this->addResponse($exception->getMessage(), 1, []);
-            var_dump($exception);die();
-            // Catch unexpected exceptions
+
             $body = $serverResponse->getBody();
+
             $body->write($exception->getMessage());
 
             return $serverResponse->withStatus(500)->withBody($body);
@@ -844,33 +950,53 @@ class Api extends BasePackage
 
             return $this->server->completeAuthorizationRequest($authoRequest, $serverResponse);
         } catch (OAuthServerException $exception) {
-            var_dump($exception);die();
+            $this->logException($exception);
 
-            // All instances of OAuthServerException can be formatted into a HTTP response
             return $exception->generateHttpResponse($serverResponse);
-
         } catch (\Exception $exception) {
-            var_dump($exception);die();
+            $this->logException($exception);
 
-            // Unknown exception
             $body = new Stream(fopen('php://temp', 'r+'));
+
             $body->write($exception->getMessage());
+
             return $serverResponse->withStatus(500)->withBody($body);
         }
     }
 
     public function authCheck()
     {
-        $this->accessTokenRepository = new AccessTokenRepository();
+        //Username/password authentication
+        if ($this->api['api_type'] === 'protected_user_credentials') {
+            $data['user'] = $this->request->getBasicAuth()['username'];
+            $data['pass'] = $this->request->getBasicAuth()['password'];
+
+            if (!$this->secTools->checkPassword($data['pass'], $this->account['security']['password'])) {
+                $isAllowed = $this->access->ipFilter->filters->bumpFilterHitCounter(true);
+
+                throw new \Exception('Error: Username/Password incorrect!');
+            }
+
+            $filter = null;
+
+            $this->access->ipFilter->filters->bumpFilterHitCounter(false, null, $filter, false, true);
+
+            $this->authenticated = true;
+
+            return true;
+        }
+
+        //Token Authorization
+        $accessTokenRepository = new AccessTokenRepository();
 
         $this->keys = $this->getAPIKeys();
 
         try {
             $this->resource = new ResourceServer(
-                $this->accessTokenRepository,
+                $accessTokenRepository,
                 new CryptKey($this->keys['public_location'], $this->keys['pki_passphrase']),
                 new BearerTokenValidator(
-                    $this->accessTokenRepository
+                    $accessTokenRepository
                 )
             );
 
@@ -878,9 +1004,11 @@ class Api extends BasePackage
 
             $this->headerAttributes = $validateToken->getAttributes();
 
-            if ($this->accessTokenRepository->isTokenExpired($this->headerAttributes['oauth_access_token_id'])) {
+            if ($accessTokenRepository->isTokenExpired($this->headerAttributes['oauth_access_token_id'])) {
                 throw new \Exception('Token Expired!');
             }
+
+            $this->authenticated = true;
 
             return $validateToken;
         } catch (\Exception $e) {
@@ -931,6 +1059,37 @@ class Api extends BasePackage
         }
 
         return $otherGrants;
+    }
+
+    public function getAPIAvailableScopes()
+    {
+        if (!$this->scopes) {
+            $this->init();
+        }
+
+        return $this->scopes->init()->scopes;
+    }
+
+    public function getAPIAvailableTypes()
+    {
+        return
+            [
+                'public'   =>
+                    [
+                        'id'            => 'public',
+                        'name'          => 'Public'
+                    ],
+                'protected_user_credentials'    =>
+                    [
+                        'id'            => 'protected_user_credentials',
+                        'name'          => 'Protected (User Credentials)',
+                    ],
+                'protected_grant'    =>
+                    [
+                        'id'            => 'protected_grant',
+                        'name'          => 'Protected (Grant)',
+                    ]
+            ];
     }
 
     public function getOpensslAlgorithms()
@@ -1078,11 +1237,6 @@ class Api extends BasePackage
         }
     }
 
-    public function getAPIAvailableScopes()
-    {
-        return $this->scopes->init()->scopes;
-    }
-
     public function getEnabledAPIByType($type)
     {
         if ($this->config->databasetype === 'db') {
@@ -1118,20 +1272,7 @@ class Api extends BasePackage
     {
         $url = false;
 
-        if (!isset($data['type'])) {
-            $this->addResponse('Please set url type.', 1);
-
-            return false;
-        }
-
-        $this->validation->add('app_id', PresenceOf::class, ["message" => "Please provide app id."]);
-        $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain id."]);
-
-        if (($validatedMessages = $this->validateData($data)) !== true) {
-            $this->addResponse($validatedMessages, 1);
-
-            return false;
-        }
+        $this->validateDataWithMetaData(data: $data, checkFields: ['type', 'app_id', 'domain_id']);
 
         $app = $this->apps->getById($data['app_id']);
         if (!$app) {
@@ -1154,15 +1295,7 @@ class Api extends BasePackage
         }
 
         if ($data['type'] === 'request' || $data['type'] === 'authorization') {
-            $this->validation->add('client_id', PresenceOf::class, ["message" => "Please provide client id."]);
-            $this->validation->add('redirect_url', PresenceOf::class, ["message" => "Please provide redirect URL."]);
-            $this->validation->add('scope_id', PresenceOf::class, ["message" => "Please provide scope id."]);
-
-            if (($validatedMessages = $this->validateData($data)) !== true) {
-                $this->addResponse($validatedMessages, 1);
-
-                return false;
-            }
+            $this->validateDataWithMetaData(data: $data, checkFields: ['client_id', 'redirect_url', 'scope_id']);
 
             $scope = $this->scopes->getById($data['scope_id']);
             if (!$scope) {
@@ -1174,25 +1307,17 @@ class Api extends BasePackage
             $url = $url . 'register/q/';
 
             if ($data['type'] === 'authorization') {
-                $url = $url . 'csrf/' . $data['csrf'] . '/?response_type=code&client_id=' . $data['client_id'] . '&redirect_url=' . $data['redirect_url'];
-                if (isset($data['state']) && $data['state'] !== '') {
-                    $url = $url . '&state=' . $data['state'];
-                }
+                $url = $url . 'state/' . $data['state'] . '/?response_type=code&client_id=' . $data['client_id'] . '&redirect_url=' . $data['redirect_url'];
             } else {
                 $url = $url . 'response_type/code/client_id/' . $data['client_id'] . '/scope/' . $scope['scope_name'];
-
-                $url = $url . '/state/' . ($data['state'] ?? '{{your_state_code}}');
 
                 $url = $url . '/redirect_uri/__' . $data['redirect_url'] . '__';
             }
 
             $this->addResponse('Generated Url', 0, ['url' => $url]);
         } else if ($data['type'] === 'redirect') {
-            if (($validatedMessages = $this->validateData($data)) !== true) {
-                $this->addResponse($validatedMessages, 1);
+            $this->validateDataWithMetaData(data: $data, checkFields: ['client_id', 'app_id', 'domain_id', 'scope_id']);
 
-                return false;
-            }
             $url = $url . 'register/q/authorized/true';
 
             $this->addResponse('Generated Url', 0, ['url' => $url]);
@@ -1201,24 +1326,10 @@ class Api extends BasePackage
         return $url;
     }
 
-    protected function validateData($data)
-    {
-        $validated = $this->validation->validate($data)->jsonSerialize();
-
-        if (count($validated) > 0) {
-            $messages = 'Error: ';
-
-            foreach ($validated as $key => $value) {
-                $messages .= $value['message'] . ' ';
-            }
-            return $messages;
-        } else {
-            return true;
-        }
-    }
-
     public function checkAuthorizationLinkData($getData)
     {
+        $this->init();
+
         try {
             if (isset($getData['code']) && isset($getData['api_id']) ||
                (isset($getData['code']) && isset($getData['state']) && isset($getData['api_id']))
@@ -1234,7 +1345,7 @@ class Api extends BasePackage
 
                     $this->api = $api;
                 }
-            } else if (!isset($getData['csrf'])) {
+            } else if (!isset($getData['state'])) {//Authorize Flow 1, state is not set
                 $client = $this->clients->getFirst('client_id', $getData['client_id']);
 
                 if (!$client || ($client && $client->revoked != 0)) {
@@ -1243,7 +1354,10 @@ class Api extends BasePackage
 
                 $api = $this->getById($client->api_id);
 
-                if ($api && isset($this->getData()['refresh']) && $this->getData()['refresh'] == true) {
+                if ($api &&
+                    (isset($this->getData()['new']) && $this->getData()['new'] == true) ||
+                    (isset($this->getData()['refresh']) && $this->getData()['refresh'] == true)
+                ) {
                     $this->api = $api;
 
                     return $api;
@@ -1256,35 +1370,52 @@ class Api extends BasePackage
                 }
 
                 if (!$api || ($api && $api['grant_type'] !== 'authorization_code')) {
-                    throw new \Exception('No API associated with this client ID.');
+                    $this->addResponse('No API associated with this client ID.', 1);
+
+                    return false;
                 }
 
                 $scope = $this->scopes->getById($api['scope_id']);
 
                 if ($scope && $scope['scope_name'] !== $getData['scope']) {
-                    throw new \Exception('Scope is incorrect.');
+                    $this->addResponse('Scope is incorrect.', 1);
+
+                    return false;
                 }
 
                 $uri = $this->request->getUri();
                 preg_match('/__.*/', $uri, $redirectUrl);
                 if (isset($redirectUrl) && is_array($redirectUrl) && count($redirectUrl) === 1 && $redirectUrl[0] !== '') {
                     $redirectUrl = str_replace('__', '', $redirectUrl[0]);
+
                     if ($redirectUrl !== $client->redirectUri) {
-                        throw new \Exception('Redirect URI is incorrect.');
+                        $this->addResponse('Redirect URI is incorrect.', 1);
+
+                        return false;
                     }
 
                     $api['redirect_url'] = $redirectUrl;
 
-                    $testRedirectUrl = $this->remoteWebContent->request('GET', $redirectUrl, ['timeout' => 1]);
+                    try {
+                        $testRedirectUrl = $this->remoteWebContent->request('GET', $redirectUrl . '/test_authorized/true', ['timeout' => 1]);
+                    } catch (\throwable $e) {
+                        $this->addResponse('Redirect URI is incorrect. Error: ' . $e->getMessage(), 1);
+
+                        return false;
+                    }
 
                     if ($testRedirectUrl->getStatusCode() !== 200) {
-                        throw new \Exception('Redirect URI is incorrect. Error Code: ' . $testRedirectUrl->getStatusCode());
+                        $this->addResponse('Redirect URI is incorrect. Error Code: ' . $testRedirectUrl->getStatusCode(), 1);
+
+                        return false;
                     }
                 } else {
-                    throw new \Exception('Redirect URI is incorrect.');
+                    $this->addResponse('Redirect URI is incorrect.', 1);
+
+                    return false;
                 }
 
-                $api['csrf'] = $this->secTools->random->base58(32);
+                $api['state'] = $this->secTools->random->base58(32);
 
                 $this->update($api);
 
@@ -1294,10 +1425,12 @@ class Api extends BasePackage
 
                 $this->api = $api;
             } else {
-                $api = $this->getFirst('csrf', $getData['csrf'], false, false, null, [], true);
+                $api = $this->getFirst('state', $getData['state'], false, false, null, [], true);
 
-                if ($getData['csrf'] !== $api['csrf']) {
-                    throw new \Exception('CSRF mismatch. Restart authorization process!');
+                if ($getData['state'] !== $api['state']) {
+                    $this->addResponse('State mismatch. Restart authorization process!', 1);
+
+                    return false;
                 }
 
                 $this->client = $this->clients->getFirst('client_id', $api['client_id'], false, false, null, [], true);
@@ -1321,5 +1454,181 @@ class Api extends BasePackage
         }
 
         return false;
+    }
+
+    public function generateOpenapiFile($data)
+    {
+        if (!isset($data['id'])) {
+            $this->addResponse('Api ID not set', 1);
+
+            return false;
+        }
+
+        $api = $this->getById((int) $data['id']);
+
+        if (!$api) {
+            $this->addResponse('Api with ID not found', 1);
+
+            return false;
+        }
+
+        $version = '0.0.0';
+
+        if ($this->apps->apps[$api['app_id']]['app_type'] === 'core') {
+            $version = $this->core->core['version'];
+        } else {
+            try {
+                if ($this->localContent->fileExists('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/type.json')) {
+                    $type = $this->helper->decode($this->localContent->read('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/type.json'), true);
+
+                    if (isset($type['version'])) {
+                        $version = $type['version'];
+                    }
+                }
+            } catch (\throwable | UnableToCheckExistence | UnableToReadFile | FilesystemException $e) {
+                $this->logException($e);
+
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+        }
+
+        //Read File Content
+        try {
+            if ($this->localContent->fileExists('var/api/openapi/' . $api['id'] . '/openapi.json')) {
+                $fileContentArr = $this->helper->decode($this->localContent->read('var/api/openapi/' . $api['id'] . '/openapi.json'), true);
+
+                if (isset($fileContentArr['openapi']) && $fileContentArr['openapi'] === $version) {
+                    $fileContent = $this->helper->encode($fileContentArr, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
+                }
+            }
+        } catch (\throwable | UnableToCheckExistence | UnableToReadFile | FilesystemException $e) {
+            $this->logException($e);
+
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        //Extract File Content and write to openapi.json file.
+        if (!isset($fileContent)) {
+            try {
+                $src =
+                    [
+                        base_path('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/Install.php'),
+                        base_path('system/Base/BaseApi.php')
+                    ];
+
+                $componentsDir = $this->basepackages->utils->scanDir('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Components/');
+
+                if (count($componentsDir['files']) > 0) {
+                    foreach ($componentsDir['files'] as $files) {
+                        if (str_ends_with($files, 'Api.php')) {
+                            array_push($src, base_path($files));
+                        }
+                    }
+                }
+
+                if ($this->apps->apps[$api['app_id']]['app_type'] === 'core') {
+                    $modelFiles = [];
+
+                    $providersArr = $this->basepackages->utils->scanDir('system/Base/Providers/');
+
+                    foreach ($providersArr['files'] as $files) {
+                        if (str_contains($files, 'ApiClientServices')) {
+                            continue;
+                        }
+
+                        if (str_contains($files, '/Model/')) {
+                            array_push($modelFiles, base_path($files));
+                        }
+                    }
+
+                    $src = array_merge($src, $modelFiles);
+                }
+
+                $result = (new \OpenApi\Builder())->setSources($src)->build();
+
+                if ($result) {
+                    $result = $this->helper->decode($result->toJson(), true);
+
+                    $result['info']['version'] = $version;
+
+                    if (isset($api['openapi_name']) && $api['openapi_name'] !== '') {
+                        $result['info']['title'] = $api['openapi_name'];
+                    }
+                    if (isset($api['openapi_description']) && $api['openapi_description'] !== '') {
+                        $result['info']['description'] = $api['openapi_description'];
+                    }
+                    if (isset($api['openapi_email']) && $api['openapi_email'] !== '') {
+                        $result['info']['contact']['email'] = $api['openapi_email'];
+                    }
+                    if (isset($api['openapi_license_name']) && $api['openapi_license_name'] !== '') {
+                        $result['info']['license']['name'] = $api['openapi_license_name'];
+                    }
+                    if (isset($api['openapi_license_url']) && $api['openapi_license_url'] !== '') {
+                        $result['info']['license']['url'] = $api['openapi_license_url'];
+                    }
+
+                    $devDefinedServers = $result['servers'];
+                    $result['servers'] = [];
+
+                    if (isset($api['openapi_server_sandbox_url']) && $api['openapi_server_sandbox_url'] !== '') {
+                        $sandbox = [];
+                        $sandbox['url'] = $api['openapi_server_sandbox_url'];
+
+                        if (isset($api['openapi_server_sandbox_description']) && $api['openapi_server_sandbox_description'] !== '') {
+                            $sandbox['description'] = $api['openapi_server_sandbox_description'];
+                        }
+
+                        array_push($result['servers'], $sandbox);
+                    }
+
+                    if (isset($api['openapi_server_production_url']) && $api['openapi_server_production_url'] !== '') {
+                        $production = [];
+                        $production['url'] = $api['openapi_server_production_url'];
+
+                        if (isset($api['openapi_server_production_description']) && $api['openapi_server_production_description'] !== '') {
+                            $production['description'] = $api['openapi_server_production_description'];
+                        }
+
+                        array_push($result['servers'], $production);
+                    }
+
+                    if (count($result['servers']) === 0) {
+                        if (isset($devDefinedServers) && count($devDefinedServers) > 0) {
+                            foreach ($devDefinedServers as $server) {
+                                $serverArr = [];
+                                $serverArr['url'] = $server['url'];
+                                $serverArr['description'] = $server['description'];
+
+                                array_push($result['servers'], $serverArr);
+                            }
+                        }
+                    }
+
+                    try {
+                        $fileContent = $this->helper->encode($result, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
+
+                        $this->localContent->write('var/api/openapi/' . $api['id'] . '/openapi.json', $fileContent);
+
+                        $this->addResponse('Ok', 0, ['fileContent' => $fileContent]);
+                    } catch (\throwable | UnableToWriteFile | FilesystemException $e) {
+                        $this->addResponse('Unable to write Json File to folder var/api/openapi. Check permission or contact developer.', 1);
+
+                        return false;
+                    }
+                }
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+        }
+
+        $this->addResponse('Generated openapi specs successfully.', 0, ['fileContent' => $fileContent]);
+
+        return true;
     }
 }

@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ApiServiceProvider\Repositories;
 
-use Carbon\Carbon;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
@@ -18,7 +17,7 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
 {
     protected $modelToUse = ServiceProviderApiAccessTokens::class;
 
-    public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null)
+    public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null) :ServiceProviderApiAccessTokens
     {
         $accessToken = $this->useModel();
 
@@ -36,7 +35,7 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
         return $accessToken;
     }
 
-    public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity)
+    public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity) :void
     {
         $accessToken = $accessTokenEntity->getIdentifier();
 
@@ -49,30 +48,30 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
                 'conditions'    => 'api_id = :apiId: AND app_id = :appId: AND domain_id = :domainId: AND account_id = :accountId:',
                 'bind'          =>
                     [
-                        'apiId'    => $this->api->getApiInfo()['id'],
-                        'appId'    => $this->apps->getAppInfo()['id'],
-                        'domainId' => $this->domains->domain['id'],
-                        'accountId'=> $accessTokenEntity->getClient()->getUserIdentifier()
+                        'apiId'    => (int) $this->api->getApiInfo()['id'],
+                        'appId'    => (int) $this->apps->getAppInfo()['id'],
+                        'domainId' => (int) $this->domains->domain['id'],
+                        'accountId'=> (int) $accessTokenEntity->getClient()->getUserIdentifier()
                     ]
             ];
         } else {
             $params['conditions'] = [
-                ['api_id', '=', $this->api->getApiInfo()['id']],
-                ['app_id', '=', $this->apps->getAppInfo()['id']],
-                ['domain_id', '=', $this->domains->domain['id']],
-                ['account_id', '=', $accessTokenEntity->getClient()->getUserIdentifier()]
+                ['api_id', '=', (int) $this->api->getApiInfo()['id']],
+                ['app_id', '=', (int) $this->apps->getAppInfo()['id']],
+                ['domain_id', '=', (int) $this->domains->domain['id']],
+                ['account_id', '=', (int) $accessTokenEntity->getClient()->getUserIdentifier()]
             ];
         }
 
         $token = $this->getByParams($params, false, false);
 
         $newToken = [
-            'api_id' => $this->api->getApiInfo()['id'],
-            'app_id' => $this->apps->getAppInfo()['id'],
-            'domain_id' => $this->domains->domain['id'],
-            'account_id' => $accessTokenEntity->getClient()->getUserIdentifier(),
+            'api_id' => (int) $this->api->getApiInfo()['id'],
+            'app_id' => (int) $this->apps->getAppInfo()['id'],
+            'domain_id' => (int) $this->domains->domain['id'],
+            'account_id' => (int) $accessTokenEntity->getClient()->getUserIdentifier(),
             'access_token' => $accessToken,
-            'expires' => (\Carbon\Carbon::parse($accessTokenEntity->getExpiryDateTime()))->toDateTimeLocalString(),
+            'expires' => (\Carbon\Carbon::parse($accessTokenEntity->getExpiryDateTime())->setTimezone('UTC'))->toAtomString(),
             'client_id' => $accessTokenEntity->getClient()->getIdentifier(),
             'revoked' => 0
         ];
@@ -90,7 +89,7 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
         }
     }
 
-    public function revokeAccessToken($tokenId)
+    public function revokeAccessToken($tokenId) :void
     {
         if ($result = $this->getFirst('access_token', $tokenId)) {
             $result = $result->toArray();
@@ -101,7 +100,7 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
         }
     }
 
-    public function isAccessTokenRevoked($tokenId)
+    public function isAccessTokenRevoked($tokenId) :bool
     {
         if ($result = $this->getFirst('access_token', $tokenId)) {
             return (int) $result->revoked === 1;
@@ -120,7 +119,7 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
             }
 
             try {
-                $expiry = (new Carbon)->parse($result['expires']);
+                $expiry = \Carbon\Carbon::parse($result['expires'])->setTimezone('UTC');
 
                 if ($expiry->isPast()) {
                     return true;

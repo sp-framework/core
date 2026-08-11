@@ -20,7 +20,7 @@ class WidgetInstaller extends BasePackage
                 $componentClassArr = array_slice(explode('\\', get_class($componentClass)), 1, -2);
                 $componentClass = 'Apps\\' . implode('\\', $componentClassArr) . '\\' . $this->helper->last($componentClassArr) . 'Component';
 
-                $component = $this->modules->components->getComponentByClass($componentClass);
+                $component = $this->modules->components->init(true)->getComponentByClass($componentClass);
 
                 if (!$component) {
                     throw new \Exception('Component with class: ' . $componentClass . ' not found!');
@@ -40,7 +40,7 @@ class WidgetInstaller extends BasePackage
                         continue;
                     }
 
-                    $widget = $this->basepackages->widgets->getWidgetByMethodAndAppType($widgetArr['method'], $component['app_type']);
+                    $widget = $this->basepackages->widgets->init(true)->getWidgetByMethodAndAppType($widgetArr['method'], $component['app_type']);
 
                     if ($widget) {
                         $widgetToUpdate =
@@ -96,6 +96,7 @@ class WidgetInstaller extends BasePackage
 
         if ($this->opCache) {
             $this->opCache->removeCache('widgets', 'core');
+            $this->opCache->removeCache('components', 'core');
         }
 
         return true;
@@ -107,7 +108,7 @@ class WidgetInstaller extends BasePackage
         $componentClassArr = array_slice(explode('\\', get_class($componentClass)), 1, -2);
         $componentClass = 'Apps\\' . implode('\\', $componentClassArr) . '\\' . $this->helper->last($componentClassArr) . 'Component';
 
-        $component = $this->modules->components->getComponentByClass($componentClass);
+        $component = $this->modules->components->init(true)->getComponentByClass($componentClass);
 
         if (!$component) {
             throw new \Exception('Component with class: ' . $componentClass . ' not found!');
@@ -115,7 +116,7 @@ class WidgetInstaller extends BasePackage
 
         if ($component) {
             foreach ($component['widgets'] as $componentWidget) {
-                $widget = $this->basepackages->widgets->getWidgetByMethodAndAppType($componentWidget['method'], $component['app_type']);
+                $widget = $this->basepackages->widgets->init(true)->getWidgetByMethodAndAppType($componentWidget['method'], $component['app_type']);
 
                 if ($widget) {
                     $this->basepackages->widgets->remove($widget['id']);

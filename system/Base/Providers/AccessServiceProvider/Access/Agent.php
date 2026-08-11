@@ -15,6 +15,11 @@ class Agent extends BasePackage
 
     public function checkAgent()
     {
+        //If Email is not configured, we cannot send new passcodes.
+        if (!$this->basepackages->email->setup()) {
+            return true;
+        }
+
         $update = false;
         $clientAddress = $this->request->getClientAddress();
         $userAgent = $this->request->getUserAgent();
@@ -116,9 +121,8 @@ class Agent extends BasePackage
             }
         }
 
-        //If Email is not configured, we cannot send new passcodes.
         //User has remember Identifier set and sessionID has changed.
-        if (!$this->basepackages->email->setup() || $update === true) {
+        if ($update === true) {
             return true;
         }
 

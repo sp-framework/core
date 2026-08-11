@@ -21,23 +21,49 @@
 {% endif %}
 {{adminltetags.useTag('content',
     [
-        'component'             : table['component'],
-        'componentName'         : componentName,
-        'componentId'           : componentId,
-        'parentComponentId'     : parent,
-        'sectionId'             : 'listing',
-        'contentType'           : 'sectionWithListing',
-        'cardHeader'            : true,
-        'cardType'              : 'primary',
-        'cardIcon'              : 'sitemap',
-        'cardTitle'             : componentName,
-        'cardAdditionalClass'   : 'rounded-0',
-        'cardShowTools'         : ['maximize'],
-        'dtFilter'              : true,
-        'dtFilters'             : table['filters'],
-        'dtFilterColumns'       : table['filterColumns'],
-        'dtFixedHeader'         : true,
-        'dtPrimaryButtons'      : canAddButton,
+        'component'                 : table['component'],
+        'componentName'             : componentName,
+        'componentId'               : componentId,
+        'parentComponentId'         : parent,
+        'sectionId'                 : 'listing',
+        'contentType'               : 'sectionWithListing',
+        'cardHeader'                : true,
+        'cardType'                  : 'primary',
+        'cardIcon'                  : 'sitemap',
+        'cardTitle'                 : componentName,
+        'cardAdditionalClass'       : 'rounded-0',
+        'cardShowTools'             : ['maximize'],
+        'dtFilter'                  : true,
+        'dtFilterShowQuickFilter'   : true,
+        'dtFilters'                 : table['filters'],
+        'dtFilterColumns'           : table['filterColumns'],
+        'dtFixedHeader'             : true,
+        'dtPrimaryButtons'          :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'services' : {
+                            'title'                   : 'Services',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/api/server/services')
+                        },
+                        'scopes' : {
+                            'title'                   : 'Scopes',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/api/server/scopes')
+                        }
+                    }
+            },
+        'dtSecondaryButtons'    : canAddButton,
         'dtTable'               : table,
         'dtColumns'             : table['columns'],
         'dtPostUrl'             : table['postUrl'],
@@ -143,7 +169,8 @@ function initFuncs() {
                 data        : dataToSend,
                 success     : function(response) {
                     if (response.responseCode === 0) {
-                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']
+                            ._filterRunAjax(null, null, {"filter" : $('#{{componentId}}-listing-filter-filters').find('option:selected').val()});
                     } else {
                         paginatedPNotify('error', {
                             title           : response.responseMessage,

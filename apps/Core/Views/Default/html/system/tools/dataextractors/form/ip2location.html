@@ -1,0 +1,347 @@
+<div class="row">
+    <div class="col">
+        <div class="callout callout-info">
+            <h6>IP2LOCATION IP DATABASE</h6>
+            IP2Location data BIN file is retrieved from <a href="https://www.ip2location.com" class="text-primary" target="_blank">IP2Location Website</a><br>
+            You can download the free (lite) version of the file or the paid version.<br><br>
+            IP2Location also provides an online API REST service via <a href="https://www.ip2location.io" class="text-primary" target="_blank">IP2Location IO Website</a><br><br>
+            IP2Location is used by IpTables middleware to allow/block region (Country & City) based access to a particular app.<br>
+            NOTE: This tool will download the BIN file. To use ip2location.io api, configure the API key in the middleware settings.
+        </div>
+    </div>
+</div>
+{% set csv_downloaded_on = '-' %}
+{% set csv_file_name = '-' %}
+{% set csv_imported_countries = '-' %}
+{% set bin_downloaded_on = '-' %}
+{% set bin_file_name = '-' %}
+{% set bin_file_version = '-' %}
+{% set proxy_downloaded_on = '-' %}
+{% set proxy_file_name = '-' %}
+{% set proxy_file_version = '-' %}
+{% if ip2locationInfo is defined %}
+    {% if ip2locationInfo['csv_downloaded_on'] is defined %}
+        {% set csv_downloaded_on = ip2locationInfo['csv_downloaded_on'] %}
+    {% endif %}
+    {% if ip2locationInfo['csv_file_name'] is defined %}
+        {% set csv_file_name = ip2locationInfo['csv_file_name'] %}
+    {% endif %}
+    {% if ip2locationInfo['csv_imported_countries'] is defined %}
+        {% set csv_imported_countries = implode(',', ip2locationInfo['csv_imported_countries']) %}
+    {% endif %}
+    {% if ip2locationInfo['bin_downloaded_on'] is defined %}
+        {% set bin_downloaded_on = ip2locationInfo['bin_downloaded_on'] %}
+    {% endif %}
+    {% if ip2locationInfo['bin_file_name'] is defined %}
+        {% set bin_file_name = ip2locationInfo['bin_file_name'] %}
+    {% endif %}
+    {% if ip2locationInfo['bin_file_version'] is defined %}
+        {% set bin_file_version = ip2locationInfo['bin_file_version'] %}
+    {% endif %}
+    {% if ip2locationInfo['proxy_downloaded_on'] is defined %}
+        {% set proxy_downloaded_on = ip2locationInfo['proxy_downloaded_on'] %}
+    {% endif %}
+    {% if ip2locationInfo['proxy_file_name'] is defined %}
+        {% set proxy_file_name = ip2locationInfo['proxy_file_name'] %}
+    {% endif %}
+    {% if ip2locationInfo['proxy_file_version'] is defined %}
+        {% set proxy_file_version = ip2locationInfo['proxy_file_version'] %}
+    {% endif %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'csv_ip2location_info',
+                'fieldLabel'                    : false,
+                'fieldType'                     : 'counters',
+                'fieldCountersPlacementType'    : 'horizontal',
+                'fieldCounters'                 :
+                    [
+                        'csv_downloaded_on'        :
+                            [
+                                'id'        : 'csv_downloaded_on',
+                                'title'     : 'CSV Downloaded On',
+                                'type'      : 'primary',
+                                'value'     : csv_downloaded_on
+                            ],
+                        'csv_file_name'        :
+                            [
+                                'id'        : 'csv_file_name',
+                                'title'     : 'CSV File Name',
+                                'type'      : 'info',
+                                'value'     : csv_file_name
+                            ],
+                        'csv_imported_countries'        :
+                            [
+                                'id'        : 'csv_imported_countries',
+                                'title'     : 'CSV Imported Countries',
+                                'type'      : 'info',
+                                'value'     : csv_imported_countries
+                            ]
+                    ]
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'bin_ip2location_info',
+                'fieldLabel'                    : false,
+                'fieldType'                     : 'counters',
+                'fieldCountersPlacementType'    : 'horizontal',
+                'fieldCounters'                 :
+                    [
+                        'bin_downloaded_on'        :
+                            [
+                                'id'        : 'bin_downloaded_on',
+                                'title'     : 'BIN Downloaded On',
+                                'type'      : 'primary',
+                                'value'     : bin_downloaded_on
+                            ],
+                        'bin_file_name'        :
+                            [
+                                'id'        : 'bin_file_name',
+                                'title'     : 'BIN File Name',
+                                'type'      : 'info',
+                                'value'     : bin_file_name
+                            ],
+                        'bin_file_version'        :
+                            [
+                                'id'        : 'bin_file_version',
+                                'title'     : 'BIN File Version',
+                                'type'      : 'info',
+                                'value'     : bin_file_version
+                            ]
+                    ]
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'proxy_ip2location_info',
+                'fieldLabel'                    : false,
+                'fieldType'                     : 'counters',
+                'fieldCountersPlacementType'    : 'horizontal',
+                'fieldCounters'                 :
+                    [
+                        'proxy_downloaded_on'        :
+                            [
+                                'id'        : 'proxy_downloaded_on',
+                                'title'     : 'Proxy Downloaded On',
+                                'type'      : 'primary',
+                                'value'     : proxy_downloaded_on
+                            ],
+                        'proxy_file_name'        :
+                            [
+                                'id'        : 'proxy_file_name',
+                                'title'     : 'Proxy File Name',
+                                'type'      : 'info',
+                                'value'     : proxy_file_name
+                            ],
+                        'proxy_file_version'        :
+                            [
+                                'id'        : 'proxy_file_version',
+                                'title'     : 'Proxy File Version',
+                                'type'      : 'info',
+                                'value'     : proxy_file_version
+                            ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'token',
+                'fieldLabel'                     : 'IP2Location.com API Token',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Get IP2location api token from ip2location.com',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'csv',
+                'fieldLabel'                     : 'Download and extract IP2Locations CSV Geo File',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Download & Extract Geo file from IP2Location. This file is used for extracting Country, States & Cities information used by ipFilter middleware',
+                'fieldRequired'                  : false,
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : false,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'csv_file_code',
+                'fieldLabel'                     : 'CSV File Code',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'CSV File Code. Refer to ip2location.com for more information. We only require ipv4 or ipv6 CSV file.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldValue'                     : 'DB3LITECSV'
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'ip2location_countries',
+                'fieldLabel'                           : 'Select Countries',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select countries to import Geo data',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazJstreeSearch'                 : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2Options'              : countries,
+                'fieldDataSelect2Multiple'             : true,
+                'fieldDataSelect2OptionsKey'           : 'iso2',
+                'fieldDataSelect2OptionsValue'         : 'name:iso2|name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'bin',
+                'fieldLabel'                     : 'Download and extract IP2Locations BIN File',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Download & Extract BIN file from IP2Location',
+                'fieldRequired'                  : false,
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : false,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'bin_file_code',
+                'fieldLabel'                     : 'BIN File Code',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'BIN File Code. Refer to ip2location.com for more information. We only require ipv4 or ipv6 BIN file.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldValue'                     : 'DB3LITEBINIPV6'
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'proxy',
+                'fieldLabel'                     : 'Download and extract IP2Locations Proxy File',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Download & Extract Proxy file from IP2Location',
+                'fieldRequired'                  : false,
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : false,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'proxy_file_code',
+                'fieldLabel'                     : 'Proxy File Code',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Proxy File Code. Refer to ip2location.com for more information. We only require ipv4 or ipv6 Proxy file.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldValue'                     : 'PX3LITEBIN'
+            ]
+        )}}
+    </div>
+</div>

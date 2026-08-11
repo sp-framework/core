@@ -1,0 +1,26 @@
+<?php
+
+"NAMESPACE"
+
+use OpenApi\Attributes as OA;
+
+#[OA\OpenApi(info: new OA\Info(
+    title: '',
+    description: '',
+    contact: new OA\Contact(email: ''),
+    license: new OA\License(
+        name: '',
+        url: ''
+    )
+), servers: [
+    new OA\Server(
+        url: '',
+        description: ''
+    )
+], externalDocs: new OA\ExternalDocumentation(
+    description: '',
+    url: ''
+))]
+class Install
+{
+}

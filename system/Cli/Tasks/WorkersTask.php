@@ -17,6 +17,10 @@ class WorkersTask extends Task
             try {
                 $this->basepackages->workers->run();
             } catch (\throwable $e) {
+                if ($this->config->logs->exceptions) {
+                    $this->logger->logExceptions->critical(json_trace($e));
+                }
+
                 throw $e;
             }
         }
@@ -28,6 +32,10 @@ class WorkersTask extends Task
             try {
                 $this->basepackages->workers->exec($taskId, $jobId);
             } catch (\throwable $e) {
+                if ($this->config->logs->exceptions) {
+                    $this->logger->logExceptions->critical(json_trace($e));
+                }
+
                 throw $e;
             }
         }

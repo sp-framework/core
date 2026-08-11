@@ -13,7 +13,7 @@ class ServiceProviderApi extends BaseModel
 
     public $status;
 
-    public $is_public;
+    public $api_type;
 
     public $name;
 
@@ -38,8 +38,6 @@ class ServiceProviderApi extends BaseModel
     public $cc_max_devices;
 
     public $client_id;
-
-    public $csrf;
 
     public $authorization_tos_pp;
 
@@ -70,6 +68,24 @@ class ServiceProviderApi extends BaseModel
     public $per_hour_calls_limit;
 
     public $per_day_calls_limit;
+
+    public $openapi_name;
+
+    public $openapi_description;
+
+    public $openapi_email;
+
+    public $openapi_license_name;
+
+    public $openapi_license_url;
+
+    public $openapi_server_sandbox_url;
+
+    public $openapi_server_sandbox_description;
+
+    public $openapi_server_production_url;
+
+    public $openapi_server_production_description;
 
     public function initialize()
     {

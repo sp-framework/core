@@ -10,6 +10,7 @@ use Phalcon\Paginator\Adapter\NativeArray;
 use Phalcon\Paginator\Exception;
 use System\Base\Exceptions\IdNotFoundException;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
+use System\Base\Providers\ErrorServiceProvider\Exceptions\DataValidationFailException;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
 abstract class BasePackage extends Controller
@@ -599,10 +600,16 @@ abstract class BasePackage extends Controller
 		}
 
 		if (isset($this->postData()['filter'])) {
-			$filter = $this->basepackages->filters->getById((int) $this->postData()['filter']);
+			if ($this->postData()['filter'] !== '') {
+				if (str_starts_with($this->postData()['filter'], '-')) {
+					$params['conditions'] = $this->postData()['filter'];
+				} else if ((int) $this->postData()['filter'] > 0) {
+					$filter = $this->basepackages->filters->getById((int) $this->postData()['filter']);
 
-			if ($filter) {
-				$params['conditions'] = $filter['conditions'];
+					if ($filter) {
+						$params['conditions'] = $filter['conditions'];
+					}
+				}
 			}
 		}
 
@@ -749,7 +756,32 @@ abstract class BasePackage extends Controller
 				if ($this->config->databasetype === 'db') {
 					$paginationCounters['filtered_items'] = $this->modelToUse::count($this->filterConditions);
 				} else {
-					$paginationCounters['filtered_items'] = $this->ffStore->count(false, $this->filterConditions);
+					$order = null;
+					$limit = null;
+					$offset = null;
+
+					if (isset($params['order'])) {
+						$orderParamsArr = explode(' ', $params['order']);
+						$orderParamsArr = $this->helper->chunk($orderParamsArr, 2);
+
+						$orderParams = [];
+
+						foreach ($orderParamsArr as $orderParam) {
+							if (isset($orderParam[1])) {
+								$orderParams[$orderParam[0]] = $orderParam[1];
+							}
+						}
+
+						$order = $orderParams;
+					}
+					if (isset($params['limit'])) {
+						$limit = $params['limit'];
+					}
+					if (isset($params['offset'])) {
+						$offset = $params['offset'];
+					}
+
+					$paginationCounters['filtered_items'] = $this->ffStore->count(false, $this->filterConditions, $order, $limit, $offset);
 				}
 			}
 
@@ -2499,95 +2531,6 @@ abstract class BasePackage extends Controller
 
 		return false;
 	}
-	// protected function addRefId($data)
-	// {
-	// 	if (!isset($data['ref_id'])) {
-	// 		$data['ref_id'] = null;
-	// 	}
-
-	// 	if (!$data['ref_id'] || $data['ref_id'] === '') {
-	// 		if (isset($data['entity_id'])) {
-	// 			$packageName = $this->helper->last($this->getClassName());
-
-	// 			$entitiesPackage = new \Apps\Core\Packages\Business\Entities\Entities;
-
-	// 			$entities = $entitiesPackage->getAll()->entities;
-
-	// 			if ($entities && count($entities) > 0) {
-	// 				foreach ($entities as $entityKey => $entity) {
-	// 					if ($entity['id'] === $data['entity_id']) {
-	// 						$entityId = $entity['id'];
-	// 						break;
-	// 					}
-	// 				}
-	// 			} else {
-	// 				$entityId = 0;
-	// 			}
-
-	// 			if (isset($entities[$entityId])) {
-	// 				$settings = $entities[$entityId]['settings'];
-
-	// 				if (isset($settings['prefix-seq'][$packageName])) {
-	// 					$settings = $settings['prefix-seq'][$packageName];
-
-	// 					$model = $this->useModel();
-
-	// 					$table = $model->getSource();
-
-	// 					if ($settings['prefix'] !== '') {
-	// 						$settings['prefix'] = explode('%', $settings['prefix']);
-
-	// 						$prefixValue = '';
-	// 						foreach ($settings['prefix'] as $prefix) {
-	// 							if ($prefix === 'Y') {
-	// 								$prefixValue .= date('Y');
-	// 							} else if ($prefix === 'm') {
-	// 								$prefixValue .= date('m');
-	// 							} else if ($prefix === 'd') {
-	// 								$prefixValue .= date('d');
-	// 							} else {
-	// 								$prefixValue .= $prefix;
-	// 							}
-	// 						}
-
-	// 						$currentId = (int) $data['id'];
-
-	// 						if (isset($settings['next_seq_number'])) {
-	// 							$nextSeqNumber = (int) $settings['next_seq_number'];
-
-	// 							if ($nextSeqNumber > 0) {
-
-	// 								if ($nextSeqNumber > $currentId) {
-	// 									$prefixValue .= $nextSeqNumber;
-
-	// 									$sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
-
-	// 									$this->db->execute($sql, [$nextSeqNumber, $currentId]);
-
-	// 									$data['id'] = $nextSeqNumber;
-	// 								} else {
-	// 									$prefixValue .= $currentId;
-	// 								}
-	// 							} else {
-	// 								$prefixValue .= $currentId;
-	// 							}
-	// 						} else {
-	// 							$prefixValue .= $currentId;
-	// 						}
-
-	// 						$sql = "UPDATE `{$table}` SET `ref_id` = ? WHERE `{$table}`.`id` = ?";
-
-	// 						$this->db->execute($sql, [$prefixValue, $data['id']]);
-
-	// 						$data['ref_id'] = $prefixValue;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-
-	// 	return $data;
-	// }
 
 	protected function extractNumbers($string)
 	{
@@ -2603,5 +2546,201 @@ abstract class BasePackage extends Controller
 		}
 
 		return $data;
+	}
+
+	protected function logException($exception)
+	{
+		if ($this->config->logs->exceptions) {
+			$this->logger->logExceptions->critical(json_trace($exception));
+		}
+	}
+
+	/**
+	 * Validate data with provided or default parameter of PresenseOf to check if the data is not empty if the field is required as per metadata.
+	 *
+	 * @param array 	$data 					Array of data
+	 * @param array		$checkFields			Provide an array of fields that you want to check, this will replace the metadata fields.
+	 * @param bool		$checkFieldsReplace		Replace the provided checkFields or merge them.
+	 * @param array		$forceFieldRequired		Provide an array of fields that are not required by you want to check their presence.
+	 * @param string	$model					Model to get the metadata from if not default model of the package
+	 * @param array		$customMessages			Custom Messages can be provided for each field if the validation fails
+	 * @param array		$fieldsCustomCheck 		If provided, it will override the default PresenseOf check for the column.
+	 * 											For a single check set $fieldsCustomCheck[$column]['class'] & $fieldsCustomCheck[$column]['check']
+	 * 											For multiple checks set $fieldsCustomCheck[$column][0]['class'] & $fieldsCustomCheck[$column][0]['check'] & so on.
+	 * @param array		$ignoreFields			Provide an array of fields that you want to ignore
+	 * @param array		$nonZeroFields			Provide an array of fields that you want to check if the value is set to > 0
+	 * @param array		$callbacks				Like fieldsCustomCheck, but you can provide a callback for the fields. must have array keys callback and message set.
+	 * @param array		$replaceColumnNames		Provide an array field names to change in the response message.
+	 * 											Example app_id can be changed to "App" so the message will be Invalid App instead of Invalid app_id
+	 * @param array		$throwException			We can either throw exception or return a list of messages that we can process.
+	 * 											Exception is caught by Error ExceptionHandlers, which respond with JSON data with validation messages.
+	 * ```
+	 *  $data['email'] = null;
+	 *	$validated = $this->validateDataWithMetaData(
+	 * 		data: $data,
+	 * 		fieldsCustomCheck:
+	 *			['email' =>
+	 *				[
+	 *					[
+	 *						'class' => \Phalcon\Filter\Validation\Validator\PresenceOf::class,
+	 *						'check' => [
+	 *							'message' => 'Enter Email!'
+	 *						]
+	 *					],
+	 *					[
+	 *						'class' => \Phalcon\Filter\Validation\Validator\Email::class,
+	 *						'check' => [
+	 *							'message' => 'Enter Correct Email!'
+	 *						]
+	 *					]
+	 *				]
+	 *			]
+	 *	);
+	 * ```
+	 */
+	public function validateDataWithMetaData(
+		$data, $checkFields = [], $checkFieldsReplace = true, $forceFieldRequired = [], $model = null, $customMessages = [],
+		$fieldsCustomCheck = [], $ignoreFields = [], $nonZeroFields = [], $callbacks = [],
+		$replaceColumnNames = [], $throwException = true
+	) {
+		if ($model) {
+			$this->setModelToUse($model);
+		}
+
+		$metadata = $this->getModelsMetaData();
+
+		$this->validation->init();
+
+		if (isset($metadata['columns']) && count($metadata['columns']) > 0) {
+			if (count($checkFields) > 0) {
+				$checkFieldsColumns = [];
+
+				foreach ($checkFields as $checkField) {
+					$checkFieldsColumns[$checkField] = $checkField;
+				}
+
+				if ($checkFieldsReplace) {
+					$metadata['columns'] = $checkFieldsColumns;
+				} else {
+					$metadata['columns'] = array_merge($metadata['columns'], $checkFieldsColumns);
+				}
+			}
+
+			if (count($replaceColumnNames) === 0) {
+				$replaceColumnNames = $metadata['columns'];
+			} else {
+				$replaceColumnNames = array_replace($metadata['columns'], $replaceColumnNames);
+			}
+
+			foreach ($metadata['columns'] as $column) {
+				if (in_array($column, $ignoreFields)) {
+					continue;
+				}
+
+				if (isset($fieldsCustomCheck[$column])) {
+					if (isset($fieldsCustomCheck[$column]['class']) && isset($fieldsCustomCheck[$column]['check'])) {
+						$this->validation->add($column, $fieldsCustomCheck[$column]['class'], $fieldsCustomCheck[$column]['check']);
+					} else if (isset($fieldsCustomCheck[$column][0])) {//Multiple Checks
+						foreach ($fieldsCustomCheck[$column] as $key => $checks) {
+							$this->validation->add($column, $checks['class'], $checks['check']);
+						}
+					}
+
+					continue;
+				}
+
+				if (count($forceFieldRequired) > 0 && in_array($column, $forceFieldRequired)) {
+					if (isset($metadata['required'][$column]) && $metadata['required'][$column] === false) {
+						$metadata['required'][$column] = true;
+					}
+				}
+
+				if (isset($metadata['required'][$column]) && $metadata['required'][$column] === true) {
+					$this->validation->add($column,
+										   \Phalcon\Filter\Validation\Validator\PresenceOf::class,
+										   [
+											   'message' => isset($customMessages[$column]) ? $customMessages[$column] : 'Enter valid ' . $replaceColumnNames[$column]
+										   ]
+					);
+				}
+
+				if (count($checkFields) > 0 && !isset($metadata['required'][$column])) {
+					$this->validation->add($column,
+										   \Phalcon\Filter\Validation\Validator\PresenceOf::class,
+										   [
+											   'message' => isset($customMessages[$column]) ? $customMessages[$column] : 'Enter valid ' . $replaceColumnNames[$column]
+										   ]
+					);
+				}
+
+				if (isset($metadata['dataTypes'][$column]) && $metadata['dataTypes'][$column] === 'string') {
+					if (isset($metadata['columnSize'][$column])) {
+						if ($metadata['columnSize'][$column] > 0 && isset($data[$column]) && strlen($data[$column]) > 0) {
+							$this->validation->add($column,
+												   \Phalcon\Filter\Validation\Validator\StringLength\Max::class,
+												   [
+													   'max' => $metadata['columnSize'][$column],
+													   'included' => true,
+													   'message' => isset($customMessages[$column]) ?
+																	$customMessages[$column] :
+																	'Field ' . $replaceColumnNames[$column] . ' has a max length of ' . $metadata['columnSize'][$column] . ' characters.'
+												   ]
+							);
+						}
+					}
+				}
+
+				if (count($nonZeroFields) > 0 && in_array($column, $nonZeroFields)) {
+					if (isset($metadata['dataTypes'][$column]) && $metadata['dataTypes'][$column] === 'integer') {
+						if (isset($metadata['number'][$column])) {
+							$this->validation->add($column,
+												   \Phalcon\Filter\Validation\Validator\Callback::class,
+												   [
+														'callback' => function($data) use($column) {
+															if ((int) $data[$column] === 0) {
+																return false;
+															}
+
+															return true;
+														},
+														'message' => isset($customMessages[$column]) ? $customMessages[$column] : 'Enter valid ' . $replaceColumnNames[$column]
+												   ]
+							);
+						}
+					}
+				}
+
+				if (count($callbacks) > 0) {
+					if (isset($metadata['dataTypes'][$column]) &&
+						isset($callbacks[$column]['callback']) &&
+						is_callable($callbacks[$column]['callback']) &&
+						isset($callbacks[$column]['message'])
+					) {
+						$this->validation->add($column,
+											   \Phalcon\Filter\Validation\Validator\Callback::class,
+											   $callbacks[$column]
+						);
+					}
+				}
+			}
+		}
+
+		$validated = $this->validation->validate($data)->jsonSerialize();
+
+		if (count($validated) > 0) {
+			$messages = 'Error: ';
+
+			foreach ($validated as $key => $value) {
+				$messages .= $value['message'] . ' ';
+			}
+
+			if ($throwException) {
+				throw new DataValidationFailException(trim($messages));
+			}
+
+			return trim($messages);
+		}
+
+		return true;
 	}
 }

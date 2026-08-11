@@ -8,14 +8,18 @@ class IpFilter extends BaseMiddleware
 {
     public function process($data)
     {
-        if ($this->access->ipFilter->checkList()) {
+        try {
+            if ($this->access->ipFilter->checkIp()) {
+                return true;
+            }
+
+            $this->access->ipFilter->processMiddlewareResponse();
+        } catch (\throwable $e) {
+            $this->logException($e);
+
+            $this->logger->logIpFilters->alert('Error while checking for IP Filter List: ' . $e->getMessage() . '. Allowing unconditionally.');
+
             return true;
         }
-
-        $this->response->setStatusCode(404);
-
-        $this->response->send();
-
-        exit;
     }
 }

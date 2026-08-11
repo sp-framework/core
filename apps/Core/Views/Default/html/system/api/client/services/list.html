@@ -14,7 +14,7 @@
             {% endfor %}
             {% if not loop.last %}
                 {% set apiButtons = apiButtons ~ ',' %}
-                {% set apiButtons = apiButtons ~ '"divider" : "",' %}
+                {% set apiButtons = apiButtons ~ '"" : "divider",' %}
             {% endif %}
         {% endif %}
     {% endfor %}

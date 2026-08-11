@@ -23,8 +23,6 @@ class Installer extends BasePackage
 {
     protected $queue;
 
-    public static $trackCounter = 0;
-
     public $method;
 
     protected $apiClient;
@@ -981,14 +979,24 @@ class Installer extends BasePackage
             $this->method = $args['progressMethod'];
 
             if (isset($this->modulesToInstallOrUpdate['repo_details']['latestRelease']['zipball_url'])) {
-                return $this->downloadData(
+                if (!$download = $this->remoteWebDownload->setVerify(false)->setConnectTimeout(60)->downloadData(
                     $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['zipball_url'],
                     base_path($this->downloadLocation .
                               $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
                               $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
                               $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
-                              $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip')
-                );
+                              $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip'),
+                    $this->method
+                    )
+                ) {
+                    return $this->queueHasErrors(
+                        'Download resulted in : ' . $this->remoteWebDownload->getDownload()->getStatusCode(),
+                        $preCheckQueueLogs,
+                        true
+                    );
+                }
+
+                return true;
             }
         }
     }
@@ -1374,7 +1382,13 @@ class Installer extends BasePackage
                         }
                     }
                 } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
-                    return true;
+                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                    return $this->queueHasErrors(
+                        $e->getMessage(),
+                        $resultQueueLogs,
+                        false
+                    );
                 }
             } catch (\throwable $e) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
@@ -2135,7 +2149,7 @@ class Installer extends BasePackage
 
                     if ($module['module_type'] === 'externals') {
                         //Execute Composer
-                        //
+                        //Pending!
                     } else {
                         $cleanup = $this->cleanup(['modulePath'], $this->getModuleFilesLocation($moduleToRemove));
 
@@ -2185,79 +2199,78 @@ class Installer extends BasePackage
 
     protected function getModuleFilesLocation($module, $viewPublic = false)
     {
-        if (!isset($module['module_type']) &&
-            ($module['app_type'] === strtolower($module['name']))
-        ) {
+        if (!isset($module['module_type'])) {
             return 'apps/' . ucfirst($module['app_type']) . '/';
-        } else if ($module['module_type'] === 'components') {
-            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Components/';
+        } else {
+            if ($module['module_type'] === 'components') {
+                $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Components/';
 
-            $routeArr = explode('/', $module['route']);
+                $routeArr = explode('/', $module['route']);
 
-            foreach ($routeArr as &$path) {
-                $path = ucfirst($path);
-            }
-
-            $routePath = implode('/', $routeArr) . '/';
-        } else if ($module['module_type'] === 'packages') {
-            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Packages/';
-
-            $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
-
-            $routePath = implode('/', $pathArr) . '/';
-        } else if ($module['module_type'] === 'middlewares') {
-            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Middlewares/';
-
-            $routePath = $module['name'] . '/';
-        } else if ($module['module_type'] === 'views') {
-            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Views/';
-
-            if ($viewPublic) {
-                $moduleLocation = 'public/' . $module['app_type'] . '/' . strtolower($module['name']) . '/';
-
-                return $moduleLocation;
-            }
-
-            if ($module['is_subview'] == 0) {
-                $routePath = $module['name'] . '/';
-            } else {
-                if (is_string($module['dependencies'])) {
-                    $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
+                foreach ($routeArr as &$path) {
+                    $path = ucfirst($path);
                 }
 
-                if (!isset($module['dependencies']['views']) ||
-                    (isset($module['dependencies']['views']) && count($module['dependencies']['views']) === 0)
-                ) {
-                    throw new \Exception('Base view dependencies for sub view missing in module dependencies.');
-                }
-
-                foreach ($module['dependencies']['views'] as $view) {
-                    $view = $this->modules->views->getViewByRepo($view['repo']);
-
-                    if ($view && $view['is_subview'] == false) {
-                        $baseView = $view;
-
-                        break;
-                    }
-                }
-
-                if (!isset($baseView)) {
-                    throw new \Exception('Base view dependencies for sub view not found on the system.');
-                }
+                $routePath = implode('/', $routeArr) . '/';
+            } else if ($module['module_type'] === 'packages') {
+                $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Packages/';
 
                 $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
 
-                if (count($pathArr) > 1) {
-                    foreach ($pathArr as &$path) {
-                        $path = strtolower($path);
-                    }
-                } else {
-                    $pathArr[0] = strtolower($pathArr[0]);
+                $routePath = implode('/', $pathArr) . '/';
+            } else if ($module['module_type'] === 'middlewares') {
+                $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Middlewares/';
+
+                $routePath = $module['name'] . '/';
+            } else if ($module['module_type'] === 'views') {
+                $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Views/';
+
+                if ($viewPublic) {
+                    $moduleLocation = 'public/' . $module['app_type'] . '/' . strtolower($module['name']) . '/';
+
+                    return $moduleLocation;
                 }
 
-                $module['route'] = implode('/', $pathArr);
+                if ($module['is_subview'] == 0) {
+                    $routePath = $module['name'] . '/';
+                } else {
+                    if (is_string($module['dependencies'])) {
+                        $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
+                    }
+                    if (!isset($module['dependencies']['views']) ||
+                        (isset($module['dependencies']['views']) && count($module['dependencies']['views']) === 0)
+                    ) {
+                        throw new \Exception('Base view dependencies for sub view missing in module dependencies.');
+                    }
 
-                $routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
+                    foreach ($module['dependencies']['views'] as $view) {
+                        $view = $this->modules->views->getViewByRepo($view['repo']);
+
+                        if ($view && $view['is_subview'] == false) {
+                            $baseView = $view;
+
+                            break;
+                        }
+                    }
+
+                    if (!isset($baseView)) {
+                        throw new \Exception('Base view dependencies for sub view not found on the system.');
+                    }
+
+                    $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+                    if (count($pathArr) > 1) {
+                        foreach ($pathArr as &$path) {
+                            $path = strtolower($path);
+                        }
+                    } else {
+                        $pathArr[0] = strtolower($pathArr[0]);
+                    }
+
+                    $module['route'] = implode('/', $pathArr);
+
+                    $routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
+                }
             }
         }
 
@@ -2312,68 +2325,6 @@ class Installer extends BasePackage
         }
 
         return true;
-    }
-
-    protected function downloadData($url, $sink)
-    {
-        $download = $this->remoteWebContent->request(
-            'GET',
-            $url,
-            $this->getHttpOptions($sink)
-        );
-
-        if ($download->getStatusCode() === 200) {
-            return true;
-        }
-
-        return false;
-    }
-
-    protected function getHttpOptions($sink)//Public because remoteWebContent needs to access it
-    {
-        self::$trackCounter = 0;
-
-        return [
-            'progress' => function(
-                $downloadTotal,
-                $downloadedBytes,
-                $uploadTotal,
-                $uploadedBytes
-            ) {
-                if ($downloadTotal === 0 && $uploadTotal === 0) {
-                    return;
-                }
-
-                $counters =
-                        [
-                            'downloadTotal'     => $downloadTotal,
-                            'downloadedBytes'   => $downloadedBytes,
-                            'uploadTotal'       => $uploadTotal,
-                            'uploadedBytes'     => $uploadedBytes
-                        ];
-
-                if ($downloadedBytes === 0) {
-                    return;
-                }
-
-                //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
-                //So this way, we only update progress when there is actually an update.
-                if ($downloadedBytes === \System\Base\Providers\ModulesServiceProvider\Installer::$trackCounter) {
-                    return;
-                }
-
-                \System\Base\Providers\ModulesServiceProvider\Installer::$trackCounter = $downloadedBytes;
-
-                $downloadComplete = null;
-                if ($downloadedBytes === $downloadTotal) {
-                    $downloadComplete = true;
-                }
-                $this->basepackages->progress->updateProgress($this->method, $downloadComplete, false, null, $counters);
-            },
-            'verify'            => false,
-            'connect_timeout'   => 60,
-            'sink'              => $sink
-        ];
     }
 
     protected function getComposerJsonFile()

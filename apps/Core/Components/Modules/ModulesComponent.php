@@ -71,66 +71,6 @@ class ModulesComponent extends BaseComponent
 	}
 
 	/**
-	 * @acl(name=add)
-	 * install module action
-	 */
-	// public function addAction()
-	// {
-	// 	$installModule = $this->modulesManager->installModule($this->postData);
-
-	// 	if ($installModule->packagesData['responseCode'] === 0) {
-	// 		$this->addResponse(
-	// 			rtrim(ucfirst($this->postData['type'])) . ' ' . ucfirst($this->postData['name']) . ' Installed Successfully! ' .
-	// 			'<br>Backup was successfully taken at location .backups/' . $installModule->packagesData['backupFile']
-	// 		);
-	// 	} else if ($installModule->packagesData['responseCode'] === 1) {
-	// 		$this->addResponse($installModule->packagesData['responseMessage'], 1);
-	// 	}
-
-	// 	return $this->generateView();
-	// }
-
-	/**
-	 * @acl(name=update)
-	 * update module action
-	 */
-	// public function updateAction()
-	// {
-	// 	$updateModule = $this->modulesManager->installModule($this->postData);
-
-	// 	if ($updateModule->packagesData['responseCode'] === 0) {
-	// 		$this->addResponse(
-	// 			rtrim(ucfirst($this->postData['type'])) . ' ' . ucfirst($this->postData['name']) . ' Updated Successfully! ' .
-	// 			'<br>Backup was successfully taken at location .backups/' . $updateModule->packagesData['backupFile']
-	// 		);
-	// 	} else if ($updateModule->packagesData['responseCode'] === 1) {
-	// 		$this->addResponse($updateModule->packagesData['responseMessage'], 1);
-	// 	}
-
-	// 	return $this->generateView();
-	// }
-
-	/**
-	 * @acl(name=remove)
-	 * uninstall module action
-	 */
-	// public function removeAction()
-	// {
-	// 	$updateModule = $this->modulesManager->installModule($this->postData);
-
-	// 	if ($updateModule->packagesData['responseCode'] === 0) {
-	// 		$this->addResponse(
-	// 			rtrim(ucfirst($this->postData['type'])) . ' ' . ucfirst($this->postData['name']) . ' Updated Successfully! ' .
-	// 			'<br>Backup was successfully taken at location .backups/' . $updateModule->packagesData['backupFile']
-	// 		);
-	// 	} else if ($updateModule->packagesData['responseCode'] === 1) {
-	// 		$this->addResponse($updateModule->packagesData['responseMessage'], 1);
-	// 	}
-
-	// 	return $this->generateView();
-	// }
-
-	/**
 	 * sync local modules with remote modules
 	 */
 	public function syncAction()
@@ -222,23 +162,19 @@ class ModulesComponent extends BaseComponent
 
 	public function processQueueAction()
 	{
-		try {
-			$this->requestIsPost();
+		$this->requestIsPost();
 
-			$installer = $this->modules->installer->init($this->postData()['process']);
+		$installer = $this->modules->installer->init($this->postData()['process']);
 
-			if ($installer) {
-				$installer->runProcess($this->postData());
-			}
-
-			$this->addResponse(
-				$this->modules->installer->packagesData->responseMessage,
-				$this->modules->installer->packagesData->responseCode,
-				$this->modules->installer->packagesData->responseData ?? []
-			);
-		} catch (\Exception $e) {
-			trace([$e]);
+		if ($installer) {
+			$installer->runProcess($this->postData());
 		}
+
+		$this->addResponse(
+			$this->modules->installer->packagesData->responseMessage,
+			$this->modules->installer->packagesData->responseCode,
+			$this->modules->installer->packagesData->responseData ?? []
+		);
 	}
 
 	public function saveQueueSettingsAction()

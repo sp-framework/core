@@ -16,12 +16,12 @@ class AuthCodeRepository extends BasePackage implements AuthCodeRepositoryInterf
 
     protected $code;
 
-    public function getNewAuthCode()
+    public function getNewAuthCode() :ServiceProviderApiAuthorizationCodes
     {
         return $this->useModel();
     }
 
-    public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity)
+    public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity) :void
     {
         $authCode = $authCodeEntity->getIdentifier();
 
@@ -34,28 +34,28 @@ class AuthCodeRepository extends BasePackage implements AuthCodeRepositoryInterf
                 'conditions'    => 'api_id = :apiId: AND app_id = :appId: AND domain_id = :domainId: AND account_id = :accountId:',
                 'bind'          =>
                     [
-                        'apiId'    => $this->api->getApiInfo()['id'],
-                        'appId'    => $this->apps->getAppInfo()['id'],
-                        'domainId' => $this->domains->domain['id'],
-                        'accountId'=> $authCodeEntity->getClient()->getUserIdentifier()
+                        'apiId'    => (int) $this->api->getApiInfo()['id'],
+                        'appId'    => (int) $this->apps->getAppInfo()['id'],
+                        'domainId' => (int) $this->domains->domain['id'],
+                        'accountId'=> (int) $authCodeEntity->getClient()->getUserIdentifier()
                     ]
             ];
         } else {
             $params['conditions'] = [
-                ['api_id', '=', $this->api->getApiInfo()['id']],
-                ['app_id', '=', $this->apps->getAppInfo()['id']],
-                ['domain_id', '=', $this->domains->domain['id']],
-                ['account_id', '=', $authCodeEntity->getClient()->getUserIdentifier()]
+                ['api_id', '=', (int) $this->api->getApiInfo()['id']],
+                ['app_id', '=', (int) $this->apps->getAppInfo()['id']],
+                ['domain_id', '=', (int) $this->domains->domain['id']],
+                ['account_id', '=', (int) $authCodeEntity->getClient()->getUserIdentifier()]
             ];
         }
         $code = $this->getByParams($params, false, false);
 
         $newCode =
             [
-                'api_id' => $this->api->getApiInfo()['id'],
-                'app_id' => $this->apps->getAppInfo()['id'],
-                'domain_id' => $this->domains->domain['id'],
-                'account_id' => $authCodeEntity->getClient()->getUserIdentifier(),
+                'api_id' => (int) $this->api->getApiInfo()['id'],
+                'app_id' => (int) $this->apps->getAppInfo()['id'],
+                'domain_id' => (int) $this->domains->domain['id'],
+                'account_id' => (int) $authCodeEntity->getClient()->getUserIdentifier(),
                 'authorization_code' => $authCode,
                 'expires' => (\Carbon\Carbon::parse($authCodeEntity->getExpiryDateTime()))->toDateTimeLocalString(),
                 'client_id' => $authCodeEntity->getClient()->getIdentifier(),
@@ -78,7 +78,7 @@ class AuthCodeRepository extends BasePackage implements AuthCodeRepositoryInterf
         $authCodeEntity->assign($newCode);
     }
 
-    public function revokeAuthCode($codeId)
+    public function revokeAuthCode($codeId) :void
     {
         if ($result = $this->getFirst('authorization_code', $codeId)) {
             $result = $result->toArray();
@@ -89,7 +89,7 @@ class AuthCodeRepository extends BasePackage implements AuthCodeRepositoryInterf
         }
     }
 
-    public function isAuthCodeRevoked($codeId)
+    public function isAuthCodeRevoked($codeId) :bool
     {
         if ($result = $this->getFirst('authorization_code', $codeId)) {
             return (int)$result->revoked === 1;

@@ -1,0 +1,232 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'ip',
+                'fieldLabel'                            : 'Host Address',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'HOST - Enter IP V4 or IP V6 host address. Example: 10.10.10.10 (ipv4) 2001:0DB8:ABCD:0012:::FFFF:FFFF (ipv6)',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataInputMaxLength'               : 100,
+                'fieldValue'                            : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       : [
+                        'cancelcheckip'       : [
+                            'title'                   : 'Cancel',
+                            'size'                    : 'xs',
+                            'type'                    : 'secondary'
+                        ],
+                        'checkip'       : [
+                            'title'                   : 'Check IP',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true
+                        ]
+                    ]
+            ]
+        )}}
+        <span id="profiling"></span>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                <legend class="text-uppercase">Filter</legend>
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : sectionId,
+                        'buttonType'                    : 'button',
+                        'buttons'                       : [
+                                'remove-checked-filter'       : [
+                                    'title'                   : 'Remove Filter',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'danger',
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'mt-1',
+                                    'icon'                    : 'cog fa-spin',
+                                    'position'                : 'right',
+                                    'iconHidden'              : true
+                                ],
+                                'remove-checked-filter-from-cache'       : [
+                                    'title'                   : 'Remove filter from cache',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'warning',
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'mt-1',
+                                    'icon'                    : 'cog fa-spin',
+                                    'position'                : 'right',
+                                    'iconHidden'              : true
+                                ],
+                                'reset-checked-filter-counters'       : [
+                                    'title'                   : 'Reset Hit Counts',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'info',
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'mt-1',
+                                    'icon'                    : 'cog fa-spin',
+                                    'position'                : 'right',
+                                    'iconHidden'              : true
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label class="text-uppercase">Store: </label>
+                <span id="filter-store">-</span>
+            </div>
+            <div class="col">
+                <label class="text-uppercase">ID: </label>
+                <span id="filter-id">-</span>
+            </div>
+            <div class="col">
+                <label class="text-uppercase">Parent ID: </label>
+                <span id="filter-parent-id">-</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label class="text-uppercase">Address Type: </label>
+                <span id="filter-address-type">-</span>
+            </div>
+            <div class="col">
+                <label class="text-uppercase">Address: </label>
+                <span id="filter-address">-</span>
+            </div>
+            <div class="col">
+                <label class="text-uppercase">Filter Type: </label>
+                <span id="filter-type">-</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label class="text-uppercase">Ip2Location Proxy: </label>
+                <span id="filter-ip2location-proxy">-</span>
+            </div>
+            <div class="col">
+                <label class="text-uppercase">Hit Count: </label>
+                <span id="filter-hit-count">-</span>
+            </div>
+            <div class="col">
+                <label class="text-uppercase">Incorrect Login Attempts: </label>
+                <span id="filter-incorrect-login-attempts">-</span>
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                <legend class="text-uppercase">Parent Filter</legend>
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : sectionId,
+                        'buttonType'                    : 'button',
+                        'buttons'                       : [
+                                'remove-checked-parent'       : [
+                                    'title'                   : 'Remove Parent',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'danger',
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'mt-1',
+                                    'icon'                    : 'cog fa-spin',
+                                    'position'                : 'right',
+                                    'iconHidden'              : true
+                                ],
+                                'remove-checked-parent-children'       : [
+                                    'title'                   : 'Remove Child Filters',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'warning',
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'mt-1',
+                                    'icon'                    : 'cog fa-spin',
+                                    'position'                : 'right',
+                                    'iconHidden'              : true
+                                ],
+                                'reset-checked-parent-counters'       : [
+                                    'title'                   : 'Reset Hit Counts',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'info',
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'mt-1',
+                                    'icon'                    : 'cog fa-spin',
+                                    'position'                : 'right',
+                                    'iconHidden'              : true
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label class="text-uppercase">Address Type: </label>
+                <span id="parent-address-type">-</span>
+            </div>
+            <div class="col">
+                <label class="text-uppercase">Address: </label>
+                <span id="parent-address">-</span>
+            </div>
+            <div class="col">
+                <label class="text-uppercase">Filter Type: </label>
+                <span id="parent-type">-</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label class="text-uppercase">Ip2Location Proxy: </label>
+                <span id="parent-ip2location-proxy">-</span>
+            </div>
+            <div class="col">
+                <label class="text-uppercase">Hit Count: </label>
+                <span id="parent-hit-count">-</span>
+            </div>
+            <div class="col">
+                <label class="text-uppercase">Incorrect Login Attempts: </label>
+                <span id="parent-incorrect-login-attempts">-</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label class="text-uppercase">Ip Hits: </label>
+                <span id="parent-ip-hits">-</span>
+            </div>
+        </div>
+    </div>
+</div>

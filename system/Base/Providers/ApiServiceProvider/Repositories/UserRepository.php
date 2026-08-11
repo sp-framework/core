@@ -19,7 +19,8 @@ class UserRepository extends BasePackage implements UserRepositoryInterface
         $password,
         $grantType,
         ClientEntityInterface $clientEntity
-    ) {
+    ) :ServiceProviderApiUsers
+    {
         $this->modelToUse = BasepackagesUsersAccounts::class;
 
         $this->setFfStoreToUse();

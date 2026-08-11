@@ -9,6 +9,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\BackupRestore;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Barcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ContactBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Dashboards;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\DataExtractors;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailQueue;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
@@ -129,6 +130,8 @@ class Basepackages
 	protected $pageswidgets;
 
 	protected $houseKeeping;
+
+	protected $dataExtractors;
 
 	public function __construct()
 	{
@@ -430,5 +433,12 @@ class Basepackages
 		$this->houseKeeping = (new HouseKeeping())->init();
 
 		return $this->houseKeeping;
+	}
+
+	protected function initDataExtractors()
+	{
+		$this->dataExtractors = (new DataExtractors())->init();
+
+		return $this->dataExtractors;
 	}
 }

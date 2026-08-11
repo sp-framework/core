@@ -33,6 +33,19 @@ class MicroCollection
         $this->microCollection = new Collection;
     }
 
+    /**
+     * Match route and assign handler to the micro collection
+     *
+     * Example Route (Public API Access):
+     * Domain not exclusive for API or default App -  api.sp.local/api/pub/core/system/tools/murls
+     * Domain exclusive for API and not exclusive for default App -  api.sp.local/pub/core/system/tools/murls
+     * Domain exclusive for API and default App -  api.sp.local/pub/system/tools/murls
+     * Example Route (Non Public API Access):
+     * Domain not exclusive for API or default App -  api.sp.local/api/core/system/tools/murls
+     * Domain exclusive for API and not exclusive for default App -  api.sp.local/core/system/tools/murls
+     * Domain exclusive for API and default App -  api.sp.local/system/tools/murls
+     *
+     */
     public function init()
     {
         if ($this->router->getRoutes() && count($this->router->getRoutes()) > 0) {
@@ -51,24 +64,27 @@ class MicroCollection
             $routeToMatch = '/api' . $routeToMatch;
         }
 
-        $handler =
-            $this->router->getRoutes()[0]->getPaths()['namespace'] .
-            '\\' .
-            ucfirst($this->router->getRoutes()[0]->getPaths()['controller']) . 'Component';
+        $handler = $this->router->getRoutes()[0]->getPaths()['namespace'] . '\\Api';
+        $action = $this->router->getRoutes()[0]->getPaths()['action'];
+        $controller = $this->router->getRoutes()[0]->getPaths()['controller'];
 
-        if ($this->router->getRoutes()[0]->getPaths()['action'] === 'view' && !$this->request->isPost()) {//Make sure methods are all Caps, else route will not match!
+        if ($action === 'view') {//Make sure methods are all Caps, else route will not match!
             $methods = ['GET'];
-            $handlerMethod = 'apiViewAction';
-        } else if ($this->router->getRoutes()[0]->getPaths()['action'] === 'view' && $this->request->isPost()) {
-            $methods = ['POST'];
-            $handlerMethod = 'apiViewAction';
+            if ($this->request->isPost()) {
+                $methods = ['POST'];
+            }
+        } else if ($action === 'add' || $action === 'update') {
+            $methods = ['POST','PATCH','PUT'];
+        } else if ($action === 'remove') {
+            $methods = ['POST','DELETE'];
         } else {
             $methods = ['POST'];
-            $handlerMethod = 'api' . ucfirst($this->router->getRoutes()[0]->getPaths()['action']) . 'Action';
         }
 
+        $handlerMethod = lcfirst($action) . 'Action';
+
         $this->microCollection->setHandler($handler, true);
-        $this->microCollection->mapVia($routeToMatch, $handlerMethod, $methods, $this->router->getRoutes()[0]->getPaths()['controller']);
+        $this->microCollection->mapVia($routeToMatch, $handlerMethod, $methods, $controller);
 
         $this->regitserNotFound();
 
@@ -87,9 +103,10 @@ class MicroCollection
         $this->application->notFound(
             function () use ($application) {
                 $application->response
-                            ->setStatusCode(404, 'API Route Not Found')
-                            ->sendHeaders()
-                            ->setContent('API Route Not Found')
+                            ->setStatusCode(404)
+                            ->sendHeaders('Cache-Control', 'no-store')
+                            ->setContentType('application/json', 'UTF-8')
+                            ->setJsonContent(['responseCode' => 404, 'responseMessage' => 'API Route Not Found', 'responseData' => null])
                             ->send();
             }
         );

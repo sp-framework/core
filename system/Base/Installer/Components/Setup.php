@@ -271,8 +271,6 @@ Class Setup
 						return $this->response->send();
 					}
 				}
-			} else if (isset($this->postData['dev']) && $this->postData['dev'] == 'true') {
-				// $this->progress->unregisterMethods(['downloadCountriesStateAndCities', 'registerCountriesStateAndCities']);
 			}
 
 			if (!$onlyUpdateDb) {
@@ -637,15 +635,6 @@ Class Setup
 							'text'		=> 'Registering geo location: countries...'
 						],
 						[
-							'method'	=> 'downloadCountriesStateAndCities',
-							'text'		=> 'Downloading geo location: selected country\'s states and cities...',
-							'remoteWeb' => true
-						],
-						[
-							'method'	=> 'registerCountriesStateAndCities',
-							'text'		=> 'Registering geo location: selected country\'s states and cities...'
-						],
-						[
 							'method'	=> 'registerTimezones',
 							'text'		=> 'Registering timezones...'
 						]
@@ -817,13 +806,13 @@ Class Setup
 		if (!$precheckFail) {
 			$this->view->countries =
 				$this->helper->decode(
-					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'),
+					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/AllCountries.json'),
 					true
 				);
 
 			$this->view->timezones =
 				$this->helper->decode(
-					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/TimeZones.json'),
+					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/TimeZones.json'),
 					true
 				);
 

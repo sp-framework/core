@@ -916,7 +916,7 @@ class BackupRestore extends BasePackage
                                 $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
                             } else {
                                 if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true' &&
-                                    ($file === 'system/.keys' || $file === 'system/.dbkeys')
+                                    ($file === 'system/.keys' || $file === 'system/.dbkeys' || str_contains($file, 'system/.api/'))
                                 ) {
                                     $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
                                 }

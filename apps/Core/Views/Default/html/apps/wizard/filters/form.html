@@ -1,165 +1,33 @@
 <div class="row">
     <div class="col">
-        {{adminltetags.useTag('fields',
+        {{adminltetags.useTag('tabs',
             [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'ip_filter_default_action',
-                'fieldLabel'                     : 'Ip Filter default action',
-                'fieldType'                      : 'radio',
-                'fieldRadioPlacementType'        : "horizontal",
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Select default action if there are no rules configured. Default is set to allow everyone to access the app. Use Allow all option if you want to block IP and then allow everyone else. Use Block all option if you want to allow IP and then block everyone else.',
-                'fieldRequired'                  : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazScan'                   : true,
-                'fieldRadioButtons'              :
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'tabsId'                        : 'filters',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsData'                      :
                     [
-                        'allow' :
-                            [
-                                'title'                           : 'Allow All',
-                                'type'                            : 'success',
-                                'dataValue'                       : 'allow'
-                            ],
-                        'block' :
-                            [
-                                'title'                           : 'Block All',
-                                'type'                            : 'danger',
-                                'dataValue'                       : 'block'
-                            ]
-                    ],
-                'fieldRadioChecked'              : appIpFilterDefaultAction
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'auto_unblock_ip_minutes',
-                'fieldLabel'                            : 'Auto Unblock IP after X minutes',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Auto unblock up after x amount of minutes.',
-                'fieldInputTypeTextFilter'              : 'positiveInt',
-                'fieldRequired'                         : false,
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldDataInputMaxLength'               : 6,
-                'fieldValue'                            : appAutoUnblockIpMinutes
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'incorrect_login_attempt_block_ip',
-                'fieldLabel'                            : 'Incorrect Login Attempt Block IP',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Block IP after # of incorrect login attempts. 0 is for not blocking. Note: Authentication middleware should be enabled for this to work.',
-                'fieldInputTypeTextFilter'              : 'positiveInt',
-                'fieldRequired'                         : false,
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldDataInputMaxLength'               : 2,
-                'fieldValue'                            : appIncorrectLoginAttemptBlockIp
-            ]
-        )}}
-    </div>
-</div>
-<hr>
-<div class="row">
-    <div class="col" id="ip-filters-add">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'ip_address',
-                'fieldLabel'                            : 'New Filter',
-                'fieldPlaceholder'                      : 'IP Address',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Enter IP V4 or IP V6 address. Adding network mask/prefix is allowed using forward slash. Example: 10.10.10.0/8 for network and 10.10.10.10 for IP host filter rule. 2001:db8:abcd:0012::0/96 for network and 2001:0DB8:ABCD:0012:::FFFF:FFFF for IP host filter rule.',
-                'fieldRequired'                         : false,
-                'fieldDisabled'                         : true,
-                'fieldGroupPreAddonDropdown'            : true,
-                'fieldGroupPreAddonDropdownButtonTitle' : 'SELECT FILTER TYPE',
-                'fieldGroupPreAddonDropdownButtonListTitle':
-                    [
-                        'allow' : 'Allow',
-                        'block' : 'Block'
-                    ]
-                ,
-                'fieldGroupPostAddonButtons'            :
-                    [
-                        'add'        : [
-                            'title'                   : 'Add',
-                            'type'                    : 'primary',
-                            'noMargin'                : true,
-                            'disabled'                : true,
-                            'buttonAdditionalClass'   : 'rounded-0 text-white',
-                            'position'                : 'right',
-                            'icon'                    : 'cog fa-spin',
-                            'iconHidden'              : true
+                        'filters'   :
+                        [
+                            'tabTitle'          : 'Filters',
+                            'tabInclude'        : 'apps/wizard/filters/form/filters'
+                        ],
+                        'checkip'   :
+                        [
+                            'tabTitle'          : 'Check IP',
+                            'tabInclude'        : 'apps/wizard/filters/form/checkip'
                         ]
-                    ],
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldDataInputMaxLength'               : 100,
-                'fieldValue'                            : ''
+                    ]
             ]
         )}}
     </div>
 </div>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'filters',
-                'fieldLabel'                     : 'Filters',
-                'fieldType'                      : 'html',
-                'fieldAdditionalClass'           : 'mb-0',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Current filters applied to the system for this app. Block filters are matched first and then allow filters.',
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazScan'                   : true
-            ]
-        )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        {% include 'apps/tables/filters' with
-            [
-                'component'             : component,
-                'componentId'           : componentId,
-                'parent'                : parent,
-                'sectionId'             : sectionId
-            ]
-        %}
-    </div>
-</div>
+{% set ip2locationInfo = json_encode(ip2locationInfo, 16) %}
 <script>
-/* globals paginatedPNotify Swal dataCollection */
+/* globals paginatedPNotify Swal dataCollection autoComplete */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -184,80 +52,700 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
 
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['funcs'] = { };
+
+dataCollectionSectionForm['funcs']['resetForm'] = function() {
+    if ($('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'host' ||
+        $('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'network'
+    ) {
+        $('#{{componentId}}-{{sectionId}}-host_network_address').val('');
+    } else if ($('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'ip2location') {
+        $('#{{componentId}}-{{sectionId}}-country_id').val(0).trigger('change');
+        $('#{{componentId}}-{{sectionId}}-state_id').val('');
+        $('#{{componentId}}-{{sectionId}}-state_name').val('');
+        $('#{{componentId}}-{{sectionId}}-city_id').val('');
+        $('#{{componentId}}-{{sectionId}}-city_name').val('');
+
+        $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', true);
+    }
+
+    $('#allow').prop('checked', true);
+    $('#host').prop('checked', true);
+    $('#allow_proxy').prop('checked', true);
+    $('#host_network_address_div').attr('hidden', false);
+    $('#ip2location_address_div').attr('hidden', true);
+    $('#ip2location-error').attr('hidden', true);
+}
+
+dataCollectionSectionForm['funcs']['resetCheckIp'] = function(resetInput = true) {
+    if (resetInput) {
+        $('#{{componentId}}-{{sectionId}}-ip').val('');
+    }
+    $('#filter-store').html('-');
+    $('#filter-id').html('-');
+    $('#filter-parent-id').html('-');
+    $('#filter-address-type').html('-');
+    $('#filter-address').html('-');
+    $('#filter-type').html('-');
+    $('#filter-ip2location-proxy').html('-');
+    $('#filter-hit-count').html('-');
+    $('#filter-incorrect-login-attempts').html('-');
+    $('#parent-address-type').html('-');
+    $('#parent-address').html('-');
+    $('#parent-type').html('-');
+    $('#parent-ip2location-proxy').html('-');
+    $('#parent-hit-count').html('-');
+    $('#parent-incorrect-login-attempts').html('-');
+    $('#parent-ip-hits').html('-');
+    $('#profiling').html('');
+
+    $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
+      '#{{componentId}}-{{sectionId}}-reset-checked-filter-counters,#{{componentId}}-{{sectionId}}-remove-checked-parent,' +
+      '#{{componentId}}-{{sectionId}}-remove-checked-parent-children,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').attr('disabled', true);
+}
+
+dataCollectionSectionForm['funcs']['removeFilter'] = function(childs = false, thisButton) {
+    var url = "{{links.url('apps/removeFilter')}}";
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData["id"] = $(thisButton).data('id');
+    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+
+    var color = 'danger';
+    var text;
+    var address;
+    if ($(thisButton).parents('td').length > 0) {
+        address = $(thisButton).parents('td').siblings('td')[0].innerHTML;
+    }
+
+    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache') {
+        if (dataCollectionSectionForm['checkedFilter']['filter'] && dataCollectionSectionForm['checkedFilter']['filter']['id']) {
+            postData["remove_from_cache"] = true;
+            color = 'warning';
+            address = dataCollectionSectionForm['checkedFilter']['filter']['address'];
+            postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['id'];
+            if (dataCollectionSectionForm['checkedFilter']['default_filter']) {
+                postData['defaultStore'] = true;
+            }
+        } else {
+            return false;
+        }
+    } else if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent-children') {
+        if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+            dataCollectionSectionForm['checkedFilter']['filter']['parent_filter'] &&
+            dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id']
+        ) {
+            postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id'];
+            address = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['address'];
+        } else {
+            return false;
+        }
+    } else if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter' ||
+               $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent'
+    ) {
+        if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter') {
+            if (dataCollectionSectionForm['checkedFilter']['default_filter']) {
+                postData['defaultStore'] = true;
+            }
+
+            if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                dataCollectionSectionForm['checkedFilter']['filter']['id']
+            ) {
+                postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['id'];
+                address = dataCollectionSectionForm['checkedFilter']['filter']['address'];
+            } else {
+                return false;
+            }
+        } else if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent') {
+            if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                dataCollectionSectionForm['checkedFilter']['filter']['parent_filter'] &&
+                dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id']
+            ) {
+                postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id'];
+                address = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['address'];
+            } else {
+                return false;
+            }
+        }
+    }
+
+    if (childs) {
+        text = 'Remove Child Filters for ' + address;
+        postData["remove_child_filters"] = true;
+        color = 'warning';
+    } else {
+        if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache') {
+            text = 'Remove filter from cache for ' + address;
+        } else {
+            text = 'Remove Filter ' + address;
+        }
+    }
+
+    Swal.fire({
+        title                       : '<span class="text-' + color + '">' + text + '?</span>',
+        icon                        : 'question',
+        background                  : 'rgba(0,0,0,.8)',
+        backdrop                    : 'rgba(0,0,0,.6)',
+        buttonsStyling              : false,
+        confirmButtonText           : 'Remove',
+        customClass                 : {
+            'confirmButton'             : 'btn btn-' + color + ' btn-sm text-uppercase',
+            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+        },
+        showCancelButton            : true,
+        keydownListenerCapture      : true,
+        allowOutsideClick           : true,
+        allowEscapeKey              : true,
+        didOpen                     : function() {
+            dataCollection.env.sounds.swalSound.play();
+        }
+    }).then((result) => {
+        if (result.value) {
+            $.post(url, postData, function(response) {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+
+                if (response.responseCode != 0) {
+                    paginatedPNotify('error', {
+                        title   : response.responseMessage
+                    });
+
+                    return;
+                }
+
+                paginatedPNotify('success', {
+                    title   : response.responseMessage
+                });
+
+                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache' ||
+                    $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent-children' ||
+                    $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter' ||
+                    $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent'
+                ) {
+                    dataCollectionSectionForm['funcs']['resetCheckIp'](false);
+                }
+            }, "json");
+        }
+    });
+}
+
+dataCollectionSectionForm['funcs']['updateFilter'] = function(task, thisButton) {
+    var text;
+    var buttonText;
+    var responseText;
+    var color;
+    var address;
+    if ($(thisButton).parents('td').length > 0) {
+        address = $(thisButton).parents('td').siblings('td')[0].innerHTML;
+    }
+
+    if (task === 'allow') {
+        text = 'Allow ' + address;
+        buttonText = 'Allow';
+        responseText = address + ' Allowed.';
+        color = 'success';
+    } else if (task === 'block') {
+        text = 'Block ' + address;
+        buttonText = 'Block';
+        responseText = address + ' Blocked.';
+        color = 'danger';
+    } else if (task === 'allow-proxy') {
+        text = 'Allow Proxy for ' + address;
+        buttonText = 'Allow';
+        responseText = 'Proxy Allowed for ' + address;
+        color = 'success';
+    } else if (task === 'block-proxy') {
+        text = 'Block Proxy for ' + address;
+        buttonText = 'Block';
+        responseText = 'Proxy Blocked for ' + address;
+        color = 'danger';
+    } else if (task === 'resetHitCount') {
+        if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters' ||
+            $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters'
+        ) {
+            if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters') {
+                if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                    dataCollectionSectionForm['checkedFilter']['filter']['address']
+                ) {
+                    address = dataCollectionSectionForm['checkedFilter']['filter']['address'];
+                } else {
+                    return false;
+                }
+            } else if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters') {
+                if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                    dataCollectionSectionForm['checkedFilter']['filter']['parent_filter'] &&
+                    dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['address']
+                ) {
+                    address = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['address'];
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        text = 'Reset hit counts for ' + address;
+        buttonText = 'Reset';
+        responseText = 'Counter reset for ' + address;
+        color = 'info';
+    }
+
+    Swal.fire({
+        title                       : '<span class="text-' + color + '">' + text + '?</span>',
+        icon                        : 'question',
+        background                  : 'rgba(0,0,0,.8)',
+        backdrop                    : 'rgba(0,0,0,.6)',
+        buttonsStyling              : false,
+        confirmButtonText           : buttonText,
+        customClass                 : {
+            'confirmButton'             : 'btn btn-' + color + ' btn-sm text-uppercase',
+            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+        },
+        showCancelButton            : true,
+        keydownListenerCapture      : true,
+        allowOutsideClick           : true,
+        allowEscapeKey              : true,
+        didOpen                     : function() {
+            dataCollection.env.sounds.swalSound.play();
+        }
+    }).then((result) => {
+        if (result.value) {
+            var url = "{{links.url('apps/updateFilter')}}";
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData["id"] = $(thisButton).data('id');
+            postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+
+            if (task === 'allow-proxy' ||
+                task === 'block-proxy'
+            ) {
+                postData["proxy"] = false;
+
+                if (task === 'allow-proxy') {
+                    postData["proxy"] = 'allow';
+                } else if (task === 'block-proxy') {
+                    postData["proxy"] = 'block';
+                }
+            }
+
+            if (task === 'resetHitCount') {
+                postData['resetHitCount'] = true;
+
+                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters' ||
+                    $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters'
+                ) {
+                    if (dataCollectionSectionForm['checkedFilter']['default_filter']) {
+                        postData['defaultStore'] = true;
+                    }
+
+                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters') {
+                        if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                            dataCollectionSectionForm['checkedFilter']['filter']['id']
+                        ) {
+                            postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['id'];
+                        }
+                    } else if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters') {
+                        if (dataCollectionSectionForm['checkedFilter']['filter'] &&
+                            dataCollectionSectionForm['checkedFilter']['filter']['parent_filter'] &&
+                            dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id']
+                        ) {
+                            postData["id"] = dataCollectionSectionForm['checkedFilter']['filter']['parent_filter']['id'];
+                        }
+                    }
+                }
+            }
+
+            if (task === 'allow' || task === 'block') {
+                if (task === 'allow') {
+                    postData["filter_type"] = 'allow';
+                } else if (task === 'block') {
+                    postData["filter_type"] = 'block';
+                }
+            }
+
+            $.post(url, postData, function(response) {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+
+                if (response.responseCode != 0) {
+                    paginatedPNotify('error', {
+                        title   : response.responseMessage
+                    });
+
+                    return;
+                }
+
+                paginatedPNotify('success', {title   : responseText});
+
+                if (task === 'resetHitCount') {
+                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters' ||
+                        $(thisButton)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters'
+                    ) {
+                        dataCollectionSectionForm['funcs']['resetCheckIp'](false);
+                    }
+                }
+
+            }, "json");
+        }
+    });
+}
+
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                              : { },
-        '{{componentId}}-{{sectionId}}-ip_filter_default_action'        : { },
-        '{{componentId}}-{{sectionId}}-auto_unblock_ip_minutes'         : { },
-        '{{componentId}}-{{sectionId}}-incorrect_login_attempt_block_ip': { },
-        '{{componentId}}-{{sectionId}}-ip_address'                      : { },
-        '{{componentId}}-{{sectionId}}-filters'                         : {
+        '{{componentId}}-{{sectionId}}-filter_type'                     : { },
+        '{{componentId}}-{{sectionId}}-address_type'                    : {
             afterInit: function() {
-                $("#ip-filters-add a").click(function(e) {
-                    e.preventDefault();
-
-                    $("#{{componentId}}-{{sectionId}}-ip_address").attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button span').text($(this).text().toUpperCase());
+                $('#{{componentId}}-{{sectionId}}-address_type').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') === 'host' ||
+                        $(this).find('input[type=radio]:checked').data('value') === 'network'
+                    ) {
+                        $('#host_network_address_div').attr('hidden', false);
+                        $('#ip2location_address_div').attr('hidden', true);
+                        $("#{{componentId}}-{{sectionId}}-city_id").val(0);
+                        $("#{{componentId}}-{{sectionId}}-city_id").attr("value", 0);
+                        $("#{{componentId}}-{{sectionId}}-city_name").val("");
+                        $("#{{componentId}}-{{sectionId}}-city_name").attr("value", "");
+                        $("#{{componentId}}-{{sectionId}}-state_id").val(0);
+                        $("#{{componentId}}-{{sectionId}}-state_id").attr("value", 0);
+                        $("#{{componentId}}-{{sectionId}}-state_name").val("");
+                        $("#{{componentId}}-{{sectionId}}-state_name").attr("value", "");
+                        $("#{{componentId}}-{{sectionId}}-country_id").val(0);
+                        $("#{{componentId}}-{{sectionId}}-country_id").attr("value", 0);
+                        $("#{{componentId}}-{{sectionId}}-country_name").val("");
+                        $("#{{componentId}}-{{sectionId}}-country_name").attr("value", "");
+                    } else if ($(this).find('input[type=radio]:checked').data('value') === 'ip2location') {
+                        $('#host_network_address_div').attr('hidden', true);
+                        $('#ip2location_address_div').attr('hidden', false);
+                        $("#{{componentId}}-{{sectionId}}-host_network_address").val("");
+                        $("#{{componentId}}-{{sectionId}}-host_network_address").attr("value", "");
+                    }
                 });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-host_network_address'            : { },
+        '{{componentId}}-{{sectionId}}-ip2location_address'             : { },
+        '{{componentId}}-{{sectionId}}-country_id'                      : {
+            placeholder: "SELECT COUNTRY",
+            allowClear: true,
+            afterInit: function() {
+                var ip2locationInfo = JSON.parse('{{ip2locationInfo}}');
 
-                $("#{{componentId}}-{{sectionId}}-ip_address").keyup(function() {
-                    if ($("#{{componentId}}-{{sectionId}}-ip_address").val() === '') {
-                        $("#{{componentId}}-{{sectionId}}-add").attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-country_id').on('select2:select', function(e) {
+                    $('.country_name').html(e.params.data.text);
+                    if (ip2locationInfo['csv_imported_countries']) {
+                        var csvImportedCountries = Object.values(ip2locationInfo['csv_imported_countries']);
+
+                        if (!csvImportedCountries.includes($(e.params.data.element).data('iso2'))) {
+                            $('#{{componentId}}-{{sectionId}}-state_name, #{{componentId}}-{{sectionId}}-city_name').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-state_name, #{{componentId}}-{{sectionId}}-city_name').val("");
+                            $('#{{componentId}}-{{sectionId}}-state_id, #{{componentId}}-{{sectionId}}-city_id').val("");
+                            $('#ip2location-error').attr('hidden', false);
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-state_name, #{{componentId}}-{{sectionId}}-city_name').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-state_name, #{{componentId}}-{{sectionId}}-city_name').val("");
+                            $('#{{componentId}}-{{sectionId}}-state_id, #{{componentId}}-{{sectionId}}-city_id').val("");
+                            $('#ip2location-error').attr('hidden', true);
+                        }
                     } else {
-                        $("#{{componentId}}-{{sectionId}}-add").attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-state_name, #{{componentId}}-{{sectionId}}-city_name').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-state_name, #{{componentId}}-{{sectionId}}-city_name').val("");
+                        $('#{{componentId}}-{{sectionId}}-state_id, #{{componentId}}-{{sectionId}}-city_id').val("");
+                        $('#ip2location-error').attr('hidden', false);
                     }
                 });
 
-                $("#{{componentId}}-{{sectionId}}-add").click(function(e) {
+                $('#{{componentId}}-{{sectionId}}-country_id').on('select2:unselect', function(e) {
+                    $('.country_name').empty();
+                    $('#{{componentId}}-{{sectionId}}-state_name, #{{componentId}}-{{sectionId}}-city_name').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-state_name, #{{componentId}}-{{sectionId}}-city_name').val("");
+                    $('#{{componentId}}-{{sectionId}}-state_id, #{{componentId}}-{{sectionId}}-city_id').val("");
+                    $('#ip2location-error').attr('hidden', true);
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-state_id'                        : { },
+        '{{componentId}}-{{sectionId}}-state_name'                      : {
+            afterInit: function() {
+                dataCollectionSectionForm["autoCompleteStates"] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = "{{links.url('apps/searchState')}}";
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append($("#security-token").attr("name"), $("#security-token").val());
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-state_name").value);
+                                formdata.append("country_id", document.querySelector("#{{componentId}}-{{sectionId}}-country_id").value);
+
+                                var requestOptions = {
+                                    method: "POST",
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $("#security-token").attr("name", response.tokenKey);
+                                    $("#security-token").val(response.token);
+                                }
+
+                                if (response.responseData.states) {
+                                    return response.responseData.states;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["name"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-state_name",
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-state_name_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-state_name",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + " <span>(Country: " + data.value.country_name + ")</span>";
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-state_name_list")) {
+                                $("#{{componentId}}-{{sectionId}}-state_name_list").empty().append(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-state_name").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-state_name_list" class="autoComplete_results"></div>'
+                                );
+                                document.querySelector("#{{componentId}}-{{sectionId}}-state_name_list").appendChild(result);
+                            }
+                        },
+                        onSelection: feedback => {
+                            $("#{{componentId}}-{{sectionId}}-state_id").val(feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-state_id").attr("value", feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-state_name").val(feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-state_name").attr("value", feedback.selection.value.name);
+                        }
+                });
+                // On delete
+                $("#{{componentId}}-{{sectionId}}-state_name").on("input propertychange", function() {
+                    $("#{{componentId}}-{{sectionId}}-state_id").val(0);
+                    $("#{{componentId}}-{{sectionId}}-state_id").attr("value", 0);
+                });
+
+                $("#{{componentId}}-{{sectionId}}-state_name").focusout(function() {
+                    $("#{{componentId}}-{{sectionId}}-state_name_list").children("li").remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-city_id'                         : { },
+        '{{componentId}}-{{sectionId}}-city_name'                       : {
+            afterInit: function() {
+                dataCollectionSectionForm["autoCompleteCities"] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = "{{links.url('apps/searchCity')}}";
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append($("#security-token").attr("name"), $("#security-token").val());
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-city_name").value);
+                                formdata.append("country_id", document.querySelector("#{{componentId}}-{{sectionId}}-country_id").value);
+
+                                var requestOptions = {
+                                    method: "POST",
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $("#security-token").attr("name", response.tokenKey);
+                                    $("#security-token").val(response.token);
+                                }
+
+                                if (response.responseData.cities) {
+                                    return response.responseData.cities;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["name"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-city_name",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-city_name_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-city_name",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + " <span>(State: " + data.value.state_name + ", Country: " + data.value.country_name + ")</span>";
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-city_name_list")) {
+                                $("#{{componentId}}-{{sectionId}}-city_name_list").empty().append(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-city_name").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-city_name_list" class="autoComplete_results"></div>'
+                                );
+                                document.querySelector("#{{componentId}}-{{sectionId}}-city_name_list").appendChild(result);
+                            }
+                        },
+                        onSelection: feedback => {
+                            $("#{{componentId}}-{{sectionId}}-city_id").val(feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-city_id").attr("value", feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-city_name").blur();
+                            $("#{{componentId}}-{{sectionId}}-city_name").val(feedback.selection.value.name);
+                            $("#{{componentId}}-{{sectionId}}-state_id").val(feedback.selection.value.state_name);
+                            $("#{{componentId}}-{{sectionId}}-state_id").attr("value", feedback.selection.value.state_name);
+                            $("#{{componentId}}-{{sectionId}}-state_name").val(feedback.selection.value.state_name);
+                            $("#{{componentId}}-{{sectionId}}-state_name").attr("value", feedback.selection.value.state_name);
+                        }
+                });
+                // On delete
+                $("#{{componentId}}-{{sectionId}}-city_name").on("input propertychange", function() {
+                    $("#{{componentId}}-{{sectionId}}-city_id").val(0);
+                    $("#{{componentId}}-{{sectionId}}-city_id").attr("value", 0);
+                    $("#{{componentId}}-{{sectionId}}-state_id").val(0);
+                    $("#{{componentId}}-{{sectionId}}-state_id").attr("value", 0);
+                    $("#{{componentId}}-{{sectionId}}-state_name").val("");
+                    $("#{{componentId}}-{{sectionId}}-state_name").attr("value", "");
+                });
+
+                $("#{{componentId}}-{{sectionId}}-city_name").focusout(function() {
+                    $("#{{componentId}}-{{sectionId}}-city_name_list").children("li").remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-ip2location_proxy'               : { },
+        '{{componentId}}-{{sectionId}}-filters'                         : {
+            afterInit: function() {
+                $("#{{componentId}}-{{sectionId}}-add-filter,#{{componentId}}-{{sectionId}}-cancel-filter").click(function(e) {
                     e.preventDefault();
 
+                    if ($(this)[0].id === '{{componentId}}-{{sectionId}}-cancel-filter') {
+                        dataCollectionSectionForm['funcs']['resetForm']();
+
+                        return;
+                    }
+
                     $(this).attr('disabled', true);
-                    $("#{{componentId}}-{{sectionId}}-ip_address").attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button').attr("disabled", true);
-                    $("#{{componentId}}-{{sectionId}}-add").children("i").attr('hidden', false);
+                    $(this).children('i').attr('hidden', false);
 
                     var url = "{{links.url('apps/addFilter')}}";
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
-                    postData['ip_address'] = $("#{{componentId}}-{{sectionId}}-ip_address").val();
-                    postData['filter_type'] = $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button span').text().toLowerCase();
+                    postData['filter_type'] = $('#{{componentId}}-{{sectionId}}-filter_type').find('input[type=radio]:checked').data('value').toLowerCase();
+                    postData['address_type'] = $('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value').toLowerCase();
 
-                    $.post(url, postData, function(response) {
-                        $("#{{componentId}}-{{sectionId}}-add").children("i").attr('hidden', true);
-                        $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button').attr("disabled", false);
+                    if ($('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'host' ||
+                        $('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'network'
+                    ) {
+                        postData['address'] = $('#{{componentId}}-{{sectionId}}-host_network_address').val();
+                    } else if ($('#{{componentId}}-{{sectionId}}-address_type').find('input[type=radio]:checked').data('value') === 'ip2location') {
+                        postData['address'] = $('#{{componentId}}-{{sectionId}}-country_id').find(':selected').data('iso2');
 
-                        if (response.responseCode != 0) {
-                            paginatedPNotify('error', {
-                                title   : response.responseMessage
-                            });
-
-                            if (response.responseCode === 3) {
-                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].search(postData['ip_address']).draw();
-                            }
-
-                            $("#{{componentId}}-{{sectionId}}-ip_address").attr('disabled', false);
-                            $("#{{componentId}}-{{sectionId}}-add").attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button').attr("disabled", false);
+                        if (postData['address'] === '' || postData['address'] === '0' || postData['address'] === 'undefined') {
+                            paginatedPNotify('error', {title   : 'Country cannot be empty'});
 
                             return;
                         }
 
-                        paginatedPNotify('success', {
-                            title   : 'Filter added.'
-                        });
+                        if ($('#{{componentId}}-{{sectionId}}-state_id').val() !== '' &&
+                            $('#{{componentId}}-{{sectionId}}-state_id').val() != '0'
+                        ) {
+                            postData['address'] += ':' + $('#{{componentId}}-{{sectionId}}-state_id').val().toUpperCase();
+                        }
+                        if ($('#{{componentId}}-{{sectionId}}-city_id').val() !== '' &&
+                            $('#{{componentId}}-{{sectionId}}-city_id').val() != '0'
+                        ) {
+                            postData['address'] += ':' + $('#{{componentId}}-{{sectionId}}-city_id').val().toUpperCase();
+                        }
+                        if ($('#{{componentId}}-{{sectionId}}-ip2location_proxy').find('input[type=radio]:checked').data('value') === 'allow_proxy' ||
+                            $('#{{componentId}}-{{sectionId}}-ip2location_proxy').find('input[type=radio]:checked').data('value') === 'block_proxy'
+                        ) {
+                            if ($('#{{componentId}}-{{sectionId}}-ip2location_proxy').find('input[type=radio]:checked').data('value').toLowerCase() === 'allow_proxy') {
+                                postData['ip2location_proxy'] = 'allow';
+                            } else if ($('#{{componentId}}-{{sectionId}}-ip2location_proxy').find('input[type=radio]:checked').data('value').toLowerCase() === 'block_proxy') {
+                                postData['ip2location_proxy'] = 'block';
+                            }
+                        }
+                    }
+
+                    $.post(url, postData, function(response) {
+                        $("#{{componentId}}-{{sectionId}}-add-filter").attr('disabled', false);
+                        $("#{{componentId}}-{{sectionId}}-add-filter").children('i').attr('hidden', true);
 
                         dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
 
-                        $("#{{componentId}}-{{sectionId}}-ip_address").val('');
-                        $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button span').text('SELECT FILTER TYPE');
+                        if (response.responseCode != 0) {
+                            paginatedPNotify('error', {title   : response.responseMessage});
+
+                            if (response.responseCode === 3) {
+                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].search(postData['address']).draw();
+                            }
+
+                            return;
+                        }
+
+                        paginatedPNotify('success', {title   : 'Filter added.'});
+
+                        dataCollectionSectionForm['funcs']['resetForm']();
                     }, "json");
                 });
 
                 $(document).ready(function() {
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+                    dataCollectionSectionForm['vars']['filterPostData'] = { };
+                    dataCollectionSectionForm['vars']['filterPostData'][$('#security-token').attr('name')] = $('#security-token').val();
+                    dataCollectionSectionForm['vars']['filterPostData']["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
                     var dom =
                     '<"row mb-1"<"col-md-3 col-xs-12"B><"col-md-3 col-xs-12"l><"col-md-3 col-xs-12"f><"col-md-3 col-xs-12"p>>' +
@@ -266,17 +754,19 @@ dataCollectionSection =
 
                     if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-filters-table')) {
                         dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'] =
-                        $('#{{componentId}}-{{sectionId}}-filters-table').DataTable({
+                            $('#{{componentId}}-{{sectionId}}-filters-table').DataTable({
                                 "responsive": true,
                                 "columns": [
-                                    { data : 'id', visible: false,},
-                                    { data : 'ip_address'},
+                                    { data : 'id', visible: false},
+                                    { data : 'address'},
                                     { data : 'address_type'},
                                     { data : 'filter_type'},
-                                    { data : 'added_by'},
+                                    { data : 'ip2location_proxy'},
+                                    { data : 'updated_by'},
+                                    { data : 'updated_at'},
                                     { data : 'hit_count'},
-                                    { data : 'incorrect_attempts'},
-                                    { data : 'actions', orderable: false },
+                                    { data : 'ip_hits'},
+                                    { data : 'actions', orderable: false},
                                 ],
                                 "rowId" : 'id',
                                 "dom": dom,
@@ -287,6 +777,14 @@ dataCollectionSection =
                                         },
                                         className: 'btn-sm',
                                         action: function ( e, dt, node, config ) {
+                                            if (dataCollectionSectionForm['vars']['filterPostData']['parent_filter_id']) {
+                                                delete(dataCollectionSectionForm['vars']['filterPostData']['parent_filter_id']);
+                                            }
+
+                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].settings()[0].ajax.data =
+                                                dataCollectionSectionForm['vars']['filterPostData'];
+                                            $('#{{componentId}}-{{sectionId}}-filters').siblings('label')[0].innerHTML = 'FILTERS';
+
                                             dt.ajax.reload();
                                         }
                                     }
@@ -294,28 +792,38 @@ dataCollectionSection =
                                 "ajax": {
                                     "url" : "{{links.url('apps/getFilters')}}",
                                     "type": "POST",
-                                    "data": postData,
+                                    "data": dataCollectionSectionForm['vars']['filterPostData'],
                                     "dataSrc" : function (json) {
                                         var return_data = new Array();
 
-                                        for(var i=0;i< json.data.length; i++) {
-                                            if (json.data[i]['incorrect_attempts'] === null) {
-                                                json.data[i]['incorrect_attempts'] = "-";
+                                        for (var i = 0; i < json.data.length; i++) {
+                                            if (json.data[i]['ip2location_proxy'] === null) {
+                                                json.data[i]['ip2location_proxy'] = "-";
+                                            }
+                                            if (json.data[i]['ip2location_proxy'] === 'allow') {
+                                                json.data[i]['ip2location_proxy'] = '<span class="badge badge-success text-uppercase">Allow</span>';
+                                            } else if (json.data[i]['ip2location_proxy'] === 'block') {
+                                                json.data[i]['ip2location_proxy'] = '<span class="badge badge-danger text-uppercase">Block</span>';
                                             }
 
-                                            if (json.data[i]['hits'] === null) {
-                                                json.data[i]['hits'] = "-";
+                                            if (json.data[i]['hit_count'] === null) {
+                                                json.data[i]['hit_count'] = "-";
+                                            }
+                                            if (json.data[i]['ip_hits'] === null) {
+                                                json.data[i]['ip_hits'] = "-";
                                             }
 
                                             if (json.data[i]['address_type'] === 'host') {
-                                                json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">Host</span>';
+                                                json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">HOST</span>';
                                             } else if (json.data[i]['address_type'] === 'network') {
-                                                json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">Network</span>';
+                                                json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">NETWORK</span>';
+                                            } else if (json.data[i]['address_type'] === 'ip2location') {
+                                                json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">COUNTRY:STATE:CITY</span>';
                                             }
 
                                             json.data[i]['actions'] = '';
 
-                                            if (json.data[i]['filter_type'] === 'monitor' && json.data[i]['added_by'] === 'System') {
+                                            if (json.data[i]['filter_type'] === 'monitor') {
                                                 json.data[i]['actions'] +=
                                                     '<a href="#" class="text-danger block-filter ml-1" ' +
                                                     'data-toggle="tooltip" data-placement="left" title="Block IP"' +
@@ -338,6 +846,34 @@ dataCollectionSection =
                                                 'data-toggle="tooltip" data-placement="left" title="Remove Filter"' +
                                                 'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-trash"></i></a>';
 
+                                            if (json.data[i]['ip2location_proxy'] === '<span class="badge badge-success text-uppercase">Allow</span>') {
+                                                json.data[i]['actions'] += ' | ';
+                                                json.data[i]['actions'] += '<a href="#" class="text-danger block-proxy" ' +
+                                                    'data-toggle="tooltip" data-placement="left" title="Block Proxy"' +
+                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-lock"></i></a>';
+                                            } else if (json.data[i]['ip2location_proxy'] === '<span class="badge badge-danger text-uppercase">Block</span>') {
+                                                json.data[i]['actions'] += ' | ';
+                                                json.data[i]['actions'] += '<a href="#" class="text-success allow-proxy" ' +
+                                                    'data-toggle="tooltip" data-placement="left" title="Allow Proxy"' +
+                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-lock"></i></a>';
+                                            }
+
+                                            if (json.data[i]['hit_count'] && json.data[i]['hit_count'] > 0) {
+                                                json.data[i]['actions'] += '<a href="#" class="text-info reset-hit-count" ' +
+                                                    'data-toggle="tooltip" data-placement="left" title="Reset Hit Count"' +
+                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-0"></i></a>';
+                                            }
+
+                                            if (json.data[i]['ip_hits'] && json.data[i]['ip_hits'] > 0) {
+                                                json.data[i]['actions'] += ' | ';
+                                                json.data[i]['actions'] += '<a href="#" class="text-primary view-child-filters" ' +
+                                                    'data-toggle="tooltip" data-placement="left" title="View Children"' +
+                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-eye"></i></a>';
+                                                json.data[i]['actions'] += '<a href="#" class="text-warning remove-child-filters" ' +
+                                                    'data-toggle="tooltip" data-placement="left" title="Remove Children"' +
+                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-trash"></i></a>';
+                                            }
+
                                             if (json.data[i]['filter_type'] === 'allow') {
                                                 json.data[i]['filter_type'] = '<span class="badge badge-success text-uppercase">Allow</span>';
                                             } else if (json.data[i]['filter_type'] === 'block') {
@@ -352,153 +888,62 @@ dataCollectionSection =
                                         return return_data;
                                     }
                                 }
-                            }
-                        );
+                            });
 
-                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].on( 'draw', function () {
+                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].on('draw', function () {
                             dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].columns.adjust().responsive.recalc();
 
-                            $('.remove-filter .block-filter').off();
-
-                            $('.remove-filter').click(function(e) {
+                            $('.remove-filter,.allow-filter,.block-filter,.view-child-filters,.remove-child-filters,.reset-hit-count').off();
+                            $('.remove-filter,.remove-child-filters').click(function(e) {
                                 e.preventDefault();
 
-                                Swal.fire({
-                                    title                       : '<span class="text-danger"> Remove Filter?</span>',
-                                    icon                        : 'question',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    buttonsStyling              : false,
-                                    confirmButtonText           : 'Remove',
-                                    customClass                 : {
-                                        'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
-                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-                                    },
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : true,
-                                    allowEscapeKey              : true,
-                                    didOpen                     : function() {
-                                        dataCollection.env.sounds.swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        var url = "{{links.url('apps/removeFilter')}}";
-                                        var postData = { };
-                                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                        postData["id"] = $(this).data('id');
+                                var childs = false;
+                                if ($($(e)[0].currentTarget).hasClass('remove-child-filters')) {
+                                    childs = true;
+                                }
 
-                                        $.post(url, postData, function(response) {
-                                            if (response.responseCode != 0) {
-                                                paginatedPNotify('error', {
-                                                    title   : response.responseMessage
-                                                });
-
-                                                return;
-                                            }
-
-                                            paginatedPNotify('success', {
-                                                title   : 'Filter removed.'
-                                            });
-
-                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-                                        }, "json");
-                                    }
-                                });
+                                dataCollectionSectionForm['funcs']['removeFilter'](childs, this);
                             });
 
                             $('.allow-filter').click(function(e) {
                                 e.preventDefault();
 
-                                Swal.fire({
-                                    title                       : '<span class="text-success"> Allow IP?</span>',
-                                    icon                        : 'question',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    buttonsStyling              : false,
-                                    confirmButtonText           : 'Allow',
-                                    customClass                 : {
-                                        'confirmButton'             : 'btn btn-success btn-sm text-uppercase',
-                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-                                    },
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : true,
-                                    allowEscapeKey              : true,
-                                    didOpen                     : function() {
-                                        dataCollection.env.sounds.swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        var url = "{{links.url('apps/allowFilter')}}";
-                                        var postData = { };
-                                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                        postData["id"] = $(this).data('id');
-
-                                        $.post(url, postData, function(response) {
-                                            if (response.responseCode != 0) {
-                                                paginatedPNotify('error', {
-                                                    title   : response.responseMessage
-                                                });
-
-                                                return;
-                                            }
-
-                                            paginatedPNotify('success', {
-                                                title   : 'IP Allowed.'
-                                            });
-
-                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-                                        }, "json");
-                                    }
-                                });
+                                dataCollectionSectionForm['funcs']['updateFilter']('allow', this);
                             });
 
                             $('.block-filter').click(function(e) {
                                 e.preventDefault();
 
-                                Swal.fire({
-                                    title                       : '<span class="text-danger"> Block IP?</span>',
-                                    icon                        : 'question',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    buttonsStyling              : false,
-                                    confirmButtonText           : 'Block',
-                                    customClass                 : {
-                                        'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
-                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-                                    },
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : true,
-                                    allowEscapeKey              : true,
-                                    didOpen                     : function() {
-                                        dataCollection.env.sounds.swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        var url = "{{links.url('apps/blockFilter')}}";
-                                        var postData = { };
-                                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                        postData["id"] = $(this).data('id');
+                                dataCollectionSectionForm['funcs']['updateFilter']('block', this);
+                            });
 
-                                        $.post(url, postData, function(response) {
-                                            if (response.responseCode != 0) {
-                                                paginatedPNotify('error', {
-                                                    title   : response.responseMessage
-                                                });
+                            $('.allow-proxy').click(function(e) {
+                                e.preventDefault();
 
-                                                return;
-                                            }
+                                dataCollectionSectionForm['funcs']['updateFilter']('allow-proxy', this);
+                            });
 
-                                            paginatedPNotify('success', {
-                                                title   : 'IP Blocked.'
-                                            });
+                            $('.block-proxy').click(function(e) {
+                                e.preventDefault();
 
-                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-                                        }, "json");
-                                    }
-                                });
+                                dataCollectionSectionForm['funcs']['updateFilter']('block-proxy', this);
+                            });
+
+                            $('.reset-hit-count').click(function(e) {
+                                e.preventDefault();
+
+                                dataCollectionSectionForm['funcs']['updateFilter']('resetHitCount', this);
+                            });
+
+                            $('.view-child-filters').click(function(e) {
+                                e.preventDefault();
+
+                                $('#{{componentId}}-{{sectionId}}-filters').siblings('label')[0].innerHTML =
+                                    'FILTERS (' + $(this).parents('td').siblings('td')[0].innerHTML + ')';
+                                dataCollectionSectionForm['vars']['filterPostData']['parent_filter_id'] = $(this).parents('tr')[0].id;
+                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].settings()[0].ajax.data =
+                                    dataCollectionSectionForm['vars']['filterPostData'];
+                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
                             });
                         });
                     }
@@ -506,16 +951,37 @@ dataCollectionSection =
 
                 $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").click(function() {
                     if ($(this).is(':checked') === true) {
-                        $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', false);
-                        $("#{{componentId}}-{{sectionId}}-tabs-filters").attr('hidden', false);
+                        Swal.fire({
+                            title                       : '<span class="text-info">Save app to add filters.</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Ok',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-info btn-sm text-uppercase'
+                            },
+                            showCancelButton            : false,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                dataCollection.env.sounds.swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                return;
+                            }
+                        });
                     } else {
                         Swal.fire({
-                            title                       : '<span class="text-danger"> This will reset all app filters. Are you sure?</span>',
+                            title                       : '<span class="text-danger"> Remove all filters and disable Ip Filter? Note: You can disable IP Filter, by changing status to disable or monitor!</span>',
                             icon                        : 'question',
                             background                  : 'rgba(0,0,0,.8)',
                             backdrop                    : 'rgba(0,0,0,.6)',
                             buttonsStyling              : false,
                             confirmButtonText           : 'Yes',
+                            cancelButtonText            : 'No',
                             customClass                 : {
                                 'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
                                 'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
@@ -529,33 +995,256 @@ dataCollectionSection =
                             }
                         }).then((result) => {
                             if (result.value) {
-                                $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', true);
-                                    var url = "{{links.url('apps/resetAppFilters')}}";
-                                    var postData = { };
-                                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+                                var url = "{{links.url('apps/resetAppFilters')}}";
+                                var postData = { };
+                                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
 
-                                    $.post(url, postData, function(response) {
-                                        if (response.responseCode != 0) {
-                                            paginatedPNotify('error', {
-                                                title   : response.responseMessage
-                                            });
+                                (async () => { await Swal.fire({
+                                        title                       : "Confirmation",
+                                        input                       : "checkbox",
+                                        inputValue                  : 0,
+                                        inputPlaceholder            : 'Confirm deletion of IP Filter rules',
+                                        confirmButtonText           : 'Remove&nbsp;<i class="fa fa-trash"></i>',
+                                        buttonsStyling              : false,
+                                        customClass                 : {
+                                            'confirmButton'             : 'btn btn-danger btn-sm text-uppercase'
+                                        },
+                                        inputValidator: (result) => {
+                                            if (!result) {
+                                                return "You need check the confirmation checkbox.";
+                                            }
 
-                                            return;
+                                            $.post(url, postData, function(response) {
+                                                if (response.responseCode != 0) {
+                                                    paginatedPNotify('error', {
+                                                        title   : response.responseMessage
+                                                    });
+
+                                                    $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', false);
+                                                    $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").prop('checked', true);
+
+                                                    return;
+                                                }
+
+                                                paginatedPNotify('success', {title   : response.responseMessage});
+
+                                                $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', true);
+
+                                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+                                            }, "json");
                                         }
-
-                                        $('#{{componentId}}-{{sectionId}}-incorrect_login_attempt_block_ip').val(0);
-                                        $('#allow').prop('checked', true);
-
-                                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-                                    }, "json");
+                                    });
+                                })();
                             } else {
-                                $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").prop('checked', true);
+                                $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', true);
+                                $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").prop('checked', false);
                             }
                         });
                     }
                 });
             }
         },
+        '{{componentId}}-{{sectionId}}-ip'                              : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-cancelcheckip').off();
+                $('#{{componentId}}-{{sectionId}}-cancelcheckip').click(function(e) {
+                    e.preventDefault();
+
+                    dataCollectionSectionForm['funcs']['resetCheckIp']();
+                });
+
+                $('#{{componentId}}-{{sectionId}}-checkip').off();
+                $('#{{componentId}}-{{sectionId}}-checkip').click(function(e) {
+                    e.preventDefault();
+
+                    dataCollectionSectionForm['funcs']['resetCheckIp'](false);
+
+                    var url = "{{links.url('apps/checkIp')}}";
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData["ip"] = $("#{{componentId}}-{{sectionId}}-ip").val();
+                    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode != 0) {
+                            paginatedPNotify('error', {title   : response.responseMessage});
+                        } else if (response.responseCode == 0) {
+                            paginatedPNotify('success', {title   : response.responseMessage});
+                        }
+
+                        if (response.responseData && response.responseData.filter && typeof response.responseData.filter === 'object') {
+                            if ($("#{{componentId}}-{{sectionId}}-ip").val() === ''&&
+                                response.responseData.filter.address
+                            ) {
+                                $("#{{componentId}}-{{sectionId}}-ip").val(response.responseData.filter.address);
+                            }
+
+                            dataCollectionSectionForm['checkedFilter'] = response.responseData;
+
+                            if (response.responseData.profiling && response.responseData.profiling[1]) {
+                                $('#profiling').html('IP found in ' + response.responseData.profiling[1]['reference'] + '. Query took ' + response.responseData.profiling[1]['difference'] + ' ms');
+                            }
+
+                            if (response.responseData.default_filter !== 'undefined') {
+                                var store = '';
+                                if (response.responseData.default_filter === true) {
+                                    store += 'DEFAULT';
+                                } else {
+                                    store += 'MAIN';
+                                }
+
+                                if (response.responseData.cached) {
+                                    $('#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache').attr('disabled', false);
+
+                                    store += ' | <span class="badge badge-success">CACHED</span>';
+                                } else {
+                                    store += ' | <span class="badge badge-warning">NOT CACHED</span>';
+                                }
+
+                                $('#filter-store').html(store);
+                            } else {
+                                $('#filter-store').html('-');
+                            }
+                            if (response.responseData.filter.id) {
+                                $('#filter-id').html(response.responseData.filter.id);
+                            } else {
+                                $('#filter-id').html('-');
+                            }
+                            if (response.responseData.filter.parent_id) {
+                                $('#filter-parent-id').html(response.responseData.filter.parent_id);
+                            } else {
+                                $('#filter-parent-id').html('-');
+                            }
+                            if (response.responseData.filter.address_type) {
+                                $('#filter-address-type').html(
+                                    '<span class="badge badge-primary text-uppercase">' + response.responseData.filter.address_type + '</span>'
+                                );
+                            } else {
+                                $('#filter-address-type').html('-');
+                            }
+                            if (response.responseData.filter.address) {
+                                $('#filter-address').html(response.responseData.filter.address);
+                            } else {
+                                $('#filter-address').html('-');
+                            }
+                            if (response.responseData.filter.filter_type) {
+                                if (response.responseData.filter.filter_type === 'allow') {
+                                    response.responseData.filter.filter_type = '<span class="badge badge-success text-uppercase">Allow</span>';
+                                } else if (response.responseData.filter.filter_type === 'block') {
+                                    response.responseData.filter.filter_type = '<span class="badge badge-danger text-uppercase">Block</span>';
+                                } else if (response.responseData.filter.filter_type === 'monitor') {
+                                    response.responseData.filter.filter_type = '<span class="badge badge-warning text-uppercase">Monitor</span>';
+                                }
+
+                                $('#filter-type').html(response.responseData.filter.filter_type);
+                            } else {
+                                $('#filter-type').html('-');
+                            }
+                            if (response.responseData.filter.ip2location_proxy) {
+                                $('#filter-ip2location-proxy').html(response.responseData.filter.ip2location_proxy);
+                            } else {
+                                $('#filter-ip2location-proxy').html('-');
+                            }
+                            if (response.responseData.filter.hit_count) {
+                                $('#filter-hit-count').html(response.responseData.filter.hit_count);
+                                $('#{{componentId}}-{{sectionId}}-reset-checked-filter-counters').attr('disabled', false);
+                            } else {
+                                $('#filter-hit-count').html('0');
+                            }
+                            if (response.responseData.filter.incorrect_login_attempts) {
+                                $('#filter-incorrect-login-attempts').html(response.responseData.filter.incorrect_login_attempts);
+                            } else {
+                                $('#filter-incorrect-login-attempts').html('0');
+                            }
+
+                            $('#{{componentId}}-{{sectionId}}-remove-checked-filter').attr('disabled', false);
+
+                            if (response.responseData.filter.parent_filter) {
+                                if (response.responseData.filter.parent_filter.address_type) {
+                                    $('#parent-address-type').html(
+                                        '<span class="badge badge-primary text-uppercase">' + response.responseData.filter.parent_filter.address_type + '</span>'
+                                    );
+                                } else {
+                                    $('#parent-address-type').html('-');
+                                }
+                                if (response.responseData.filter.parent_filter.address) {
+                                    $('#parent-address').html(response.responseData.filter.parent_filter.address);
+                                } else {
+                                    $('#parent-address').html('-');
+                                }
+                                if (response.responseData.filter.parent_filter.filter_type) {
+                                    if (response.responseData.filter.parent_filter.filter_type === 'allow') {
+                                        response.responseData.filter.parent_filter.filter_type = '<span class="badge badge-success text-uppercase">Allow</span>';
+                                    } else if (response.responseData.filter.parent_filter.filter_type === 'block') {
+                                        response.responseData.filter.parent_filter.filter_type = '<span class="badge badge-danger text-uppercase">Block</span>';
+                                    } else if (response.responseData.filter.parent_filter.filter_type === 'monitor') {
+                                        response.responseData.filter.parent_filter.filter_type = '<span class="badge badge-warning text-uppercase">Monitor</span>';
+                                    }
+
+                                    $('#parent-type').html(response.responseData.filter.parent_filter.filter_type);
+                                } else {
+                                    $('#parent-type').html('-');
+                                }
+                                if (response.responseData.filter.parent_filter.ip2location_proxy) {
+                                    if (response.responseData.filter.parent_filter.ip2location_proxy === 'allow') {
+                                        response.responseData.filter.parent_filter.ip2location_proxy = '<span class="badge badge-success text-uppercase">Allow</span>';
+                                    } else if (response.responseData.filter.parent_filter.ip2location_proxy === 'block') {
+                                        response.responseData.filter.parent_filter.ip2location_proxy = '<span class="badge badge-danger text-uppercase">Block</span>';
+                                    } else {
+                                        response.responseData.filter.parent_filter.ip2location_proxy = '-';
+                                    }
+
+                                    $('#parent-ip2location-proxy').html(response.responseData.filter.parent_filter.ip2location_proxy);
+
+                                } else {
+                                    $('#parent-ip2location-proxy').html('-');
+                                }
+                                if (response.responseData.filter.parent_filter.hit_count) {
+                                    $('#parent-hit-count').html(response.responseData.filter.parent_filter.hit_count);
+                                    $('#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').attr('disabled', false);
+                                } else {
+                                    $('#parent-hit-count').html('0');
+                                }
+                                if (response.responseData.filter.parent_filter.incorrect_login_attempts) {
+                                    $('#parent-incorrect-login-attempts').html(response.responseData.filter.parent_filter.incorrect_login_attempts);
+                                } else {
+                                    $('#parent-incorrect-login-attempts').html('0');
+                                }
+                                if (response.responseData.filter.parent_filter.ip_hits) {
+                                    $('#parent-ip-hits').html(response.responseData.filter.parent_filter.ip_hits);
+                                    $('#{{componentId}}-{{sectionId}}-remove-checked-parent-children').attr('disabled', false);
+                                } else {
+                                    $('#parent-ip-hits').html('0');
+                                }
+                                $('#{{componentId}}-{{sectionId}}-remove-checked-parent').attr('disabled', false);
+                            }
+
+                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+                        }
+                    }, "json");
+                });
+
+                $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
+                  '#{{componentId}}-{{sectionId}}-reset-checked-filter-counters,#{{componentId}}-{{sectionId}}-remove-checked-parent,' +
+                  '#{{componentId}}-{{sectionId}}-remove-checked-parent-children,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').off();
+                $('#{{componentId}}-{{sectionId}}-remove-checked-filter,#{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache,' +
+                  '#{{componentId}}-{{sectionId}}-reset-checked-filter-counters,#{{componentId}}-{{sectionId}}-remove-checked-parent,' +
+                  '#{{componentId}}-{{sectionId}}-remove-checked-parent-children,#{{componentId}}-{{sectionId}}-reset-checked-parent-counters').click(function(e) {
+                    if ($(this)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter-from-cache' ||
+                        $(this)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-filter' ||
+                        $(this)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent'
+                    ) {
+                        dataCollectionSectionForm['funcs']['removeFilter'](false, this);
+                    } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-remove-checked-parent-children') {
+                        dataCollectionSectionForm['funcs']['removeFilter'](true, this);
+                    } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-filter-counters' ||
+                               $(this)[0].id === '{{componentId}}-{{sectionId}}-reset-checked-parent-counters'
+                    ) {
+                        dataCollectionSectionForm['funcs']['updateFilter']('resetHitCount', this);
+                    }
+                });
+            }
+        }
     });
 </script>

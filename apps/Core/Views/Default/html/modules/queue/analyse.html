@@ -141,30 +141,30 @@
 {% set hasAnalysisError = 'false' %}
 {% if queue['tasks']['analysed']|length > 0 %}
     {% for task, queueTaskModules in queue['tasks']['analysed'] %}
-        {% if task === 'first' or task === 'install' or task === 'uninstall' or task === 'update' or task === 'remove' %}
+        {% if task == 'first' or task == 'install' or task == 'uninstall' or task == 'update' or task == 'remove' %}
             {% if queueTaskModules|length > 0 %}
                 {% for modulesType, modules in queueTaskModules %}
                     {% if is_array(modules) and modules|length > 0 %}
                         {% for moduleId, module in modules %}
                             {% set error = 'false' %}
                             {% set color = 'primary' %}
-                            {% if task === 'update' or (task === 'first' and modulesType === 'packages') %}
+                            {% if task == 'update' or (task == 'first' and modulesType == 'packages') %}
                                 {% set color = 'info' %}
-                            {% elseif task === 'uninstall' %}
+                            {% elseif task == 'uninstall' %}
                                 {% set color = 'warning' %}
-                            {% elseif task === 'remove' %}
+                            {% elseif task == 'remove' %}
                                 {% set color = 'danger' %}
                             {% endif %}
-                            {% if task === 'first' and modulesType === 'packages' %}
+                            {% if task == 'first' and modulesType == 'packages' %}
                                 {% set taskName = 'update' %}
-                            {% elseif task === 'first' and modulesType === 'external' %}
+                            {% elseif task == 'first' and modulesType == 'external' %}
                                 {% set taskName = 'install' %}
                             {% else %}
                                 {% set taskName = task %}
                             {% endif %}
 
                             {% set errorClass = '' %}
-                            {% if queue['results'][task][modulesType][module['name']]['analyse'] is defined and queue['results'][task][modulesType][module['name']]['analyse'] === 'fail' %}
+                            {% if queue['results'][task][modulesType][module['name']]['analyse'] is defined and queue['results'][task][modulesType][module['name']]['analyse'] == 'fail' %}
                                 {% set module['id'] = module['name'] %}
                                 {% set hasAnalysisError = 'true' %}
                                 {% set error = 'true' %}
@@ -173,6 +173,7 @@
                             {% set moduleHtml = moduleHtml ~ '<tr' ~ errorClass ~ '>' ~
                             '           <td>' ~  module['name'] ~ '</td>' ~
                             '           <td>' ~  module['module_type'] ~ '</td>' ~
+                            '           <td>' ~  module['needed_by'] ~ '</td>' ~
                             '           <td>' ~  module['version'] ~ '</td>' ~
                             '           <td>' ~  module['repo'] ~ '</td>' ~
                             '           <td>' ~  '<span class="badge badge-' ~ color ~ ' mt-1 text-xs text-uppercase">' ~ taskName ~ '</span></td>' ~
@@ -197,6 +198,7 @@
                     <tr>
                         <th class="text-uppercase">Name</th>
                         <th class="text-uppercase">Module Type</th>
+                        <th class="text-uppercase">Needed By</th>
                         <th class="text-uppercase">Version</th>
                         <th class="text-uppercase">Repository</th>
                         <th class="text-uppercase">Task</th>
@@ -216,6 +218,65 @@
         </div>
     </div>
 {% endif %}
+{% set footer = true %}
+{% if queue['status'] == 2 %}
+    {% set footer = false %}
+{% endif %}
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'queue-settings-modal',
+            'modalBodyInclude'          : 'modules/queue/settings',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : footer,
+            'modalHeaderCloseButton'    : true,
+            'modalEscClose'             : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-cogs"></i> SETTINGS',
+            'modalFooterButtons'        :
+                [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                        [
+                            'modal-button-save' : [
+                                'title'                   : 'save',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
+                            ]
+                        ]
+                ]
+        ]
+    )}}
+</div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'queue-logs-modal',
+            'modalBodyInclude'          : 'modules/queue/logs',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalHeaderCloseButton'    : true,
+            'modalEscClose'             : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> LOGS'
+        ]
+    )}}
+</div>
 {% set queue = json_encode(queue, 16) %}
 {% set queue = str_replace('\\', '\\\\', queue) %}
 <script>
@@ -255,6 +316,7 @@ dataCollectionSectionForm['funcs']['init'] = function() {
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
         $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
             columns: [
+                null,
                 null,
                 null,
                 null,
@@ -346,6 +408,12 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
     if (task === 'process') {
         postData['process'] = 'runprocess';
     }
+
+    $('body').on('bazProgressCancelled', function() {
+        $('#{{componentId}}-{{sectionId}}-re-analyse').removeClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').children('i').attr('hidden', true);
+    });
 
     $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
         if (response.tokenKey && response.token) {
@@ -441,8 +509,14 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                                     ) {
                                         var moduleLogs = document.querySelectorAll("[data-id='" + taskModule + "']");
 
-                                        if (moduleLogs.length === 1) {
-                                            $(moduleLogs).parents('tr').addClass('bg-danger');
+                                        if (moduleLogs.length > 0) {
+                                            $(moduleLogs).each(function(index, moduleLog) {
+                                                if ($(moduleLog).data('moduletype') &&
+                                                    $(moduleLog).data('moduletype') === moduleType
+                                                ) {
+                                                    $(moduleLog).parents('tr').addClass('bg-danger');
+                                                }
+                                            });
                                         }
                                     }
                                 }
@@ -704,59 +778,4 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
-<div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : sectionId,
-            'modalId'                   : 'queue-settings-modal',
-            'modalBodyInclude'          : 'modules/queue/settings',
-            'modalSize'                 : 'xl',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalHeaderCloseButton'    : true,
-            'modalEscClose'             : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-cogs"></i> SETTINGS',
-            'modalFooterButtons'        :
-                [
-                'component'                     : component,
-                'componentName'                 : componentName,
-                'componentId'                   : componentId,
-                'parentComponentId'             : parent,
-                'sectionId'                     : sectionId,
-                'buttonType'                    : 'button',
-                'buttons'                       :
-                        [
-                            'modal-button-save' : [
-                                'title'                   : 'save',
-                                'type'                    : 'primary',
-                                'position'                : 'right',
-                                'icon'                    : 'cog fa-spin',
-                                'iconHidden'              : true
-                            ]
-                        ]
-                ]
-        ]
-    )}}
-</div>
-<div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : sectionId,
-            'modalId'                   : 'queue-logs-modal',
-            'modalBodyInclude'          : 'modules/queue/logs',
-            'modalSize'                 : 'xl',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalHeaderCloseButton'    : true,
-            'modalEscClose'             : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> LOGS'
-        ]
-    )}}
-</div>
 <!-- htmlmin:ignore -->

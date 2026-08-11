@@ -1,24 +1,50 @@
 {
-    "name": "IpFilter",
-    "display_name": "IP Filter",
-    "description": "This middleware is used to allow/block IP based access to an app.",
-    "module_type"   : "middlewares",
-    "app_type": "core",
-    "category": "tools",
-    "version": "0.0.0",
-    "repo": "https://.../",
-    "class": "Apps\\Core\\Middlewares\\IpFilter\\IpFilter",
-    "dependencies"  : {
-        "core"          : {
-            "name"      : "Core",
-            "version"   : "0.0.0",
-            "repo"      : "https://.../"
-        },
-        "components"    : [],
-        "packages"      : [],
-        "middlewares"   : [],
-        "views"         : [],
-        "external"      : []
-    },
-    "settings": {}
+	"name" : "IpFilter",
+	"display_name" : "IP Filter",
+	"description" : "This middleware is used to allow/block IP based access to an app.",
+	"module_type" : "middlewares",
+	"app_type" : "core",
+	"category" : "tools",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "Apps\\Core\\Middlewares\\IpFilter\\IpFilter",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : [],
+		"externals" : []
+	},
+	"settings" : 
+	{
+		"status" : "monitor",
+		"default_filter" : "block",
+		"incorrect_login_attempt_block_ip" : 10,
+		"incorrect_login_auto_unblock_ip_minutes" : 60,
+		"filter_ipv4" : true,
+		"filter_ipv6" : true,
+		"allow_private_range" : true,
+		"allow_reserved_range" : true,
+		"ip2location_bin_file_code" : "DB3LITEBINIPV6",
+		"ip2location_bin_access_mode" : "FILE_IO",
+		"ip2location_proxy_bin_file_code" : "PX3LITEBIN",
+		"ip2location_proxy_bin_access_mode" : "FILE_IO",
+		"ip2location_io_api_key":null,
+		"ip2location_io_api_language" : "en",
+		"ip2location_primary_lookup_method" : "BIN",
+		"log_filters" : false,
+		"debug_filters" : false,
+		"response_type" : "code",
+		"response_code" : 404,
+		"response_url" : "",
+		"response_route" : "auth/q/blocked/true"
+	}
 }

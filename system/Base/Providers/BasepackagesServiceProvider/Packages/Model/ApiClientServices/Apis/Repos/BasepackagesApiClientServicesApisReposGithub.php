@@ -24,6 +24,8 @@ class BasepackagesApiClientServicesApisReposGithub extends BaseModel
 
     public $access_token;
 
+    public $refresh_token;
+
     public $authorization;
 
     public $sync;

@@ -3,367 +3,404 @@
 namespace System\Base\Providers\AccessServiceProvider\Access;
 
 use Carbon\Carbon;
-use Phalcon\Filter\Validation\Validator\Ip;
+use Symfony\Component\HttpFoundation\IpUtils;
 use System\Base\BasePackage;
-use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilter;
+use System\Base\Providers\AccessServiceProvider\Access\IpFilter\Filters;
+use System\Base\Providers\AccessServiceProvider\Access\IpFilter\Ip2location;
 use System\Base\Providers\AppsServiceProvider\Exceptions\IpFilterBlockedException;
 
 class IpFilter extends BasePackage
 {
-    protected $modelToUse = ServiceProviderAccessIpFilter::class;
-
     protected $packageName = 'ipfilter';
 
-    protected $packageNameS = 'ipfilter';
+    public $ip;
 
-    public $clientAddress;
+    public $filters;
+
+    public $ip2location;
+
+    protected $ipFilterSettings;
 
     protected $app;
 
-    public function init()
+    public function init($appId = null)
     {
-        $this->app = $this->apps->getAppInfo();
+        if ($appId) {
+            $this->app = $this->apps->apps[$appId];
+        } else {
+            $this->app = $this->apps->getAppInfo();
+        }
+
+        $this->filters = (new Filters())->init($appId);
+
+        $this->ip2location = new Ip2location($this);
+
+        $this->getIpFilterSettings($appId);
+
+        $this->filters->setFilterSettings($this->ipFilterSettings);
+
+        $this->filters->ip2location = $this->ip2location;
 
         return $this;
     }
 
-    public function getFilters(array $data)
+    public function getIpFilterSettings($appId = null)
     {
-        $filters = [];
+        if ($appId || !$this->ipFilterSettings) {
+            $ipfilterMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('IpFilter', $this->app['id']);
 
-        if (!isset($data['app_id'])) {
-            return $this->helper->encode([]);//blank array
-        }
-
-        if ($this->config->databasetype === 'db') {
-            $app = $this->apps->getFirst('id', (int) $data['app_id']);
-
-            $filtersObj = $app->getIpFilters();
-
-            if ($filtersObj && $filtersObj->count() > 0) {
-                $filters = $filtersObj->toArray();
-            }
-        } else {
-            $this->apps->setFFRelations(true);
-
-            $this->apps->setFFRelationsConditions(['monitorlist' => ['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]]);
-
-            $app = $this->apps->getFirst('id', (int) $data['app_id']);
-
-            if ($app->data['ipFilters'] && count($app->data['ipFilters']) > 0) {
-                $filters = $app->data['ipFilters'];
-            }
-        }
-
-        return $filters;
-    }
-
-    public function addFilter(array $data)
-    {
-        if (!isset($data['filter_type']) || !isset($data['ip_address'])) {
-            $this->addResponse('Please provide correct address and filter type', 1);
-
-            return false;
-        }
-
-        if ($data['filter_type'] !== 'allow' &&
-            $data['filter_type'] !== 'block' &&
-            $data['filter_type'] !== 'monitor'
-        ) {
-            $this->addResponse('Please provide correct filter type', 1);
-
-            return false;
-        }
-
-        $address = explode('/', $data['ip_address']);
-
-        if (count($address) === 2 || count($address) === 1) {
-            //validate address
-            $validateIP = $this->validateIp($address[0]);
-
-            if ($validateIP !== true) {
-                $this->addResponse($validateIP, 1);
-
-                return;
-            }
-
-            if (count($address) === 2) {
-                $data['address_type'] = 2;
-            } else if (count($address) === 1) {
-                $data['address_type'] = 1;
-            }
-        } else {
-            $this->addResponse('Please enter correct address', 1);
-
-            return false;
-        }
-
-        if ($data['filter_type'] === 'allow') {
-            $data['filter_type'] = 1;
-        } else if ($data['filter_type'] === 'block') {
-            $data['filter_type'] = 2;
-        } else if ($data['filter_type'] === 'monitor') {
-            $data['filter_type'] = 3;
-        }
-        if (!isset($data['added_by'])) {
-            $data['added_by'] = $this->access->auth->account()['id'];
-        }
-        $data['updated_at'] = time();
-
-        try {
-            $this->add($data);
-
-            $this->addResponse('Filter Added.');
-        } catch (\Exception $e) {
-            if (strpos($e->getMessage(), 'UNIQUE') !== false) {
-                $this->addResponse('Duplicate Entry!', 3);
-
-                return false;
-            }
-
-            throw $e;
-        }
-    }
-
-    public function updateFilter(array $data)
-    {
-        //
-    }
-
-    public function removeFilter(array $data)
-    {
-        if (!isset($data['id'])) {
-            $this->addResponse('Please provide correct filter ID', 1);
-
-            return false;
-        }
-
-        $filter = $this->getById($data['id']);
-
-        if ($filter['ip_address'] === $this->getClientAddress()) {
-            $this->addResponse('Cannot remove your own IP!', 1);
-
-            return false;
-        }
-
-        if ($this->remove($filter['id'])) {
-            $this->addResponse('Filter removed.');
-        } else {
-            $this->addResponse('Error removing filter.', 1);
-        }
-    }
-
-    public function allowFilter(array $data)
-    {
-        if (!isset($data['id'])) {
-            $this->addResponse('Please provide correct filter ID', 1);
-
-            return false;
-        }
-
-        $filter = $this->getFirst('id', $data['id'], false, true, null, [], true);
-        $filter['filter_type'] = 1;
-        $filter['added_by'] = $this->access->auth->account()['id'];
-        $filter['incorrect_attempts'] = null;
-        $filter['hit_count'] = null;
-        $filter['updated_at'] = null;
-
-        if ($this->update($filter)) {
-            $this->addResponse('Filter moved to allow.', 0);
-        } else {
-            $this->addResponse('Error allowing filter.', 1);
-        }
-    }
-
-    public function blockFilter(array $data)
-    {
-        if (!isset($data['id'])) {
-            $this->addResponse('Please provide correct filter ID', 1);
-
-            return false;
-        }
-
-        $filter = $this->getFirst('id', $data['id'], false, true, null, [], true);
-
-        if ($filter['ip_address'] === $this->getClientAddress()) {
-            $this->addResponse('Cannot block your own IP!', 1);
-
-            return false;
-        }
-
-        $filter['filter_type'] = 2;
-        $filter['added_by'] = $this->access->auth->account()['id'];
-        $filter['incorrect_attempts'] = null;
-        $filter['hit_count'] = null;
-        $filter['updated_at'] = null;
-
-        if ($this->update($filter)) {
-            $this->addResponse('Filter moved to block.', 0);
-        } else {
-            $this->addResponse('Error blocking filter.', 1);
-        }
-    }
-
-    public function resetAppFilters(array $data)
-    {
-        if (!isset($data['app_id'])) {
-            $this->addResponse('Incorrect App ID', 1);
-
-            return;
-        }
-
-        if ($this->config->databasetype === 'db') {
-            $app = $this->apps->getFirst('id', $data['app_id']);
-
-            $filtersObj = $app->getIpFilters();
-
-            if ($filtersObj && $filtersObj->count() > 0) {
-                $filtersObj->delete();
-            }
-
-            $app->assign(['incorrect_login_attempt_block_ip' => 0, 'ip_filter_default_action' => 'allow']);
-
-            $app->update();
-
-            return true;
-        } else {
-            $this->apps->setFFRelations(true);
-
-            $app = $this->apps->getFirst('id', (int) $data['app_id']);
-
-            if ($app->data['ipFilters'] && count($app->data['ipFilters']) > 0) {
-                foreach ($app->data['ipFilters'] as $filter) {
-                    $this->removeFilter(['id' => $filter['id']]);
+            if ($ipfilterMiddleware) {
+                if (isset($ipfilterMiddleware['apps'][$this->app['id']]['settings'])) {
+                    $this->ipFilterSettings = $ipfilterMiddleware['apps'][$this->app['id']]['settings'];
+                } else if (isset($ipfilterMiddleware['settings'])) {//Load default settings
+                    $this->ipFilterSettings = $ipfilterMiddleware['settings'];
                 }
             }
+        }
 
-            $app = $app->toArray();
+        $this->addResponse('Ok', 0, ['ipFilterSettings' => $this->ipFilterSettings]);
 
-            $app['incorrect_login_attempt_block_ip'] = 0;
-            $app['ip_filter_default_action'] = 'allow';
+        return $this->ipFilterSettings;
+    }
 
-            $this->apps->update($app);
+    public function setVisitorIp($ip = null)
+    {
+        if (!$ip) {
+            $this->ip = $this->ip2location->ipTools->getVisitorIp();
+        } else {
+            $this->ip = $ip;
+        }
+    }
+
+    public function getVisitorIp($ip = null)
+    {
+        if (!$this->ip) {
+            $this->setVisitorIp($ip);
+        }
+
+        return $this->ip;
+    }
+
+    public function checkIp($ip = null, array $overrideIp2locationLookupSequence = null, $checkViaApp = false)
+    {
+        if ($this->ipFilterSettings['status'] === 'disable') {
+            $this->addResponse('Firewall is disabled, ip address is allowed!');
 
             return true;
         }
 
-        $this->addResponse('Incorrect App ID', 1);
+        $this->ip = $ip;
 
-        return;
-    }
-
-    public function setClientAddress($clientAddress = null)
-    {
-        if (!$clientAddress) {
-            $this->clientAddress = $this->request->getClientAddress();
-        } else {
-            $this->clientAddress = $clientAddress;
-        }
-    }
-
-    public function getClientAddress($clientAddress = null)
-    {
-        if (!$this->clientAddress) {
-            $this->setClientAddress($clientAddress);
+        if (!$this->ip) {
+            $this->getVisitorIp();
         }
 
-        return $this->clientAddress;
-    }
-
-    public function checkList()
-    {
-        $this->getClientAddress();
-
-        if ($this->clientAddress === "127.0.0.1") {
+        if ($this->ip === "127.0.0.1") {
             return true;
         }
 
-        $this->apps->setFFRelations(true);
-        $this->apps->setFFRelationsConditions(['monitorlist' => ['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]]);
+        //Zero Check - We check OpCache
+        $profiling = [];
+        $this->basepackages->utils->setMicroTimer('Cached Filters', true, true);
 
-        $app = $this->apps->getFirst('id', $this->app['id']);
+        $opCacheFilters = [];
+        $cached = false;
+        if ($this->opCache && $this->opCache->checkCache($this->app['route'], 'filters')) {
+            $opCacheFilters = $this->opCache->getCache($this->app['route'], 'filters');
 
-        $filterStore = $this->ff->store($this->useModel()->getSource());
+            if (isset($opCacheFilters[$this->ip])) {
+                $this->basepackages->utils->setMicroTimer('Cached Filters', true);
 
-        $filter = [];
+                $profiling = $this->basepackages->utils->getMicroTimer();
 
-        if ($this->config->databasetype === 'db') {
-            $filterObj = $app->getMonitorlist();
-
-            if ($filterObj) {
-                $filter = $filterObj->toArray();
-            }
-        } else {
-            $app = $app->toArray();
-
-            $filter = $app['monitorlist'];
-        }
-
-        if ($filter && count($filter) > 0) {
-            if ($filter['filter_type'] == '2') {
-                if (isset($filter['updated_at']) &&
-                    isset($app['auto_unblock_ip_minutes']) &&
-                    ((int) $app['auto_unblock_ip_minutes'] > 0)
-                ) {
-                    $blockedAt = Carbon::parse($filter['updated_at']);
-
-                    if (time() > $blockedAt->addMinutes((int) $app['auto_unblock_ip_minutes'])->timestamp) {
-                        $this->removeFromMonitoring();
+                if ($checkViaApp) {
+                    $cached = true;
+                } else {
+                    if ($this->ipFilterSettings['status'] === 'monitor') {
+                        $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2);
 
                         return true;
                     }
+
+                    return $opCacheFilters[$this->ip];
                 }
-
-                if ($this->config->databasetype === 'db') {
-                    $this->bumpFilterHitCounter($filterObj);
-                } else {
-                    $filterStore->findById($filter['id']);
-
-                    $this->bumpFilterHitCounter($filterStore);
-                }
-
-                return false;
-            } else if ($filter['filter_type'] == '1') {
-                return true;
             }
         }
 
-        $filters = [];
-
-        if ($this->config->databasetype === 'db') {
-            $filtersObj = $app->getIpFilters(
-                [
-                    'address_type = :address_type:',
-                    'bind' => [
-                        'address_type' => '2',
-                    ]
-                ]
+        if (!$cached && !$this->filters->validateIP($this->ip)) {
+            $this->addResponse(
+                $this->filters->packagesData->responseMessage,
+                $this->filters->packagesData->responseCode,
+                $this->filters->packagesData->responseData ?? []
             );
 
-            if ($filtersObj) {
-                $filters = $filtersObj->toArray();
-            }
-        } else {
-            $filters = $filterStore->findBy(['address_type', '=', (int) 2]);
+            return false;
         }
 
+        //First Check - We check HOST entries
+        if (!$cached) {
+            $profiling = [];
+            $this->basepackages->utils->setMicroTimer('Host Filters', true, true);
+        }
+
+        $filter = $this->filters->getFilterByAddressAndType($this->ip, 'host');
+
+        if ($filter) {//We find the address in address_type host
+            $hostCheckIpFilter = $this->filters->checkIPFilter($filter, $this->ip);
+
+            if (count($profiling) === 0) {
+                $this->basepackages->utils->setMicroTimer('Host Filters', true);
+
+                $profiling = $this->basepackages->utils->getMicroTimer();
+            }
+
+            $responseData = $this->filters->packagesData->responseData ?? [];
+
+            if (count($responseData) > 0) {
+                $responseData['profiling'] = $profiling;
+                $responseData['cached'] = $cached;
+            }
+
+            $this->addResponse(
+                $this->filters->packagesData->responseMessage,
+                $this->filters->packagesData->responseCode,
+                $responseData
+            );
+
+            if ($this->opCache) {
+                $opCacheFilters[$this->ip] = false;
+
+                if ($filter['filter_type'] === 'allow' ||
+                    $filter['filter_type'] === 'monitor'
+                ) {
+                    $opCacheFilters[$this->ip] = true;
+                }
+
+                $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+            }
+
+            if ($checkViaApp) {
+                return $hostCheckIpFilter;
+            }
+
+            if ($filter['filter_type'] === 'allow' ||
+                $filter['filter_type'] === 'monitor'
+            ) {
+                return true;
+            }
+
+            if ($this->ipFilterSettings['status'] === 'monitor') {
+                $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, $responseData);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        //Second Check - We check NETWORK entries
+        if (!$cached) {
+            $profiling = [];
+            $this->basepackages->utils->setMicroTimer('Network Filters', true, true);
+        }
+
+        $filters = $this->filters->getFilterByType('network');
+
         if ($filters && count($filters) > 0) {
-            foreach ($filters as $key => $filter) {
-                if (\Symfony\Component\HttpFoundation\IpUtils::checkIp($this->clientAddress, $filter['ip_address'])) {
-                    if ($this->config->databasetype === 'db') {
-                        $filterObj = $this->getFirst('ip_address', $filter['ip_address']);
+            foreach ($filters as $filterKey => $filter) {
+                if (IpUtils::checkIp($this->ip, $filter['address'])) {
+                    $networkCheckIpFilter = $this->filters->checkIPFilter($filter, $this->ip);
 
-                        $this->bumpFilterHitCounter($filterObj);
+                    if (count($profiling) === 0) {
+                        $this->basepackages->utils->setMicroTimer('Network Filters', true);
 
-                        if ($filterObj->filter_type == '2') {
+                        $profiling = $this->basepackages->utils->getMicroTimer();
+                    }
+
+                    $responseData = $this->filters->packagesData->responseData ?? [];
+
+                    if (count($responseData) > 0) {
+                        if (isset($responseData['filter'])) {
+                            if ($this->opCache) {
+                                $opCacheFilters[$this->ip] = false;
+
+                                if ($responseData['filter']['filter_type'] === 'allow' ||
+                                    $responseData['filter']['filter_type'] === 'monitor'
+                                ) {
+                                    $opCacheFilters[$this->ip] = true;
+                                }
+
+                                $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+                            }
+                        }
+
+                        $responseData['profiling'] = $profiling;
+                        $responseData['cached'] = $cached;
+                    }
+
+                    $this->addResponse(
+                        $this->filters->packagesData->responseMessage,
+                        $this->filters->packagesData->responseCode,
+                        $responseData
+                    );
+
+                    if ($checkViaApp) {
+                        return $networkCheckIpFilter;
+                    }
+
+                    if (count($responseData) > 0) {
+                        if (isset($responseData['filter'])) {
+                            if ($responseData['filter']['filter_type'] === 'allow' ||
+                                $responseData['filter']['filter_type'] === 'monitor'
+                            ) {
+                                return true;
+                            }
+
+                            if ($this->ipFilterSettings['status'] === 'monitor') {
+                                $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, $responseData);
+
+                                return true;
+                            }
+
                             return false;
                         }
-                    } else {
-                        if ($filterStore->findOneBy(['ip_address', '=', $filter['ip_address']])) {
-                            $this->bumpFilterHitCounter($filterStore);
+                    }
+                }
+            }
+        }
 
-                            if ($filterStore->data['filter_type'] == '2') {
-                                return false;
+        //Third Check - We check ip2location as per the primary set first and then secondary if we did not find the entry
+        if ($this->ip2location->checkIPIsPublic($this->ip)) {
+            if (!$cached) {
+                $profiling = [];
+                $this->basepackages->utils->setMicroTimer('Ip2location Filters', true, true);
+            }
+
+            $filters = $this->filters->getFilterByType('ip2location');
+
+            if ($filters && count($filters) > 0) {
+                $ip2locationFilters = [];
+
+                foreach ($filters as $filterKey => $filter) {
+                    $ip2locationAddressArr = explode(':', $filter['address']);
+
+                    if (count($ip2locationAddressArr) === 1) {
+                        $ip2locationFilters[strtolower($ip2locationAddressArr[0])]['id'] = $filter['id'];
+                    } else if (count($ip2locationAddressArr) === 2) {
+                        $ip2locationFilters[strtolower($ip2locationAddressArr[0])][strtolower($ip2locationAddressArr[1])]['id'] = $filter['id'];
+                    } else if (count($ip2locationAddressArr) === 3) {
+                        $ip2locationFilters[strtolower($ip2locationAddressArr[0])][strtolower($ip2locationAddressArr[1])][strtolower($ip2locationAddressArr[2])]['id'] = $filter['id'];
+                    }
+                }
+
+                if (count($ip2locationFilters) > 0) {
+                    $ip2locationLookupOptions = ['API', 'BIN'];
+
+                    if ($overrideIp2locationLookupSequence && count($overrideIp2locationLookupSequence) === 2) {
+                        $ip2locationLookupOptions = $overrideIp2locationLookupSequence;
+                    }
+
+                    if (in_array($this->ipFilterSettings['ip2location_primary_lookup_method'], $ip2locationLookupOptions)) {
+                        if (!$overrideIp2locationLookupSequence) {
+                            $arrayKey = array_keys($ip2locationLookupOptions, $this->ipFilterSettings['ip2location_primary_lookup_method']);
+
+                            $ip2locationLookupOptionsMethod = strtoupper($ip2locationLookupOptions[$arrayKey[0]]);
+                        } else {
+                            $ip2locationLookupOptionsMethod = strtoupper($ip2locationLookupOptions[0]);
+                        }
+
+                        $lookupMethod = 'getIpDetailsFromIp2location' . $ip2locationLookupOptionsMethod;
+
+                        $response = $this->ip2location->$lookupMethod($this->ip);
+
+                        if (!$response) {//Not found in primary lookup, we get the secondary from list.
+                            unset($ip2locationLookupOptions[$arrayKey[0]]);
+
+                            $ip2locationLookupOptions = array_values($ip2locationLookupOptions);
+
+                            $ip2locationLookupOptionsMethod = strtoupper($ip2locationLookupOptions[0]);
+
+                            $lookupMethod = 'getIpDetailsFromIp2location' . $ip2locationLookupOptionsMethod;
+
+                            $response = $this->ip2location->$lookupMethod($this->ip);
+                        }
+
+                        if ($response) {
+                            $filterRule = null;
+
+                            if (isset($ip2locationFilters[strtolower($response['country_code'])][strtolower($response['region_name'])][strtolower($response['city_name'])]['id'])) {
+                                $filterRule = $ip2locationFilters[strtolower($response['country_code'])][strtolower($response['region_name'])][strtolower($response['city_name'])]['id'];
+                            } else if (isset($ip2locationFilters[strtolower($response['country_code'])][strtolower($response['region_name'])]['id'])) {
+                                $filterRule = $ip2locationFilters[strtolower($response['country_code'])][strtolower($response['region_name'])]['id'];
+                            } else if (isset($ip2locationFilters[strtolower($response['country_code'])]['id'])) {
+                                $filterRule = $ip2locationFilters[strtolower($response['country_code'])]['id'];
+                            }
+
+                            if ($filterRule) {
+                                $filter = $this->filters->getFilterById($filterRule);
+
+                                if (isset($filter['ip2location_proxy']) && $filter['ip2location_proxy'] === 'block') {
+                                    if (isset($response['is_proxy']) && $response['is_proxy'] === true) {
+                                        $filter['filter_type'] = 'block';
+                                    }
+                                }
+
+                                $ip2locationCheckIpFilter = $this->filters->checkIPFilter($filter, $this->ip);
+
+                                if (count($profiling) === 0) {
+                                    $this->basepackages->utils->setMicroTimer('Ip2location Filters', true);
+
+                                    $profiling = $this->basepackages->utils->getMicroTimer();
+                                }
+
+                                $responseData = $this->filters->packagesData->responseData ?? [];
+
+                                if (count($responseData) > 0) {
+                                    if (isset($responseData['filter'])) {
+                                        if ($this->opCache) {
+                                            $opCacheFilters[$this->ip] = false;
+
+                                            if ($responseData['filter']['filter_type'] === 'allow' ||
+                                                $responseData['filter']['filter_type'] === 'monitor'
+                                            ) {
+                                                $opCacheFilters[$this->ip] = true;
+                                            }
+
+                                            $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+                                        }
+                                    }
+
+                                    $responseData['profiling'] = $profiling;
+                                    $responseData['cached'] = $cached;
+                                }
+
+                                $this->addResponse(
+                                    $this->filters->packagesData->responseMessage,
+                                    $this->filters->packagesData->responseCode,
+                                    $responseData
+                                );
+
+                                if ($checkViaApp) {
+                                    return $ip2locationCheckIpFilter;
+                                }
+
+                                if (count($responseData) > 0) {
+                                    if (isset($responseData['filter'])) {
+                                        if ($responseData['filter']['filter_type'] === 'allow' ||
+                                            $responseData['filter']['filter_type'] === 'monitor'
+                                        ) {
+                                            return true;
+                                        }
+
+                                        if ($this->ipFilterSettings['status'] === 'monitor') {
+                                            $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, $responseData);
+
+                                            return true;
+                                        }
+
+                                        return false;
+                                    }
+                                }
                             }
                         }
                     }
@@ -371,154 +408,133 @@ class IpFilter extends BasePackage
             }
         }
 
-        if ($this->config->databasetype === 'db') {
-            if ($app->ip_filter_default_action === 'block') {
-                return false;
+        //Forth - We check DEFAULT entries in default store
+        if (!$cached) {
+            $profiling = [];
+            $this->basepackages->utils->setMicroTimer('Default Filters', true, true);
+        }
+
+        $filter = $this->filters->getFilterByAddressAndType($this->ip, 'host', true);
+
+        if ($filter) {//We find the address in default store and bump its counter
+            $this->filters->bumpFilterHitCounter(false, null, $filter, true);
+        } else {//We add a new entry in default store
+            $newFilter['app_id'] = $this->app['id'];
+            $newFilter['address_type'] = 'host';
+            $newFilter['address'] = $this->ip;
+            if ($this->ip2location->ipTools->isIpv4($this->ip)) {
+                $newFilter['decimal'] = (int) $this->ip2location->ipTools->ipv4ToDecimal($this->ip);
+            } else if ($this->ip2location->ipTools->isIpv6($this->ip)) {
+                $newFilter['decimal'] = (int) $this->ip2location->ipTools->ipv6ToDecimal($this->ip);
             }
-        } else {
-            if ($app['ip_filter_default_action'] === 'block') {
-                return false;
+            $newFilter['hit_count'] = 1;
+            $newFilter['updated_by'] = 0;
+            $newFilter['updated_at'] = time();
+            $newFilter['filter_type'] = $this->ipFilterSettings['default_filter'];
+
+            $filter = $this->filters->addFilter($newFilter, true);
+        }
+
+        if (count($profiling) === 0) {
+            $this->basepackages->utils->setMicroTimer('Default Filters', true);
+
+            $profiling = $this->basepackages->utils->getMicroTimer();
+        }
+
+        $responseData = [];
+        $responseData['default_filter'] = true;
+        $responseData['filter'] = $filter;
+
+        if (count($responseData) > 0) {
+            if (isset($responseData['filter'])) {
+                if ($this->opCache) {
+                    $opCacheFilters[$this->ip] = false;
+
+                    if ($responseData['filter']['filter_type'] === 'allow' ||
+                        $responseData['filter']['filter_type'] === 'monitor'
+                    ) {
+                        $opCacheFilters[$this->ip] = true;
+                    }
+
+                    $this->opCache->setCache($this->app['route'], $opCacheFilters, 'filters');
+                }
             }
+
+            $responseData['profiling'] = $profiling;
+            $responseData['cached'] = $cached;
+        }
+
+        if ($this->ipFilterSettings['default_filter'] === 'allow') {
+            $this->addResponse('Allowed', 0, $responseData);
+
+            if ($this->ipFilterSettings['log_filters'] === true) {
+                $this->logger->logIpFilters->info($this->helper->encode(['action' => 'ALLOWED', 'ip' => $this->ip, 'filters_store'=> 'default', 'filter_id' => $filter['id']]));
+            }
+
+            return true;
+        } else if ($this->ipFilterSettings['default_filter'] === 'block') {
+            if ($this->ipFilterSettings['status'] === 'monitor') {
+                $this->addResponse('IP address is blocked, but firewall status is monitor so ip address is allowed!', 2, $responseData);
+
+                return true;
+            }
+
+            if ($this->ipFilterSettings['log_filters'] === true) {
+                $this->logger->logIpFilters->info($this->helper->encode(['action' => 'BLOCKED', 'ip' => $this->ip, 'filters_store'=> 'default', 'filter_id' => $filter['id']]));
+            }
+
+            $this->addResponse('Blocked', 1, $responseData);
+
+            return false;
         }
 
         return true;
     }
 
-    public function validateIp($ip)
+    public function processMiddlewareResponse()
     {
-        $this->validation->init()->add("ip_address", Ip::class,
-            [
-                "message"           => "Incorrect ip address.",
-                "version"           => Ip::VERSION_4 | Ip::VERSION_6,
-                "allowReserved"     => true,
-                "allowPrivate"      => true,
-                "allowEmpty"        => false
-            ]
-        );
+        $responseType = 'code';
 
-        $validated = $this->validation->validate(["ip_address" => $ip])->jsonSerialize();
-
-        if (count($validated) > 0) {
-            $messages = 'Error: ';
-
-            foreach ($validated as $key => $value) {
-                $messages .= $value['message'];
-            }
-
-            return $messages;
-        } else {
-            return true;
-        }
-    }
-
-    public function bumpFilterHitCounter($filterObj = null, $updateHitCount = true, $updateIncorrectAttempts = false, $appRoute = null)
-    {
-        if (!$this->ipFilterMiddlewareEnabled($appRoute)) {
-            return;
+        if (isset($this->ipFilterSettings['response_type'])) {
+            $responseType = $this->ipFilterSettings['response_type'];
         }
 
-        if ($updateHitCount) {
-            $filter = $filterObj->toArray();
+        $this->logger->commit();
 
-            if ($filter['hit_count'] !== null) {
-                $hitCount = (int) $filter['hit_count'];
+        if ($responseType === 'code') {
+            $this->response->setStatusCode($this->ipFilterSettings['response_code'] ?? 404);
+        } else if ($responseType === 'url') {
+            $url = '/';
 
-                $hitCount = $hitCount + 1;
-            } else {
-                $hitCount = 1;
+            if (isset($this->ipFilterSettings['response_url']) && $this->ipFilterSettings['response_url'] !== '') {
+                $url = $this->ipFilterSettings['response_url'];
             }
 
-            $filter['hit_count'] = $hitCount;
+            return $this->response->redirect($url);
+        } else if ($responseType === 'route') {
+            if (isset($this->ipFilterSettings['response_route']) && $this->ipFilterSettings['response_route'] !== '') {
+                if (str_contains($this->request->getURI(), '/q/')) {
+                    $routeUrl = $this->helper->last(explode('/', $this->request->getURI()));
 
-            $this->update($filter);
+                    $responseRoute = $this->helper->last(explode('/', $this->ipFilterSettings['response_route']));
 
-            return true;
-        }
-
-        if ($updateIncorrectAttempts) {
-            if (!$filterObj) {
-                $filterObj = $this->getFirst('ip_address', $this->clientAddress);
-            }
-
-            $filter = [];
-
-            if ($filterObj) {
-                $filter = $filterObj->toArray();
-            }
-
-            if (count($filter) === 0) {
-                $newFilter =
-                    [
-                        'app_id'                => $this->app['id'],
-                        'ip_address'            => $this->clientAddress,
-                        'address_type'          => 1,
-                        'filter_type'           => 'monitor',
-                        'added_by'              => 0,
-                        'incorrect_attempts'    => 1
-                    ];
-
-                $this->addFilter($newFilter);
-            } else {
-                if ($filter['incorrect_attempts'] !== null) {
-                    $incorrectAttempt = (int) $filter['incorrect_attempts'];
-
-                    $incorrectAttempt = $incorrectAttempt + 1;
+                    if ($routeUrl === $responseRoute) {
+                        return true;
+                    }
                 } else {
-                    $incorrectAttempt = 1;
+                    $routeUrl = $this->helper->last(explode('/', $this->request->getURI()));
+
+                    if ($routeUrl === $this->ipFilterSettings['response_route']) {
+                        return true;
+                    }
                 }
 
-                if ((int) $this->app['incorrect_login_attempt_block_ip'] !== 0 &&
-                    $incorrectAttempt >= (int) $this->app['incorrect_login_attempt_block_ip']
-                ) {
-                    $filter['filter_type'] = 2;
-                }
-
-                $filter['incorrect_attempts'] = $incorrectAttempt;
-
-                $this->update($filter);
-            }
-
-            return true;
-        }
-    }
-
-    public function removeFromMonitoring()
-    {
-        if (!$this->ipFilterMiddlewareEnabled()) {
-            return;
-        }
-
-        $this->apps->setFFRelations(true);
-
-        $app = $this->apps->getFirst('id', $this->app['id']);
-
-        $filterStore = $this->ff->store($this->useModel()->getSource());
-
-        if ($this->config->databasetype === 'db') {
-            $filter = $app->getMonitorlist();
-
-            if ($filter && $filter->count() > 0) {
-                $filter->delete();
-            }
-        } else {
-            $filter = $filterStore->findOneBy([['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()], ['added_by', '=', 0]]);
-
-            if ($filter && count($filter) > 0) {
-                $filterStore->deleteById($filter['id']);
+                return $this->response->redirect($this->links->url($this->ipFilterSettings['response_route']));
             }
         }
-    }
 
-    private function ipFilterMiddlewareEnabled($appRoute = null)
-    {
-        $middleware = $this->modules->middlewares->getMiddlewareByNameForAppId('IpFilter', $this->apps->getAppInfo($appRoute)['id']);
+        $this->response->send();
 
-        if (isset($middleware['apps'][$this->app['id']]['enabled']) &&
-            $middleware['apps'][$this->app['id']]['enabled'] === true
-        ) {
-            return true;
-        }
-
-        return false;
+        exit;
     }
 }

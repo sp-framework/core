@@ -438,6 +438,12 @@ class Queues extends BasePackage
             return false;
         }
 
+        if ($queue['status'] == 2) {
+            $this->addResponse('Queue is already processed, cannot update settings', 1);
+
+            return false;
+        }
+
         if ($data['settings']['backupSettings']['backup'] == 'true') {
             if ($data['settings']['backupSettings']['keys'] === true &&
                 $data['settings']['backupSettings']['password_protect'] === ''
@@ -636,12 +642,8 @@ class Queues extends BasePackage
                     }
 
                     if ($moduleType === 'bundles') {
-                        if ($taskName === 'remove') {
-                            $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
-                        } else {
-                            if (isset($module['bundle_modules'])) {
-                                $this->processBundleModules($taskName, $module);
-                            }
+                        if (isset($module['bundle_modules'])) {
+                            $this->processBundleModules($taskName, $module);
                         }
                     } else {
                         if ($taskName === 'update' &&
@@ -651,72 +653,13 @@ class Queues extends BasePackage
                         }
 
                         if (isset($module['dependencies'])) {
-                            if (is_string($module['dependencies'])) {
-                                $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
-                            }
-
-                            foreach ($module['dependencies'] as $dependencyType => $dependencies) {
-                                if (count($dependencies) === 0) {
-                                    continue;
-                                }
-
-                                if ($taskName === 'uninstall' || $taskName === 'remove') {
-                                    continue;//we dont process dependencies for anything other than install/update
-                                }
-
-                                if ($dependencyType === 'composer' || $dependencyType === 'externals') {
-                                    $this->checkComposerAndAddToQueue($dependencies, $module);
-
-                                    continue;
-                                }
-
-                                if ($dependencyType === 'core') {
-                                    $core = $this->modules->packages->getPackageByRepo($dependencies['repo']);
-
-                                    $this->compareAndAddToQueue($dependencies, $core, 'first', 'packages');
-                                } else if ($dependencyType === 'apptype') {
-                                    $appType = $this->apps->types->getAppTypeByRepo($dependencies['repo']);
-
-                                    if ($appType) {
-                                        $this->compareAndAddToQueue($dependencies, $appType, $taskName, $dependencyType);
-                                    } else {
-                                        $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencies, null, 'fail', $this->getApiClientServices($dependencies, true));
-                                    }
-                                } else {
-                                    if (count($dependencies) > 0) {
-                                        foreach ($dependencies as $dependency) {
-                                            if (!isset($this->queueTasks[$taskName][$dependencyType])) {
-                                                $this->queueTasks[$taskName][$dependencyType] = [];
-                                            }
-                                            $dependencyModuleMethod = 'get' . ucfirst(substr($dependencyType, 0, -1)) . 'ByRepo';
-                                            $dependencyModule = $this->modules->$dependencyType->$dependencyModuleMethod($dependency['repo']);
-
-                                            if ($dependencyModule) {
-                                                $removeUninstallArr = ['remove', 'uninstall'];
-
-                                                foreach ($removeUninstallArr as $removeUninstall) {
-                                                    if (isset($queue['tasks'][$removeUninstall][$dependencyType]) && in_array($dependencyModule['id'], $queue['tasks'][$removeUninstall][$dependencyType])) {
-                                                        $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencyModule, null, 'fail', 'Dependency is in ' . $removeUninstall . ' task, but is also required by module <strong>' . ($module['display_name'] ?? $module['name']) . '</strong>');
-
-                                                        continue 2;
-                                                    }
-                                                }
-
-                                                $this->compareAndAddToQueue($dependency, $dependencyModule, $taskName, $dependencyType);
-                                            } else {
-                                                $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependency, null, 'fail', $this->getApiClientServices($dependency, true));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            $this->processModuleDependencies($taskName, $module);
                         }
 
                         if (strtolower($module['name']) === 'core') {
                             $taskName = 'first';
                         }
 
-                        // $module['name'] = $module['display_name'] ?? $module['name'];
                         $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
 
                         if ($moduleType === 'views' &&
@@ -759,6 +702,69 @@ class Queues extends BasePackage
         $this->addResponse('Error analysing queue', 1);
 
         return false;
+    }
+
+    protected function processModuleDependencies($taskName, $module)
+    {
+        if (is_string($module['dependencies'])) {
+            $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
+        }
+
+        foreach ($module['dependencies'] as $dependencyType => $dependencies) {
+            if (count($dependencies) === 0) {
+                continue;
+            }
+
+            if ($taskName === 'uninstall' || $taskName === 'remove') {
+                continue;//we dont process dependencies for anything other than install/update
+            }
+
+            if ($dependencyType === 'composer' || $dependencyType === 'externals') {
+                $this->checkComposerAndAddToQueue($dependencies, $module);
+
+                continue;
+            }
+
+            if ($dependencyType === 'core') {
+                $core = $this->modules->packages->getPackageByRepo($dependencies['repo']);
+
+                $this->compareAndAddToQueue($dependencies, $core, 'first', 'packages', $module);
+            } else if ($dependencyType === 'apptype') {
+                $appType = $this->apps->types->getAppTypeByRepo($dependencies['repo']);
+
+                if ($appType) {
+                    $this->compareAndAddToQueue($dependencies, $appType, $taskName, $dependencyType, $module);
+                } else {
+                    $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencies, null, 'fail', $this->getApiClientServices($dependencies, true));
+                }
+            } else {
+                if (count($dependencies) > 0) {
+                    foreach ($dependencies as $dependency) {
+                        if (!isset($this->queueTasks[$taskName][$dependencyType])) {
+                            $this->queueTasks[$taskName][$dependencyType] = [];
+                        }
+                        $dependencyModuleMethod = 'get' . ucfirst(substr($dependencyType, 0, -1)) . 'ByRepo';
+                        $dependencyModule = $this->modules->$dependencyType->$dependencyModuleMethod($dependency['repo']);
+
+                        if ($dependencyModule) {
+                            $removeUninstallArr = ['remove', 'uninstall'];
+
+                            foreach ($removeUninstallArr as $removeUninstall) {
+                                if (isset($queue['tasks'][$removeUninstall][$dependencyType]) && in_array($dependencyModule['id'], $queue['tasks'][$removeUninstall][$dependencyType])) {
+                                    $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencyModule, null, 'fail', 'Dependency is in ' . $removeUninstall . ' task, but is also required by module <strong>' . ($module['display_name'] ?? $module['name']) . '</strong>');
+
+                                    continue 2;
+                                }
+                            }
+
+                            $this->compareAndAddToQueue($dependency, $dependencyModule, $taskName, $dependencyType, $module);
+                        } else {
+                            $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependency, null, 'fail', $this->getApiClientServices($dependency, true));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     protected function processBundleModules($taskName, $module)
@@ -805,7 +811,11 @@ class Queues extends BasePackage
                         $bundleModule = $this->modules->{$bundleModuleType}->$bundleModuleMethod($bundle['repo']);
 
                         if ($bundleModule) {
-                            $this->compareAndAddToQueue($bundle, $bundleModule, $taskName, $bundleType);
+                            $this->compareAndAddToQueue($bundle, $bundleModule, $taskName, $bundleType, $module);
+
+                            if (isset($bundleModule['dependencies'])) {
+                                $this->processModuleDependencies($taskName, $bundleModule);
+                            }
                         } else {
                             $this->addToQueueTasksAndResults($taskName, $bundleType, $bundle, null, 'fail', $this->getApiClientServices($bundle, true));
                         }
@@ -838,7 +848,7 @@ class Queues extends BasePackage
         return $apiClientService;
     }
 
-    protected function compareAndAddToQueue($requestedModule, $installedModule, $task, $moduleType)
+    protected function compareAndAddToQueue($requestedModule, $installedModule, $task, $moduleType, $neededBy = null)
     {
         if (Version::greaterThan($requestedModule['version'], $installedModule['version'])) {
             if (isset($installedModule['update_version']) &&
@@ -855,14 +865,12 @@ class Queues extends BasePackage
                     $this->addToQueueTasksAndResults($task, $moduleType, $installedModule, null, 'fail', $analyseLogs);
                 } else if (Version::equal($requestedModule['version'], $installedModule['update_version'])) {
                     if ($installedModule['installed'] != '1') {
-                        $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
+                        $this->addToQueueTasksAndResults('install', $moduleType, $installedModule, null, 'pass', '-', $neededBy);
                     } else {
-                        // $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']);
-
                         if ($task !== 'first') {
                             $task = 'update';
                         }
-                        $this->addToQueueTasksAndResults($task, $moduleType, $installedModule);
+                        $this->addToQueueTasksAndResults($task, $moduleType, $installedModule, null, 'pass', '-', $neededBy);
                     }
 
                     if ($moduleType === 'views' &&
@@ -875,12 +883,12 @@ class Queues extends BasePackage
                         $installedModule['repo'] = $installedModule['repo'] . '-public';
 
                         if ($installedModule['installed'] != '1') {
-                            $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
+                            $this->addToQueueTasksAndResults('install', $moduleType, $installedModule, null, 'pass', '-', $neededBy);
                         } else {
                             if ($task !== 'first') {
                                 $task = 'update';
                             }
-                            $this->addToQueueTasksAndResults($task, $moduleType, $installedModule);
+                            $this->addToQueueTasksAndResults($task, $moduleType, $installedModule, null, 'pass', '-', $neededBy);
                         }
                     }
                 }
@@ -898,7 +906,7 @@ class Queues extends BasePackage
             if (isset($installedModule['installed']) &&
                 $installedModule['installed'] != '1'
             ) {
-                $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
+                $this->addToQueueTasksAndResults('install', $moduleType, $installedModule, null, 'pass', '-', $neededBy);
 
                 if ($moduleType === 'views' &&
                     array_key_exists('is_subview', $installedModule) &&
@@ -909,7 +917,7 @@ class Queues extends BasePackage
                     $installedModule['is_public'] = true;
                     $installedModule['repo'] = $installedModule['repo'] . '-public';
 
-                    $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
+                    $this->addToQueueTasksAndResults('install', $moduleType, $installedModule, null, 'pass', '-', $neededBy);
                 }
             }
         }
@@ -945,8 +953,23 @@ class Queues extends BasePackage
             $hasPatch = false;
 
             if ($composerJsonFile && isset($composerJsonFile['require'])) {
+                if (isset($composerJsonFile['require'][$composerPackage])) {
+                    //Check if installed version is same as what we want to install. if installed and same, continue.
+                    if ($composerJsonFile['require'][$composerPackage] === $version) {
+                        continue;
+                    } else {
+                        //If installed version is higher than what the package want, continue.
+                        $installedVersion = $this->getComposerPackageVersion($composerJsonFile['require'][$composerPackage]);
+                        $requiredVersion = $this->getComposerPackageVersion($version);
+
+                        if (Version::greaterThan($installedVersion, $requiredVersion)) {
+                            continue;
+                        }
+                    }
+                }
+
                 //We bind the external package to the internal component/package/middleware.
-                //When we uninstal a component/package/middleware, we also remove the composer package.
+                //When we uninstall a component/package/middleware, we also remove the composer package.
                 //If a composer package is being shared by multiple modules, it is not removed.
                 //If the module that is being removed is the only one that this composer package requires, composer package will also be removed.
                 $composerJsonFile['require'][$composerPackage] = $version;
@@ -994,7 +1017,7 @@ class Queues extends BasePackage
                         ['name', 'tag_name', 'published_at', 'zipball_url']
                     );
 
-                $this->addToQueueTasksAndResults('first', 'externals', $package, $version);
+                $this->addToQueueTasksAndResults('first', 'externals', $package, $version, 'pass', '-', $module);
             } else {
                 $package['id'] = '0';
                 $package['name'] = $composerPackage;
@@ -1005,7 +1028,7 @@ class Queues extends BasePackage
         }
     }
 
-    protected function addToQueueTasksAndResults($taskName, $moduleType, $module, $version = null, $analyseResult = 'pass', $analyseResultLogs = '-',)
+    protected function addToQueueTasksAndResults($taskName, $moduleType, $module, $version = null, $analyseResult = 'pass', $analyseResultLogs = '-', $neededBy = null)
     {
         if (isset($module['id'])) {
             $moduleId = $module['id'];
@@ -1022,6 +1045,11 @@ class Queues extends BasePackage
             $this->queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['name'];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['display_name'] = $module['display_name'] ?? $module['name'];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $moduleType;
+            if ($neededBy) {
+                $this->queueTasks[$taskName][$moduleType][$module['id']]['needed_by'] = $neededBy['display_name'] ?? $neededBy['name'] . ' (' . ucfirst($neededBy['module_type']) . ')';
+            } else {
+                $this->queueTasks[$taskName][$moduleType][$module['id']]['needed_by'] = '-';
+            }
 
             if ($moduleType === 'components' && array_key_exists('route', $module)) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['route'] = $module['route'];
@@ -1114,6 +1142,8 @@ class Queues extends BasePackage
         $version = str_replace('^', '', $version);
         //Remove .*
         $version = str_replace('.*', '', $version);
+        //Remove @dev
+        $version = str_replace('@dev', '', $version);
 
         $versionArr = explode('.', $version);
 

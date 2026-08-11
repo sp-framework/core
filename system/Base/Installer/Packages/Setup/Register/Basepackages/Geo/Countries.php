@@ -10,17 +10,25 @@ class Countries
 
     public $progress;
 
-    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
+    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/';
+
+    protected $countryStore;
+
+    protected $regionStore;
 
     public function register($db, $ff, $localContent, $helper)
     {
-        $countries =
-            $helper->decode(
-                $localContent->read(
-                    '/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'
-                ),
-                true
-            );
+        if (!is_dir(base_path($this->sourceDir))) {
+            if (!mkdir(base_path($this->sourceDir), 0777, true)) {
+                $this->addResponse('Unable to create Geo directory', 1);
+
+                return false;
+            }
+        }
+
+        $countries = $helper->decode($localContent->read($this->sourceDir . 'AllCountries.json'), true);
+        $this->countryStore = $ff->store('basepackages_geo_countries');
+        $this->regionStore = $ff->store('basepackages_geo_regions');
 
         foreach ($countries as $key => $country) {
             $countryToInsert =
@@ -57,9 +65,7 @@ class Countries
             }
 
             if ($ff) {
-                $countryStore = $ff->store('basepackages_geo_countries');
-
-                $countryStore->updateOrInsert($countryToInsert, false);
+                $this->countryStore->updateOrInsert($countryToInsert, false);
             }
 
             if (strlen($country['region']) > 0 &&
@@ -72,219 +78,12 @@ class Countries
         return true;
     }
 
-    public function downloadSelectedCountryStatesAndCities($ff, $localContent, $remoteWebContent, $country, $progress)
-    {
-        $this->progress = $progress;
-
-        $countryStore = $ff->store('basepackages_geo_countries');
-
-        $country = $countryStore->findOneBy(['iso3', '=', $country]);
-
-        $zip = new \ZipArchive;
-
-        try {
-            if ($localContent->fileExists($this->sourceDir . $country['iso2'] . '.json')) {
-                return true;
-            }
-
-            $downloadCountry =
-                $remoteWebContent->request(
-                    'GET',
-                    'https://github.com/sp-framework/geodata/raw/main/' . $country['iso2'] . '.zip',
-                    [
-                        'progress' => function(
-                            $downloadTotal,
-                            $downloadedBytes,
-                            $uploadTotal,
-                            $uploadedBytes
-                        ) {
-                            $counters =
-                                    [
-                                        'downloadTotal'     => $downloadTotal,
-                                        'downloadedBytes'   => $downloadedBytes,
-                                        'uploadTotal'       => $uploadTotal,
-                                        'uploadedBytes'     => $uploadedBytes
-                                    ];
-
-                            if ($downloadedBytes === 0) {
-                                return;
-                            }
-
-                            //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
-                            //So this way, we only update progress when there is actually an update.
-                            if ($downloadedBytes === $this->trackCounter) {
-                                return;
-                            }
-
-                            $this->trackCounter = $downloadedBytes;
-
-                            if ($downloadedBytes === $downloadTotal) {
-                                $this->progress->updateProgress('downloadCountriesStateAndCities', true, false, null, $counters);
-                            } else {
-                                $this->progress->updateProgress('downloadCountriesStateAndCities', null, false, null, $counters);
-                            }
-                        },
-                        'verify'            => false,
-                        'connect_timeout'   => 5,
-                        'sink'              => base_path($this->sourceDir . $country['iso2'] . '.zip')
-                    ]
-                );
-
-            $this->trackCounter = 0;
-
-            if ($zip->open(base_path($this->sourceDir . $country['iso2'] . '.zip'))) {
-                if (!$zip->extractTo(base_path($this->sourceDir))) {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-
-            $zip->close();
-
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    public function registerSelectedCountryStatesAndCities($ff, $localContent, $country, $ip2location = null, $helper)
-    {
-        // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
-        // Timeout 3600
-
-        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
-        if ((int) ini_get('max_execution_time') < 3600) {
-            set_time_limit(3600);
-        }
-
-        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
-        if ((int) ini_get('memory_limit') < 2048) {
-            ini_set('memory_limit', '2048M');
-        }
-
-        $countriesStore = $ff->store('basepackages_geo_countries');
-        $country = $countriesStore->findOneBy(['iso3', '=', $country]);
-
-        $statesStore = $ff->store('basepackages_geo_states');
-        $citiesStore = $ff->store('basepackages_geo_cities');
-        $postcodesStore = $ff->store('basepackages_geo_postcodes');
-
-        if ($ip2location) {
-            $ipv4Store = $ff->store('basepackages_geo_cities_ip2locationv4');
-            $ipv6Store = $ff->store('basepackages_geo_cities_ip2locationv6');
-        }
-
-        try {
-
-            if (!$ip2location) {
-                set_time_limit(300);//5Mins
-            }
-
-            $countryData = $helper->decode($localContent->read($this->sourceDir . $country['iso2'] . '.json'), true);
-
-            foreach ($countryData['states'] as $key => $state) {
-                $state['country_id'] = $country['id'];
-
-                if (isset($state['cities'])) {
-                    $cities = $state['cities'];
-                    unset($state['cities']);
-                }
-
-                if (isset($state['postcodes'])) {
-                    $postcodes = $state['postcodes'];
-                    unset($state['postcodes']);
-                }
-
-                $statesStore->updateOrInsert($state, false);
-
-                if (isset($cities)) {
-                    foreach ($cities as $key => $city) {
-                        if (!isset($city['id'])) {
-                            continue;
-                        }
-
-                        $city['state_id'] = $state['id'];
-                        $city['country_id'] = $country['id'];
-
-                        if ($ip2location == 'true' && isset($city['ip2locationv4'])) {
-                            $ip2locationv4['id'] = $city['id'];
-                            $ip2locationv4['city_id'] = $city['id'];
-                            $ip2v4chunks = $helper->chunk($city['ip2locationv4'], 2);
-                            foreach ($ip2v4chunks as $chunk) {
-                                if (count($chunk) !== 2) {
-                                    continue;
-                                }
-
-                                $ip2locationv4['range_start'] = $chunk[0];
-                                $ip2locationv4['range_end'] = $chunk[1];
-
-                                $ipv4Store->updateOrInsert($ip2locationv4, false);
-                            }
-                        }
-
-                        if ($ip2location == 'true' && isset($city['ip2locationv6'])) {
-                            $ip2locationv6['id'] = $city['id'];
-                            $ip2locationv6['city_id'] = $city['id'];
-                            $ip2v6chunks = $helper->chunk($city['ip2locationv6'], 2);
-                            foreach ($ip2v6chunks as $chunk) {
-                                if (count($chunk) !== 2) {
-                                    continue;
-                                }
-
-                                $ip2locationv6['range_start'] = $chunk[0];
-                                $ip2locationv6['range_end'] = $chunk[1];
-
-                                $ipv6Store->updateOrInsert($ip2locationv6, false);
-                            }
-                        }
-
-                        unset($city['ip2locationv4']);
-                        unset($city['ip2locationv6']);
-
-                        $citiesStore->updateOrInsert($city, false);
-                    }
-                }
-
-                if (isset($postcodes)) {
-                    foreach ($postcodes as $key => $postcode) {
-                        if (!isset($postcode['id'])) {
-                            continue;
-                        }
-
-                        $postcode['state_id'] = $state['id'];
-                        $postcode['country_id'] = $country['id'];
-
-                        $postcodesStore->updateOrInsert($postcode, false);
-                    }
-                }
-            }
-
-            $localContent->delete($this->sourceDir . $country['iso2'] . '.json');
-            $localContent->delete($this->sourceDir . $country['iso2'] . '.zip');
-            $countriesStore->count(true);
-            $statesStore->count(true);
-            $citiesStore->count(true);
-            $postcodesStore->count(true);
-
-            $country['installed'] = 1;
-            $country['enabled'] = 1;
-            $countriesStore->update($country);
-
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
     protected function checkRegion($db, $ff, $country)
     {
         $subregion = false;
 
         if ($ff) {
-            $regionStore = $ff->store('basepackages_geo_regions');
-
-            $subregion = $regionStore->findById($country['subregion_id']);
+            $subregion = $this->regionStore->findById($country['subregion_id']);
         }
 
         if ($db) {
@@ -299,6 +98,8 @@ class Countries
 
             if (isset($subregion[0])) {
                 $subregion = $subregion[0];
+            } else {
+                $subregion = false;
             }
         }
 
@@ -308,7 +109,7 @@ class Countries
             $newSubRegion['parent_region_id'] = $country['region_id'];
 
             if ($ff) {
-                $regionStore->updateOrInsert($newSubRegion, false);
+                $this->regionStore->updateOrInsert($newSubRegion, false);
             }
 
             if ($db) {
@@ -319,7 +120,7 @@ class Countries
         $region = false;
 
         if ($ff) {
-            $region = $regionStore->findById($country['region_id']);
+            $region = $this->regionStore->findById($country['region_id']);
         }
 
         if ($db) {
@@ -334,6 +135,8 @@ class Countries
 
             if (isset($region[0])) {
                 $region = $region[0];
+            } else {
+                $region = false;
             }
         }
 
@@ -343,7 +146,7 @@ class Countries
             $newRegion['parent_region_id'] = null;
 
             if ($ff) {
-                $regionStore->updateOrInsert($newRegion, false);
+                $this->regionStore->updateOrInsert($newRegion, false);
             }
 
             if ($db) {

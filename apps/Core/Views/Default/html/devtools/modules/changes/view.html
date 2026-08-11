@@ -176,10 +176,11 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['modifiedModules'] = JSON.parse('{{modifiedModules}}');
 dataCollectionSectionForm['vars']['selectedAppType'] = '{{selectedAppType}}';
+
 dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['funcs']['init'] = function() {
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-changes-table')) {
-        $('#{{componentId}}-{{sectionId}}-changes-table').DataTable({
+        dataCollectionSectionForm['vars']['modulesTable'] = $('#{{componentId}}-{{sectionId}}-changes-table').DataTable({
             columns: [
                 null,
                 null,
@@ -195,152 +196,160 @@ dataCollectionSectionForm['funcs']['init'] = function() {
                 [50, 100, 'All']
             ]
         });
+
+        dataCollectionSectionForm['vars']['modulesTable'].on('draw responsive-display', function() {
+            resetButtons();
+        });
     }
 
-    $('.editModule').off();
-    $('.editModule').click(function(e) {
-        e.preventDefault();
+    function resetButtons() {
+        $('.editModule').off();
+        $('.editModule').click(function(e) {
+            e.preventDefault();
 
-        dataCollectionSectionForm['funcs']['browse']($(this).attr('href'));
-    });
+            dataCollectionSectionForm['funcs']['browse']($(this).attr('href'));
+        });
 
-    $('.releaseModule').off();
-    $('.releaseModule').click(function(e) {
-        e.preventDefault();
+        $('.releaseModule').off();
+        $('.releaseModule').click(function(e) {
+            e.preventDefault();
 
-        dataCollectionSectionForm['funcs']['browse']($(this).attr('href'));
-    });
+            dataCollectionSectionForm['funcs']['browse']($(this).attr('href'));
+        });
 
-    $('.moduleModified').off();
-    $('.moduleModified').click(function(e) {
-        e.preventDefault();
+        $('.moduleModified').off();
+        $('.moduleModified').click(function(e) {
+            e.preventDefault();
 
-        $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal-label')
-            .html('<span class="text-uppercase"> CHANGES FOR MODULE : ' + $(this).data()['name'] + ' (' + $(this).data()['type'] + ')</span>');
+            $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal-label')
+                .html('<span class="text-uppercase"> CHANGES FOR MODULE : ' + $(this).data()['name'] + ' (' + $(this).data()['type'] + ')</span>');
 
-        var moduleThatHasChanged = dataCollectionSectionForm['vars']['modifiedModules'][$(this).data()['type']][$(this).data()['id']];
+            var moduleThatHasChanged = dataCollectionSectionForm['vars']['modifiedModules'][$(this).data()['type']][$(this).data()['id']];
 
-        var changedModule = { };
-        for (var changeType in moduleThatHasChanged) {
-            if (Object.keys(moduleThatHasChanged[changeType]).length === 0) {
-                changedModule[changeType.toUpperCase() + ' (0)'] = '-';
-            } else {
-                var modifiedModules = { };
+            var changedModule = { };
+            for (var changeType in moduleThatHasChanged) {
+                if (Object.keys(moduleThatHasChanged[changeType]).length === 0) {
+                    changedModule[changeType.toUpperCase() + ' (0)'] = '-';
+                } else {
+                    var modifiedModules = { };
 
-                for (var modifiedModuleCounter in moduleThatHasChanged[changeType]) {
-                    if (changeType === 'modified') {
-                        modifiedModules[modifiedModuleCounter] =
-                            moduleThatHasChanged[changeType][modifiedModuleCounter] +
-                            '<a href="#" class="diff" ' +
-                                'data-type="' + $(this).data()['type'] +
-                                '" data-id="' + $(this).data()['id'] +
-                                '" data-file="' + moduleThatHasChanged[changeType][modifiedModuleCounter] + '"> (diff)</a>';
-                    } else {
-                        modifiedModules[modifiedModuleCounter] = moduleThatHasChanged[changeType][modifiedModuleCounter];
+                    for (var modifiedModuleCounter in moduleThatHasChanged[changeType]) {
+                        if (changeType === 'modified') {
+                            modifiedModules[modifiedModuleCounter] =
+                                moduleThatHasChanged[changeType][modifiedModuleCounter] +
+                                '<a href="#" class="diff" ' +
+                                    'data-type="' + $(this).data()['type'] +
+                                    '" data-id="' + $(this).data()['id'] +
+                                    '" data-file="' + moduleThatHasChanged[changeType][modifiedModuleCounter] + '"> (diff)</a>';
+                        } else {
+                            modifiedModules[modifiedModuleCounter] = moduleThatHasChanged[changeType][modifiedModuleCounter];
+                        }
                     }
+
+                    changedModule[changeType.toUpperCase() + ' (' + Object.keys(moduleThatHasChanged[changeType]).length + ')'] = modifiedModules;
                 }
-
-                changedModule[changeType.toUpperCase() + ' (' + Object.keys(moduleThatHasChanged[changeType]).length + ')'] = modifiedModules;
             }
-        }
 
-        var changes = BazHelpers.createHtmlList({'obj': changedModule});
+            var changes = BazHelpers.createHtmlList({'obj': changedModule});
 
-        $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal .modal-body').empty().html(changes + '<div id="diff"></div>');
+            $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal .modal-body').empty().html(changes + '<div id="diff"></div>');
 
-        $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').modal('show');
+            $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').modal('show');
 
-        $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').on('shown.bs.modal', function() {
-            $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').off('shown.bs.modal');
+            $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').on('shown.bs.modal', function() {
+                $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').off('shown.bs.modal');
 
-            $('.diff').click(function(e) {
-                e.preventDefault();
+                $('.diff').click(function(e) {
+                    e.preventDefault();
 
-                var postData = { };
-                postData[$('#security-token').attr('name')] = $('#security-token').val();
-                postData['id'] = $(this).data()['id'];
-                postData['module_type'] = $(this).data()['type'];
-                postData['file'] = $(this).data()['file'];
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $(this).data()['id'];
+                    postData['module_type'] = $(this).data()['type'];
+                    postData['file'] = $(this).data()['file'];
 
-                getDiff(postData);
+                    getDiff(postData);
+                });
             });
         });
-    });
 
-    $('.recalculateHashModule').off();
-    $('.recalculateHashModule').click(function(e) {
-        e.preventDefault();
+        $('.recalculateHashModule').off();
+        $('.recalculateHashModule').click(function(e) {
+            e.preventDefault();
 
-        var postData = { };
-        postData[$('#security-token').attr('name')] = $('#security-token').val();
-        postData['id'] = $(this).data()['id'];
-        postData['module_type'] = $(this).data()['type'];
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData['id'] = $(this).data()['id'];
+            postData['module_type'] = $(this).data()['type'];
 
-        Swal.fire({
-            title                       : '<span class="text-warning"> Recalculate Hash for module?</span>',
-            icon                        : 'question',
-            background                  : 'rgba(0,0,0,.8)',
-            backdrop                    : 'rgba(0,0,0,.6)',
-            buttonsStyling              : false,
-            confirmButtonText           : 'Yes',
-            cancelButtonText            : 'No',
-            customClass                 : {
-                'confirmButton'             : 'btn btn-warning btn-sm text-uppercase',
-                'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-            },
-            showCancelButton            : true,
-            keydownListenerCapture      : true,
-            allowOutsideClick           : true,
-            allowEscapeKey              : true,
-            didOpen                     : function() {
-                dataCollection.env.sounds.swalSound.play();
-            }
-        }).then((result) => {
-            if (result.value) {
-                reCalculateFilesHash(postData);
-            } else {
-                return;
-            }
+            Swal.fire({
+                title                       : '<span class="text-warning"> Recalculate Hash for module?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                cancelButtonText            : 'No',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-warning btn-sm text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    reCalculateFilesHash(postData);
+                } else {
+                    return;
+                }
+            });
         });
-    });
 
-    $('.recalculateHashReleasePendingModule').off();
-    $('.recalculateHashReleasePendingModule').click(function(e) {
-        e.preventDefault();
+        $('.recalculateHashReleasePendingModule').off();
+        $('.recalculateHashReleasePendingModule').click(function(e) {
+            e.preventDefault();
 
-        var postData = { };
-        postData[$('#security-token').attr('name')] = $('#security-token').val();
-        postData['id'] = $(this).data()['id'];
-        postData['module_type'] = $(this).data()['type'];
-        postData['release_pending'] = 'true';
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData['id'] = $(this).data()['id'];
+            postData['module_type'] = $(this).data()['type'];
+            postData['release_pending'] = 'true';
 
-        Swal.fire({
-            title                       : '<span class="text-warning"> Recalculate Hash (with release pending) for module?</span>',
-            icon                        : 'question',
-            background                  : 'rgba(0,0,0,.8)',
-            backdrop                    : 'rgba(0,0,0,.6)',
-            buttonsStyling              : false,
-            confirmButtonText           : 'Yes',
-            cancelButtonText            : 'No',
-            customClass                 : {
-                'confirmButton'             : 'btn btn-warning btn-sm text-uppercase',
-                'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-            },
-            showCancelButton            : true,
-            keydownListenerCapture      : true,
-            allowOutsideClick           : true,
-            allowEscapeKey              : true,
-            didOpen                     : function() {
-                dataCollection.env.sounds.swalSound.play();
-            }
-        }).then((result) => {
-            if (result.value) {
-                reCalculateFilesHash(postData);
-            } else {
-                return;
-            }
+            Swal.fire({
+                title                       : '<span class="text-warning"> Recalculate Hash (with release pending) for module?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                cancelButtonText            : 'No',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-warning btn-sm text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    reCalculateFilesHash(postData);
+                } else {
+                    return;
+                }
+            });
         });
-    });
+    }
+
+    resetButtons();
 
     function reCalculateFilesHash(postData) {
         $.post('{{links.url("devtools/modules/reCalculateFilesHash")}}', postData, function(response) {

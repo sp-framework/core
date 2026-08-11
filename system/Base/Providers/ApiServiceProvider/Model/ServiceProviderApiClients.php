@@ -38,39 +38,41 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     public $revoked;
 
-    public $concurrent_calls_count;
+    public $revoked_by;
 
-    // public $concurrent_calls_connections;
+    public $revoked_at;
+
+    public $regen;
+
+    public $regen_by;
+
+    public $regen_at;
+
+    public $concurrent_calls_count;
 
     public $per_minute_calls_count;
 
     public $per_minute_calls_start;
 
-    // public $per_minute_calls_connections;
-
     public $per_hour_calls_count;
 
     public $per_hour_calls_start;
-
-    // public $per_hour_calls_connections;
 
     public $per_day_calls_count;
 
     public $per_day_calls_start;
 
-    // public $per_day_calls_connections;
-
-    public function getIdentifier()
+    public function getIdentifier() :string
     {
         return $this->client_id;
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier() :string
     {
         return $this->account_id;
     }
 
-    public function setRedirectUri(string $uri)
+    public function setRedirectUri(string $uri) :void
     {
         $this->redirectUri = $uri;
     }

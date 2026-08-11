@@ -3,11 +3,21 @@
 namespace Apps\Core\Components\System\Api\Server\Services;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
+use League\Flysystem\UnableToReadFile;
 use System\Base\BaseComponent;
 
 class ServicesComponent extends BaseComponent
 {
     use DynamicTable;
+
+    protected $apiClients;
+
+    public function initialize()
+    {
+        $this->apiClients = $this->api->init()->clients;
+    }
 
     /**
      * @acl(name=view)
@@ -15,6 +25,8 @@ class ServicesComponent extends BaseComponent
     public function viewAction()
     {
         $this->view->availableAPIScopes = $this->api->getAPIAvailableScopes();
+        $this->view->availableAPITypes = $this->api->getAPIAvailableTypes();
+        $this->view->availableAPIGrantTypes = $this->api->getAvailableAPIGrantTypes();
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
@@ -27,7 +39,7 @@ class ServicesComponent extends BaseComponent
             $api['request_url'] = '';
 
             if (isset($api['client_id']) && $api['client_id'] !== '') {
-                $client = $this->api->clients->getFirst('client_id', $api['client_id']);
+                $client = $this->apiClients->getFirst('client_id', $api['client_id']);
 
                 if ($client) {
                     $client = $client->toArray();
@@ -55,10 +67,93 @@ class ServicesComponent extends BaseComponent
                 $api['client_secret'] = '';
             }
 
+            if (isset($api['account_id']) && $api['account_id'] != 0) {
+                $account = $this->basepackages->accounts->getById($api['account_id']);
+
+                if ($account) {
+                    $api['account_email'] = $account['email'];
+                } else {
+                    $api['account_id'] = 0;
+                    $api['account_email'] = '';
+                }
+            } else {
+                $api['account_id'] = 0;
+                $api['account_email'] = '';
+            }
+
+            if ($this->getData()['id'] != 0) {//Read dev provided openapi information via Install.php file
+                try {
+                    $version = '0.0.0';
+
+                    if ($this->apps->apps[$api['app_id']]['app_type'] === 'core') {
+                        $version = $this->core->core['version'];
+                    } else {
+                        try {
+                            if ($this->localContent->fileExists('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/type.json')) {
+                                $type = $this->helper->decode($this->localContent->read('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/type.json'), true);
+
+                                if (isset($type['version'])) {
+                                    $version = $type['version'];
+                                }
+                            }
+                        } catch (\throwable | UnableToCheckExistence | UnableToReadFile | FilesystemException $e) {
+                            $this->logException($e);
+
+                            $this->addResponse($e->getMessage(), 1);
+
+                            return false;
+                        }
+                    }
+
+                    $result =
+                        (new \OpenApi\Builder())
+                        ->setSources(
+                            [
+                                base_path('apps/' . ucfirst($this->apps->apps[$api['app_id']]['app_type']) . '/Install/Install.php')
+                            ]
+                        )
+                        ->setVersion($version)
+                        ->build();
+
+                    if ($result) {
+                        $result = $this->helper->decode($result->toJson(), true);
+
+                        if (isset($result['info']['title']) && $api['openapi_name'] === '') {
+                            $api['openapi_name'] = $result['info']['title'];
+                        }
+                        if (isset($result['info']['description']) && $api['openapi_description'] === '') {
+                            $api['openapi_description'] = $result['info']['description'];
+                        }
+                        if (isset($result['info']['contact']['email']) && $api['openapi_email'] === '') {
+                            $api['openapi_email'] = $result['info']['contact']['email'];
+                        }
+                        if (isset($result['info']['license']['name']) && $api['openapi_license_name'] === '') {
+                            $api['openapi_license_name'] = $result['info']['license']['name'];
+                        }
+                        if (isset($result['info']['license']['url']) && $api['openapi_license_url'] === '') {
+                            $api['openapi_license_url'] = $result['info']['license']['url'];
+                        }
+
+                        if (isset($result['servers']) && count($result['servers']) > 0) {
+                            foreach ($result['servers'] as $server) {
+                                if (str_contains($server['url'], 'sandbox')) {
+                                    $api['openapi_server_sandbox_url'] = $server['url'];
+                                    $api['openapi_server_sandbox_description'] = $server['description'];
+                                } else {
+                                    $api['openapi_server_production_url'] = $server['url'];
+                                    $api['openapi_server_production_description'] = $server['description'];
+                                }
+                            }
+                        }
+                    }
+                } catch (\throwable $e) {
+                    //Do nothing!
+                }
+            }
+
             $this->view->api = $api;
             $this->view->apps = $this->apps->apps;
             $this->view->domains = $this->domains->domains;
-            $this->view->availableAPIGrantTypes = $this->api->getAvailableAPIGrantTypes();
             $this->view->availableOpensslKeyBits = $this->api->getOpensslKeyBits();
             $this->view->availableOpensslAlgorithms = $this->api->getOpensslAlgorithms();
             $this->view->apiKeysParams = $this->api->getAPIKeysParams($this->getData()['id']);
@@ -90,27 +185,13 @@ class ServicesComponent extends BaseComponent
                 ]
             ];
 
-        if ($this->access->auth->account()['security']['role_id'] != '1') {
-            $conditions =
-                [
-                    'conditions'    =>
-                        '-|account_id|equals|' . $this->access->auth->account()['id'] . '&',
-                    'order'         => 'id desc'
-                ];
-        } else {
-            $conditions =
-                [
-                    'order'         => 'id desc'
-                ];
-        }
-
         $this->generateDTContent(
             $this->api,
             'system/api/server/services/view',
-            $conditions,
-            ['name', 'status', 'is_public', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
+            null,
+            ['name', 'status', 'api_type', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
             true,
-            ['name', 'status', 'is_public', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
+            ['name', 'status', 'api_type', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
             $controlActions,
             ['app_id' => 'app', 'domain_id' => 'domain', 'scope_id' => 'scope', 'account_id' => 'Account'],
             $replaceColumns,
@@ -133,11 +214,14 @@ class ServicesComponent extends BaseComponent
             } else if ($data['status'] == '1') {
                 $data['status'] = '<span class="badge badge-success text-uppercase">Yes</span>';
             }
-            if ($data['is_public'] == '0') {
-                $data['is_public'] = '<span class="badge badge-secondary text-uppercase">No</span>';
-            } else if ($data['is_public'] == '1') {
-                $data['is_public'] = '<span class="badge badge-warning text-uppercase">Yes</span>';
+            if ($data['api_type'] === 'public' || $data['api_type'] === 'protected_user_credentials') {
                 $data['grant_type'] = '-';
+            }
+
+            $data['api_type'] = $this->view->availableAPITypes[$data['api_type']]['name'];
+
+            if ($data['grant_type'] !== '-') {
+                $data['grant_type'] = $this->view->availableAPIGrantTypes[$data['grant_type']]['name'];
             }
             $app = $this->apps->getById($data['app_id']);
             if ($app) {
@@ -226,5 +310,18 @@ class ServicesComponent extends BaseComponent
         if ($this->api->packagesData->responseData) {
             $this->view->responseData = $this->api->packagesData->responseData;
         }
+    }
+
+    public function generateOpenapiFileAction()
+    {
+        $this->requestIsPost();
+
+        $this->api->generateOpenapiFile($this->postData());
+
+        $this->addResponse(
+            $this->api->packagesData->responseMessage,
+            $this->api->packagesData->responseCode,
+            $this->api->packagesData->responseData ?? []
+        );
     }
 }

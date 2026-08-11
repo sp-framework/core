@@ -80,7 +80,7 @@
         )}}
     </div>
     {% set generateHidden = 'hidden' %}
-    {% if apiPrivateKey == '1' %}
+    {% if apiType == 'protected_grant' %}
         {% set generateHidden = '' %}
     {% endif %}
     <div class="col" {{generateHidden}}>

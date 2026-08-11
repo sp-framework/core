@@ -3966,8 +3966,6 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                 '<ul data-tabid="' + tabId + '-ul"></ul>' +
                                 '</li>'
                             );
-
-                        return;
                     }
 
                     that._populateTree(tabId);
@@ -4092,6 +4090,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     }
                 });
 
+                $('#' + sectionId + ' .card-footer button.addData, #' + sectionId + ' .card-footer button.updateData').off();
                 $('#' + sectionId + ' .card-footer button.addData, #' + sectionId + ' .card-footer button.updateData').click(function(e) {
                     e.preventDefault();
 
@@ -5785,7 +5784,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         $('#' + sectionId + '-delete').addClass('disabled');
                     }
                 }
-                        // $('#' + sectionId + '-filters option:selected').data()['filter_type'] === 1    //User
 
                 toggleFilterButtons(sectionId);
 
@@ -6367,7 +6365,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 $('body').on('formToDatatableTableRowDelete', function(e) {
                     onFormToDatatableTableUpdate(e);
                 });
-
                 function onFormToDatatableTableUpdate(e) {
                     //Remove numeric from edit data
                     $('#' + sectionId + '-filter-table-data tbody tr').each(function(index, tr) {
@@ -6582,19 +6579,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     $('#' + sectionId + '-search').click(function(e) {
                         e.preventDefault();
 
-                        if (dataType == 0) {
-                            query['conditions'] = '-|' + selectedId + '|equals|' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
-                        } else {
-                            query['conditions'] = '-|' + selectedId + '|like|%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
-                        }
-
-                        query['quick_filter'] = true;
-
-                        that._filterRunAjax(
-                            1,
-                            datatableOptions.paginationCounters.limit,
-                            query
-                        );
+                        that._performQuickSearch(dataType);
                     });
 
                     $('#' + sectionId + '-clear').click(function(e) {
@@ -6602,7 +6587,33 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                         resetFilters(true);
                     });
+
+                    $(document).on('keydown', function(e) {
+                        if (e.which === 13) {
+                            var activeField = $(document.activeElement);
+
+                            if ($(activeField)[0].id === sectionId + '-filter-quick') {
+                                that._performQuickSearch(dataType);
+                            }
+                        }
+                    });
                 }
+            }
+
+            _proto._performQuickSearch = function(dataType) {
+                if (dataType == 0) {
+                    query['conditions'] = '-|' + selectedId + '|equals|' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
+                } else {
+                    query['conditions'] = '-|' + selectedId + '|like|%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
+                }
+
+                query['quick_filter'] = true;
+
+                that._filterRunAjax(
+                    1,
+                    datatableOptions.paginationCounters.limit,
+                    query
+                );
             }
 
             //Build listing datatable
@@ -6908,7 +6919,13 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         $('#listing-secondary-buttons').attr('hidden', false);
                         $('#listing-additional-fields').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
-                        $.extend(thisOptions.listOptions.datatable, JSON.parse(response.rows));
+                        if (response.rows) {
+                            if (typeof response.rows === 'string') {
+                                response.rows = JSON.parse(response.rows);
+                            }
+
+                            $.extend(thisOptions.listOptions.datatable, response.rows);
+                        }
 
                         if (response.routeEnv && response.routeEnv.pageParams) {
                             if (response.routeEnv.pageParams.limit) {
@@ -6932,13 +6949,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                                     dataCollection.env['customConditions'] = customConditions;
 
-                                    $('#' + sectionId + '-filter-quick').attr('disabled', false);
-                                    $('#' + sectionId + '-filter-search').attr('disabled', false);
-                                    $('#' + sectionId + '-filter-clear').attr('disabled', false);
-                                    $('#' + sectionId + '-filter-quick-prepend-dropdown-button span')
-                                        .text($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).text().toUpperCase());
-                                    selectedId = dataCollection.env['customConditions'][0][1];
-                                    $('#' + sectionId + '-filter-quick').val(dataCollection.env['customConditions'][0][3].replace(/%/g, ''));
+                                    if ($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).length > 0) {
+                                        $('#' + sectionId + '-filter-quick').attr('disabled', false);
+                                        $('#' + sectionId + '-filter-search').attr('disabled', false);
+                                        $('#' + sectionId + '-filter-clear').attr('disabled', false);
+                                        $('#' + sectionId + '-filter-quick-prepend-dropdown-button span')
+                                            .text($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).text().toUpperCase());
+                                        selectedId = dataCollection.env['customConditions'][0][1];
+                                        $('#' + sectionId + '-filter-quick').val(dataCollection.env['customConditions'][0][3].replace(/%/g, ''));
+                                    }
                                 }
 
                                 filter = true;
@@ -7257,8 +7276,16 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     filterQuery = query;
                 }
 
-                if (filterQuery['filter']) {
+                if (typeof filterQuery['filter'] !== 'object') {
                     filter = true;
+
+                    if (Array.isArray(filterQuery)) {
+                        filterQuery = Object.assign({}, filterQuery);
+
+                        if (typeof filterQuery['filter'] === 'object') {
+                            delete(filterQuery['filter']);
+                        }
+                    }
                 }
 
                 thisOptions['datatable'].rows().clear().draw();
@@ -7268,14 +7295,18 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 postData['page'] = page;
                 postData['limit'] = limit;
 
-                if (filterQuery.filter || filterQuery.order) {
-                    postData['filter'] = filterQuery.filter;
-                    postData['order'] = filterQuery.order;
+                if (filter && (filterQuery['filter'] || filterQuery['order'])) {
+                    if (filterQuery['filter']) {
+                        postData['filter'] = filterQuery['filter'];
+                    }
+                    if (filterQuery['order']) {
+                        postData['order'] = filterQuery['order'];
+                    }
                 } else {
                     postData['filter'] = filterQuery;
                 }
 
-                if (filterQuery.quick_filter) {
+                if (filterQuery['quick_filter']) {
                     postData['conditions'] = filterQuery['conditions'];
                     postData['quick_filter'] = true;
                     if (postData['filter']) {
@@ -7288,6 +7319,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 }
 
                 that._runDatatableAjax(postData, true);
+
+                filter = false;
             }
 
             _proto._drawCallback = function() {
@@ -10282,6 +10315,10 @@ var BazTunnels = function() {
     }
 
     function sendPing() {
+        if (!dataCollection.env.profile) {
+            return;
+        }
+
         var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/wsping/';
 
         var postData = { };
@@ -10418,6 +10455,10 @@ var BazNotifications = function() {
         if (responseData && Object.keys(responseData).length > 0) {
             processResponseData(responseData);
         } else {
+            if (!dataCollection.env.profile) {
+                return;
+            }
+
             var url = dataCollection.env.rootPath + appRoute + 'system/notifications/fetchNewNotificationsCount';
 
             var postData = { };
@@ -10500,6 +10541,9 @@ var BazNotifications = function() {
     }
 
     function initPullNotifications(offline) {
+        if (!dataCollection.env.profile) {
+            return;
+        }
         //eslint-disable-next-line
         console.log(promiseInit);
         if (offline && !promiseInit) {
@@ -12515,11 +12559,11 @@ var BazProgress = function() {
         BazProgress.buildProgressBar = function(el, mSH = false, child = false, hasSubProcess = false, hasCancelButton = true, hasDetails = true) {
             buildProgressBar(el, mSH, child, hasSubProcess, hasCancelButton, hasDetails);
         }
-        BazProgress.switchProgressBarColor = function(el, color) {
+        BazProgress.switchProgressBarColor = function(el = null, color = 'info') {
             switchProgressBarColor(el, color);
         }
-        BazProgress.resetProgressCounter = function() {
-            resetProgressCounter();
+        BazProgress.resetProgressCounter = function(hideDiv = true) {
+            resetProgressCounter(hideDiv);
         }
         BazProgress.setCallable = function(callable) {
             setCallable(callable);

@@ -41,7 +41,8 @@ class Dispatcher
         if ($this->appsInfo) {
             $component = $this->components->getComponentById($this->appsInfo['errors_component']);
 
-            if (isset($this->appsInfo['errors_component']) &&
+            if ($component &&
+                isset($this->appsInfo['errors_component']) &&
                 $this->appsInfo['errors_component'] != 0
             ) {
                 $errorClassArr = explode('\\', $component['class']);
@@ -52,6 +53,7 @@ class Dispatcher
                 $errorComponent = 'Errors';
                 $namespace = 'System\Base\Providers\ErrorServiceProvider';
             }
+
             $this->dispatcher->setEventsManager($this->register404($errorComponent, $namespace));
         } else {
             $this->dispatcher->setEventsManager($this->events);//Register Other events

@@ -376,11 +376,7 @@ $(document).ready(function(){
                                     $("#{{componentId}}-form :input").prop("disabled", true);
                                 },
             error           : function(response) {
-                                    if (response.getResponseHeader('redirect_url')) {
-                                        window.location = response.getResponseHeader('redirect_url');
-                                    }
-                                    $('.login-box-msg').text('Error! Please contact administrator.');
-                                    failed();
+                                    window.location.reload();
                                 },
             success         : function(response) {
                                 if (response.responseCode == '0') {

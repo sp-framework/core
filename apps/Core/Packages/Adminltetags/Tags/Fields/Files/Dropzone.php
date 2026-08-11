@@ -303,8 +303,8 @@ class Dropzone
                         ]
                     ) .
                     '<ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments">';
+                        $counter = 0;
                         if ($this->params['attachments'] && count($this->params['attachments']) > 0) {
-                            $counter = 0;
                             foreach ($this->params['attachments'] as $attachmentKey => $attachment) {
                                 if (!isset($attachment['uuid'])) {
                                     continue;
@@ -422,16 +422,19 @@ class Dropzone
                                 $counter++;
                             }
 
+                            $noData = 'hidden';
                             if ($counter === 0) {
-                                $preview .=
-                                    '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata">
-                                        <div class="row">
-                                            <div class="col text-uppercase">
-                                                <i class="fa fa-fw fa-exclamation"></i> Add ' . $this->params['allowedUploads'] . '
-                                            </div>
-                                        </div>
-                                    </div>';
+                                $noData = '';
                             }
+
+                            $preview .=
+                                '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata" ' . $noData . '>
+                                    <div class="row">
+                                        <div class="col text-uppercase">
+                                            <i class="fa fa-fw fa-exclamation"></i> Add ' . $this->params['allowedUploads'] . '
+                                        </div>
+                                    </div>
+                                </div>';
                         } else {
                             $preview .=
                                 '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata">
@@ -718,8 +721,8 @@ class Dropzone
                                                 newList +=';
                                                 if ($this->params['storage']['permission'] === 'public') {
                                                     $inclJs .=
-                                                        '\'<a class="chocolat-image" title="\' + file.name + \'" href="\' + response.responseData.publicLinks[1] + \'">\' +
-                                                            \'<img alt="\' + file.name + \'" src="\' + response.responseData.publicLinks[0] + \'" class="img-fluid img-thumbnail">\' +
+                                                        '\'<a class="chocolat-image" title="\' + file.name + \'" href="\' + response.responseData.publicLinks[1].replace("public/", "") + \'">\' +
+                                                            \'<img alt="\' + file.name + \'" src="\' + response.responseData.publicLinks[0].replace("public/", "") + \'" class="img-fluid img-thumbnail">\' +
                                                         \'</a>\';';
                                                 } else {
                                                     $inclJs .=
@@ -747,7 +750,7 @@ class Dropzone
 
                                                 if ($this->params['storage']['permission'] === 'public') {
                                                     $inclJs .=
-                                                        '\'<a data-uuid="\' + response.responseData.uuid + \'" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="\' + response.responseData.publicLinks[0] + \'" target="_blank">\' +
+                                                        '\'<a data-uuid="\' + response.responseData.uuid + \'" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="\' + response.responseData.publicLinks[0].replace("public/", "") + \'" target="_blank">\' +
                                                             \'<i class="fa fa-fw fa-download"></i>\' +
                                                         \'</a>\';';
                                                 } else {

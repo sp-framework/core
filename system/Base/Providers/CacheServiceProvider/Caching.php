@@ -21,8 +21,8 @@ class Caching
 
     public function init($cacheService, $cacheTimeout = 3600)
     {
-        if ($this->enabled) {
-            return false;
+        if ($this->enabled && $this->cache) {
+            return $this->cache;
         }
 
         if (!isset($this->caches[$cacheService])) {
@@ -35,9 +35,14 @@ class Caching
             $this->cache = $this->caches[$cacheService];
         }
 
-        $this->enabled = false;
+        $this->enabled = true;
 
         return $this;
+    }
+
+    public function getCaches()
+    {
+        return $this->caches;
     }
 
     public function getCache($cacheKey)

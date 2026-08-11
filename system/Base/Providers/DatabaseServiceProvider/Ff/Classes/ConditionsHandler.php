@@ -11,8 +11,8 @@ class ConditionsHandler
 {
     public static function verifyCondition(string $condition, $fieldValue, $value): bool
     {
-        if (is_null($fieldValue)) {
-            return false;
+        if ($condition === '=' && is_null($fieldValue) && is_null($value)) {
+            return true;
         }
 
         if (is_string($value) &&

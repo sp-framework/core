@@ -56,7 +56,7 @@ class MurlsComponent extends BaseComponent
             'system/tools/murls/view',
             null,
             ['murl', 'hits', 'valid_till'],
-            false,
+            true,
             ['murl', 'hits', 'valid_till'],
             $controlActions,
             null,
@@ -65,43 +65,6 @@ class MurlsComponent extends BaseComponent
         );
 
         $this->view->pick('murls/list');
-    }
-
-    /**
-     * @api_acl(name=view)
-     */
-    public function apiViewAction()
-    {
-        $this->initialize();
-
-        if (isset($this->getData()['id'])) {
-            if ($this->getData()['id'] != 0) {
-                $murl = $this->murls->getById($this->getData()['id']);
-
-                if (!$murl) {
-                    return $this->throwIdNotFound();
-                }
-            }
-            $this->addResponse('Ok', 0, ['data' => $murl]);
-
-            return;
-        }
-
-        if ($this->request->isPost()) {
-            $data =
-                $this->generateDTContent(
-                    $this->murls,
-                    null,
-                    null,
-                    ['murl', 'hits']
-                );
-
-            if ($data) {
-                $this->addResponse('Ok', 0, ['data' => $data]);
-            }
-
-            return;
-        }
     }
 
     /**
