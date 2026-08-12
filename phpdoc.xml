@@ -12,6 +12,7 @@
     <version number="3.0.0">
         <api>
             <source>
+                <path>public/index.php</path>
                 <path>apps/Core/**/*</path>
                 <path>system/**/*</path>
             </source>
