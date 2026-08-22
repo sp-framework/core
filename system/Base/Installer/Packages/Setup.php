@@ -1,938 +1,1036 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * SP Framework
+ *
+ * @package     System\Base\Installer\Packages
+ * @copyright   Copyright (c) 2026
+ * @link        https://github.com/sp-framework/core
+ */
+
 namespace System\Base\Installer\Packages;
 
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
+use PDOException;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Filter\Validation\Validator\Email;
 use Phalcon\Filter\Validation\Validator\PresenceOf;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\ApiClientServices\Apis\Repos as RegisterRepos;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Dashboard as RegisterCoreDashboard;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Filter as RegisterFilter;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Countries as RegisterCountries;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Timezones as RegisterTimezones;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Menu as RegisterMenu;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Storages\Storages as RegisterStorages;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as RegisterRootCoreAccount;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Profile as RegisterRootCoreProfile;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Role as RegisterRole;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Widgets as RegisterCoreWidgets;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Schedules as RegisterSchedules;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Tasks as RegisterTasks;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Workers as RegisterWorkers;
-use System\Base\Installer\Packages\Setup\Register\Modules\Component as RegisterComponent;
-use System\Base\Installer\Packages\Setup\Register\Modules\Middleware as RegisterMiddleware;
-use System\Base\Installer\Packages\Setup\Register\Modules\Package as RegisterPackage;
-use System\Base\Installer\Packages\Setup\Register\Modules\View as RegisterView;
-use System\Base\Installer\Packages\Setup\Register\Modules\External as RegisterExternal;
-use System\Base\Installer\Packages\Setup\Register\Providers\App as RegisterCoreApp;
-use System\Base\Installer\Packages\Setup\Register\Providers\App\Type as RegisterCoreAppType;
+use System\Base\Installer\Packages\Setup\Cleaner;
+use System\Base\Installer\Packages\Setup\ComposerRunner;
+use System\Base\Installer\Packages\Setup\DatabaseProvisioner;
+use System\Base\Installer\Packages\Setup\ModuleRegistrar;
+use System\Base\Installer\Packages\Setup\PasswordChecker;
 use System\Base\Installer\Packages\Setup\Register\Providers\Core as RegisterCore;
-use System\Base\Installer\Packages\Setup\Register\Providers\Domain as RegisterDomain;
-use System\Base\Installer\Packages\Setup\Schema;
+use System\Base\Installer\Packages\Setup\SchemaBuilder;
+use System\Base\Installer\Packages\Setup\SeedRegistrar;
 use System\Base\Installer\Packages\Setup\Write\Configs;
-use System\Base\Installer\Packages\Setup\Write\Pdo;
 use System\Base\Providers\DatabaseServiceProvider\Ff;
 
+/**
+ * Main Setup package orchestrator handling database schema initialization,
+ * module registration, default seeds, configuration file generation, and indexing.
+ *
+ * Sub-components (Cleaner, DatabaseProvisioner, SchemaBuilder, ModuleRegistrar,
+ * SeedRegistrar, ComposerRunner, PasswordChecker, Configs) are lazily instantiated
+ * on demand to optimize memory consumption and execution speed.
+ */
 class Setup
 {
-	protected $container;
-
-	protected $postData;
-
-	protected $request;
-
-	protected $session;
-
-	protected $db;
-
-	protected $ff;
-
-	protected $dbConfig;
-
-	protected $localContent;
-
-	protected $basepackages;
-
-	protected $progress;
-
-	protected $configs;
-
-	protected $validation;
-
-	protected $security;
-
-	protected $cookies;
-
-	protected $helper;
-
-	protected $opCache;
-
-	protected $remoteWebContent;
-
-	protected $onlyUpdateDb = false;
-
-	protected $storesToIndex = [];
-
-	public function __construct($container, $postData, $precheckFail = false, $onlyUpdateDb = false)
-	{
-		$this->container = $container;
-
-		$this->request = $this->container->getShared('request');
-
-		$this->session = $this->container->getShared('session');
-
-		$this->postData = $postData;
-
-		$this->validation = $this->container->getShared('validation');
-
-		$this->security = $this->container->getShared('security');
-
-		$this->cookies = $this->container->getShared('cookies');
-
-		$this->helper = $this->container->getShared('helper');
-
-		$this->opCache = $this->container->getShared('opCache');
-
-		if (($this->request->isPost() &&
-			 !$precheckFail &&
-			 isset($this->postData['databasetype']) &&
-			 $this->postData['databasetype'] !== 'ff') ||
-			$onlyUpdateDb && $this->request->isPost()
-		) {
-			$this->dbConfig =
-					[
-						'db' =>
-							[
-								'host' 		=>
-									isset($this->postData['host']) ?
-									$this->postData['host'] :
-									'',
-								'dbname' 	=>
-									isset($this->postData['dbname']) ?
-									$this->postData['dbname'] :
-									'',
-								'username'	=>
-									isset($this->postData['username']) ?
-									$this->postData['username'] :
-									'',
-								'password' 	=>
-									isset($this->postData['password']) ?
-									$this->postData['password'] :
-									'',
-								'port' 		=>
-									isset($this->postData['port']) ?
-									$this->postData['port'] :
-									3306,
-							]
-					];
-
-			if (isset($this->postData['create-username']) && isset($this->postData['create-password'])) {
-				$this->dbConfig['db']['username'] = $this->postData['create-username'];
-				$this->dbConfig['db']['password'] = $this->postData['create-password'];
-				$this->dbConfig['db']['dbname'] = 'mysql';
-			}
-
-			$this->db = new Mysql($this->dbConfig['db']);
-		}
-
-		$this->basepackages = $this->container->getShared('basepackages');
-
-		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'db') {
-			$reset = false;
-
-			if ($this->postData['databasetype'] === 'hybrid') {
-				$reset = true;
-			}
-
-			$this->ff = (new Ff(
-				(object) [
-					'cache' => (object) [
-						'enabled' => false,
-						'timeout' => 0
-					],
-					'databaseType' => $this->postData['databasetype']
-				], $this->request, $this->helper))->init($reset, false);
-		}
-
-		if (!$onlyUpdateDb) {
-			$this->progress = $this->basepackages->progress;
-		}
-
-		if (!$precheckFail) {
-			$this->localContent = $this->container['localContent'];
-			$this->remoteWebContent = $this->container['remoteWebContent'];
-		}
-
-		$this->onlyUpdateDb = $onlyUpdateDb;
-	}
-
-	public function __call($method, $arguments)
-	{
-		if (method_exists($this, $method)) {
-			if (!$this->onlyUpdateDb) {
-				$this->progress->updateProgress($method, null, false);
-			}
-
-			$call = call_user_func_array([$this, $method], $arguments);
-
-			$callResult = $call;
-
-			if ($call !== false) {
-				$call = true;
-			}
-
-			if (!$this->onlyUpdateDb) {
-				$this->progress->updateProgress($method, $call, false);
-			}
-
-			return $callResult;
-		}
-	}
-
-	protected function cleanVar()
-	{
-		$files = $this->basepackages->utils->init($this->container)->scanDir('var/');
-
-		foreach ($files['files'] as $key => $file) {
-			try {
-				if (strpos($file, 'progress') === false &&
-					strpos($file, 'opcache') === false &&
-					strpos($file, 'pusher-') === false &&
-					strpos($file, 'messenger-') === false
-				) {
-					$this->localContent->delete($file);
-				}
-			} catch (FilesystemException | UnableToDeleteFile $exception) {
-				throw $exception;
-			}
-		}
-
-		if ($this->opCache) {
-			$this->opCache->removeCache(null, 'core');
-		}
-
-		return true;
-	}
-
-	protected function cleanOldFfs()
-	{
-		$files = $this->basepackages->utils->init($this->container)->scanDir('.ff/');
-
-		foreach ($files['files'] as $key => $file) {
-			try {
-				if (strpos($file, '.ff') !== false) {
-					$this->localContent->delete($file);
-				}
-			} catch (FilesystemException | UnableToDeleteFile $exception) {
-				throw $exception;
-			}
-		}
-
-		foreach ($files['dirs'] as $key => $dir) {
-			try {
-				if (strpos($dir, '.ff') !== false) {
-					$this->localContent->deleteDirectory($dir);
-				}
-			} catch (FilesystemException | UnableToDeleteDirectory $exception) {
-				throw $exception;
-			}
-		}
-
-		return true;
-	}
-
-	protected function cleanOldAPIKeys()
-	{
-		$files = $this->basepackages->utils->init($this->container)->scanDir('system/.api/');
-
-		foreach ($files['files'] as $key => $file) {
-			try {
-				if (strpos($file, '.api') !== false) {
-					$this->localContent->delete($file);
-				}
-			} catch (FilesystemException | UnableToDeleteFile $exception) {
-				throw $exception;
-			}
-		}
-
-		foreach ($files['dirs'] as $key => $dir) {
-			try {
-				if (strpos($dir, '.api') !== false) {
-					$this->localContent->deleteDirectory($dir);
-				}
-			} catch (FilesystemException | UnableToDeleteDirectory $exception) {
-				throw $exception;
-			}
-		}
-
-		return true;
-	}
-
-	protected function cleanOldBackups()
-	{
-		$dirs =
-			[
-				'.backupsdb/',
-				'.backupsff/'
-			];
-
-		foreach ($dirs as $dir) {
-			$files = $this->basepackages->utils->init($this->container)->scanDir($dir);
-
-			$this->cleanOldBackupsFiles($files);
-		}
-
-		return true;
-	}
-
-	protected function cleanOldBackupsFiles($files)
-	{
-		foreach ($files['files'] as $key => $file) {
-			try {
-				$this->localContent->delete($file);
-			} catch (FilesystemException | UnableToDeleteFile $exception) {
-				throw $exception;
-			}
-		}
-
-		return true;
-	}
-
-	protected function cleanOldCookies()
-	{
-		$cookieKey = 'SP';
-
-		//Set cookies to 1 second so browser removes them.
-		$this->cookies->set(
-			$cookieKey,
-			'0',
-			1,
-			'/',
-			false,
-			$this->request->getHttpHost(),
-			true
-		);
-
-		$this->cookies->get($cookieKey)->setOptions(['samesite'=>'strict']);
-
-		$this->cookies->set(
-			'id',
-			'0',
-			1,
-			'/',
-			false,
-			$this->request->getHttpHost(),
-			true
-		);
-
-		$this->cookies->set(
-			'Installer',
-			'0',
-			1,
-			'/',
-			false,
-			$this->request->getHttpHost(),
-			true
-		);
-
-		$this->cookies->send();
-
-		return true;
-	}
-
-	protected function checkDbEmpty()
-	{
-		if (!$this->db) {
-			return true;
-		}
-
-		$allTables = $this->db->listTables($this->postData['dbname']);
-
-		if (count($allTables) > 0) {
-			if ($this->postData['drop'] === 'false') {
-				return false;
-			} else {
-				foreach ($allTables as $tableKey => $tableValue) {
-					$this->db->dropTable($tableValue);
-				}
-				return true;
-			}
-		}
-
-		return true;
-	}
-
-	protected function buildSchema()
-	{
-		$databases = (new Schema)->getSchema($this->postData['dev']);
-
-		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'ff') {
-			foreach ($databases as $tableName => $tableClass) {
-				if (method_exists($tableClass['schema'], 'columns')) {
-					$this->db->createTable($tableName, $this->dbConfig['db']['dbname'], $tableClass['schema']->columns());
-				}
-				if (method_exists($tableClass['schema'], 'indexes')) {
-					$this->addIndex($tableName, $tableClass['schema']->indexes());
-				}
-			}
-		}
-
-		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'db') {
-			$this->cleanOldFfs();
-
-			foreach ($databases as $tableName => $tableClass) {
-				if (!isset($tableClass['schema'])) {
-					continue;
-				}
-
-				if ($tableClass['model'] && $tableClass['model']->getSource()) {
-					$tableName = $tableClass['model']->getSource();
-				}
-
-				$tableConfigParams = [];
-				if (isset($tableClass['configParams'])) {
-					$tableConfigParams = $tableClass['configParams'];
-				}
-				$config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model'], $tableConfigParams);
-				$schema = $this->ff->generateSchema($tableName, $tableClass['schema'], $tableClass['model']);
-
-				$this->ff->store($tableName, $config, $schema, $this->ff)->deleteStore();
-
-				$this->ff->store($tableName, $config, $schema, $this->ff);
-
-				if (method_exists($tableClass['schema'], 'indexes')) {
-					array_push($this->storesToIndex, $tableName);
-				}
-			}
-		}
-
-		return true;
-	}
-
-	protected function registerRepos()
-	{
-		(new RegisterRepos())->register($this->db, $this->ff, $this->postData);
-
-		return true;
-	}
-
-	protected function registerDomain()
-	{
-		(new RegisterDomain())->register($this->db, $this->ff, $this->request, $this->helper);
-
-		return true;
-	}
-
-	protected function registerCore(array $baseConfig)
-	{
-		(new RegisterCore())->register($baseConfig, $this->db, $this->ff);
-
-		return true;
-	}
-
-	protected function registerCoreAppType()
-	{
-		try {
-			$jsonFile =
-				$this->helper->decode(
-					$this->localContent->read('apps/Core/Install/type.json'),
-					true
-				);
-		} catch (\throwable $e) {
-			throw new \Exception($e->getMessage() . '. Problem reading type.json');
-		}
-
-		return (new RegisterCoreAppType())->register($this->db, $this->ff, $jsonFile);
-	}
-
-	protected function registerCoreApp()
-	{
-		return (new RegisterCoreApp())->register($this->db, $this->ff, $this->helper);
-	}
-
-	protected function registerModule($type)
-	{
-		if ($type === 'components') {
-			$adminComponents = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Components/', true);
-
-			if (!$adminComponents || count($adminComponents) === 0) {
-				return false;
-			}
-
-			foreach ($adminComponents['files'] as $adminComponentKey => $adminComponent) {
-				if (strpos($adminComponent, 'component.json')) {
-					try {
-						$jsonFile =
-							$this->helper->decode(
-								$this->localContent->read($adminComponent),
-								true
-							);
-					} catch (\throwable $e) {
-						throw new \Exception($e->getMessage() . '. Problem reading component.json at location ' . $adminComponent);
-					}
-
-					if ($jsonFile['category'] === 'devtools' &&
-						$this->postData['dev'] == 'false'
-					) {
-						continue;
-					}
-					$menuId = null;
-
-					$registeredComponentId = $this->registerCoreComponent($jsonFile, $menuId);
-
-					if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
-						$menuId = $this->registerCoreMenu($jsonFile, $registeredComponentId);
-					}
-
-					if ($menuId) {
-						$this->registerCoreComponent($jsonFile, $menuId, true);
-					}
-
-					if ($jsonFile['route'] === 'dashboards') {
-						$this->registerCoreDashboard($jsonFile);
-					}
-
-					if (isset($jsonFile['widgets'])) {
-						if (is_string($jsonFile['widgets'])) {
-							$jsonFile['widgets'] = $this->helper->decode($jsonFile['widgets'], true);
-						}
-
-						if (count($jsonFile['widgets']) > 0) {
-							$this->registerCoreWidgets($jsonFile, $registeredComponentId, $adminComponent);
-						}
-					}
-				}
-			}
-		} else if ($type === 'packages') {
-			$adminPackages = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Packages/', true);
-
-			$adminPackages =
-				array_merge_recursive(
-					$adminPackages,
-					$this->basepackages->utils->init($this->container)->scanDir('system/Base/Installer/Packages/Setup/Register/Modules/Packages/', true)
-				);
-
-			if (!$adminPackages || count($adminPackages) === 0) {
-				return false;
-			}
-
-			foreach ($adminPackages['files'] as $adminPackageKey => $adminPackage) {
-				if (strpos($adminPackage, 'package.json')) {
-					try {
-						$jsonFile =
-							$this->helper->decode(
-								$this->localContent->read($adminPackage),
-								true
-							);
-					} catch (\throwable $e) {
-						throw new \Exception($e->getMessage() . '. Problem reading package.json at location ' . $adminPackage);
-					}
-
-					if ($jsonFile['category'] === 'devtools' &&
-						$this->postData['dev'] == 'false'
-					) {
-						continue;
-					}
-
-					if ($jsonFile['name'] === 'Storages') {
-						$this->registerStorages($jsonFile);
-					}
-
-					$this->registerCorePackage($jsonFile);
-				}
-			}
-		} else if ($type === 'middlewares') {
-			$adminMiddlewares = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Middlewares/', true);
-
-			foreach ($adminMiddlewares['files'] as $adminMiddlewareKey => $adminMiddleware) {
-				if (strpos($adminMiddleware, 'middleware.json')) {
-					try {
-						$jsonFile =
-							$this->helper->decode(
-								$this->localContent->read($adminMiddleware),
-								true
-							);
-					} catch (\throwable $e) {
-						throw new \Exception($e->getMessage() . '. Problem reading middleware.json at location ' . $adminMiddleware);
-					}
-
-					if ($jsonFile['category'] === 'devtools' &&
-						$this->postData['dev'] == 'false'
-					) {
-						continue;
-					}
-
-					$this->registerCoreMiddleware($jsonFile);
-				}
-			}
-		} else if ($type === 'views') {
-			try {
-				$jsonFile =
-					$this->helper->decode(
-						$this->localContent->read('apps/Core/Views/Default/view.json'),
-						true
-					);
-			} catch (\throwable $e) {
-				throw new \Exception($e->getMessage() . '. Problem reading view.json');
-			}
-
-			if ($jsonFile['category'] === 'devtools' &&
-				$this->postData['dev'] == 'false'
-			) {
-				return;
-			}
-
-			$this->registerCoreView($jsonFile);
-		} else if ($type === 'externals') {
-			try {
-				$composerJsonFile = $this->helper->decode(file_get_contents(base_path('external/composer.json')), true);
-			} catch (\throwable $e) {
-				throw new \Exception($e->getMessage() . '. Problem reading composer.json');
-			}
-
-			$this->registerCoreExternal($composerJsonFile);
-		}
-
-		return true;
-	}
-
-	protected function registerCoreComponent(array $componentFile, $menuId = null, $update = false)
-	{
-		if ($update) {
-			return (new RegisterComponent())->update($this->db, $this->ff, $componentFile, $menuId);
-		}
-
-		return (new RegisterComponent())->register($this->db, $this->ff, $componentFile, $menuId, $this->helper);
-	}
-
-	protected function registerCoreDashboard(array $componentFile)
-	{
-		return (new RegisterCoreDashboard())->register($this->db, $this->ff, $componentFile, $this->helper);
-	}
-
-	protected function registerCoreWidgets(array $componentFile, $registeredComponentId, $path)
-	{
-		return (new RegisterCoreWidgets())->register($this->db, $this->ff, $componentFile, $registeredComponentId, $path, $this->localContent, $this->helper);
-	}
-
-	protected function updateCoreAppComponents()
-	{
-		return (new RegisterCoreApp())->update($this->db, $this->ff);
-	}
-
-	protected function registerCoreMenu($componentJsonFile, $registeredComponentId)
-	{
-		return (new RegisterMenu())->register($this->db, $this->ff, $componentJsonFile, $this->helper, $registeredComponentId);
-	}
-
-	protected function registerCorePackage(array $packageFile)
-	{
-		return (new RegisterPackage())->register($this->db, $this->ff, $packageFile, $this->helper, $this->basepackages, $this->container, $this->postData['databasetype']);
-	}
-
-	protected function registerCoreMiddleware(array $middlewareFile)
-	{
-		return (new RegisterMiddleware())->register($this->db, $this->ff, $middlewareFile, $this->helper);
-	}
-
-	protected function registerCoreView(array $viewFile)
-	{
-		return (new RegisterView())->register($this->db, $this->ff, $viewFile, $this->helper);
-	}
-
-	protected function registerCoreExternal(array $composerJsonFile)
-	{
-		return (new RegisterExternal())->register($this->db, $this->ff, $composerJsonFile, $this->helper);
-	}
-
-	public function validateData()
-	{
-		$this->validation->add('email', Email::class, ["message" => "Please enter valid email address."]);
-		$this->validation->add('pass', PresenceOf::class, ["message" => "Please enter a password."]);
-
-		$validated = $this->validation->validate($this->postData)->jsonSerialize();
-
-		if (count($validated) > 0) {
-			$messages = 'Error: ';
-
-			foreach ($validated as $key => $value) {
-				$messages .= $value['message'] . ' ';
-			}
-			return $messages;
-		} else {
-			return true;
-		}
-	}
-
-	protected function registerCoreRole()
-	{
-		return (new RegisterRole())->registerCoreRole($this->db, $this->ff, $this->helper);
-	}
-
-	protected function registerAdditionalRoles()
-	{
-		return (new RegisterRole())->registerAdditionalRoles($this->db, $this->ff, $this->helper);
-	}
-
-	protected function registerCoreAccount($workFactor = 12)
-	{
-		$password = $this->container['security']->hash($this->postData['pass'], ['cost' => $workFactor]);
-
-		return (new RegisterRootCoreAccount())->register($this->db, $this->ff, $this->postData['email'], $password, $this->helper);
-	}
-
-	protected function registerCoreProfile()
-	{
-		return (new RegisterRootCoreProfile())->register($this->db, $this->ff, $this->postData['country'], $this->postData['timezone']);
-	}
-
-	protected function registerExcludeAutoGeneratedFilters()
-	{
-		return (new RegisterFilter())->register($this->db, $this->ff);
-	}
-
-	protected function processGeoData()
-	{
-		$this->progress->updateProgress('processGeoData', null, false, 'registerCountries');
-		$call = $this->registerCountries();
-		if ($call !== false) {
-			$call = true;
-		}
-		$this->progress->updateProgress('processGeoData', $call, false, 'registerCountries');
-
-
-		$call = $this->registerTimezones();
-		if ($call !== false) {
-			$call = true;
-		}
-		$this->progress->updateProgress('processGeoData', $call, false, 'registerTimezones');
-
-		return true;
-	}
-
-	protected function registerCountries()
-	{
-		return (new RegisterCountries())->register($this->db, $this->ff, $this->localContent, $this->helper);
-	}
-
-	protected function registerTimezones()
-	{
-		return (new RegisterTimezones())->register($this->db, $this->ff, $this->localContent, $this->helper);
-	}
-
-	protected function registerStorages(array $packageFile)
-	{
-		return (new RegisterStorages())->register($this->db, $this->ff, $packageFile, $this->helper);
-	}
-
-	protected function registerWorkers()
-	{
-		(new RegisterWorkers())->register($this->db, $this->ff);
-
-		return true;
-	}
-
-	protected function registerSchedules()
-	{
-		(new RegisterSchedules())->register($this->db, $this->ff, $this->helper);
-
-		return true;
-	}
-
-	protected function registerTasks()
-	{
-		(new RegisterTasks())->register($this->db, $this->ff, $this->postData['databasetype']);
-
-		return true;
-	}
-
-	protected function performIndexing()
-	{
-		if (isset($this->postData['databasetype']) &&
-			$this->postData['databasetype'] !== 'db' &&
-			count($this->storesToIndex) > 0
-		) {
-			foreach ($this->storesToIndex as $storeToIndex) {
-				$store = $this->ff->store($storeToIndex);
-
-				$store->reIndexStore();
-			}
-		}
-
-		return true;
-	}
-
-	protected function writeBaseConfigs($coreJson = null)
-	{
-		if (!$this->configs) {
-			$this->configs = new Configs($this->container, $this->postData, $coreJson);
-		}
-
-		return $this->configs->write(false);
-	}
-
-	protected function writeConfigs($coreJson = null, $writeBaseFile = false, $onlyUpdateDb = false)
-	{
-		if (!$this->configs) {
-			$this->configs = new Configs($this->container, $this->postData, $coreJson);
-		}
-
-		if ($onlyUpdateDb) {
-			$coreJson = $this->configs->write($writeBaseFile);
-
-			if (isset($coreJson['settings']['db'])) {
-				unset($coreJson['settings']['db']);
-			}
-			if (isset($coreJson['settings']['ff'])) {
-				unset($coreJson['settings']['ff']);
-			}
-
-			$this->ff = (new Ff(
-				(object) [
-					'cache' => (object) [
-						'enabled' => false,
-						'timeout' => 0
-					],
-					'databaseType' => $coreJson['settings']['databasetype']
-				], $this->request, $this->helper))->init(false, false);
-
-			(new RegisterCore())->onlyUpdateDb($coreJson['settings']['dbs'], $this->helper, $this->db, $this->ff);
-
-			return $coreJson;
-		}
-
-		return $this->configs->write($writeBaseFile);
-	}
-
-	protected function revertBaseConfig($coreJson = null)
-	{
-		if (!$this->configs) {
-			$this->configs = new Configs($this->container, $this->postData, $coreJson);
-		}
-
-		return $this->configs->revert();
-	}
-
-	protected function removeInstaller()
-	{
-		// $installerContents = $this->localContent->listContents(base_path('system/Base/Installer/'));
-
-		// foreach ($installerContents as $fileContent) {
-			//Remove All Files
-		// }
-
-		// foreach ($installerContents as $dirContent) {
-			//Remove All Dirs
-		// }
-
-		// (new Pdo())->write($this->localContent);
-	}
-
-	protected function addIndex(string $table, array $index, $schemaName = '')
-	{
-		foreach ($index as $idx) {
-			$columnsArr = $idx->getColumns();
-
-			if (count($columnsArr) > 1) {
-				$columns = '';
-
-				foreach ($columnsArr as $columnsArrKey => $column) {
-					$columns .= '`' . $column . '`';
-
-					if ($columnsArrKey != $this->helper->lastKey($columnsArr)) {
-						$columns .= ',';
-					}
-				}
-			} else {
-				$columns = '`' . $columnsArr[0] . '`';
-			}
-
-			$this->executeSQL(
-				'ALTER TABLE `' . $table . '` ADD ' . strtoupper($idx->getType()) . ' `' . $idx->getName() . '` (' . $columns . ')'
-			);
-		}
-	}
-
-	protected function executeSQL(string $sql, $data = [])
-	{
-		try {
-			return $this->db->query($sql, $data);
-		} catch (\PDOException $e) {
-			throw new \Exception($e->getMessage());
-		}
-	}
-
-	protected function createNewDb()
-	{
-		$this->executeSQL(
-			"CREATE DATABASE IF NOT EXISTS " . $this->postData['dbname'] . " CHARACTER SET " . $this->postData['charset'] . " COLLATE " . $this->postData['collation']
-		);
-
-		return true;
-	}
-
-	protected function createNewUser()
-	{
-		$checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE ?", [$this->postData['username']]);
-
-		if ($checkUser->numRows() === 0) {
-			if (!isset($this->postData['create-username']) && !isset($this->postData['create-password'])) {
-				throw new \Exception('User ' . $this->postData['username'] . ' does not exist. Please enable create new user/database.');
-			}
-
-			if ($this->postData['dev'] == false) {
-				$passStrength = $this->checkPwStrength($this->postData['password']);
-
-				if ($passStrength !== false && $passStrength <= 2) {
-					throw new \Exception('DB Password strength is weak!');
-				}
-			}
-
-			$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH caching_sha2_password BY ?;", [$this->postData['username'], $this->postData['password']]);
-		}
-
-		$this->executeSQL("GRANT ALL PRIVILEGES ON " . $this->postData['dbname'] . ".* TO ?@'%' WITH GRANT OPTION;", [$this->postData['username']]);
-
-		return true;
-	}
-
-	protected function executeComposer()
-	{
-		try {
-			putenv('COMPOSER_HOME=' . base_path('external/'));
-
-			$stream = fopen(base_path('external/composer.install'), 'w');
-			$input = new \Symfony\Component\Console\Input\StringInput('install -d ' . base_path('external/'));
-			$output = new \Symfony\Component\Console\Output\StreamOutput($stream);
-
-			$application = new \Composer\Console\Application();
-			$application->setAutoExit(false); // prevent `$application->run` method from exiting the script
-
-			$app = $application->run($input, $output);
-		} catch (\throwable $e) {
-			throw $e;
-		}
-
-		if ($app !== 0) {
-			return false;
-		}
-
-		return true;
-	}
-
-	protected function checkPwStrength(string $pass)
-	{
-		$checkingTool = new \ZxcvbnPhp\Zxcvbn();
-
-		$result = $checkingTool->passwordStrength($pass);
-
-		if ($result && is_array($result) && isset($result['score'])) {
-			return $result['score'];
-		}
-
-		return false;
-	}
+    /**
+     * Dependency injection container.
+     *
+     * @var mixed
+     */
+    protected mixed $container;
+
+    /**
+     * POST payload received from setup controller.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $postData;
+
+    /**
+     * Request service instance.
+     *
+     * @var mixed
+     */
+    protected mixed $request;
+
+    /**
+     * Session service instance.
+     *
+     * @var mixed
+     */
+    protected mixed $session;
+
+    /**
+     * Phalcon MySQL PDO connection adapter instance.
+     *
+     * @var mixed
+     */
+    protected mixed $db = null;
+
+    /**
+     * FlatFile database adapter instance.
+     *
+     * @var mixed
+     */
+    protected mixed $ff = null;
+
+    /**
+     * Database configuration credentials array.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $dbConfig = [];
+
+    /**
+     * Flysystem local file storage adapter.
+     *
+     * @var mixed
+     */
+    protected mixed $localContent = null;
+
+    /**
+     * Basepackages manager service instance.
+     *
+     * @var mixed
+     */
+    protected mixed $basepackages;
+
+    /**
+     * Installation progress tracker instance.
+     *
+     * @var mixed
+     */
+    protected mixed $progress = null;
+
+    /**
+     * Configs writer instance.
+     *
+     * @var Configs|null
+     */
+    protected ?Configs $configs = null;
+
+    /**
+     * Validation service instance.
+     *
+     * @var mixed
+     */
+    protected mixed $validation;
+
+    /**
+     * Security service instance.
+     *
+     * @var mixed
+     */
+    protected mixed $security;
+
+    /**
+     * Cookies service instance.
+     *
+     * @var mixed
+     */
+    protected mixed $cookies;
+
+    /**
+     * Helpers service instance.
+     *
+     * @var mixed
+     */
+    protected mixed $helper;
+
+    /**
+     * OpCache service instance.
+     *
+     * @var mixed
+     */
+    protected mixed $opCache = null;
+
+    /**
+     * Remote web content service instance.
+     *
+     * @var mixed
+     */
+    protected mixed $remoteWebContent = null;
+
+    /**
+     * Flag indicating whether execution only updates DB configuration.
+     *
+     * @var bool
+     */
+    protected bool $onlyUpdateDb = false;
+
+    /**
+     * Cleaner helper instance.
+     *
+     * @var Cleaner|null
+     */
+    protected ?Cleaner $cleaner = null;
+
+    /**
+     * Database provisioner instance.
+     *
+     * @var DatabaseProvisioner|null
+     */
+    protected ?DatabaseProvisioner $databaseProvisioner = null;
+
+    /**
+     * Schema builder instance.
+     *
+     * @var SchemaBuilder|null
+     */
+    protected ?SchemaBuilder $schemaBuilder = null;
+
+    /**
+     * Module registrar instance.
+     *
+     * @var ModuleRegistrar|null
+     */
+    protected ?ModuleRegistrar $moduleRegistrar = null;
+
+    /**
+     * Seed registrar instance.
+     *
+     * @var SeedRegistrar|null
+     */
+    protected ?SeedRegistrar $seedRegistrar = null;
+
+    /**
+     * Composer runner instance.
+     *
+     * @var ComposerRunner|null
+     */
+    protected ?ComposerRunner $composerRunner = null;
+
+    /**
+     * Password checker instance.
+     *
+     * @var PasswordChecker|null
+     */
+    protected ?PasswordChecker $passwordChecker = null;
+
+    /**
+     * Setup constructor.
+     *
+     * @param mixed                $container    DI container.
+     * @param array<string, mixed> $postData     Post data payload.
+     * @param bool                 $precheckFail Whether system requirements failed.
+     * @param bool                 $onlyUpdateDb Whether only database update is being run.
+     */
+    public function __construct(
+        mixed $container,
+        array $postData = [],
+        bool $precheckFail = false,
+        bool $onlyUpdateDb = false
+    ) {
+        $this->container = $container;
+        $this->postData = $postData;
+        $this->onlyUpdateDb = $onlyUpdateDb;
+
+        $this->request = $this->getService('request');
+        $this->session = $this->getService('session');
+        $this->validation = $this->getService('validation');
+        $this->security = $this->getService('security');
+        $this->cookies = $this->getService('cookies');
+        $this->helper = $this->getService('helper');
+        $this->opCache = $this->getService('opCache');
+
+        $isPost = $this->request && method_exists($this->request, 'isPost') && $this->request->isPost();
+        $dbType = $this->postData['databasetype'] ?? 'hybrid';
+        if (($isPost && !$precheckFail && $dbType !== 'ff') || ($onlyUpdateDb && $isPost)) {
+            $this->dbConfig = [
+                'db' => [
+                    'host'     => $this->postData['host'] ?? '',
+                    'dbname'   => $this->postData['dbname'] ?? '',
+                    'username' => $this->postData['username'] ?? '',
+                    'password' => $this->postData['password'] ?? '',
+                    'port'     => (int) ($this->postData['port'] ?? 3306),
+                ]
+            ];
+
+            if (isset($this->postData['create-username'], $this->postData['create-password'])) {
+                $this->dbConfig['db']['username'] = $this->postData['create-username'];
+                $this->dbConfig['db']['password'] = $this->postData['create-password'];
+                $this->dbConfig['db']['dbname'] = 'mysql';
+            }
+
+            if ($this->dbConfig['db']['host'] !== '') {
+                $this->db = new Mysql($this->dbConfig['db']);
+            }
+        }
+
+        $this->basepackages = $this->getService('basepackages');
+
+        if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'db') {
+            $reset = ($this->postData['databasetype'] === 'hybrid');
+
+            $this->ff = (new Ff(
+                (object) [
+                    'cache' => (object) [
+                        'enabled' => false,
+                        'timeout' => 0
+                    ],
+                    'databaseType' => $this->postData['databasetype']
+                ],
+                $this->request,
+                $this->helper
+            ))->init($reset, false);
+        }
+
+        if (!$onlyUpdateDb) {
+            $this->progress = $this->basepackages->progress;
+        }
+
+        if (!$precheckFail) {
+            $this->localContent = $this->getService('localContent');
+
+            $this->remoteWebContent = $this->getService('remoteWebContent');
+        }
+    }
+
+    /**
+     * Lazily gets Cleaner sub-component.
+     *
+     * @return Cleaner
+     */
+    public function getCleaner(): Cleaner
+    {
+        if ($this->cleaner === null) {
+            $this->cleaner = new Cleaner(
+                $this->container,
+                $this->localContent,
+                $this->basepackages,
+                $this->opCache,
+                $this->cookies,
+                $this->request
+            );
+        }
+
+        return $this->cleaner;
+    }
+
+    /**
+     * Lazily gets DatabaseProvisioner sub-component.
+     *
+     * @return DatabaseProvisioner
+     */
+    public function getDatabaseProvisioner(): DatabaseProvisioner
+    {
+        if ($this->databaseProvisioner === null) {
+            $this->databaseProvisioner = new DatabaseProvisioner(
+                $this->db,
+                $this->postData,
+                $this->getPasswordChecker()
+            );
+        }
+
+        return $this->databaseProvisioner;
+    }
+
+    /**
+     * Lazily gets SchemaBuilder sub-component.
+     *
+     * @return SchemaBuilder
+     */
+    public function getSchemaBuilder(): SchemaBuilder
+    {
+        if ($this->schemaBuilder === null) {
+            $this->schemaBuilder = new SchemaBuilder(
+                $this->db,
+                $this->ff,
+                $this->postData,
+                $this->dbConfig,
+                $this->getCleaner(),
+                $this->getDatabaseProvisioner()
+            );
+        }
+
+        return $this->schemaBuilder;
+    }
+
+    /**
+     * Lazily gets ModuleRegistrar sub-component.
+     *
+     * @return ModuleRegistrar
+     */
+    public function getModuleRegistrar(): ModuleRegistrar
+    {
+        if ($this->moduleRegistrar === null) {
+            $this->moduleRegistrar = new ModuleRegistrar(
+                $this->container,
+                $this->db,
+                $this->ff,
+                $this->postData,
+                $this->localContent,
+                $this->basepackages,
+                $this->helper
+            );
+        }
+
+        return $this->moduleRegistrar;
+    }
+
+    /**
+     * Lazily gets SeedRegistrar sub-component.
+     *
+     * @return SeedRegistrar
+     */
+    public function getSeedRegistrar(): SeedRegistrar
+    {
+        if ($this->seedRegistrar === null) {
+            $this->seedRegistrar = new SeedRegistrar(
+                $this->db,
+                $this->ff,
+                $this->postData,
+                $this->request,
+                $this->helper,
+                $this->localContent,
+                $this->security,
+                $this->progress
+            );
+        }
+
+        return $this->seedRegistrar;
+    }
+
+    /**
+     * Lazily gets ComposerRunner sub-component.
+     *
+     * @return ComposerRunner
+     */
+    public function getComposerRunner(): ComposerRunner
+    {
+        if ($this->composerRunner === null) {
+            $this->composerRunner = new ComposerRunner();
+        }
+
+        return $this->composerRunner;
+    }
+
+    /**
+     * Lazily gets PasswordChecker sub-component.
+     *
+     * @return PasswordChecker
+     */
+    public function getPasswordChecker(): PasswordChecker
+    {
+        if ($this->passwordChecker === null) {
+            $this->passwordChecker = new PasswordChecker();
+        }
+
+        return $this->passwordChecker;
+    }
+
+    /**
+     * Proxies dynamic setup stage invocations and tracks execution progress.
+     *
+     * @param string              $method    Method name.
+     * @param array<int, mixed>   $arguments Arguments array.
+     *
+     * @return mixed Method result.
+     */
+    public function __call(string $method, array $arguments): mixed
+    {
+        if (method_exists($this, $method)) {
+            if (!$this->onlyUpdateDb && $this->progress && method_exists($this->progress, 'updateProgress')) {
+                $this->progress->updateProgress($method, null, false);
+            }
+
+            $call = call_user_func_array([$this, $method], $arguments);
+            $callResult = $call;
+
+            $status = ($call !== false);
+
+            if (!$this->onlyUpdateDb && $this->progress && method_exists($this->progress, 'updateProgress')) {
+                $this->progress->updateProgress($method, $status, false);
+            }
+
+            return $callResult;
+        }
+
+        return null;
+    }
+
+    /**
+     * Cleans var/ runtime cache, logs, and temporary files.
+     *
+     * @throws FilesystemException|UnableToDeleteFile If deletion fails.
+     *
+     * @return bool True on success.
+     */
+    protected function cleanVar(): bool
+    {
+        return $this->getCleaner()->cleanVar();
+    }
+
+    /**
+     * Purges existing FlatFile .ff/ storage directories and files.
+     *
+     * @throws FilesystemException|UnableToDeleteFile|UnableToDeleteDirectory If deletion fails.
+     *
+     * @return bool True on success.
+     */
+    protected function cleanOldFfs(): bool
+    {
+        return $this->getCleaner()->cleanOldFfs();
+    }
+
+    /**
+     * Purges legacy API key directories from system/.api/.
+     *
+     * @throws FilesystemException|UnableToDeleteFile|UnableToDeleteDirectory If deletion fails.
+     *
+     * @return bool True on success.
+     */
+    protected function cleanOldAPIKeys(): bool
+    {
+        return $this->getCleaner()->cleanOldAPIKeys();
+    }
+
+    /**
+     * Purges legacy database and FlatFile backup directories.
+     *
+     * @return bool True on success.
+     */
+    protected function cleanOldBackups(): bool
+    {
+        return $this->getCleaner()->cleanOldBackups();
+    }
+
+    /**
+     * Clears authentication session cookies on domain setup.
+     *
+     * @return bool True on success.
+     */
+    protected function cleanOldCookies(): bool
+    {
+        return $this->getCleaner()->cleanOldCookies();
+    }
+
+    /**
+     * Checks if database is empty or drops tables if requested.
+     *
+     * @return bool True if empty or dropped, false if non-empty and drop=false.
+     */
+    protected function checkDbEmpty(): bool
+    {
+        return $this->getDatabaseProvisioner()->checkDbEmpty();
+    }
+
+    /**
+     * Builds and applies schema tables and FlatFile stores.
+     *
+     * @return bool True on success.
+     */
+    protected function buildSchema(): bool
+    {
+        return $this->getSchemaBuilder()->buildSchema();
+    }
+
+    /**
+     * Seeds initial API repository configurations.
+     *
+     * @return bool True on success.
+     */
+    protected function registerRepos(): bool
+    {
+        return $this->getSeedRegistrar()->registerRepos();
+    }
+
+    /**
+     * Seeds default tenant domain record.
+     *
+     * @return bool True on success.
+     */
+    protected function registerDomain(): bool
+    {
+        return $this->getSeedRegistrar()->registerDomain();
+    }
+
+    /**
+     * Seeds core framework registration record.
+     *
+     * @param array<string, mixed> $baseConfig Core base configuration array.
+     *
+     * @return bool True on success.
+     */
+    protected function registerCore(array $baseConfig): bool
+    {
+        return $this->getSeedRegistrar()->registerCore($baseConfig);
+    }
+
+    /**
+     * Seeds Core App Type definition.
+     *
+     * @return mixed Registration result.
+     */
+    protected function registerCoreAppType(): mixed
+    {
+        return $this->getSeedRegistrar()->registerCoreAppType();
+    }
+
+    /**
+     * Seeds default Core Application record.
+     *
+     * @return mixed Registration result.
+     */
+    protected function registerCoreApp(): mixed
+    {
+        return $this->getSeedRegistrar()->registerCoreApp();
+    }
+
+    /**
+     * Scans and registers application modules by type (components, packages, middlewares, views, externals).
+     *
+     * @param string $type Module type identifier.
+     *
+     * @return bool True on success.
+     */
+    protected function registerModule(string $type): bool
+    {
+        return $this->getModuleRegistrar()->registerModule($type);
+    }
+
+    /**
+     * Seeds component record.
+     *
+     * @param array<string, mixed> $componentFile Component metadata.
+     * @param int|null             $menuId        Associated Menu ID.
+     * @param bool                 $update        Whether this is an update.
+     *
+     * @return mixed Component ID.
+     */
+    protected function registerCoreComponent(array $componentFile, ?int $menuId = null, bool $update = false): mixed
+    {
+        return $this->getModuleRegistrar()->registerCoreComponent($componentFile, $menuId, $update);
+    }
+
+    /**
+     * Seeds core dashboard record.
+     *
+     * @param array<string, mixed> $componentFile Component metadata.
+     *
+     * @return mixed
+     */
+    protected function registerCoreDashboard(array $componentFile): mixed
+    {
+        return $this->getModuleRegistrar()->registerCoreDashboard($componentFile);
+    }
+
+    /**
+     * Seeds core widgets.
+     *
+     * @param array<string, mixed> $componentFile         Component metadata.
+     * @param mixed                $registeredComponentId Component ID.
+     * @param string               $path                  File path.
+     *
+     * @return mixed
+     */
+    protected function registerCoreWidgets(array $componentFile, mixed $registeredComponentId, string $path): mixed
+    {
+        return $this->getModuleRegistrar()->registerCoreWidgets($componentFile, $registeredComponentId, $path);
+    }
+
+    /**
+     * Updates core app components mapping.
+     *
+     * @return mixed
+     */
+    protected function updateCoreAppComponents(): mixed
+    {
+        return $this->getModuleRegistrar()->updateCoreAppComponents();
+    }
+
+    /**
+     * Seeds navigation menu item.
+     *
+     * @param array<string, mixed> $componentJsonFile     Component metadata.
+     * @param mixed                $registeredComponentId Component ID.
+     *
+     * @return mixed Menu ID.
+     */
+    protected function registerCoreMenu(array $componentJsonFile, mixed $registeredComponentId): mixed
+    {
+        return $this->getModuleRegistrar()->registerCoreMenu($componentJsonFile, $registeredComponentId);
+    }
+
+    /**
+     * Seeds package record.
+     *
+     * @param array<string, mixed> $packageFile Package metadata.
+     *
+     * @return mixed
+     */
+    protected function registerCorePackage(array $packageFile): mixed
+    {
+        return $this->getModuleRegistrar()->registerCorePackage($packageFile);
+    }
+
+    /**
+     * Seeds middleware record.
+     *
+     * @param array<string, mixed> $middlewareFile Middleware metadata.
+     *
+     * @return mixed
+     */
+    protected function registerCoreMiddleware(array $middlewareFile): mixed
+    {
+        return $this->getModuleRegistrar()->registerCoreMiddleware($middlewareFile);
+    }
+
+    /**
+     * Seeds view theme record.
+     *
+     * @param array<string, mixed> $viewFile View metadata.
+     *
+     * @return mixed
+     */
+    protected function registerCoreView(array $viewFile): mixed
+    {
+        return $this->getModuleRegistrar()->registerCoreView($viewFile);
+    }
+
+    /**
+     * Seeds external library dependencies record.
+     *
+     * @param array<string, mixed> $composerJsonFile Composer metadata.
+     *
+     * @return mixed
+     */
+    protected function registerCoreExternal(array $composerJsonFile): mixed
+    {
+        return $this->getModuleRegistrar()->registerCoreExternal($composerJsonFile);
+    }
+
+    /**
+     * Validates administrator credentials payload.
+     *
+     * @return bool|string True if valid, or error message string.
+     */
+    public function validateData(): bool|string
+    {
+        if (!$this->validation) {
+            return true;
+        }
+
+        $this->validation->add('email', Email::class, ['message' => 'Please enter valid email address.']);
+        $this->validation->add('pass', PresenceOf::class, ['message' => 'Please enter a password.']);
+
+        $messages = $this->validation->validate($this->postData);
+        $validated = (is_object($messages) && method_exists($messages, 'jsonSerialize')) ? $messages->jsonSerialize() : (array) $messages;
+
+        if (count($validated) > 0) {
+            $errorStr = 'Error: ';
+            foreach ($validated as $value) {
+                $msg = is_array($value) ? ($value['message'] ?? '') : (string) $value;
+                $errorStr .= $msg . ' ';
+            }
+
+            return trim($errorStr);
+        }
+
+        return true;
+    }
+
+    /**
+     * Seeds default administrator role.
+     *
+     * @return mixed
+     */
+    protected function registerCoreRole(): mixed
+    {
+        return $this->getSeedRegistrar()->registerCoreRole();
+    }
+
+    /**
+     * Seeds auxiliary user roles (Super Users, Registered Users, Guests).
+     *
+     * @return mixed
+     */
+    protected function registerAdditionalRoles(): mixed
+    {
+        return $this->getSeedRegistrar()->registerAdditionalRoles();
+    }
+
+    /**
+     * Seeds initial superadmin user account.
+     *
+     * @param int $workFactor Bcrypt hashing work factor.
+     *
+     * @return mixed
+     */
+    protected function registerCoreAccount(int $workFactor = 12): mixed
+    {
+        return $this->getSeedRegistrar()->registerCoreAccount($workFactor);
+    }
+
+    /**
+     * Seeds initial superadmin user profile.
+     *
+     * @return mixed
+     */
+    protected function registerCoreProfile(): mixed
+    {
+        return $this->getSeedRegistrar()->registerCoreProfile();
+    }
+
+    /**
+     * Seeds excluded auto-generated filter rules.
+     *
+     * @return mixed
+     */
+    protected function registerExcludeAutoGeneratedFilters(): mixed
+    {
+        return $this->getSeedRegistrar()->registerExcludeAutoGeneratedFilters();
+    }
+
+    /**
+     * Seeds geographic countries and timezones datasets.
+     *
+     * @return bool True on success.
+     */
+    protected function processGeoData(): bool
+    {
+        return $this->getSeedRegistrar()->processGeoData();
+    }
+
+    /**
+     * Seeds ISO countries dataset.
+     *
+     * @return mixed
+     */
+    protected function registerCountries(): mixed
+    {
+        return $this->getSeedRegistrar()->registerCountries();
+    }
+
+    /**
+     * Seeds geographic timezones dataset.
+     *
+     * @return mixed
+     */
+    protected function registerTimezones(): mixed
+    {
+        return $this->getSeedRegistrar()->registerTimezones();
+    }
+
+    /**
+     * Seeds default public and private file storage mounts.
+     *
+     * @param array<string, mixed> $packageFile Package metadata.
+     *
+     * @return mixed
+     */
+    protected function registerStorages(array $packageFile): mixed
+    {
+        return $this->getModuleRegistrar()->registerStorages($packageFile);
+    }
+
+    /**
+     * Seeds background workers.
+     *
+     * @return bool True on success.
+     */
+    protected function registerWorkers(): bool
+    {
+        return $this->getSeedRegistrar()->registerWorkers();
+    }
+
+    /**
+     * Seeds default background worker schedules.
+     *
+     * @return bool True on success.
+     */
+    protected function registerSchedules(): bool
+    {
+        return $this->getSeedRegistrar()->registerSchedules();
+    }
+
+    /**
+     * Seeds default background tasks.
+     *
+     * @return bool True on success.
+     */
+    protected function registerTasks(): bool
+    {
+        return $this->getSeedRegistrar()->registerTasks();
+    }
+
+    /**
+     * Re-indexes FlatFile document stores.
+     *
+     * @return bool True on success.
+     */
+    protected function performIndexing(): bool
+    {
+        return $this->getSchemaBuilder()->performIndexing();
+    }
+
+    /**
+     * Generates base configurations array.
+     *
+     * @param array<string, mixed>|null $coreJson Core metadata array.
+     *
+     * @return array<string, mixed>|null
+     */
+    protected function writeBaseConfigs(?array $coreJson = null): ?array
+    {
+        if (!$this->configs) {
+            $this->configs = new Configs($this->container, $this->postData, $coreJson);
+        }
+
+        return $this->configs->write(false);
+    }
+
+    /**
+     * Generates and persists configuration files.
+     *
+     * @param array<string, mixed>|null $coreJson      Core package metadata.
+     * @param bool                      $writeBaseFile Whether to write Base.php.
+     * @param bool                      $onlyUpdateDb  Whether this is DB-only update.
+     *
+     * @return array<string, mixed>|null
+     */
+    protected function writeConfigs(?array $coreJson = null, bool $writeBaseFile = false, bool $onlyUpdateDb = false): ?array
+    {
+        if (!$this->configs) {
+            $this->configs = new Configs($this->container, $this->postData, $coreJson);
+        }
+
+        if ($onlyUpdateDb) {
+            $coreJson = $this->configs->write($writeBaseFile);
+
+            if (isset($coreJson['settings']['db'])) {
+                unset($coreJson['settings']['db']);
+            }
+            if (isset($coreJson['settings']['ff'])) {
+                unset($coreJson['settings']['ff']);
+            }
+
+            if (class_exists(Ff::class)) {
+                $this->ff = (new Ff(
+                    (object) [
+                        'cache' => (object) [
+                            'enabled' => false,
+                            'timeout' => 0
+                        ],
+                        'databaseType' => $coreJson['settings']['databasetype'] ?? 'hybrid'
+                    ],
+                    $this->request,
+                    $this->helper
+                ))->init(false, false);
+            }
+
+            (new RegisterCore())->onlyUpdateDb($coreJson['settings']['dbs'] ?? [], $this->helper, $this->db, $this->ff);
+
+            return $coreJson;
+        }
+
+        return $this->configs->write($writeBaseFile);
+    }
+
+    /**
+     * Reverts Base.php config to setup mode.
+     *
+     * @param array<string, mixed>|null $coreJson Core metadata.
+     *
+     * @return array<string, mixed>|null
+     */
+    protected function revertBaseConfig(?array $coreJson = null): ?array
+    {
+        if (!$this->configs) {
+            $this->configs = new Configs($this->container, $this->postData, $coreJson);
+        }
+
+        return $this->configs->revert();
+    }
+
+    /**
+     * Executes SQL statement against connected database.
+     *
+     * @param string            $sql  SQL query string.
+     * @param array<int, mixed> $data Prepared statement parameters.
+     *
+     * @return mixed Query result.
+     */
+    protected function executeSQL(string $sql, array $data = []): mixed
+    {
+        return $this->getDatabaseProvisioner()->executeSQL($sql, $data);
+    }
+
+    /**
+     * Creates new database schema if it does not exist.
+     *
+     * @return bool True on success.
+     */
+    protected function createNewDb(): bool
+    {
+        return $this->getDatabaseProvisioner()->createNewDb();
+    }
+
+    /**
+     * Provisions new MySQL user and grants privileges.
+     *
+     * @return bool True on success.
+     */
+    protected function createNewUser(): bool
+    {
+        return $this->getDatabaseProvisioner()->createNewUser();
+    }
+
+    /**
+     * Executes composer install for external vendor dependencies.
+     *
+     * @return bool True on success, false on non-zero exit code.
+     */
+    protected function executeComposer(): bool
+    {
+        return $this->getComposerRunner()->executeComposer();
+    }
+
+    /**
+     * Checks password strength via zxcvbn analyzer.
+     *
+     * @param string $pass Password string.
+     *
+     * @return int|false Score from 0 to 4, or false on error.
+     */
+    public function checkPwStrength(string $pass): int|false
+    {
+        return $this->getPasswordChecker()->checkPwStrength($pass);
+    }
+
+    /**
+     * Resolves service from DI container whether array or object.
+     *
+     * @param string $name Service name.
+     *
+     * @return mixed Service instance or null.
+     */
+    protected function getService(string $name): mixed
+    {
+        if (is_array($this->container) && isset($this->container[$name])) {
+            return $this->container[$name];
+        }
+
+        if (is_object($this->container)) {
+            if (method_exists($this->container, 'getShared')) {
+                return $this->container->getShared($name);
+            }
+            if (method_exists($this->container, 'get')) {
+                return $this->container->get($name);
+            }
+            if (isset($this->container->{$name})) {
+                return $this->container->{$name};
+            }
+        }
+
+        return null;
+    }
 }

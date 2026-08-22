@@ -1,66 +1,115 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * SP Framework
+ *
+ * @package     System\Base\Installer\Packages\Setup\Register\Basepackages\Storages
+ * @copyright   Copyright (c) 2026
+ * @link        https://github.com/sp-framework/core
+ */
+
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Storages;
 
+/**
+ * Seeds default local Public and Private file storage records.
+ */
 class Storages
 {
-    protected $db;
+    /**
+     * PDO database connection adapter.
+     *
+     * @var mixed
+     */
+    protected mixed $db = null;
 
-    protected $ff;
+    /**
+     * FlatFile database manager.
+     *
+     * @var mixed
+     */
+    protected mixed $ff = null;
 
-    protected $helper;
+    /**
+     * Helpers service instance.
+     *
+     * @var mixed
+     */
+    protected mixed $helper = null;
 
-    public function register($db, $ff, $packageFile, $helper)
+    /**
+     * Registers Public and Private storage configurations.
+     *
+     * @param mixed                $db          PDO database connection adapter.
+     * @param mixed                $ff          FlatFile database manager.
+     * @param array<string, mixed> $packageFile Package metadata array.
+     * @param mixed                $helper      Helpers service instance.
+     *
+     * @return void
+     */
+    public function register(mixed $db, mixed $ff, array $packageFile, mixed $helper): void
     {
         $this->db = $db;
-
         $this->ff = $ff;
-
         $this->helper = $helper;
 
         $allowedImageMimeTypes = [];
         $allowedImageSizes = [];
         $allowedFileMimeTypes = [];
 
-        foreach ($packageFile['settings']['allowedImageMimeTypes'] as $imageMimeTypes) {
-            array_push($allowedImageMimeTypes, $imageMimeTypes['id']);
-        }
-        foreach ($packageFile['settings']['allowedImageSizes'] as $imageSizes) {
-            array_push($allowedImageSizes, $imageSizes['id']);
-        }
-        foreach ($packageFile['settings']['allowedFileMimeTypes'] as $fileMimeTypes) {
-            array_push($allowedFileMimeTypes, $fileMimeTypes['id']);
+        if (isset($packageFile['settings']['allowedImageMimeTypes']) && is_array($packageFile['settings']['allowedImageMimeTypes'])) {
+            foreach ($packageFile['settings']['allowedImageMimeTypes'] as $imageMimeTypes) {
+                if (isset($imageMimeTypes['id'])) {
+                    $allowedImageMimeTypes[] = $imageMimeTypes['id'];
+                }
+            }
         }
 
-        $this->addToDb(
-            'Public',
-            'local',
-            'public',
-            $allowedImageMimeTypes,
-            $allowedImageSizes,
-            $allowedFileMimeTypes
-        );
+        if (isset($packageFile['settings']['allowedImageSizes']) && is_array($packageFile['settings']['allowedImageSizes'])) {
+            foreach ($packageFile['settings']['allowedImageSizes'] as $imageSizes) {
+                if (isset($imageSizes['id'])) {
+                    $allowedImageSizes[] = $imageSizes['id'];
+                }
+            }
+        }
 
-        $this->addToDb(
-            'Private',
-            'local',
-            'private',
-            $allowedImageMimeTypes,
-            $allowedImageSizes,
-            $allowedFileMimeTypes
-        );
+        if (isset($packageFile['settings']['allowedFileMimeTypes']) && is_array($packageFile['settings']['allowedFileMimeTypes'])) {
+            foreach ($packageFile['settings']['allowedFileMimeTypes'] as $fileMimeTypes) {
+                if (isset($fileMimeTypes['id'])) {
+                    $allowedFileMimeTypes[] = $fileMimeTypes['id'];
+                }
+            }
+        }
+
+        $this->addToDb('Public', 'local', 'public', $allowedImageMimeTypes, $allowedImageSizes, $allowedFileMimeTypes);
+        $this->addToDb('Private', 'local', 'private', $allowedImageMimeTypes, $allowedImageSizes, $allowedFileMimeTypes);
     }
 
-    protected function addToDb($name, $type, $permission, $allowedImageMimeTypes, $allowedImageSizes, $allowedFileMimeTypes)
-    {
-        $maxFilesize = toBytes(ini_get('upload_max_filesize'));
-        $maxPostsize = toBytes(ini_get('post_max_size'));
+    /**
+     * Persists storage entry into storages table and storage provider store.
+     *
+     * @param string              $name                  Storage name.
+     * @param string              $type                  Storage adapter type (local).
+     * @param string              $permission            Visibility permission (public, private).
+     * @param array<int, mixed>   $allowedImageMimeTypes Allowed image MIME IDs.
+     * @param array<int, mixed>   $allowedImageSizes     Allowed image sizes.
+     * @param array<int, mixed>   $allowedFileMimeTypes  Allowed document MIME IDs.
+     *
+     * @return void
+     */
+    protected function addToDb(
+        string $name,
+        string $type,
+        string $permission,
+        array $allowedImageMimeTypes,
+        array $allowedImageSizes,
+        array $allowedFileMimeTypes
+    ): void {
+        $maxFilesize = function_exists('toBytes') ? toBytes((string) ini_get('upload_max_filesize')) : 2097152;
+        $maxPostsize = function_exists('toBytes') ? toBytes((string) ini_get('post_max_size')) : 8388608;
 
-        if ($maxPostsize >= $maxFilesize) {
-            $maxBytes = $maxFilesize;
-        } else {
-            $maxBytes = $maxPostsize;
-        }
+        $maxBytes = ($maxPostsize >= $maxFilesize) ? $maxFilesize : $maxPostsize;
 
         $storage =
             [
@@ -85,9 +134,9 @@ class Storages
         }
 
         if ($this->ff) {
-            $storageStore = $this->ff->store('basepackages_storages');
+            $storagesStore = $this->ff->store('basepackages_storages');
 
-            $storageStore->updateOrInsert($storage);
+            $storagesStore->updateOrInsert($storage);
         }
     }
 }

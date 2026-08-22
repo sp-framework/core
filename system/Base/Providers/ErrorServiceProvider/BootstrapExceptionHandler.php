@@ -3,9 +3,9 @@
 /**
  * SP Framework
  *
- * @package   System\Base\Providers\ErrorServiceProvider
- * @copyright Copyright (c) 2026
- * @link      https://phpdoc.org/
+ * @package     System\Base\Providers\ErrorServiceProvider
+ * @copyright   Copyright (c) 2026
+ * @link        https://github.com/sp-framework/core
  */
 
 namespace System\Base\Providers\ErrorServiceProvider;
@@ -23,8 +23,6 @@ use System\Bootstrap;
  * - API Context: Returns structured JSON error payloads or passes through to MicroExceptionHandler in debug mode.
  * - MVC Context: Forwards to registered error service providers, handles 404 AppNotFoundExceptions, or renders
  *   a secure, styled HTML debug trace table with XSS protection.
- *
- * @package System\Base\Providers\ErrorServiceProvider
  */
 class BootstrapExceptionHandler
 {

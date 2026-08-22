@@ -1,14 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * SP Framework
+ *
+ * @package     System\Base\Installer\Packages\Setup\Register\Basepackages\Workers
+ * @copyright   Copyright (c) 2026
+ * @link        https://github.com/sp-framework/core
+ */
+
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Workers;
 
+/**
+ * Seeds recurring background schedule presets into basepackages_workers_schedules.
+ */
 class Schedules
 {
-    public function register($db, $ff, $helper)
+    /**
+     * Registers default background worker cron/interval schedules.
+     *
+     * @param mixed $db     PDO database connection adapter.
+     * @param mixed $ff     FlatFile database manager.
+     * @param mixed $helper Helpers service instance.
+     *
+     * @return void
+     */
+    public function register(mixed $db, mixed $ff, mixed $helper): void
     {
         $schedulesArr = $this->systemSchedules($helper);
 
-        foreach ($schedulesArr as $key => $schedule) {
+        foreach ($schedulesArr as $schedule) {
             if ($db) {
                 $db->insertAsDict('basepackages_workers_schedules', $schedule);
             }
@@ -21,227 +43,118 @@ class Schedules
         }
     }
 
-    protected function systemSchedules($helper)
+    /**
+     * Compiles standard system schedule presets.
+     *
+     * @param mixed $helper Helpers service instance.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function systemSchedules(mixed $helper): array
     {
-        $descriptions =
-            [
-                'everyxseconds'             => 'Task with this schedule will run every X seconds of the minute.',
-                'everyminute'               => 'Task with this schedule will run every minute.',
-                'everyxminutes'             => 'Task with this schedule will run every X minutes from the moment it starts.',
-                'hourly'                    => 'Task with this schedule will run every hour. If minutes are specified the task will run X minutes past the hour.',
-                'daily'                     => 'Task with this schedule will run every day. If hour and minutes are specified the task will run daily at X hour.',
-                'daily6'                    => 'Task with this schedule will run every day every 6th hour.',
-                'daily12'                   => 'Task with this schedule will run every day every 12th hour.',
-                'daily18'                   => 'Task with this schedule will run every day every 18th hour.',
-                'weekly'                    => 'Task with this schedule will run on selected weekday at X hour.',
-                'monthly'                   => 'Task with this schedule will run in selected month(s) on day X of the month at X hour.',
-                'businesshours'             => 'Task with this schedule will run every minute during business hours.',
-            ];
+        $descriptions = [
+            'everyxseconds' => 'Task with this schedule will run every X seconds of the minute.',
+            'everyminute'   => 'Task with this schedule will run every minute.',
+            'everyxminutes' => 'Task with this schedule will run every X minutes from the moment it starts.',
+            'hourly'        => 'Task with this schedule will run every hour. If minutes are specified the task will run X minutes past the hour.',
+            'daily'         => 'Task with this schedule will run every day. If hour and minutes are specified the task will run daily at X hour.',
+            'daily6'        => 'Task with this schedule will run every day every 6th hour.',
+            'daily12'       => 'Task with this schedule will run every day every 12th hour.',
+            'daily18'       => 'Task with this schedule will run every day every 18th hour.',
+            'weekly'        => 'Task with this schedule will run on selected weekday at X hour.',
+            'monthly'       => 'Task with this schedule will run in selected month(s) on day X of the month at X hour.',
+            'businesshours' => 'Task with this schedule will run every minute during business hours.',
+        ];
 
         $schedulesArr = [];
 
-        //Every 15 Seconds
-        $schedule =
-            [
-                'type'      => 'everyxseconds',
-                'params'    =>
-                    [
-                        'seconds'   => ['0','15','30','45']
-                    ]
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Every 15 Seconds',
-                'description'   => $descriptions['everyxseconds'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Every 15 Seconds
+        $schedulesArr[] = [
+            'name'        => 'Every 15 Seconds',
+            'description' => $descriptions['everyxseconds'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'everyxseconds', 'params' => ['seconds' => ['0', '15', '30', '45']]])
+        ];
 
-        //EveryMinute
-        $schedule =
-            [
-                'type'      => 'everyminute'
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Every Minute',
-                'description'   => $descriptions['everyminute'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Every 30 Seconds
+        $schedulesArr[] = [
+            'name'        => 'Every 30 Seconds',
+            'description' => $descriptions['everyxseconds'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'everyxseconds', 'params' => ['seconds' => ['0', '30']]])
+        ];
 
-        //Every 15 Minutes
-        $schedule =
-            [
-                'type'      => 'everyxminutes',
-                'params'    =>
-                    [
-                        'minutes'   => '15'
-                    ]
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Every 15 Minutes',
-                'description'   => $descriptions['everyxminutes'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Every Minute
+        $schedulesArr[] = [
+            'name'        => 'Every Minute',
+            'description' => $descriptions['everyminute'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'everyminute', 'params' => []])
+        ];
 
-        //Every 30 Minutes
-        $schedule =
-            [
-                'type'      => 'everyxminutes',
-                'params'    =>
-                    [
-                        'minutes'   => '30'
-                    ]
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Every 30 Minutes',
-                'description'   => $descriptions['everyxminutes'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Every 5 Minutes
+        $schedulesArr[] = [
+            'name'        => 'Every 5 Minutes',
+            'description' => $descriptions['everyxminutes'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'everyxminutes', 'params' => ['minutes' => 5]])
+        ];
 
-        //Business Hours 8AM to 5PM
-        $schedule =
-            [
-                'type'      => 'everyxminutesbetween',
-                'params'    =>
-                    [
-                        'minutes'   => '1',
-                        'start'     => '08:00',
-                        'end'       => '17:00'
-                    ]
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Business hours (Every Minute 08:00 - 17:00)',
-                'description'   => $descriptions['businesshours'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Hourly
+        $schedulesArr[] = [
+            'name'        => 'Hourly',
+            'description' => $descriptions['hourly'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'hourly', 'params' => ['minutes' => 0]])
+        ];
 
-        //Every Hour
-        $schedule =
-            [
-                'type'      => 'hourly',
-                'params'    =>
-                    [
-                        'hourly_minutes'   => '00'
-                    ]
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Every Hour',
-                'description'   => $descriptions['hourly'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Daily
+        $schedulesArr[] = [
+            'name'        => 'Daily',
+            'description' => $descriptions['daily'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'daily', 'params' => ['hour' => 0, 'minutes' => 0]])
+        ];
 
-        //Everyday (midnight)
-        $schedule =
-            [
-                'type'      => 'daily',
-                'params'    =>
-                    [
-                        'daily_hours'     => '00',
-                        'daily_minutes'   => '00'
-                    ]
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Everyday',
-                'description'   => $descriptions['daily'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Daily 6 Hours
+        $schedulesArr[] = [
+            'name'        => 'Daily Every 6 Hours',
+            'description' => $descriptions['daily6'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'daily6', 'params' => ['minutes' => 0]])
+        ];
 
-        //Everyday (6th hour)
-        $schedule =
-            [
-                'type'      => 'daily',
-                'params'    =>
-                    [
-                        'daily_hours'     => '06',
-                        'daily_minutes'   => '00'
-                    ]
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Everyday 6th Hour',
-                'description'   => $descriptions['daily6'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Daily 12 Hours
+        $schedulesArr[] = [
+            'name'        => 'Daily Every 12 Hours',
+            'description' => $descriptions['daily12'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'daily12', 'params' => ['minutes' => 0]])
+        ];
 
-        //Everyday (12th hour)
-        $schedule =
-            [
-                'type'      => 'daily',
-                'params'    =>
-                    [
-                        'daily_hours'     => '12',
-                        'daily_minutes'   => '00'
-                    ]
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Everyday 12th Hour',
-                'description'   => $descriptions['daily12'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Weekly
+        $schedulesArr[] = [
+            'name'        => 'Weekly',
+            'description' => $descriptions['weekly'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'weekly', 'params' => ['day' => 1, 'hour' => 0, 'minutes' => 0]])
+        ];
 
-        //Everyday (18th hour)
-        $schedule =
-            [
-                'type'      => 'daily',
-                'params'    =>
-                    [
-                        'daily_hours'     => '18',
-                        'daily_minutes'   => '00'
-                    ]
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Everyday 18th Hour',
-                'description'   => $descriptions['daily18'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Monthly
+        $schedulesArr[] = [
+            'name'        => 'Monthly',
+            'description' => $descriptions['monthly'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'monthly', 'params' => ['day' => 1, 'hour' => 0, 'minutes' => 0]])
+        ];
 
-        //Everymonth on day 1
-        $schedule =
-            [
-                'type'      => 'monthly',
-                'params'    =>
-                    [
-                        'monthly_months'        => ['1','2','3','4','5','6','7','8','9','10','11','12'],
-                        'monthly_day'           => '1',
-                        'monthly_hours'         => '00',
-                        'monthly_minutes'       => '00'
-                    ]
-            ];
-        $scheduleEntry =
-            [
-                'name'          => 'Every Month (Day 1)',
-                'description'   => $descriptions['monthly'],
-                'type'          => 0,
-                'schedule'      => $helper->encode($schedule)
-            ];
-        array_push($schedulesArr, $scheduleEntry);
+        // Business Hours
+        $schedulesArr[] = [
+            'name'        => 'Business Hours',
+            'description' => $descriptions['businesshours'],
+            'type'        => 0,
+            'schedule'    => $helper->encode(['type' => 'businesshours', 'params' => []])
+        ];
 
         return $schedulesArr;
     }

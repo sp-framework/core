@@ -5,9 +5,9 @@
  * This file serves as the single bootstrap and execution gateway for all incoming
  * HTTP (MVC and Micro/API) requests and Command Line Interface (CLI) tasks.
  *
- * @package    System
- * @subpackage Core
- * @link       https://github.com/sp-framework/core
+ * @package    	System
+ * @copyright   Copyright (c) 2026
+ * @link       	https://github.com/sp-framework/core
  */
 
 use System\Base\Providers\ErrorServiceProvider\BootstrapExceptionHandler;

@@ -1,18 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * SP Framework
+ *
+ * @package     System\Base\Installer\Packages\Setup\Register\Basepackages
+ * @copyright   Copyright (c) 2026
+ * @link        https://github.com/sp-framework/core
+ */
+
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages;
 
+/**
+ * Seeds default dashboard and initial widgets into basepackages_dashboards.
+ */
 class Dashboard
 {
-    public function register($db, $ff, $componentFile, $helper)
+    /**
+     * Registers default Core dashboard and timezone widget.
+     *
+     * @param mixed                $db            PDO database connection adapter.
+     * @param mixed                $ff            FlatFile database manager.
+     * @param array<string, mixed> $componentFile Component metadata array.
+     * @param mixed                $helper        Helpers service instance.
+     *
+     * @return void
+     */
+    public function register(mixed $db, mixed $ff, array $componentFile, mixed $helper): void
     {
-        $dashboard =
-            [
-                'name'                  => 'Core Default',
-                'app_type'              => 'core',
-                'created_by'            => 1,
-                'settings'              => $helper->encode($componentFile['settings'])
-            ];
+        $settings = isset($componentFile['settings']) ? $helper->encode($componentFile['settings']) : $helper->encode([]);
+
+        $dashboard = [
+            'name'       => 'Core Default',
+            'app_type'   => 'core',
+            'created_by' => 1,
+            'settings'   => $settings
+        ];
 
         if ($db) {
             $db->insertAsDict('basepackages_dashboards', $dashboard);
@@ -24,24 +48,21 @@ class Dashboard
             $dashboardStore->updateOrInsert($dashboard);
         }
 
-        //Register Timezone Widget
-        $widget =
-            [
-                "dashboard_id"              =>  1,
-                "sequence"                  =>  0,
-                "widget_id"                 =>  1,
-                "settings"                  =>
-                    $helper->encode([
-                        "minW"              =>  "3",
-                        "method"            =>  "worldClock",
-                        "widget_id"         =>  "1",
-                        "dashboard_id"      =>  "1",
-                        "x"                 =>  "0",
-                        "y"                 =>  "0",
-                        "clocks"            => ["australiamelbourne"],
-                        "w"                 =>  "12"
-                    ])
-            ];
+        $widget = [
+            'dashboard_id' => 1,
+            'sequence'     => 0,
+            'widget_id'    => 1,
+            'settings'     => $helper->encode([
+                'minW'         => '3',
+                'method'       => 'worldClock',
+                'widget_id'    => '1',
+                'dashboard_id' => '1',
+                'x'            => '0',
+                'y'            => '0',
+                'clocks'       => ['australiamelbourne'],
+                'w'            => '12'
+            ])
+        ];
 
         if ($db) {
             $db->insertAsDict('basepackages_dashboards_widgets', $widget);

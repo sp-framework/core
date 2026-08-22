@@ -1,13 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * SP Framework
+ *
+ * @package     System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers
+ * @copyright   Copyright (c) 2026
+ * @link        https://github.com/sp-framework/core
+ */
+
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers;
 
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 
+/**
+ * Table schema definition for Calls (Basepackages Workers Calls).
+ */
 class Calls
 {
-    public function columns()
+    /**
+     * Defines table columns and data types.
+     *
+     * @return array<string, array<int, Column>> Columns definition array.
+     */
+    public function columns(): array
     {
         return
             [
@@ -87,7 +105,12 @@ class Calls
             ];
     }
 
-    public function indexes()
+    /**
+     * Defines table indexes and database constraints.
+     *
+     * @return array<int, Index> Indexes definition array.
+     */
+    public function indexes(): array
     {
         return
         [

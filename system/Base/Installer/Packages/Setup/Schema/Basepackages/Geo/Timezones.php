@@ -1,12 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * SP Framework
+ *
+ * @package     System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo
+ * @copyright   Copyright (c) 2026
+ * @link        https://github.com/sp-framework/core
+ */
+
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo;
 
 use Phalcon\Db\Column;
 
+/**
+ * Table schema definition for Timezones (Basepackages Geo Timezones).
+ */
 class Timezones
 {
-    public function columns()
+    /**
+     * Defines table columns and data types.
+     *
+     * @return array<string, array<int, Column>> Columns definition array.
+     */
+    public function columns(): array
     {
         return
         [

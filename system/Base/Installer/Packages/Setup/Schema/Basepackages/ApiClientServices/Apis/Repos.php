@@ -1,13 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * SP Framework
+ *
+ * @package     System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis
+ * @copyright   Copyright (c) 2026
+ * @link        https://github.com/sp-framework/core
+ */
+
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis;
 
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 
+/**
+ * Table schema definition for Repos (Basepackages Api Client Services Apis Repos).
+ */
 class Repos
 {
-    public function columns()
+    /**
+     * Defines table columns and data types.
+     *
+     * @return array<string, array<int, Column>> Columns definition array.
+     */
+    public function columns(): array
     {
         return
             [

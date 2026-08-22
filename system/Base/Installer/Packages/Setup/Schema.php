@@ -1,5 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * SP Framework
+ *
+ * @package     System\Base\Installer\Packages\Setup
+ * @copyright   Copyright (c) 2026
+ * @link        https://github.com/sp-framework/core
+ */
+
 namespace System\Base\Installer\Packages\Setup;
 
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
@@ -15,8 +25,6 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Email\Queue as Emai
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Email\Services as EmailServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Filters;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV4;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV6;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Holidays;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Postcodes;
@@ -74,10 +82,8 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Api\RefreshTokens;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Scopes;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\Types;
-use System\Base\Installer\Packages\Setup\Schema\Providers\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Core;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
-use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
 use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilters;
 use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersDefault;
 use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFiltersIp2location;
@@ -149,315 +155,324 @@ use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesPackages;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesViews;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesViewsSettings;
 
+/**
+ * Registry mapping database table names to their Schema definitions and ORM Models.
+ */
 class Schema
 {
-    public function getSchema($dev)
+    /**
+     * Retrieves the complete schema registry mapping for platform installation.
+     *
+     * @param string|bool $dev Whether development mode schemas should be included.
+     *
+     * @return array<string, array{schema: object, model: object|null}> Complete schema definition map.
+     */
+    public function getSchema(string|bool $dev = false): array
     {
-        $schema =
-            [
-                'service_provider_core'                     => [
-                        'schema'    => new Core,
-                        'model'     => new ServiceProviderCore,
-                    ],
-                'service_provider_apps'                     => [
-                        'schema'    => new Apps,
-                        'model'     => new ServiceProviderApps,
-                    ],
-                'service_provider_apps_types'               => [
-                        'schema'    => new Types,
-                        'model'     => new ServiceProviderAppsTypes,
-                    ],
-                'service_provider_access_ip_filters'        => [
-                        'schema'    => new IpFilters,
-                        'model'     => new ServiceProviderAccessIpFilters,
-                    ],
-                'service_provider_access_ip_filters_default'=> [
-                        'schema'    => new IpFiltersDefault,
-                        'model'     => new ServiceProviderAccessIpFiltersDefault,
-                    ],
-                'service_provider_access_ip_filters_ip2location'=> [
-                        'schema'    => new IpFiltersIp2location,
-                        'model'     => new ServiceProviderAccessIpFiltersIp2location,
-                    ],
-                'service_provider_access_ip_filters_ip2location_countries'=> [
-                        'schema'    => new IpFiltersIp2locationCountries,
-                        'model'     => new ServiceProviderAccessIpFiltersIp2locationCountries,
-                    ],
-                'service_provider_access_ip_filters_ip2location_states'=> [
-                        'schema'    => new IpFiltersIp2locationStates,
-                        'model'     => new ServiceProviderAccessIpFiltersIp2locationStates,
-                    ],
-                'service_provider_access_ip_filters_ip2location_cities'=> [
-                        'schema'    => new IpFiltersIp2locationCities,
-                        'model'     => new ServiceProviderAccessIpFiltersIp2locationCities,
-                    ],
-                'service_provider_domains'                  => [
-                        'schema'    => new Domains,
-                        'model'     => new ServiceProviderDomains,
-                    ],
-                'service_provider_modules_queues'           => [
-                        'schema'    => new Queues,
-                        'model'     => new ServiceProviderModulesQueues,
-                    ],
-                'modules_bundles'                           => [
-                        'schema'    => new Bundles,
-                        'model'     => new ModulesBundles,
-                    ],
-                'modules_components'                        => [
-                        'schema'    => new Components,
-                        'model'     => new ModulesComponents,
-                    ],
-                'modules_packages'                          => [
-                        'schema'    => new Packages,
-                        'model'     => new ModulesPackages,
-                    ],
-                'modules_middlewares'                       => [
-                        'schema'    => new Middlewares,
-                        'model'     => new ModulesMiddlewares,
-                    ],
-                'modules_views'                             => [
-                        'schema'    => new Views,
-                        'model'     => new ModulesViews,
-                    ],
-                'modules_views_settings'                    => [
-                        'schema'    => new Settings,
-                        'model'     => new ModulesViewsSettings,
-                    ],
-                'modules_externals'                         => [
-                        'schema'    => new Externals,
-                        'model'     => new ModulesExternals,
-                    ],
-                'basepackages_tags'                         => [
-                        'schema'    => new Tags,
-                        'model'     => new BasepackagesTags,
-                    ],
-                'basepackages_pages'                        => [
-                        'schema'    => new Pages,
-                        'model'     => new BasepackagesPages,
-                    ],
-                'basepackages_pages_widgets'                => [
-                        'schema'    => new PagesWidgets,
-                        'model'     => new BasepackagesPagesWidgets,
-                    ],
-                'basepackages_email_services'               => [
-                        'schema'    => new EmailServices,
-                        'model'     => new BasepackagesEmailServices,
-                    ],
-                'basepackages_email_queue'                  => [
-                        'schema'    => new EmailQueue,
-                        'model'     => new BasepackagesEmailQueue,
-                    ],
-                'basepackages_users_accounts'               => [
-                        'schema'    => new Accounts,
-                        'model'     => new BasepackagesUsersAccounts,
-                    ],
-                'basepackages_users_accounts_security'      => [
-                        'schema'    => new Security,
-                        'model'     => new BasepackagesUsersAccountsSecurity,
-                    ],
-                'basepackages_users_accounts_canlogin'      => [
-                        'schema'    => new CanLogin,
-                        'model'     => new BasepackagesUsersAccountsCanlogin,
-                    ],
-                'basepackages_users_accounts_sessions'      => [
-                        'schema'    => new Sessions,
-                        'model'     => new BasepackagesUsersAccountsSessions,
-                    ],
-                'basepackages_users_accounts_identifiers'   => [
-                        'schema'    => new Identifiers,
-                        'model'     => new BasepackagesUsersAccountsIdentifiers,
-                    ],
-                'basepackages_users_accounts_agents'        => [
-                        'schema'    => new Agents,
-                        'model'     => new BasepackagesUsersAccountsAgents,
-                    ],
-                'basepackages_users_accounts_tunnels'       => [
-                        'schema'    => new Tunnels,
-                        'model'     => new BasepackagesUsersAccountsTunnels,
-                    ],
-                'basepackages_users_accounts_env'           => [
-                        'schema'    => new Env,
-                        'model'     => new BasepackagesUsersAccountsEnv,
-                    ],
-                'basepackages_users_profiles'               => [
-                        'schema'    => new Profiles,
-                        'model'     => new BasepackagesUsersProfiles,
-                    ],
-                'basepackages_users_roles'                  => [
-                        'schema'    => new Roles,
-                        'model'     => new BasepackagesUsersRoles,
-                    ],
-                'basepackages_menus'                        => [
-                        'schema'    => new Menus,
-                        'model'     => new BasepackagesMenus,
-                    ],
-                'basepackages_murls'                        => [
-                        'schema'    => new Murls,
-                        'model'     => new BasepackagesMurls,
-                    ],
-                'basepackages_mutex'                        => [
-                        'schema'    => new Mutex,
-                        'model'     => new BasepackagesMutex,
-                    ],
-                'basepackages_filters'                      => [
-                        'schema'    => new Filters,
-                        'model'     => new BasepackagesFilters,
-                    ],
-                'basepackages_geo_regions'                  => [
-                        'schema'    => new Regions,
-                        'model'     => new BasepackagesGeoRegions,
-                    ],
-                'basepackages_geo_holidays'                 => [
-                        'schema'    => new Holidays,
-                        'model'     => new BasepackagesGeoHolidays,
-                    ],
-                'basepackages_geo_countries'                => [
-                        'schema'    => new Countries,
-                        'model'     => new BasepackagesGeoCountries,
-                    ],
-                'basepackages_geo_states'                   => [
-                        'schema'    => new States,
-                        'model'     => new BasepackagesGeoStates,
-                    ],
-                'basepackages_geo_cities'                   => [
-                        'schema'    => new Cities,
-                        'model'     => new BasepackagesGeoCities,
-                    ],
-                'basepackages_geo_postcodes'                => [
-                        'schema'    => new Postcodes,
-                        'model'     => new BasepackagesGeoPostcodes,
-                    ],
-                'basepackages_geo_timezones'                => [
-                        'schema'    => new Timezones,
-                        'model'     => new BasepackagesGeoTimezones,
-                    ],
-                'basepackages_address_book'                 => [
-                        'schema'    => new AddressBook,
-                        'model'     => new BasepackagesAddressBook,
-                    ],
-                'basepackages_contact_book'                 => [
-                        'schema'    => new ContactBook,
-                        'model'     => new BasepackagesContactBook,
-                    ],
-                'basepackages_storages'                     => [
-                        'schema'    => new Storages,
-                        'model'     => new BasepackagesStorages,
-                    ],
-                'basepackages_storages_local'               => [
-                        'schema'    => new StoragesLocal,
-                        'model'     => new BasepackagesStoragesLocal,
-                    ],
-                'basepackages_activity_logs'                => [
-                        'schema'    => new ActivityLogs,
-                        'model'     => new BasepackagesActivityLogs,
-                    ],
-                'basepackages_notes'                        => [
-                        'schema'    => new Notes,
-                        'model'     => new BasepackagesNotes,
-                    ],
-                'basepackages_notifications'                => [
-                        'schema'    => new Notifications,
-                        'model'     => new BasepackagesNotifications,
-                    ],
-                'basepackages_workers_workers'              => [
-                        'schema'    => new Workers,
-                        'model'     => new BasepackagesWorkersWorkers,
-                    ],
-                'basepackages_workers_schedules'            => [
-                        'schema'    => new Schedules,
-                        'model'     => new BasepackagesWorkersSchedules,
-                    ],
-                'basepackages_workers_calls'                => [
-                        'schema'    => new Calls,
-                        'model'     => new BasepackagesWorkersCalls,
-                    ],
-                'basepackages_workers_tasks'                => [
-                        'schema'    => new Tasks,
-                        'model'     => new BasepackagesWorkersTasks,
-                    ],
-                'basepackages_workers_jobs'                 => [
-                        'schema'    => new Jobs,
-                        'model'     => new BasepackagesWorkersJobs,
-                    ],
-                'basepackages_import_export'                => [
-                        'schema'    => new ImportExport,
-                        'model'     => new BasepackagesImportExport,
-                    ],
-                'basepackages_templates'                    => [
-                        'schema'    => new Templates,
-                        'model'     => new BasepackagesTemplates,
-                    ],
-                'basepackages_dashboards'                   => [
-                        'schema'    => new Dashboards,
-                        'model'     => new BasepackagesDashboards,
-                    ],
-                'basepackages_dashboards_widgets'           => [
-                        'schema'    => new DashboardsWidgets,
-                        'model'     => new BasepackagesDashboardsWidgets,
-                    ],
-                'basepackages_widgets'                      => [
-                        'schema'    => new Widgets,
-                        'model'     => new BasepackagesWidgets,
-                    ],
-                'basepackages_messenger'                    => [
-                        'schema'    => new Messenger,
-                        'model'     => new BasepackagesMessenger,
-                    ],
-                'basepackages_api_client_services'          => [
-                        'schema'    => new ApiClientServices,
-                        'model'     => new BasepackagesApiClientServices,
-                    ],
-                'basepackages_api_client_services_calls'    => [
-                        'schema'    => new ApiClientServicesCalls,
-                        'model'     => new BasepackagesApiClientServicesCalls,
-                    ],
-                'basepackages_api_client_services_apis_repos'=> [
-                        'schema'    => new Repos,
-                        'model'     => null
-                    ],
-                'basepackages_api_client_services_apis_frameworks'=> [
-                        'schema'    => new Frameworks,
-                        'model'     => null
-                    ],
-                'service_provider_api'                       => [
-                        'schema'    => new SPApi,
-                        'model'     => new ServiceProviderApi,
-                    ],
-                'service_provider_api_access_tokens'         => [
-                        'schema'    => new AccessTokens,
-                        'model'     => new ServiceProviderApiAccessTokens,
-                    ],
-                'service_provider_api_authorization_codes'   => [
-                        'schema'    => new AuthorizationCodes,
-                        'model'     => new ServiceProviderApiAuthorizationCodes,
-                    ],
-                'service_provider_api_clients'               => [
-                        'schema'    => new Clients,
-                        'model'     => new ServiceProviderApiClients,
-                    ],
-                'service_provider_api_refresh_tokens'        => [
-                        'schema'    => new RefreshTokens,
-                        'model'     => new ServiceProviderApiRefreshTokens,
-                    ],
-                'service_provider_api_scopes'                => [
-                        'schema'    => new Scopes,
-                        'model'     => new ServiceProviderApiScopes,
-                    ],
-                'service_provider_api_scopes'                => [
-                        'schema'    => new Scopes,
-                        'model'     => new ServiceProviderApiScopes,
-                    ]
-            ];
+        $schema = [
+            'service_provider_core'                     => [
+                'schema' => new Core(),
+                'model'  => new ServiceProviderCore(),
+            ],
+            'service_provider_apps'                     => [
+                'schema' => new Apps(),
+                'model'  => new ServiceProviderApps(),
+            ],
+            'service_provider_apps_types'               => [
+                'schema' => new Types(),
+                'model'  => new ServiceProviderAppsTypes(),
+            ],
+            'service_provider_access_ip_filters'        => [
+                'schema' => new IpFilters(),
+                'model'  => new ServiceProviderAccessIpFilters(),
+            ],
+            'service_provider_access_ip_filters_default' => [
+                'schema' => new IpFiltersDefault(),
+                'model'  => new ServiceProviderAccessIpFiltersDefault(),
+            ],
+            'service_provider_access_ip_filters_ip2location' => [
+                'schema' => new IpFiltersIp2location(),
+                'model'  => new ServiceProviderAccessIpFiltersIp2location(),
+            ],
+            'service_provider_access_ip_filters_ip2location_countries' => [
+                'schema' => new IpFiltersIp2locationCountries(),
+                'model'  => new ServiceProviderAccessIpFiltersIp2locationCountries(),
+            ],
+            'service_provider_access_ip_filters_ip2location_states' => [
+                'schema' => new IpFiltersIp2locationStates(),
+                'model'  => new ServiceProviderAccessIpFiltersIp2locationStates(),
+            ],
+            'service_provider_access_ip_filters_ip2location_cities' => [
+                'schema' => new IpFiltersIp2locationCities(),
+                'model'  => new ServiceProviderAccessIpFiltersIp2locationCities(),
+            ],
+            'service_provider_domains'                  => [
+                'schema' => new Domains(),
+                'model'  => new ServiceProviderDomains(),
+            ],
+            'service_provider_modules_queues'           => [
+                'schema' => new Queues(),
+                'model'  => new ServiceProviderModulesQueues(),
+            ],
+            'modules_bundles'                           => [
+                'schema' => new Bundles(),
+                'model'  => new ModulesBundles(),
+            ],
+            'modules_components'                        => [
+                'schema' => new Components(),
+                'model'  => new ModulesComponents(),
+            ],
+            'modules_packages'                          => [
+                'schema' => new Packages(),
+                'model'  => new ModulesPackages(),
+            ],
+            'modules_middlewares'                       => [
+                'schema' => new Middlewares(),
+                'model'  => new ModulesMiddlewares(),
+            ],
+            'modules_views'                             => [
+                'schema' => new Views(),
+                'model'  => new ModulesViews(),
+            ],
+            'modules_views_settings'                    => [
+                'schema' => new Settings(),
+                'model'  => new ModulesViewsSettings(),
+            ],
+            'modules_externals'                         => [
+                'schema' => new Externals(),
+                'model'  => new ModulesExternals(),
+            ],
+            'basepackages_tags'                         => [
+                'schema' => new Tags(),
+                'model'  => new BasepackagesTags(),
+            ],
+            'basepackages_pages'                        => [
+                'schema' => new Pages(),
+                'model'  => new BasepackagesPages(),
+            ],
+            'basepackages_pages_widgets'                => [
+                'schema' => new PagesWidgets(),
+                'model'  => new BasepackagesPagesWidgets(),
+            ],
+            'basepackages_email_services'               => [
+                'schema' => new EmailServices(),
+                'model'  => new BasepackagesEmailServices(),
+            ],
+            'basepackages_email_queue'                  => [
+                'schema' => new EmailQueue(),
+                'model'  => new BasepackagesEmailQueue(),
+            ],
+            'basepackages_users_accounts'               => [
+                'schema' => new Accounts(),
+                'model'  => new BasepackagesUsersAccounts(),
+            ],
+            'basepackages_users_accounts_security'      => [
+                'schema' => new Security(),
+                'model'  => new BasepackagesUsersAccountsSecurity(),
+            ],
+            'basepackages_users_accounts_canlogin'      => [
+                'schema' => new CanLogin(),
+                'model'  => new BasepackagesUsersAccountsCanlogin(),
+            ],
+            'basepackages_users_accounts_sessions'      => [
+                'schema' => new Sessions(),
+                'model'  => new BasepackagesUsersAccountsSessions(),
+            ],
+            'basepackages_users_accounts_identifiers'   => [
+                'schema' => new Identifiers(),
+                'model'  => new BasepackagesUsersAccountsIdentifiers(),
+            ],
+            'basepackages_users_accounts_agents'        => [
+                'schema' => new Agents(),
+                'model'  => new BasepackagesUsersAccountsAgents(),
+            ],
+            'basepackages_users_accounts_tunnels'       => [
+                'schema' => new Tunnels(),
+                'model'  => new BasepackagesUsersAccountsTunnels(),
+            ],
+            'basepackages_users_accounts_env'           => [
+                'schema' => new Env(),
+                'model'  => new BasepackagesUsersAccountsEnv(),
+            ],
+            'basepackages_users_profiles'               => [
+                'schema' => new Profiles(),
+                'model'  => new BasepackagesUsersProfiles(),
+            ],
+            'basepackages_users_roles'                  => [
+                'schema' => new Roles(),
+                'model'  => new BasepackagesUsersRoles(),
+            ],
+            'basepackages_menus'                        => [
+                'schema' => new Menus(),
+                'model'  => new BasepackagesMenus(),
+            ],
+            'basepackages_murls'                        => [
+                'schema' => new Murls(),
+                'model'  => new BasepackagesMurls(),
+            ],
+            'basepackages_mutex'                        => [
+                'schema' => new Mutex(),
+                'model'  => new BasepackagesMutex(),
+            ],
+            'basepackages_filters'                      => [
+                'schema' => new Filters(),
+                'model'  => new BasepackagesFilters(),
+            ],
+            'basepackages_geo_regions'                  => [
+                'schema' => new Regions(),
+                'model'  => new BasepackagesGeoRegions(),
+            ],
+            'basepackages_geo_holidays'                 => [
+                'schema' => new Holidays(),
+                'model'  => new BasepackagesGeoHolidays(),
+            ],
+            'basepackages_geo_countries'                => [
+                'schema' => new Countries(),
+                'model'  => new BasepackagesGeoCountries(),
+            ],
+            'basepackages_geo_states'                   => [
+                'schema' => new States(),
+                'model'  => new BasepackagesGeoStates(),
+            ],
+            'basepackages_geo_cities'                   => [
+                'schema' => new Cities(),
+                'model'  => new BasepackagesGeoCities(),
+            ],
+            'basepackages_geo_postcodes'                => [
+                'schema' => new Postcodes(),
+                'model'  => new BasepackagesGeoPostcodes(),
+            ],
+            'basepackages_geo_timezones'                => [
+                'schema' => new Timezones(),
+                'model'  => new BasepackagesGeoTimezones(),
+            ],
+            'basepackages_address_book'                 => [
+                'schema' => new AddressBook(),
+                'model'  => new BasepackagesAddressBook(),
+            ],
+            'basepackages_contact_book'                 => [
+                'schema' => new ContactBook(),
+                'model'  => new BasepackagesContactBook(),
+            ],
+            'basepackages_storages'                     => [
+                'schema' => new Storages(),
+                'model'  => new BasepackagesStorages(),
+            ],
+            'basepackages_storages_local'               => [
+                'schema' => new StoragesLocal(),
+                'model'  => new BasepackagesStoragesLocal(),
+            ],
+            'basepackages_activity_logs'                => [
+                'schema' => new ActivityLogs(),
+                'model'  => new BasepackagesActivityLogs(),
+            ],
+            'basepackages_notes'                        => [
+                'schema' => new Notes(),
+                'model'  => new BasepackagesNotes(),
+            ],
+            'basepackages_notifications'                => [
+                'schema' => new Notifications(),
+                'model'  => new BasepackagesNotifications(),
+            ],
+            'basepackages_workers_workers'              => [
+                'schema' => new Workers(),
+                'model'  => new BasepackagesWorkersWorkers(),
+            ],
+            'basepackages_workers_schedules'            => [
+                'schema' => new Schedules(),
+                'model'  => new BasepackagesWorkersSchedules(),
+            ],
+            'basepackages_workers_calls'                => [
+                'schema' => new Calls(),
+                'model'  => new BasepackagesWorkersCalls(),
+            ],
+            'basepackages_workers_tasks'                => [
+                'schema' => new Tasks(),
+                'model'  => new BasepackagesWorkersTasks(),
+            ],
+            'basepackages_workers_jobs'                 => [
+                'schema' => new Jobs(),
+                'model'  => new BasepackagesWorkersJobs(),
+            ],
+            'basepackages_import_export'                => [
+                'schema' => new ImportExport(),
+                'model'  => new BasepackagesImportExport(),
+            ],
+            'basepackages_templates'                    => [
+                'schema' => new Templates(),
+                'model'  => new BasepackagesTemplates(),
+            ],
+            'basepackages_dashboards'                   => [
+                'schema' => new Dashboards(),
+                'model'  => new BasepackagesDashboards(),
+            ],
+            'basepackages_dashboards_widgets'           => [
+                'schema' => new DashboardsWidgets(),
+                'model'  => new BasepackagesDashboardsWidgets(),
+            ],
+            'basepackages_widgets'                      => [
+                'schema' => new Widgets(),
+                'model'  => new BasepackagesWidgets(),
+            ],
+            'basepackages_messenger'                    => [
+                'schema' => new Messenger(),
+                'model'  => new BasepackagesMessenger(),
+            ],
+            'basepackages_api_client_services'          => [
+                'schema' => new ApiClientServices(),
+                'model'  => new BasepackagesApiClientServices(),
+            ],
+            'basepackages_api_client_services_calls'    => [
+                'schema' => new ApiClientServicesCalls(),
+                'model'  => new BasepackagesApiClientServicesCalls(),
+            ],
+            'basepackages_api_client_services_apis_repos' => [
+                'schema' => new Repos(),
+                'model'  => null,
+            ],
+            'basepackages_api_client_services_apis_frameworks' => [
+                'schema' => new Frameworks(),
+                'model'  => null,
+            ],
+            'service_provider_api'                       => [
+                'schema' => new SPApi(),
+                'model'  => new ServiceProviderApi(),
+            ],
+            'service_provider_api_access_tokens'         => [
+                'schema' => new AccessTokens(),
+                'model'  => new ServiceProviderApiAccessTokens(),
+            ],
+            'service_provider_api_authorization_codes'   => [
+                'schema' => new AuthorizationCodes(),
+                'model'  => new ServiceProviderApiAuthorizationCodes(),
+            ],
+            'service_provider_api_clients'               => [
+                'schema' => new Clients(),
+                'model'  => new ServiceProviderApiClients(),
+            ],
+            'service_provider_api_refresh_tokens'        => [
+                'schema' => new RefreshTokens(),
+                'model'  => new ServiceProviderApiRefreshTokens(),
+            ],
+            'service_provider_api_scopes'                => [
+                'schema' => new Scopes(),
+                'model'  => new ServiceProviderApiScopes(),
+            ],
+        ];
 
-        if ($dev == 'true') {
-            $schema['apps_core_devtools_files_hash'] = [
-                    'schema'    => new \Apps\Core\Packages\Devtools\Modules\Install\Schema\FilesHash,
-                    'model'     => new \Apps\Core\Packages\Devtools\Modules\Model\AppsCoreDevtoolsFilesHash,
+        if ($dev === 'true' || $dev === true) {
+            if (class_exists(\Apps\Core\Packages\Devtools\Modules\Install\Schema\FilesHash::class)) {
+                $schema['apps_core_devtools_files_hash'] = [
+                    'schema' => new \Apps\Core\Packages\Devtools\Modules\Install\Schema\FilesHash(),
+                    'model'  => new \Apps\Core\Packages\Devtools\Modules\Model\AppsCoreDevtoolsFilesHash(),
                 ];
-            $schema['devtools_test'] = [
-                    'schema'    => new \Apps\Core\Packages\Devtools\Test\Install\Schema\DevtoolsTest,
-                    'model'     => new \Apps\Core\Packages\Devtools\Test\Model\DevtoolsTest,
+            }
+            if (class_exists(\Apps\Core\Packages\Devtools\Test\Install\Schema\DevtoolsTest::class)) {
+                $schema['devtools_test'] = [
+                    'schema' => new \Apps\Core\Packages\Devtools\Test\Install\Schema\DevtoolsTest(),
+                    'model'  => new \Apps\Core\Packages\Devtools\Test\Model\DevtoolsTest(),
                 ];
+            }
         }
 
         return $schema;

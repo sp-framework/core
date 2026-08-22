@@ -10,6 +10,10 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+if (file_exists(__DIR__ . '/../external/vendor/autoload.php')) {
+    require_once __DIR__ . '/../external/vendor/autoload.php';
+}
+
 if (!function_exists('json_trace')) {
     require_once __DIR__ . '/../system/Base/Helpers.php';
 }

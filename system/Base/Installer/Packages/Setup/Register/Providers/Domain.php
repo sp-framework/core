@@ -1,154 +1,176 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * SP Framework
+ *
+ * @package     System\Base\Installer\Packages\Setup\Register\Providers
+ * @copyright   Copyright (c) 2026
+ * @link        https://github.com/sp-framework/core
+ */
+
 namespace System\Base\Installer\Packages\Setup\Register\Providers;
 
 use BlueLibraries\Dns\DnsRecords;
 use BlueLibraries\Dns\Handlers\Types\TCP;
 use BlueLibraries\Dns\Records\RecordTypes;
+use Throwable;
 
+/**
+ * Seeds default Domain registration entry and runs DNS validation.
+ */
 class Domain
 {
-	protected $request;
+    /**
+     * HTTP request service.
+     *
+     * @var mixed
+     */
+    protected mixed $request = null;
 
-	public function register($db, $ff, $request, $helper)
-	{
-		$this->request = $request;
+    /**
+     * Registers default tenant domain record.
+     *
+     * @param mixed $db      PDO database connection adapter.
+     * @param mixed $ff      FlatFile database manager.
+     * @param mixed $request HTTP request service.
+     * @param mixed $helper  Helpers service instance.
+     *
+     * @return void
+     */
+    public function register(mixed $db, mixed $ff, mixed $request, mixed $helper): void
+    {
+        $this->request = $request;
 
-		$this->request->setStrictHostCheck(true);
+        if ($this->request) {
+            $this->request->setStrictHostCheck(true);
+        }
 
-		$apps =
-		[
-			'1' =>
-			[
-				'allowed'			=> true,
-				'view'				=> 1,
-				'email_service'		=> null,
-				'publicStorage'		=> 1,
-				'privateStorage'	=> 2
-			]
-		];
+        $host = ($this->request && method_exists($this->request, 'getHttpHost')) ? (string) $this->request->getHttpHost() : 'localhost';
 
-		$record = $this->validateDomain($this->request->getHttpHost());
+        $apps = [
+            '1' => [
+                'allowed'        => true,
+                'view'           => 1,
+                'email_service'  => null,
+                'publicStorage'  => 1,
+                'privateStorage' => 2
+            ]
+        ];
 
-		if (count($record) > 0) {
-			if (isset($record['internal']) && $record['internal'] === true) {
-				$isInternal = '1';
-			} else {
-				$isInternal = '0';
-			}
+        $record = $this->validateDomain($host);
 
-			$record = $helper->encode($record);
-		} else {
-			$isInternal = '1';
-			$record = $helper->encode([]);
-		}
+        if (count($record) > 0) {
+            $isInternal = (isset($record['internal']) && $record['internal'] === true) ? '1' : '0';
+            $encodedRecord = method_exists($helper, 'encode') ? $helper->encode($record) : json_encode($record);
+        } else {
+            $isInternal = '1';
+            $encodedRecord = method_exists($helper, 'encode') ? $helper->encode([]) : '[]';
+        }
 
-		$domain =
-			[
-				'name'   							=> $this->request->getHttpHost(),
-				'description' 						=> '',
-				"default_app_id"					=> 1,
-				"exclusive_to_default_app"			=> 0,
-				"exclusive_for_api"					=> 0,
-				"apps"			    				=> $helper->encode($apps),
-				"dns_record"						=> $record,
-				"is_internal"						=> $isInternal,
-				'settings'			 				=> $helper->encode([])
-			];
+        $domain = [
+            'name'                     => $host,
+            'description'              => '',
+            'default_app_id'           => 1,
+            'exclusive_to_default_app' => 0,
+            'exclusive_for_api'        => 0,
+            'apps'                     => method_exists($helper, 'encode') ? $helper->encode($apps) : json_encode($apps),
+            'dns_record'               => $encodedRecord,
+            'is_internal'              => $isInternal,
+            'settings'                 => method_exists($helper, 'encode') ? $helper->encode([]) : '{}'
+        ];
 
-		if ($db) {
-			$db->insertAsDict('service_provider_domains', $domain);
-		}
+        if ($db) {
+            $db->insertAsDict('service_provider_domains', $domain);
+        }
 
-		if ($ff) {
-			$domainStore = $ff->store('service_provider_domains');
+        if ($ff) {
+            $domainStore = $ff->store('service_provider_domains');
 
-			$domainStore->updateOrInsert($domain);
-		}
-	}
+            $domainStore->updateOrInsert($domain);
+        }
+    }
 
-	protected function validateDomain($domain)
-	{
-		$record = [];
-		$record['internal'] = false;
-		$record['matched'] = false;
-		$record['server_address'] = $this->request->getServer('SERVER_ADDR');
+    /**
+     * Performs DNS lookup and validation for the domain name.
+     *
+     * @param string $domain Domain name to validate.
+     *
+     * @return array<string, mixed> DNS validation details.
+     */
+    protected function validateDomain(string $domain): array
+    {
+        $serverAddr = ($this->request && method_exists($this->request, 'getServer')) ? $this->request->getServer('SERVER_ADDR') : '127.0.0.1';
 
-		try {
-			$dnsHandler = (new TCP())
-				->setPort(53)
-				->setNameserver('8.8.8.8')
-				->setTimeout(3) // limit execution to 3 seconds
-				->setRetries(3); // allows 3 retries if response fails
+        $record = [
+            'internal'       => false,
+            'matched'        => false,
+            'server_address' => $serverAddr,
+        ];
 
-			$dnsRecordsService = new DnsRecords($dnsHandler);
+        if (!class_exists(DnsRecords::class) || !class_exists(TCP::class)) {
+            $record['internal'] = true;
+            return $record;
+        }
 
-			$record['AAAA'] = $dnsRecordsService->get($domain, RecordTypes::AAAA);
-			$aaaa = [];
-			if (count($record['AAAA']) > 0) {
-				if (count($record['AAAA']) === 1) {
-					$aaaaRecord = $record['AAAA'][0]->toArray();
-					array_push($aaaa, $aaaaRecord['ipv6']);
-				} else {
-					foreach ($record['AAAA'] as $aaaaRecord) {
-						$aaaaRecord = $aaaaRecord->toArray();
+        try {
+            $dnsHandler = (new TCP())
+                ->setPort(53)
+                ->setNameserver('8.8.8.8')
+                ->setTimeout(3)
+                ->setRetries(3);
 
-						if (isset($aaaaRecord['ipv6'])) {
-							array_push($aaaa, $aaaaRecord['ipv6']);
-						}
-					}
-				}
-			}
-			$record['AAAA'] = $aaaa;
+            $dnsRecordsService = new DnsRecords($dnsHandler);
 
-			$record['A'] = $dnsRecordsService->get($domain, RecordTypes::A);
-			$a = [];
-			if (count($record['A']) > 0) {
-				if (count($record['A']) === 1) {
-					$aRecord = $record['A'][0]->toArray();
-					array_push($a, $aRecord['ip']);
-				} else {
-					foreach ($record['A'] as $aRecord) {
-						$aRecord = $aRecord->toArray();
+            $rawAaaa = $dnsRecordsService->get($domain, RecordTypes::AAAA);
+            $aaaa = [];
+            if (is_array($rawAaaa) && count($rawAaaa) > 0) {
+                foreach ($rawAaaa as $aaaaRecord) {
+                    $arr = method_exists($aaaaRecord, 'toArray') ? $aaaaRecord->toArray() : (array) $aaaaRecord;
+                    if (isset($arr['ipv6'])) {
+                        $aaaa[] = $arr['ipv6'];
+                    }
+                }
+            }
+            $record['AAAA'] = $aaaa;
 
-						if (isset($aRecord['ip'])) {
-							array_push($a, $aRecord['ip']);
-						}
-					}
-				}
-			}
-			$record['A'] = $a;
-			$record['CNAME'] = $dnsRecordsService->get($domain, RecordTypes::CNAME);
-			if (count($record['CNAME']) > 0) {
-				$record['CNAME'] = $record['CNAME'][0]->toArray();
-			}
+            $rawA = $dnsRecordsService->get($domain, RecordTypes::A);
+            $a = [];
+            if (is_array($rawA) && count($rawA) > 0) {
+                foreach ($rawA as $aRecord) {
+                    $arr = method_exists($aRecord, 'toArray') ? $aRecord->toArray() : (array) $aRecord;
+                    if (isset($arr['ip'])) {
+                        $a[] = $arr['ip'];
+                    }
+                }
+            }
+            $record['A'] = $a;
 
-			$record['SOA'] = $dnsRecordsService->get($domain, RecordTypes::SOA);
-			if (count($record['SOA']) > 0) {
-				$record['SOA'] = $record['SOA'][0]->toArray();
-			}
+            $rawCname = $dnsRecordsService->get($domain, RecordTypes::CNAME);
+            $record['CNAME'] = (is_array($rawCname) && isset($rawCname[0]) && method_exists($rawCname[0], 'toArray')) ? $rawCname[0]->toArray() : [];
 
-			if (count($record['AAAA']) === 0 &&
-				count($record['A']) === 0 &&
-				count($record['CNAME']) === 0
-			) {
-				$record['internal'] = true;
-			}
+            $rawSoa = $dnsRecordsService->get($domain, RecordTypes::SOA);
+            $record['SOA'] = (is_array($rawSoa) && isset($rawSoa[0]) && method_exists($rawSoa[0], 'toArray')) ? $rawSoa[0]->toArray() : [];
 
-			if ($record['internal'] === false) {
-				if (count($record['A']) > 0 && in_array($record['server_address'], $record['A'])) {
-					$record['internal'] = false;
-					$record['matched'] = true;
-				}
-				if (count($record['AAAA']) > 0 && in_array($record['server_address'], $record['AAAA'])) {
-					$record['internal'] = false;
-					$record['matched'] = true;
-				}
-			}
+            if (count($record['AAAA']) === 0 && count($record['A']) === 0 && empty($record['CNAME'])) {
+                $record['internal'] = true;
+            }
 
-			return $record;
-		} catch (\Exception $e) {
-			return [];
-		}
-	}
+            if ($record['internal'] === false) {
+                if (count($record['A']) > 0 && in_array($record['server_address'], $record['A'], true)) {
+                    $record['internal'] = false;
+                    $record['matched'] = true;
+                }
+                if (count($record['AAAA']) > 0 && in_array($record['server_address'], $record['AAAA'], true)) {
+                    $record['internal'] = false;
+                    $record['matched'] = true;
+                }
+            }
+
+            return $record;
+        } catch (Throwable $e) {
+            return [];
+        }
+    }
 }

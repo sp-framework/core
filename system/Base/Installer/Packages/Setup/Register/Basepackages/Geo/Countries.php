@@ -1,84 +1,137 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * SP Framework
+ *
+ * @package System\Base\Installer\Packages\Setup\Register\Basepackages\Geo
+ * @copyright Copyright (c) 2026
+ * @link      https://github.com/sp-framework/core
+ */
+
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Geo;
 
 use Phalcon\Db\Enum;
 
+/**
+ * Seeds ISO country definitions, regions, and currency settings.
+ *
+ * @package System\Base\Installer\Packages\Setup\Register\Basepackages\Geo
+ */
 class Countries
 {
-    public $trackCounter;
+    /**
+     * Geo source data directory path relative to framework root.
+     *
+     * @var string
+     */
+    protected string $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/';
 
-    public $progress;
+    /**
+     * FlatFile country store instance.
+     *
+     * @var mixed
+     */
+    protected mixed $countryStore = null;
 
-    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/DataExtractors/Geo/';
+    /**
+     * FlatFile region store instance.
+     *
+     * @var mixed
+     */
+    protected mixed $regionStore = null;
 
-    protected $countryStore;
-
-    protected $regionStore;
-
-    public function register($db, $ff, $localContent, $helper)
+    /**
+     * Registers country and region dataset into database and FlatFile stores.
+     *
+     * @param mixed $db           PDO database connection adapter.
+     * @param mixed $ff           FlatFile database manager.
+     * @param mixed $localContent Flysystem local file storage adapter.
+     * @param mixed $helper       Helpers service instance.
+     *
+     * @return bool True on success, false on error.
+     */
+    public function register(mixed $db, mixed $ff, mixed $localContent, mixed $helper): bool
     {
-        if (!is_dir(base_path($this->sourceDir))) {
-            if (!mkdir(base_path($this->sourceDir), 0777, true)) {
-                $this->addResponse('Unable to create Geo directory', 1);
-
+        $dir = base_path($this->sourceDir);
+        if (!is_dir($dir)) {
+            if (!mkdir($dir, 0777, true)) {
                 return false;
             }
         }
 
-        $countries = $helper->decode($localContent->read($this->sourceDir . 'AllCountries.json'), true);
-        $this->countryStore = $ff->store('basepackages_geo_countries');
-        $this->regionStore = $ff->store('basepackages_geo_regions');
+        $filePath = $this->sourceDir . 'AllCountries.json';
+        if ($localContent) {
+            $countries = $helper->decode($localContent->read($filePath), true);
+        } else {
+            $countries = [];
+        }
 
-        foreach ($countries as $key => $country) {
-            $countryToInsert =
-                [
-                    'id'                => $country['id'],
-                    'name'              => $country['name'],
-                    'native'            => $country['native'],
-                    'nationality'       => $country['nationality'],
-                    'capital'           => $country['capital'],
-                    'iso2'              => $country['iso2'],
-                    'iso3'              => $country['iso3'],
-                    'currency'          => $country['currency'],
-                    'currency_name'     => $country['currency_name'],
-                    'currency_symbol'   => $country['currency_symbol'],
-                    'currency_enabled'  => 0,
-                    'region_id'         => $country['region_id'],
-                    'region'            => $country['region'],
-                    'subregion_id'      => $country['subregion_id'],
-                    'subregion'         => $country['subregion'],
-                    'numeric_code'      => $country['numeric_code'],
-                    'phone_code'        => $country['phonecode'],
-                    'tld'               => $country['tld'],
-                    'emoji'             => $country['emoji'],
-                    'emojiU'            => $country['emojiU'],
-                    'latitude'          => (int) $country['latitude'],
-                    'longitude'         => (int) $country['longitude'],
-                    'translations'      => $helper->encode($country['translations']),
-                    'installed'         => 0,
-                    'enabled'           => 0
+        if ($ff) {
+            $this->countryStore = $ff->store('basepackages_geo_countries');
+            $this->regionStore = $ff->store('basepackages_geo_regions');
+        }
+
+        if (is_array($countries)) {
+            foreach ($countries as $country) {
+                $countryToInsert = [
+                    'id'               => $country['id'] ?? null,
+                    'name'             => $country['name'] ?? '',
+                    'native'           => $country['native'] ?? '',
+                    'nationality'      => $country['nationality'] ?? '',
+                    'capital'          => $country['capital'] ?? '',
+                    'iso2'             => $country['iso2'] ?? '',
+                    'iso3'             => $country['iso3'] ?? '',
+                    'currency'         => $country['currency'] ?? '',
+                    'currency_name'    => $country['currency_name'] ?? '',
+                    'currency_symbol'  => $country['currency_symbol'] ?? '',
+                    'currency_enabled' => 0,
+                    'region_id'        => $country['region_id'] ?? null,
+                    'region'           => $country['region'] ?? '',
+                    'subregion_id'     => $country['subregion_id'] ?? null,
+                    'subregion'        => $country['subregion'] ?? '',
+                    'numeric_code'     => $country['numeric_code'] ?? '',
+                    'phone_code'       => $country['phonecode'] ?? '',
+                    'tld'              => $country['tld'] ?? '',
+                    'emoji'            => $country['emoji'] ?? '',
+                    'emojiU'           => $country['emojiU'] ?? '',
+                    'latitude'         => (int) ($country['latitude'] ?? 0),
+                    'longitude'        => (int) ($country['longitude'] ?? 0),
+                    'translations'     => isset($country['translations']) ? $helper->encode($country['translations']) : $helper->encode([]),
+                    'installed'        => 0,
+                    'enabled'          => 0
                 ];
 
-            if ($db) {
-                $db->insertAsDict('basepackages_geo_countries', $countryToInsert);
-            }
+                if ($db) {
+                    $db->insertAsDict('basepackages_geo_countries', $countryToInsert);
+                }
 
-            if ($ff) {
-                $this->countryStore->updateOrInsert($countryToInsert, false);
-            }
+                if ($ff) {
+                    $this->countryStore->updateOrInsert($countryToInsert);
+                }
 
-            if (strlen($country['region']) > 0 &&
-                strlen($country['subregion']) > 0
-            ) {
-                $this->checkRegion($db, $ff, $country);
+                if (strlen($country['region']) > 0 &&
+                    strlen($country['subregion']) > 0
+                ) {
+                    $this->checkRegion($db, $ff, $country);
+                }
             }
         }
 
         return true;
     }
 
-    protected function checkRegion($db, $ff, $country)
+    /**
+     * Checks and registers geographic regions and subregions.
+     *
+     * @param mixed                $db              PDO database connection adapter.
+     * @param mixed                $ff              FlatFile database manager.
+     * @param array<string, mixed> $country         Country data structure.
+     *
+     * @return void
+     */
+    protected function checkRegion(mixed $db, mixed $ff, array $country): void
     {
         $subregion = false;
 
