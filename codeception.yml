@@ -6,6 +6,7 @@ paths:
     data: tests/Support/Data
     support: tests/Support
     envs: tests/_envs
+bootstrap: bootstrap.php
 actor_suffix: Tester
 extensions:
     enabled:
